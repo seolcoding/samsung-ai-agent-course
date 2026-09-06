@@ -1,0 +1,14 @@
+# Local source archive: original email, attachments, personal data
+/private/
+
+# Local environment and OS files
+.DS_Store
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+__pycache__/
+.venv/
+node_modules/
+~$*
