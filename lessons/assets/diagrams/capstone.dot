@@ -1,0 +1,19 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+s [label="Supervisor\n상태로 다음 단계 결정",fillcolor="#FFF0D9"];
+r [label="Researcher\nMCP 자료 검색"];
+a [label="승인 대기\ninterrupt",fillcolor="#FFF0D9"];
+w [label="Writer\n승인된 근거로 작성"];
+e [label="Evaluator\n형식·출처 검사"];
+f [label="종료",fillcolor="#E8F0FF"];
+s -> r [label="조사 전"];
+r -> s [label="근거 반환"];
+s -> a [label="근거 있음"];
+a -> s [label="승인 / 거절"];
+s -> w [label="승인됨"];
+w -> s [label="보고서"];
+s -> e [label="작성됨"];
+e -> s [label="검사 결과"];
+s -> f [label="근거 없음 / 거절 / 검사 완료"];
+}

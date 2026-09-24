@@ -1,0 +1,17 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+s [label="입력 목록",fillcolor="#FFF0D9"];
+a [label="Worker A",fillcolor="#FFF0D9"];
+b [label="Worker B",fillcolor="#E8F0FF"];
+c [label="Worker C",fillcolor="#E4F4EF"];
+r [label="Reducer\n결과 목록 합치기",fillcolor="#E4F4EF"];
+e [label="최종 정리",fillcolor="#FFF0D9"];
+s -> a [label="Send"];
+s -> b [label="Send"];
+s -> c [label="Send"];
+a -> r [label=""];
+b -> r [label=""];
+c -> r [label=""];
+r -> e [label=""];
+}

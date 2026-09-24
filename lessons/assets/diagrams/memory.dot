@@ -1,0 +1,13 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+a [label="thread A",fillcolor="#FFF0D9"];
+ca [label="A Checkpoint",fillcolor="#E4F4EF"];
+b [label="thread B",fillcolor="#E8F0FF"];
+cb [label="B Checkpoint",fillcolor="#E4F4EF"];
+s [label="Store\n사용자 namespace",fillcolor="#FFF0D9"];
+a -> ca [label="실행 상태"];
+b -> cb [label="실행 상태"];
+a -> s [label="공유 정보"];
+b -> s [label="공유 정보"];
+}

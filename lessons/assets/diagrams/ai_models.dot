@@ -1,0 +1,11 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+ai [label="AI\n지능적 행동 연구",fillcolor="#E8F0FF"];
+ml [label="머신러닝\n데이터로 패턴 학습",fillcolor="#E8F0FF"];
+dl [label="딥러닝\n신경망으로 학습",fillcolor="#E8F0FF"];
+llm [label="LLM\n언어 토큰 생성",fillcolor="#E8F0FF"];
+ai -> ml [label="범위 안에"];
+ml -> dl [label="범위 안에"];
+dl -> llm [label="모델의 한 종류"];
+}

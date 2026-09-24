@@ -1,0 +1,16 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+g [label="목표·완료 기준",fillcolor="#E8F0FF"];
+p [label="계획·다음 행동",fillcolor="#E8F0FF"];
+t [label="허용 도구 실행",fillcolor="#FFF0D9"];
+o [label="결과·상태 기록",fillcolor="#E4F4EF"];
+v [label="검증",fillcolor="#FFF0D9"];
+e [label="완료 또는 중단",fillcolor="#FFF0D9"];
+g -> p [label=""];
+p -> t [label=""];
+t -> o [label=""];
+o -> v [label=""];
+v -> p [label="수정 필요·한도 이내"];
+v -> e [label="완료·한도 도달"];
+}

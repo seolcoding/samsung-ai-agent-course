@@ -1,0 +1,15 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+d [label="문서+출처",fillcolor="#E4F4EF"];
+c [label="청크 분할",fillcolor="#E4F4EF"];
+v [label="임베딩·저장",fillcolor="#FFF0D9"];
+r [label="질문으로 검색",fillcolor="#E4F4EF"];
+g [label="근거와 질문 전달",fillcolor="#E8F0FF"];
+a [label="답변+출처",fillcolor="#FFF0D9"];
+d -> c [label=""];
+c -> v [label=""];
+v -> r [label=""];
+r -> g [label="선택된 청크"];
+g -> a [label=""];
+}

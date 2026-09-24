@@ -1,0 +1,13 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+h [label="Host\n사용자·모델·실행 제어",fillcolor="#E8F0FF"];
+c [label="MCP Client",fillcolor="#E4F4EF"];
+s [label="MCP Server",fillcolor="#FFF0D9"];
+t [label="Tools / Resources\nPrompts",fillcolor="#FFF0D9"];
+h -> c [label="연결 관리"];
+c -> s [label="목록 조회·호출"];
+s -> t [label="기능 제공"];
+s -> c [label="결과"];
+c -> h [label=""];
+}

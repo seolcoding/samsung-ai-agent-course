@@ -1,0 +1,12 @@
+// docs/templates/flow_diagram.dot 스타일을 확장한 교안 도식 원본.
+digraph Lesson {
+graph [rankdir=LR,bgcolor="#FCFBF7",pad="0.35",nodesep="0.5",ranksep="0.6"]; node [shape=box,style="rounded,filled",fontname="Noto Sans KR",fontsize=19,color="#BDD0E4",fillcolor="#E8F0FF",fontcolor="#15324F",margin="0.2,0.16"]; edge [fontname="Noto Sans KR",fontsize=14,color="#55769A",arrowsize=0.8,penwidth=1.6];
+c [label="Client\n요청 작성",fillcolor="#E4F4EF"];
+q [label="HTTP 요청\n메서드·경로·본문",fillcolor="#E8F0FF"];
+s [label="Server\n검사·처리",fillcolor="#FFF0D9"];
+r [label="HTTP 응답\n상태·본문",fillcolor="#E4F4EF"];
+c -> q [label=""];
+q -> s [label=""];
+s -> r [label=""];
+r -> c [label=""];
+}
