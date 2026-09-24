@@ -1,0 +1,16 @@
+// 정확한 실행·데이터 흐름을 그릴 때 복사해 쓰는 Graphviz 템플릿.
+// labels, nodes, edges를 교안 내용에 맞게 바꾸고 dot -Tsvg로 출력한다.
+digraph LessonFlow {
+  graph [rankdir=LR, bgcolor="white", pad="0.28", nodesep="0.48", ranksep="0.66", splines=polyline];
+  node [shape=box, style="rounded,filled", color="#B8C9DE", fillcolor="#F3F7FC", fontname="Noto Sans KR", fontsize=17, margin="0.16,0.13"];
+  edge [color="#55769A", arrowsize=0.7, penwidth=1.5];
+
+  question [label="입력", fillcolor="#E8F0FF"];
+  decide [label="판단\n(모델)", fillcolor="#DDEBFF"];
+  execute [label="검사·실행\n(프로그램)", fillcolor="#FFF2DA"];
+  observe [label="결과 확인", fillcolor="#E7F5F1"];
+  stop [label="중단·오류", fillcolor="#FCEBE9"];
+
+  question -> decide -> execute -> observe;
+  decide -> stop;
+}

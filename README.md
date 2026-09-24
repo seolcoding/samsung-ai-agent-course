@@ -8,8 +8,9 @@
 | --- | --- |
 | [작업 지침](AGENTS.md) | 교육 개편 방향, 실행 환경, 작업 규칙, 기존에 발견한 결함 |
 | [강의 자료 지도](docs/COURSE_MAP.md) | 4일 과정의 PDF·실습·노트북 위치 |
-| [통합 교안 조립 지도](docs/INTEGRATED_LESSONS.md) · [노트북 틀](lessons/_template.ipynb) | 4일·13개 시간 블록에 맞춰 슬라이드·설명·실습을 재배치하는 기준 |
-| [최종 형태 시범본](lessons/_prototype_agent_loop.ipynb) | 1일차 30~90분: 그림·설명·코드·CodeMate 실습·검토를 한 권에 엮은 예 |
+| [통합 교안 조립 지도](docs/INTEGRATED_LESSONS.md) · [노트북 틀](lessons/_template.ipynb) | `1.1`, `1.1.1` 번호에 맞춰 그림·설명·실습을 재배치하는 기준 |
+| [강사용 시간 배분](docs/INSTRUCTOR_TIMING.md) | 같은 의미 번호에 연결된 4일·13개 블록의 운영 시간 |
+| [최종 형태 시범본](lessons/_prototype_agent_loop.ipynb) | `1.1.2`·`1.1.3`: 그림·설명·코드·CodeMate 실습·검토를 한 권에 엮은 예 |
 | [교안 PDF](docs/raw/) | 교안 정본 14개 |
 | [주피터 노트북 안내](docs/NOTEBOOKS.md) | 교안·실습 노트북의 위치와 실행 순서 |
 | [M1 실습](src/raw/Chapter01/) | 1·2일차 Python 실습 |
@@ -18,7 +19,7 @@
 | [공통 설정](src/config/) · [패키지 목록](pyproject.toml) | 환경에 따른 API 연결 코드와 Python 의존성 |
 | [슬라이드 해설 노트북](docs/notebooks/) | PDF별 학습용 노트북. 실행 노트북은 각 Python 파일 옆에 있음 |
 
-`lessons/`는 수업에서 설명과 그림을 보여 주고 코드를 실행하며 실습하는 통합 노트북의 최종 위치다. 현재는 60분 시범 구간과 작성 틀이 있으며 4일치 완성 교안은 아직 없다. 기존 PDF·해설·코드 노트북은 조립 재료로 유지한다.
+`lessons/`는 수업에서 설명과 그림을 보여 주고 코드를 실행하며 실습하는 통합 노트북의 최종 위치다. 현재는 `1.1.2`·`1.1.3` 시범 주제와 작성 틀이 있으며 4일치 완성 교안은 아직 없다. 기존 PDF·해설·코드 노트북은 조립 재료로 유지한다.
 
 ## 실행 환경 선택
 

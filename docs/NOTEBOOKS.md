@@ -1,7 +1,7 @@
 # 주피터 노트북 교안 안내
 
 PDF 정본은 `docs/raw/`에 둔다. Python 실습과 정답의 `.ipynb`는 대응하는 `.py`와 같은 폴더에 둔다. 슬라이드 해설 노트북은 `docs/notebooks/`에 별도로 둔다.
-설명·그림·코드 실행·CodeMate 실습을 수업 시간 순서로 엮은 최종 교안은 `lessons/`에 만든다. [통합 교안 조립 지도](INTEGRATED_LESSONS.md)의 4일·13개 블록에 맞춘다. [`lessons/_prototype_agent_loop.ipynb`](../lessons/_prototype_agent_loop.ipynb)는 60분짜리 완성 모습 시범본, [`lessons/_template.ipynb`](../lessons/_template.ipynb)는 작성 틀이며 4일치 수업용 완성본은 아직 없다.
+설명·그림·코드 실행·CodeMate 실습을 의미 번호 순서로 엮은 최종 교안은 `lessons/`에 만든다. [통합 교안 조립 지도](INTEGRATED_LESSONS.md)의 `1.1`, `1.1.1` 번호를 따른다. 시간은 [강사용 배분표](INSTRUCTOR_TIMING.md)에만 둔다. [`lessons/_prototype_agent_loop.ipynb`](../lessons/_prototype_agent_loop.ipynb)는 `1.1.2`·`1.1.3`의 완성 모습 시범본, [`lessons/_template.ipynb`](../lessons/_template.ipynb)는 작성 틀이며 4일치 수업용 완성본은 아직 없다.
 
 ## 시작하기
 

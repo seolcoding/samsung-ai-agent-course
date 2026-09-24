@@ -71,10 +71,13 @@ docs/
   raw/             교안 PDF 정본 14개 (Chapter01 / Chapter02)
   notebooks/       PDF별 슬라이드 해설 노트북
   INTEGRATED_LESSONS.md  통합 교안의 이름·작성 규칙
+  INSTRUCTOR_TIMING.md  의미 번호별 강사용 시간 배분
   NOTEBOOKS.md     노트북 실행 안내
   COURSE_MAP.md    4일 과정의 교안·실습·노트북 지도
   guides/          Chapter02·캡스톤 안내 문서
-lessons/            커리큘럼 시간 순서로 슬라이드·설명·코드·실습을 합친 수업용 노트북
+  templates/       개념 그림 생성 지시와 정확한 흐름도 제작 틀
+lessons/            의미 번호 순서로 그림·설명·코드·실습을 합친 수업용 노트북
+  assets/           수업용 그림 원본과 재생성용 도식 소스
 tests/             환경 분기·실습 경로 검증
 .env.sample        환경변수 이름 예시. 실제 키는 Git 제외 대상 .env에만 둔다.
 uv.lock            강의장 설치 버전을 고정하는 잠금 파일
@@ -86,8 +89,8 @@ uv.lock            강의장 설치 버전을 고정하는 잠금 파일
 수강생 배포본을 따로 만들려면 새 브랜치를 파서 작업한다 — `main`을 깎지 않는다.
 `raw`는 원본 파일 형식인 `.py`와 PDF를 뜻한다. 변경 금지 아카이브라는 뜻은 아니다.
 Python `.ipynb`는 대응 `.py`와 같은 폴더에 둔다. PDF 해설 `.ipynb`는 `docs/notebooks/`에 둔다. Python 파일을 고치면 대응 노트북의 코드·경로·설명도 확인한다.
-수업에서 열 통합 교안은 `lessons/`에 둔다. PDF 한 개당 한 권으로 만들지 않는다. PDF·해설·코드를 해체해 커리큘럼의 13개 시간 블록에 맞춰 재배치한다. 노트북 한 권 안에서 슬라이드 화면·설명·실행 코드·CodeMate 실습·검토가 이어져야 한다. 시간 배정과 원본 대응은 `docs/INTEGRATED_LESSONS.md`를 따른다.
-통합 교안은 먼저 설명·그림·실습의 내용과 시간 배분을 완성한다. 1일차 30~90분의 시범본은 `lessons/_prototype_agent_loop.ipynb`다. VS Code Jupyter Slide Show의 셀 유형은 나중에 발표 구획을 표시할 때 쓴다. HTML 슬라이드 출력은 정적이며, 수업 중 코드 실행과 실습은 VS Code의 원본 `.ipynb`에서 한다. 사용법은 `docs/NOTEBOOKS.md`에 있다.
+수업에서 열 통합 교안은 `lessons/`에 둔다. PDF 한 개당 한 권으로 만들지 않는다. PDF·해설·코드를 해체해 커리큘럼의 13개 블록에 맞춰 재배치한다. 노트북 한 권 안에서 슬라이드 화면·설명·실행 코드·CodeMate 실습·검토가 이어져야 한다. 원본 대응은 `docs/INTEGRATED_LESSONS.md`, 시간 배정은 `docs/INSTRUCTOR_TIMING.md`를 따른다.
+통합 교안은 먼저 설명·그림·실습의 내용을 완성한다. 학습자용 제목은 `1.1`, `1.1.1`처럼 의미 번호로 쓰고 분·시각을 넣지 않는다. 배정은 `docs/INSTRUCTOR_TIMING.md`에 별도로 둔다. 그림은 `docs/templates/visual_prompt.md` 또는 `docs/templates/flow_diagram.dot`을 바탕으로 만들고, 바로 아래에 뜻·볼 지점·표현의 한계를 설명한다. `1.1.2`·`1.1.3` 시범본은 `lessons/_prototype_agent_loop.ipynb`다. VS Code Jupyter Slide Show의 셀 유형은 나중에 발표 구획을 표시할 때 쓴다. HTML 슬라이드 출력은 정적이며, 수업 중 코드 실행과 실습은 VS Code의 원본 `.ipynb`에서 한다. 사용법은 `docs/NOTEBOOKS.md`에 있다.
 실행에 쓰는 `skills.md`, `SKILL.md`, `data/*.md`는 문서 형식이어도 코드가 읽으므로 `src/`의 실습 폴더에 둔다. 그 밖의 안내 문서는 `docs/`에 둔다.
 명령과 링크는 프로젝트 루트를 기준으로 적는다. 실행할 때는 `uv run --env-file .env`처럼 환경 파일을 명시한다.
 메일 원문, 첨부, 전달받은 ZIP, 지난 준비 기록은 저장소 밖의 강의 아카이브에 둔다. 정규 폴더에는 수업·강의 운영에 직접 필요한 자료만 둔다.
