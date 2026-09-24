@@ -8,7 +8,7 @@
 | --- | --- |
 | [작업 지침](AGENTS.md) | 교육 개편 방향, 실행 환경, 작업 규칙, 기존에 발견한 결함 |
 | [강의 자료 지도](docs/COURSE_MAP.md) | 4일 과정의 PDF·실습·노트북 위치 |
-| [통합 교안 작성 규칙](docs/INTEGRATED_LESSONS.md) · [노트북 틀](lessons/_template.ipynb) | 슬라이드·설명·실습을 한 권으로 만드는 구조와 이름 |
+| [통합 교안 조립 지도](docs/INTEGRATED_LESSONS.md) · [노트북 틀](lessons/_template.ipynb) | 4일·13개 시간 블록에 맞춰 슬라이드·설명·실습을 재배치하는 기준 |
 | [교안 PDF](docs/raw/) | 교안 정본 14개 |
 | [주피터 노트북 안내](docs/NOTEBOOKS.md) | 교안·실습 노트북의 위치와 실행 순서 |
 | [M1 실습](src/raw/Chapter01/) | 1·2일차 Python 실습 |
@@ -17,7 +17,7 @@
 | [공통 설정](src/config/) · [패키지 목록](pyproject.toml) | 환경에 따른 API 연결 코드와 Python 의존성 |
 | [슬라이드 해설 노트북](docs/notebooks/) | PDF별 학습용 노트북. 실행 노트북은 각 Python 파일 옆에 있음 |
 
-`lessons/`는 제작 중인 통합 교안의 최종 위치다. 현재는 작성 틀을 마련했으며 완성된 주제별 교안은 아직 없다. 기존 PDF·해설·코드 노트북은 원본 자료로 유지한다.
+`lessons/`는 수업에서 슬라이드처럼 띄우고 코드를 실행하며 실습하는 통합 노트북의 최종 위치다. 현재는 작성 틀만 있으며 완성된 수업용 교안은 아직 없다. 기존 PDF·해설·코드 노트북은 조립 재료로 유지한다.
 
 ## 실행 환경 선택
 

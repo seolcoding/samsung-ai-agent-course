@@ -1,7 +1,7 @@
 # 주피터 노트북 교안 안내
 
 PDF 정본은 `docs/raw/`에 둔다. Python 실습과 정답의 `.ipynb`는 대응하는 `.py`와 같은 폴더에 둔다. 슬라이드 해설 노트북은 `docs/notebooks/`에 별도로 둔다.
-슬라이드 화면·설명·실습을 한 권에 모은 최종 교안은 `lessons/`에 만든다. 이름과 작성 순서는 [통합 교안 작성 규칙](INTEGRATED_LESSONS.md)을 따른다. 지금 있는 [`lessons/_template.ipynb`](../lessons/_template.ipynb)는 복사해 쓰는 틀이며 수업용 완성본은 아니다.
+슬라이드 화면·설명·코드 실행·CodeMate 실습을 수업 시간 순서로 엮은 최종 교안은 `lessons/`에 만든다. [통합 교안 조립 지도](INTEGRATED_LESSONS.md)의 4일·13개 블록에 맞춘다. 지금 있는 [`lessons/_template.ipynb`](../lessons/_template.ipynb)는 작성 틀이며 수업용 완성본은 아니다.
 
 ## 시작하기
 
