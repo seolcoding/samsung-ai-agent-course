@@ -13,7 +13,7 @@ import os
 
 import numpy as np
 from dotenv import load_dotenv
-from langchain_openai import OpenAIEmbeddings
+from config.embeddings import get_embeddings
 
 load_dotenv()
 
@@ -34,7 +34,9 @@ class SamsungEmbeddings(Embeddings):
                 f'{API_URL}/v1/embeddings',
                 json={'input': texts[i:i + BATCH]},
                 headers={'x-dep-ticket': TICKET},
+                timeout=30,
             )
+            res.raise_for_status()
             result.extend(item['embedding'] for item in res.json()['data'])
         return result
 
@@ -42,7 +44,14 @@ class SamsungEmbeddings(Embeddings):
         # 질문 하나를 임베딩할 때는 embed_documents 재활용
         return self.embed_documents([text])[0]
 
-embeddings = SamsungEmbeddings()
+provider = os.getenv('EMBED_PROVIDER', 'samsung').strip().lower()
+if provider == 'samsung':
+    if not API_URL or not TICKET:
+        raise RuntimeError('embedding_api_url과 embedding_x_dep_ticket이 필요합니다.')
+    embeddings = SamsungEmbeddings()
+else:
+    # 사외에서는 같은 유사도 실습을 OpenAI 임베딩으로 실행한다.
+    embeddings = get_embeddings()
 
 sentences = [
     '강아지가 공원에서 뛰어놀고 있다.',
@@ -87,7 +96,6 @@ print()
 #
 # 아래 주석을 해제하고 SamsungEmbeddings 를 완성한 뒤,
 # embeddings = SamsungEmbeddings() 로 교체해 위 유사도 계산을 다시 실행해 보자.
-
 
 
 

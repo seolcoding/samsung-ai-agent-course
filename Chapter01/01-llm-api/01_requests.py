@@ -1,5 +1,4 @@
 import os
-import json
 import uuid
 from pprint import pprint
 
@@ -8,46 +7,53 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Private 환경
-api_base_url = f'{os.getenv("api_base_url")}/chat/completions' 
+provider = os.getenv('LLM_PROVIDER', 'samsung').strip().lower()
+if provider == 'openai':
+    api_base_url = 'https://api.openai.com/v1/chat/completions'
+    model = os.getenv('OPENAI_MODEL')
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not model or not api_key:
+        raise RuntimeError('OPENAI_MODEL과 OPENAI_API_KEY가 필요합니다.')
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json',
+    }
+elif provider == 'samsung':
+    required = ('api_base_url', 'model', 'credential_key', 'send_system_name', 'user_id')
+    missing = [name for name in required if not os.getenv(name)]
+    if missing:
+        raise RuntimeError(f'사내 LLM 설정이 부족합니다: {missing}')
+    api_base_url = f'{os.getenv("api_base_url").rstrip("/")}/chat/completions'
+    model = os.getenv('model')
+    headers = {
+        'x-dep-ticket': os.getenv('credential_key'),
+        'Send-System-Name': os.getenv('send_system_name'),
+        'User-Id': os.getenv('user_id'),
+        'User-Type': 'AD_ID',
+        'Prompt-Msg-Id': str(uuid.uuid4()),
+        'Completion-Msg-Id': str(uuid.uuid4()),
+        'Content-Type': 'application/json',
+    }
+else:
+    raise ValueError(f'지원하지 않는 LLM_PROVIDER: {provider}')
 
-payload = json.dumps({
-    "model":"private-model.1-260330",
+payload = {
+    "model": model,
     "messages": [
         { "role": "user","content": "LLM이 무엇인지 3문장으로 설명해줘." },
     ],
     "temperature": 0.5,
     "stream": False,
-    "include_reasoning": False,
-})
-
-headers = {
-    'x-dep-ticket': os.getenv('credential_key'),  # 발급받은 credential 정보
-    'Send-System-Name': os.getenv('send_system_name'),  # 승인 받으신 결재문서에 기입하신 Send-System-Name
-    'User-Id': os.getenv('user_id'), 
-    'User-Type': 'AD_ID', # 유저 AD ID
-    'Prompt-Msg-Id': str(uuid.uuid4()),
-    'Completion-Msg-Id': str(uuid.uuid4()),
-    'Accept': 'text/event-stream; charset=utf-8',
-    'Content-Type': 'application/json'
 }
+if provider == 'samsung':
+    payload['include_reasoning'] = False
 
-
-try:
-    new_response = requests.request(
-        "POST", 
-        url=api_base_url,
-        headers=headers, 
-        data=payload, 
-        timeout=None
-    )
-except Exception as e:
-  print(e)
+new_response = requests.post(
+    api_base_url, headers=headers, json=payload, timeout=30
+)
+new_response.raise_for_status()
 recv_json = new_response.json()
   
-print("### 응답 Json")
-pprint(recv_json)
- 
 print("### 응답 Json")
 pprint(recv_json)
 print("### 결과 메시지")

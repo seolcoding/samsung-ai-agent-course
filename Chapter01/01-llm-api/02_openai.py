@@ -7,27 +7,38 @@ from openai import OpenAI
 
 load_dotenv()
 
-model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
-os.environ['OPENAI_API_KEY'] = 'api_key'
-
-# Private 환경 OpenAI API 활용
 import uuid
-client = OpenAI(
-    base_url = os.getenv('api_base_url'),
-    default_headers = {
-        "x-dep-ticket": os.getenv('credential_key'),
-        "Send-System-Name": os.getenv('send_system_name'), # 전달받은 Send-System-Name
-        "User-Id": os.getenv('user_id'),
-        "User-Type": "AD_ID", # 유저 AD ID
-        "Prompt-Msg-Id": str(uuid.uuid4()),
-        "Completion-Msg-Id": str(uuid.uuid4()),
-    }
-)
+
+provider = os.getenv('LLM_PROVIDER', 'samsung').strip().lower()
+if provider == 'openai':
+    model = os.getenv('OPENAI_MODEL')
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not model or not api_key:
+        raise RuntimeError('OPENAI_MODEL과 OPENAI_API_KEY가 필요합니다.')
+    client = OpenAI(api_key=api_key)
+elif provider == 'samsung':
+    model = os.getenv('model')
+    required = ('api_base_url', 'credential_key', 'send_system_name', 'user_id')
+    missing = [name for name in required if not os.getenv(name)]
+    if not model or missing:
+        raise RuntimeError(f'사내 LLM 설정이 부족합니다: {missing or ["model"]}')
+    client = OpenAI(
+        api_key='samsung-gateway',  # 실제 사내 인증은 x-dep-ticket 헤더에서 처리
+        base_url=os.getenv('api_base_url'),
+        default_headers={
+            'x-dep-ticket': os.getenv('credential_key'),
+            'Send-System-Name': os.getenv('send_system_name'),
+            'User-Id': os.getenv('user_id'),
+            'User-Type': 'AD_ID',
+            'Prompt-Msg-Id': str(uuid.uuid4()),
+            'Completion-Msg-Id': str(uuid.uuid4()),
+        },
+    )
+else:
+    raise ValueError(f'지원하지 않는 LLM_PROVIDER: {provider}')
 
 
-# # OpenAI SDK 초기화
-# # OPENAI_API_KEY 환경변수를 자동으로 읽어 인증 — 별도로 api_key를 전달할 필요 없음
-# client = OpenAI()
+# OpenAI SDK 예제는 사외에서는 공식 API, 사내에서는 호환 게이트웨이를 사용한다.
 
 
 # ── Single Turn ───────────────────────────────────────────────────────────────
@@ -86,4 +97,3 @@ response = client.responses.create(
 )
 print(response.output_text)
 """
-
