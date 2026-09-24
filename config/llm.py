@@ -24,6 +24,9 @@ def get_llm(**kwargs):
         from langchain_openai import ChatOpenAI
         if "model" not in kwargs:
             kwargs["model"] = _required("OPENAI_MODEL")
+        if kwargs["model"] == "gpt-6-luna":
+            # 이 수업의 도구 호출 실습은 Chat Completions를 사용한다.
+            kwargs.setdefault("reasoning_effort", "none")
         return ChatOpenAI(api_key=_required("OPENAI_API_KEY"), **kwargs)
 
     elif provider == "samsung":
