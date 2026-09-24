@@ -1,7 +1,7 @@
 # 강의 자료 지도
 
 M1은 `Chapter01`(1·2일차), M2는 `Chapter02`(3·4일차)다. 아래 경로는 프로젝트 루트 기준이다. 강의 직전의 세부 순서와 과제는 컨플루언스 최신 안내를 확인한다.
-슬라이드·설명·코드를 합친 수업용 노트북은 [`lessons/`](../lessons/)에 만든다. [조립 지도](INTEGRATED_LESSONS.md)의 4일·13개 시간 블록을 따라 원본의 순서를 다시 짠다. 아래의 기존 노트북은 통합본을 만드는 재료다.
+슬라이드·설명·코드를 합친 수업용 노트북은 [`lessons/day01.ipynb`](../lessons/day01.ipynb)부터 [`day04.ipynb`](../lessons/day04.ipynb)까지다. 공통 실행 구현은 [`src/courseware/`](../src/courseware/), 실제 사용·대체 범위는 [자료 대응표](LESSON_SOURCES.md)에 있다. [조립 지도](INTEGRATED_LESSONS.md)의 4일·13개 시간 블록을 따라 원본의 순서를 다시 짠다. 아래의 기존 노트북은 통합본을 만드는 재료다.
 
 | 일차 | PDF 정본 | Python 실습 | 학습 노트북 |
 | --- | --- | --- | --- |
