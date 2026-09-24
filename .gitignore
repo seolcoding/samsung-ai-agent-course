@@ -179,3 +179,14 @@ uv.lock
 *.db
 # macOS
 .DS_Store
+
+# Local originals and credentials (merged from the context repository)
+/private/
+/source_archives/
+.env.*
+!.env.sample
+!.env.example
+*.pem
+*.key
+node_modules/
+~$*
