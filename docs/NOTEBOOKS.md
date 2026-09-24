@@ -12,6 +12,12 @@ PDF 정본은 `docs/raw/`에 둔다. Python 실습과 정답의 `.ipynb`는 대�
 
 서버와 Streamlit 예제는 노트북에서 구조를 읽고 검토한 뒤, `src/raw/` 또는 `src/solution/`의 `.py`를 별도 터미널에서 실행한다. 슬라이드 노트북은 페이지별 개념을 설명하며, 도표의 세부 모습은 연결된 PDF에서 확인한다.
 
+## 통합 노트북을 발표하며 실행하기
+
+VS Code의 **Jupyter Slide Show** 확장(`ms-toolsai.vscode-jupyter-slideshow`)은 셀에 발표용 유형을 붙인다. 이 맥북에는 VS Code Jupyter 확장과 함께 설치돼 있다. 노트북을 연 뒤 명령 팔레트(맥 `Cmd+Shift+P`, 윈도우 `Ctrl+Shift+P`)에서 `Switch Slide Type`을 선택해 현재 셀의 유형을 바꿀 수 있다. 제목·핵심 그림은 `Slide`, 이어지는 설명·코드는 `Sub-Slide`, 강사용 출처·메모는 `Notes`로 표시한다. [작성 틀](../lessons/_template.ipynb)에 이 메타데이터의 예가 있다.
+
+**수업 중 코드 실행과 CodeMate 실습은 VS Code의 `.ipynb` 화면에서 진행한다.** 확장은 셀 유형을 지정하는 기능이며 실행 가능한 발표 화면을 별도로 제공하지 않는다. `jupyter nbconvert lessons/day01.ipynb --to slides --post serve`로 변환한 HTML은 발표용 정적 화면이다. 그 화면에서 Python 셀을 실시간 실행할 수는 없다. `nbconvert`가 설치돼 있어야 하고, 기본 HTML은 Reveal.js를 외부 CDN에서 읽으므로 사내망에서 발표 자료로 쓸 때는 별도로 접속을 확인해야 한다. [Microsoft 확장 안내](https://github.com/microsoft/vscode-jupyter-slideshow), [Jupyter nbconvert 안내](https://nbconvert.readthedocs.io/en/latest/usage.html#reveal-js-html-slideshow).
+
 ## 순서
 
 | 일차 | 이론 교안 | 실습 노트북 |
