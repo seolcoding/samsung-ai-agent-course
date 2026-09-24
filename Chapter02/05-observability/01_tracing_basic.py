@@ -11,7 +11,7 @@ LangChain 트레이싱: Langfuse로 LLM 호출 흐름 기록하기
   2. .env 파일에 아래 세 줄 추가:
        LANGFUSE_PUBLIC_KEY=pk-lf-...
        LANGFUSE_SECRET_KEY=sk-lf-...
-       LANGFUSE_HOST=https://cloud.langfuse.com
+       LANGFUSE_BASE_URL=https://jp.cloud.langfuse.com
 
 실행:
   python Chapter02/05-observability/01_tracing_basic.py
