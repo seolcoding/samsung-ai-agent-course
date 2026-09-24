@@ -1,4 +1,4 @@
-# AGENTS.md — 삼성전자 DS AI Agent 개발 프로젝트 교육 (2026-AI-PD, v1.2, 2026-09-24)
+# AGENTS.md — 삼성전자 DS AI Agent 개발 프로젝트 교육 (2026-AI-PD, v1.3, 2026-09-24)
 
 이 리포지토리는 **강의용 실습 코드 + 교안**이다. 제품 코드가 아니다.
 모든 변경은 "수강생 앞에서 이게 어떻게 보이는가"를 기준으로 판단한다.
@@ -94,8 +94,6 @@ config/             llm.py · embeddings.py — 사내/OpenAI provider 스위치
 
 우선순위 높은 것만:
 
-- `config/llm.py:8` — `os.environ['OPENAI_API_KEY'] = 'api_key'`가 실제 키를 덮어쓴다. 사외 경로 전체가 죽는다.
-- `config/llm.py` — 기본 provider가 `samsung`인데 docstring은 `openai`라고 적혀 있다. 미지원 provider에 `None` 반환(`embeddings.py`는 `raise`).
 - `Chapter01/04-langgraph/04_human_in_the_loop.py` — "거부" 시나리오가 메일을 **실제로 전송**한다. `update_state` 누락.
 - `Chapter02/01-mcp/` — 서버는 SSE, 클라이언트는 stdio. 슬라이드의 SSE 설정이 한 번도 실행되지 않는다.
 - `Chapter02/03-langgraph-advanced/03_memory_store.py` — `compile()`에 checkpointer·store 누락. 슬라이드 3-4 p7과 화면이 다르다.

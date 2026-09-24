@@ -18,6 +18,19 @@
 | [메일·첨부 원본](private/) | 로컬 보관 자료. Git 제외 |
 | [전달받은 ZIP](source_archives/) | 원본 ZIP 2개. Git 제외 |
 
+## 실행 환경 선택
+
+[.env.sample](.env.sample)을 복사해 맥북에는 `.env.external`, 사내 PC에는 `.env.internal`을 만든다. 실제 키와 주소는 복사한 파일에만 입력한다. 두 파일은 Git에서 제외된다.
+
+| 환경 파일 | 바꿀 값 | 동작 |
+| --- | --- | --- |
+| `.env.external` | `LLM_PROVIDER=openai`, `EMBED_PROVIDER=openai`, `RAG_PROVIDER=mock`; OpenAI 키·모델명 입력 | OpenAI LLM·임베딩 사용, RAGaaS는 모의 응답 |
+| `.env.internal` | 세 PROVIDER를 `samsung`으로 변경; 사내 주소·모델명·인증 값 입력 | 사내 LLM·임베딩·RAGaaS 사용 |
+
+프로젝트 루트에서 환경 파일을 지정해 실행한다. 예: `uv run --env-file .env.external python Chapter01/01-llm-api/03_langchain.py`. 내부에서는 `.env.internal`을 지정한다. 환경을 선택하는 기준은 실행 명령이며, 사내 URL의 응답 여부로 자동 전환하지 않는다. 사내 API가 일시적으로 실패하면 오류를 확인하고 원인을 조사한다.
+
+`RAG_PROVIDER=mock`의 검색 내용에는 `[MOCK RAGaaS]`가 표시된다. 이 응답은 API 흐름 확인용이며 실제 보험 약관이나 사내 문서의 검색 결과가 아니다. Langfuse 예제는 별도 `LANGFUSE_*` 설정이 필요하다.
+
 ## 자료 시점
 
 `context/`는 9월 6일 수집 기록을 보존한다. 9월 17일 확정된 실습 개편 방향과 9월 21일 코드 점검 내용은 [AGENTS.md](AGENTS.md)에 있다. 폴더 통합 과정에서 교육 내용이나 실습 코드는 수정하지 않았다.

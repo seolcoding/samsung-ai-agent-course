@@ -6,43 +6,33 @@ RAG as a Service (RAGaaS): 삼성 사내 RAG API 활용
   RAGaaS: 문서 업로드(API 1회) → 검색(API 1회)
   청킹·임베딩·벡터스토어 관리를 API가 대신 처리한다.
 
-⚠️  이 파일은 삼성 사내망에서만 동작합니다.
-    .env 에 아래 항목이 필요합니다:
-      rag_credential_key=...
-      search_url=...
-      index_name=...
+사외에서는 RAG_PROVIDER=mock으로 요청·응답 형식을 연습한다.
+실제 문서 내용이 필요한 실습은 사내망에서 RAG_PROVIDER=samsung으로 실행한다.
 
 실행:
   python 03-rag/05_ragaas.py
 """
-import json
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 from config.llm import get_llm
+from config.ragaas import post_ragaas
 
 load_dotenv()
 
-RAG_KEY   = os.getenv('rag_credential_key')
-RAG_API_KEY = os.getenv('rag_api_key')
-SEARCH_URL = os.getenv('search_url')
-# 사용할 인덱스 네임
-INDEX_NAME = 'rp-aicoa-meritz-pet'
-
-HEADERS = {
-    'Content-Type': 'application/json',
-    'x-dep-ticket': RAG_KEY,
-    'api-key': RAG_API_KEY,
-}
+RAG_PROVIDER = os.getenv('RAG_PROVIDER', 'samsung').strip().lower()
+INDEX_NAME = os.getenv('index_name') or ('mock-pet-insurance' if RAG_PROVIDER == 'mock' else '')
+if not INDEX_NAME:
+    raise RuntimeError('사내 RAGaaS에는 index_name 환경변수가 필요합니다.')
+# 실제 사내 요청의 x-dep-ticket과 api-key 헤더는 config/ragaas.py에서 설정한다.
+print(f'RAGaaS 모드: {RAG_PROVIDER}')
 
 
 # ── 1부: 문서 업로드 ──────────────────────────────────────────────────────────
 # insert-doc 엔드포인트 하나로 청킹·임베딩·벡터스토어 저장을 모두 처리한다.
 # chunk_factor: 청킹 방식과 크기를 서버에 위임 (직접 구현 불필요)
-
-import requests
 
 # 업로드할 텍스트 준비 (예: 파일을 읽어서 문자열로 전달)
 PDF_PATH = Path(__file__).parent / 'data' / 'meritz_pet_insurance.pdf'
@@ -69,12 +59,7 @@ payload = {
 
 print('=== 문서 업로드 ===')
 # TODO: insert-doc 엔드포인트로 문서를 업로드해 주세요.
-# response = requests.post(
-#     f'{SEARCH_URL}/dsllmrag/elastic/v2/insert-doc',
-#     # 파이썬의 딕셔너리 형태 -> JSON 형태로 변환해서 전송
-#     data= json.dumps(payload),
-#     headers= HEADERS
-# )
+# response = post_ragaas('insert-doc', payload)
 # print(f'상태: {response.status_code}')
 # print(response.text[:200])
 # print()
@@ -102,11 +87,7 @@ print('=== 문서 검색 (RRF: 하이브리드) ===')
 
 # TODO: retrieve-rrf 엔드포인트로 관련 문서를 검색해 주세요.
 
-response = requests.post(
-    f'{SEARCH_URL}/dsllmrag/elastic/v2/retrieve-rrf',
-    data=json.dumps(search_payload),
-    headers=HEADERS
-)
+response = post_ragaas('retrieve-rrf', search_payload)
 result = response.json()
 # print(result)
 hits = result['hits']['hits']
@@ -151,9 +132,5 @@ delete_payload = {
 }
 
 # TODO: delete-doc 엔드포인트로 업로드한 문서를 삭제해 주세요.
-# response = requests.post(
-#     f'{SEARCH_URL}/dsllmrag/elastic/v2/delete-doc',
-#     headers=HEADERS,
-#     data=json.dumps(delete_payload),
-# )
+# response = post_ragaas('delete-doc', delete_payload)
 # print(f'=== 문서 삭제: {response.status_code} ===')

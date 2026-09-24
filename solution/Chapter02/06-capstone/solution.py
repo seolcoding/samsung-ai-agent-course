@@ -17,12 +17,10 @@
 """
 
 import asyncio
-import json
 import os
 from pathlib import Path
 from typing import Annotated, Literal
 
-import requests
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 from dotenv import load_dotenv
@@ -38,6 +36,7 @@ from pydantic import BaseModel
 from typing_extensions import TypedDict
 
 from config.llm import get_llm
+from config.ragaas import post_ragaas
 
 load_dotenv()
 
@@ -60,41 +59,22 @@ def search_web(query: str) -> str:
 
 @tool
 def rag_search(query: str) -> str:
-    """내부 지식베이스에서 관련 문서를 검색한다. 삼성 사내망에서는 RAGaaS API를 사용한다."""
-    # 삼성 사내망 환경: RAGaaS API 호출
-    rag_key = os.getenv('rag_credential_key')
-    search_url = os.getenv('search_url')
-    index_name = os.getenv('index_name')
-
-    if rag_key and search_url and index_name:
-        try:
-            payload = {
-                'index_name': index_name,
-                'permission_groups': ['rag-public'],
-                'query_text': query,
-                'num_result_doc': 3,
-                'fields_exclude': ['v_merge_title_content'],
-            }
-            resp = requests.post(
-                f'{search_url}/dsllmrag/elastic/v2/retrieve-rrf',
-                headers={'Content-Type': 'application/json', 'x-dep-ticket': rag_key},
-                data=json.dumps(payload),
-                timeout=10,
-            )
-            hits = resp.json().get('hits', {}).get('hits', [])
-            if hits:
-                return '\n\n'.join(h['_source']['merge_title_content'] for h in hits)
-        except Exception:
-            pass  # 사내망 실패 시 로컬 폴백
-
-    # 로컬 폴백: data/ 폴더 키워드 검색
-    results = []
-    for doc_path in (CAPSTONE_DIR / 'data').glob('*.md'):
-        content = doc_path.read_text(encoding='utf-8')
-        paragraphs = [p.strip() for p in content.split('\n\n') if query in p]
-        if paragraphs:
-            results.append(f'[{doc_path.name}]\n' + '\n\n'.join(paragraphs[:2]))
-    return '\n\n'.join(results) if results else f'"{query}" 관련 내부 문서 없음'
+    """사내 RAGaaS 또는 모의 응답에서 문서를 검색한다."""
+    provider = os.getenv('RAG_PROVIDER', 'samsung').strip().lower()
+    index_name = os.getenv('index_name') or ('mock-capstone' if provider == 'mock' else '')
+    if not index_name:
+        raise RuntimeError('사내 RAGaaS에는 index_name 환경변수가 필요합니다.')
+    payload = {
+        'index_name': index_name,
+        'permission_groups': ['rag-public'],
+        'query_text': query,
+        'num_result_doc': 3,
+    }
+    response = post_ragaas('retrieve-rrf', payload)
+    hits = response.json()['hits']['hits']
+    if not hits:
+        return 'RAGaaS 검색 결과 없음'
+    return '\n\n'.join(hit['_source']['merge_title_content'] for hit in hits)
 
 
 # ── State ─────────────────────────────────────────────────────────────────────

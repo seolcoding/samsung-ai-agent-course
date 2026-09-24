@@ -13,6 +13,7 @@
 정답용 MCP 서버: solution/Chapter02/06-capstone/mcp_server.py
 
 starter.py는 구현할 부분이 남아 있는 실습 뼈대다.
+사외에서는 RAG_PROVIDER=mock으로 RAGaaS 응답 형식을 모의 실행한다.
 """
 
 import asyncio
@@ -37,6 +38,7 @@ from pydantic import BaseModel
 from typing_extensions import TypedDict
 
 from config.llm import get_llm
+from config.ragaas import post_ragaas
 
 load_dotenv()
 
@@ -53,6 +55,8 @@ def search_web(query: str) -> str:
 @tool
 def rag_search(query: str) -> str:
     """내부 지식베이스에서 관련 문서를 검색한다. 삼성 사내망에서는 RAGaaS API를 사용한다."""
+    # TODO: post_ragaas('retrieve-rrf', payload)를 Coding AI에게 구현하게 하고
+    # RAG_PROVIDER=mock일 때 결과에 [MOCK RAGaaS]가 표시되는지 검토하세요.
 
 
 # ── State ─────────────────────────────────────────────────────────────────────
