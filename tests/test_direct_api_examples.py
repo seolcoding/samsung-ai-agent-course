@@ -76,7 +76,7 @@ class DirectApiExamplesTests(unittest.TestCase):
             runpy.run_path(str(ROOT / relative_path), run_name="__main__")
 
     def test_raw_request_selects_external_and_internal_endpoint(self):
-        for prefix in ("Chapter01", "solution/Chapter01"):
+        for prefix in ("src/raw/Chapter01", "src/solution/Chapter01"):
             path = f"{prefix}/01-llm-api/01_requests.py"
             self.run_example(
                 path,
@@ -91,6 +91,18 @@ class DirectApiExamplesTests(unittest.TestCase):
             self.assertEqual(options["json"]["model"], "test-public-model")
             self.assertNotIn("include_reasoning", options["json"])
             self.assertEqual(options["headers"]["Authorization"], "Bearer test-key")
+
+            self.run_example(
+                path,
+                {
+                    "LLM_PROVIDER": "openai",
+                    "OPENAI_MODEL": "gpt-6-luna",
+                    "OPENAI_API_KEY": "test-key",
+                },
+            )
+            _, luna_options = self.calls[-1]
+            self.assertNotIn("temperature", luna_options["json"])
+            self.assertEqual(luna_options["json"]["reasoning_effort"], "none")
 
             self.run_example(
                 path,
@@ -110,7 +122,7 @@ class DirectApiExamplesTests(unittest.TestCase):
             self.assertEqual(options["headers"]["x-dep-ticket"], "test-ticket")
 
     def test_openai_sdk_example_does_not_overwrite_key(self):
-        for prefix in ("Chapter01", "solution/Chapter01"):
+        for prefix in ("src/raw/Chapter01", "src/solution/Chapter01"):
             path = f"{prefix}/01-llm-api/02_openai.py"
             values = {
                 "LLM_PROVIDER": "openai",

@@ -71,7 +71,7 @@ class RagProviderTests(unittest.TestCase):
     def test_capstone_search_marks_mock_and_rejects_missing_internal_index(self):
         source = (
             Path(__file__).resolve().parents[1]
-            / "solution/Chapter02/06-capstone/solution.py"
+            / "src/solution/Chapter02/06-capstone/solution.py"
         )
         tree = ast.parse(source.read_text())
         function = next(
