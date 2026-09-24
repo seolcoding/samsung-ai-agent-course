@@ -5,34 +5,39 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-os.environ['OPENAI_API_KEY'] = 'api_key'
+
+def _required(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f'{name} 환경변수가 필요합니다. 실행할 환경 파일을 확인하세요.')
+    return value
 
 def get_llm(**kwargs):
     """
     LLM_PROVIDER 환경변수에 따라 LLM 인스턴스를 반환한다.
-    - openai (기본값): OpenAI ChatOpenAI
-    - samsung: 삼성 사내 LLM (아래 주석 블록 활성화)
+    - openai: OpenAI ChatOpenAI (사외)
+    - samsung (기본값): 삼성 사내 LLM
     """
-    provider = os.getenv("LLM_PROVIDER", "samsung")
+    provider = os.getenv("LLM_PROVIDER", "samsung").strip().lower()
 
-    # OpenAI 모델을 LangChain으로 불러오는 방법.
     if provider == "openai":
         from langchain_openai import ChatOpenAI
-        # OpenAI SDK와 유사하게 API Key는 환경변수에서 가져오므로
-        # 모델만 설정하면 됩니다.
-        kwargs.setdefault("model", os.getenv("OPENAI_MODEL", "gpt-5-mini"))
-        return ChatOpenAI(**kwargs)
+        if "model" not in kwargs:
+            kwargs["model"] = _required("OPENAI_MODEL")
+        return ChatOpenAI(api_key=_required("OPENAI_API_KEY"), **kwargs)
 
-    # 삼성 사내 LLM 설정. 사내 망에서만 동작함.
     elif provider == "samsung":
         from langchain_openai import ChatOpenAI
+        if "model" not in kwargs:
+            kwargs["model"] = _required("model")
         return ChatOpenAI(
-            model=os.getenv("model"),
-            base_url=os.getenv("api_base_url"),
+            # 사내 게이트웨이는 x-dep-ticket으로 인증한다. SDK 필수값만 채운다.
+            api_key="samsung-gateway",
+            base_url=_required("api_base_url"),
             default_headers={
-                "x-dep-ticket": os.getenv("credential_key"),
-                "Send-System-Name": os.getenv("send_system_name"),
-                "User-Id": os.getenv("user_id"),
+                "x-dep-ticket": _required("credential_key"),
+                "Send-System-Name": _required("send_system_name"),
+                "User-Id": _required("user_id"),
                 "User-Type": "AD_ID",
                 "Prompt-Msg-Id": str(uuid.uuid4()),
                 "Completion-Msg-Id": str(uuid.uuid4()),
@@ -42,5 +47,7 @@ def get_llm(**kwargs):
                     "enable_thinking": False,
                 }
             },
+            **kwargs,
         )
 
+    raise ValueError(f"지원하지 않는 LLM_PROVIDER: {provider!r}. 'openai' 또는 'samsung'을 사용하세요.")

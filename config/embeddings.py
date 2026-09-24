@@ -5,17 +5,26 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _required(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f'{name} 환경변수가 필요합니다. 실행할 환경 파일을 확인하세요.')
+    return value
+
+
 def get_embeddings(**kwargs):
     """
     EMBED_PROVIDER 환경변수에 따라 임베딩 인스턴스를 반환한다.
-    - openai (기본값): OpenAI text-embedding-3-small
-    - samsung: 삼성 사내 임베딩 REST API (아래 주석 블록 활성화)
+    - openai: OpenAI 임베딩 (사외)
+    - samsung (기본값): 삼성 사내 임베딩 REST API
     """
-    provider = os.getenv("EMBED_PROVIDER", "samsung")
+    provider = os.getenv("EMBED_PROVIDER", "samsung").strip().lower()
 
     if provider == "openai":
         from langchain_openai import OpenAIEmbeddings
-        kwargs.setdefault("model", os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"))
+        _required("OPENAI_API_KEY")
+        if "model" not in kwargs:
+            kwargs["model"] = _required("OPENAI_EMBEDDING_MODEL")
         return OpenAIEmbeddings(**kwargs)
 
     # ── 삼성 사내 임베딩 ──────────────────────────────────────────────────────
@@ -39,6 +48,7 @@ def get_embeddings(**kwargs):
                         "Content-Type": "application/json",
                         "x-dep-ticket": self.ticket,
                     },
+                    timeout=30,
                 )
                 resp.raise_for_status()
                 return [item["embedding"] for item in resp.json()["data"]]
@@ -47,8 +57,8 @@ def get_embeddings(**kwargs):
                 return self.embed_documents([text])[0]
     
         return _SamsungEmbeddings(
-            api_url=os.getenv("embedding_api_url"),
-            ticket=os.getenv("embedding_x_dep_ticket"),
+            api_url=_required("embedding_api_url"),
+            ticket=_required("embedding_x_dep_ticket"),
         )
     # ─────────────────────────────────────────────────────────────────────────
 
