@@ -11,6 +11,7 @@
 | [커리큘럼](context/CURRICULUM.md) | 전달받은 커리큘럼 비교 |
 | [자료 출처](context/SOURCES.md) | 메일과 첨부자료 출처 |
 | [교안 PDF](99_pdf/) | 교안 정본 14개 |
+| [주피터 노트북 안내](NOTEBOOKS.md) | 교안·실습 노트북의 위치와 실행 순서 |
 | [M1 실습](Chapter01/) | 1·2일차 실습 |
 | [M2 실습](Chapter02/) | 3·4일차 실습 (`00-review/` ~ `06-capstone/`) |
 | [정답본](solution/) | 실습 정답 |
