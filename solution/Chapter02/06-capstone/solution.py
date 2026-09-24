@@ -9,11 +9,11 @@
                → Writer(SDS 보고서 작성) → 최종 출력
 
 사전 준비:
-  터미널 A: python 12-capstone/mcp_server.py   ← MCP 서버 먼저 실행
-  터미널 B: python 12-capstone/solution.py
+  터미널 A: python solution/Chapter02/06-capstone/mcp_server.py   ← MCP 서버 먼저 실행
+  터미널 B: python solution/Chapter02/06-capstone/solution.py
 
 실행:
-  python 12-capstone/solution.py
+  python solution/Chapter02/06-capstone/solution.py
 """
 
 import asyncio

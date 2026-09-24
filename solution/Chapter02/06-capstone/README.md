@@ -27,10 +27,13 @@ Supervisor (skills.md 기반)
 ## 파일 구조
 
 ```
-12-capstone/
+Chapter02/06-capstone/
+  starter.py      ← 수강생 실습 시작점
+solution/Chapter02/06-capstone/
   README.md       ← 이 파일
-  starter.py      ← 빈 뼈대 코드 (실습 시작점)
-  solution.py     ← 완성 코드 (강의 종료 후 공개)
+  solution.py     ← 정답 예시
+  mcp_server.py   ← 정답 예시의 MCP 서버
+  skills/         ← 정답 예시의 스킬
 ```
 
 ## 구현 체크리스트

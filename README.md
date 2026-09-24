@@ -12,7 +12,7 @@
 | [자료 출처](context/SOURCES.md) | 메일과 첨부자료 출처 |
 | [교안 PDF](99_pdf/) | 교안 정본 14개 |
 | [M1 실습](Chapter01/) | 1·2일차 실습 |
-| `00-review/` ~ `06-capstone/` | M2 실습 |
+| [M2 실습](Chapter02/) | 3·4일차 실습 (`00-review/` ~ `06-capstone/`) |
 | [정답본](solution/) | 실습 정답 |
 | [공통 설정](config/) · [패키지 목록](pyproject.toml) | LLM 연결 코드와 Python 의존성 |
 | [메일·첨부 원본](private/) | 로컬 보관 자료. Git 제외 |

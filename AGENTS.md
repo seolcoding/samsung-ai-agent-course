@@ -1,4 +1,4 @@
-# AGENTS.md — 삼성전자 DS AI Agent 개발 프로젝트 교육 (2026-AI-PD)
+# AGENTS.md — 삼성전자 DS AI Agent 개발 프로젝트 교육 (2026-AI-PD, v1.1, 2026-09-24)
 
 이 리포지토리는 **강의용 실습 코드 + 교안**이다. 제품 코드가 아니다.
 모든 변경은 "수강생 앞에서 이게 어떻게 보이는가"를 기준으로 판단한다.
@@ -64,7 +64,7 @@ upstream 깃 히스토리는 받지 못했고, 로컬 `main`의 최초 커밋이
 
 ```
 Chapter01/          M1 실습 (수강생 배포본)
-Chapter02 계열/     M2 실습 — 00-review · 01-mcp · 02-a2a ·
+Chapter02/          M2 실습 — 00-review · 01-mcp · 02-a2a ·
                     03-langgraph-advanced · 04-harness · 05-observability · 06-capstone
 solution/           정답본 (Chapter01 / Chapter02)
 config/             llm.py · embeddings.py — 사내/OpenAI provider 스위치
@@ -97,13 +97,12 @@ config/             llm.py · embeddings.py — 사내/OpenAI provider 스위치
 - `config/llm.py:8` — `os.environ['OPENAI_API_KEY'] = 'api_key'`가 실제 키를 덮어쓴다. 사외 경로 전체가 죽는다.
 - `config/llm.py` — 기본 provider가 `samsung`인데 docstring은 `openai`라고 적혀 있다. 미지원 provider에 `None` 반환(`embeddings.py`는 `raise`).
 - `Chapter01/04-langgraph/04_human_in_the_loop.py` — "거부" 시나리오가 메일을 **실제로 전송**한다. `update_state` 누락.
-- `01-mcp/` — 서버는 SSE, 클라이언트는 stdio. 슬라이드의 SSE 설정이 한 번도 실행되지 않는다.
-- `03-langgraph-advanced/03_memory_store.py` — `compile()`에 checkpointer·store 누락. 슬라이드 3-4 p7과 화면이 다르다.
-- `03-langgraph-advanced/checkpoints.db` — 이전 회차 대화가 들어 있어 영속성 데모가 미리 답을 알고 있다.
-- `04-harness/large_tool_results/` — 이전 회차 완성 리포트가 남아 있어 에이전트가 그걸 베낀다.
-- `06-capstone/` — `mcp_server.py`와 `skills/`가 정답본에만 있다. 배점 20점이 배포본에서 불가능하다.
-- `06-capstone/README.md` — Streamlit UI에 15점을 배점하는데 정답본에 Streamlit이 없다.
-- 실행 경로 주석이 낡았다 — `11-observability/`, `12-capstone/`. 복붙하면 전부 실패한다.
+- `Chapter02/01-mcp/` — 서버는 SSE, 클라이언트는 stdio. 슬라이드의 SSE 설정이 한 번도 실행되지 않는다.
+- `Chapter02/03-langgraph-advanced/03_memory_store.py` — `compile()`에 checkpointer·store 누락. 슬라이드 3-4 p7과 화면이 다르다.
+- `Chapter02/03-langgraph-advanced/checkpoints.db` — 이전 회차 대화가 들어 있어 영속성 데모가 미리 답을 알고 있다.
+- `Chapter02/04-harness/large_tool_results/` — 이전 회차 완성 리포트가 남아 있어 에이전트가 그걸 베낀다.
+- `Chapter02/06-capstone/` — `mcp_server.py`와 `skills/`가 정답본에만 있다. 배점 20점이 배포본에서 불가능하다.
+- `Chapter02/06-capstone/README.md` — Streamlit UI에 15점을 배점하는데 정답본에 Streamlit이 없다.
 - `pyproject.toml` — 상한 핀이 없고 `uv.lock`이 `.gitignore`에 있다. `a2a-sdk>=0.2.0`인데 코드가 쓰는 모듈은 0.x에 없다.
 
 ## 8. 되돌리기

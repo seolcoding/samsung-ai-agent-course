@@ -10,7 +10,7 @@
       3. LLM 평가   — 다른 LLM이 응답 품질을 채점 (LLM-as-a-Judge)
 
 실행:
-  python 11-observability/04_evaluation.py
+  python Chapter02/05-observability/04_evaluation.py
 """
 
 from dotenv import load_dotenv
@@ -99,6 +99,9 @@ answer3 = run_chain('강화학습을 쉽게 설명해줘', handler3)
 trace_id3 = handler3.last_trace_id
 
 # 사용자가 👍를 눌렀다고 가정
+# 랜덤한 상황에 에이전트 2개를 병렬적으로 실행한 결과를 사용자에게 보여주고,
+    # 그 때에만 잠시 사용자의 승인을 대기하는 방식으로 처리
+    # 그때 사용자가 답변한 응답을 토대로 점수 기록
 user_feedback = 1.0
 langfuse.create_score(
     trace_id=trace_id3,

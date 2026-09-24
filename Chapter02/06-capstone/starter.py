@@ -8,12 +8,11 @@
   사용자 입력 → Supervisor → Researcher(MCP+RAG+웹검색) → [HITL 승인]
                → Writer(SDS 보고서 작성) → 최종 출력
 
-사전 준비:
-  터미널 A: python 12-capstone/mcp_server.py   ← MCP 서버 먼저 실행
-  터미널 B: python 12-capstone/solution.py
+실습 파일: Chapter02/06-capstone/starter.py
+정답 참고: solution/Chapter02/06-capstone/solution.py
+정답용 MCP 서버: solution/Chapter02/06-capstone/mcp_server.py
 
-실행:
-  python 12-capstone/solution.py
+starter.py는 구현할 부분이 남아 있는 실습 뼈대다.
 """
 
 import asyncio
