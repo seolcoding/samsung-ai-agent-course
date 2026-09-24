@@ -26,7 +26,7 @@ class MockResponse:
         pass
 
 
-def post_ragaas(endpoint: str, payload: dict):
+def post_ragaas(endpoint: str, payload: dict, *, api_key: str | None = None):
     """RAG_PROVIDER=mock이면 네트워크 없이 같은 응답 형태를 돌려준다."""
     if endpoint not in _ENDPOINTS:
         raise ValueError(f"지원하지 않는 RAGaaS 엔드포인트: {endpoint}")
@@ -53,8 +53,11 @@ def post_ragaas(endpoint: str, payload: dict):
     if provider != "samsung":
         raise ValueError(f"지원하지 않는 RAG_PROVIDER: {provider!r}. 'mock' 또는 'samsung'을 사용하세요.")
 
-    required = ("search_url", "rag_credential_key", "rag_api_key")
+    required = ("search_url", "rag_credential_key")
     missing = [name for name in required if not os.getenv(name)]
+    api_key = api_key or os.getenv("rag_api_key")
+    if not api_key:
+        missing.append("rag_api_key")
     if missing:
         raise RuntimeError(f"사내 RAGaaS 설정이 부족합니다: {missing}")
 
@@ -66,7 +69,7 @@ def post_ragaas(endpoint: str, payload: dict):
         headers={
             "Content-Type": "application/json",
             "x-dep-ticket": os.environ["rag_credential_key"],
-            "api-key": os.environ["rag_api_key"],
+            "api-key": api_key,
         },
         timeout=30,
     )

@@ -23,10 +23,11 @@ from config.ragaas import post_ragaas
 load_dotenv()
 
 RAG_PROVIDER = os.getenv('RAG_PROVIDER', 'samsung').strip().lower()
+RAG_API_KEY = os.getenv('rag_api_key')
 INDEX_NAME = os.getenv('index_name') or ('mock-pet-insurance' if RAG_PROVIDER == 'mock' else '')
 if not INDEX_NAME:
     raise RuntimeError('사내 RAGaaS에는 index_name 환경변수가 필요합니다.')
-# 실제 사내 요청의 x-dep-ticket과 api-key 헤더는 config/ragaas.py에서 설정한다.
+# 실제 사내 요청의 api-key 헤더에는 RAG_API_KEY가 들어간다.
 print(f'RAGaaS 모드: {RAG_PROVIDER}')
 
 
@@ -58,7 +59,7 @@ payload = {
 }
 
 print('=== 문서 업로드 ===')
-response = post_ragaas('insert-doc', payload)
+response = post_ragaas('insert-doc', payload, api_key=RAG_API_KEY)
 print(f'상태: {response.status_code}')
 print(response.text[:200])
 print()
@@ -79,7 +80,7 @@ search_payload = {
 }
 
 print('=== 문서 검색 (RRF: 하이브리드) ===')
-response = post_ragaas('retrieve-rrf', search_payload)
+response = post_ragaas('retrieve-rrf', search_payload, api_key=RAG_API_KEY)
 result = response.json()
 hits = result['hits']['hits']
 
@@ -120,5 +121,5 @@ delete_payload = {
     'doc_id': 'meritz_pet_insurance',
 }
 
-response = post_ragaas('delete-doc', delete_payload)
+response = post_ragaas('delete-doc', delete_payload, api_key=RAG_API_KEY)
 print(f'=== 문서 삭제: {response.status_code} ===')
