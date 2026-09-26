@@ -87,6 +87,7 @@ class ProviderConfigTests(unittest.TestCase):
         with patch.dict(os.environ, values, clear=True):
             llm = self.llm.get_llm()
             self.assertEqual(llm.options["reasoning_effort"], "none")
+            self.assertIs(llm.options["use_responses_api"], False)
             overridden = self.llm.get_llm(reasoning_effort="low")
             self.assertEqual(overridden.options["reasoning_effort"], "low")
 

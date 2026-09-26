@@ -27,6 +27,8 @@ def get_llm(**kwargs):
         if kwargs["model"] == "gpt-6-luna":
             # 이 수업의 도구 호출 실습은 Chat Completions를 사용한다.
             kwargs.setdefault("reasoning_effort", "none")
+            # gpt-6 계열은 도구가 있으면 Responses API로 자동 전환되므로 고정한다.
+            kwargs.setdefault("use_responses_api", False)
         return ChatOpenAI(api_key=_required("OPENAI_API_KEY"), **kwargs)
 
     elif provider == "samsung":

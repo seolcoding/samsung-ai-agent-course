@@ -50,11 +50,27 @@ uv run --extra notebooks streamlit run src/courseware/app.py
 
 기본 모드는 외부 API를 호출하지 않는다. 자료·모델 대역은 교육용이라고 표시한다. LangChain·LangGraph·MCP·A2A·Chroma·DeepAgents·Streamlit 자체는 실제 라이브러리를 실행했다.
 
-아래는 이번 검증에서 실행하지 않았다.
+### 사외 실제 연결 (2026-09-26)
 
-- OpenAI·삼성 사내 LLM의 실제 텍스트·도구 호출·구조화 출력 품질.
-- 실제 임베딩과 사내 RAGaaS의 인증·응답·자료 접근 정책.
-- Langfuse 인증·전송·대시보드 저장 확인과 실제 모델 Judge 평가.
+`.env`(`LLM_PROVIDER=openai`, `EMBED_PROVIDER=openai`, `RAG_PROVIDER=mock`, `gpt-6-luna`, `text-embedding-3-small`)로 day01~day04를 `RUN_LIVE=True`, `ENABLE_LANGFUSE=True`로 바꾼 임시 사본에서 새 커널로 실행했다. 저장소의 노트북은 바꾸지 않았다.
+
+| 대상 | 결과 |
+| --- | --- |
+| 텍스트 응답·LCEL 체인 (1.2, 1.3) | 한국어 응답 확인 |
+| 도구 호출 Agent (create_agent, LangGraph ToolNode) | `multiply` 호출 → 42, 72 결과로 최종 답변 |
+| 임베딩 (2.1) | 7개 청크, 1536차원 |
+| DeepAgents Skill 읽기 | 보고서 Skill 규칙을 요약 |
+| 구조화 출력 Judge | `JudgeResult` 반환. 근거에 없는 "교육 자료입니다."를 지적 |
+| 캡스톤 승인·거절·근거 없음 | 실제 모델 Writer가 출처 ID를 붙여 작성. 거절·근거 없음 경로에서 Writer 미실행 |
+| Langfuse | `auth_check` 통과, Trace 생성과 observation 5개 저장을 API로 조회 |
+
+- `gpt-6` 계열은 langchain-openai 1.6.6에서 도구가 있으면 Responses API로 자동 전환된다. 이때 `content`가 dict 목록으로 출력되어 사내 경로(Chat Completions, 문자열)와 화면이 달랐다. `src/config/llm.py`에서 `use_responses_api=False`로 고정해 두 경로의 출력 형식을 맞췄다.
+- Langfuse 실습 셀은 모의 모델을 기록하므로 "LLM model을 해석하지 못했다"는 경고가 출력된다. 기록 자체는 저장된다.
+
+아래는 아직 실행하지 않았다.
+
+- 삼성 사내 LLM·임베딩의 실제 응답과 도구 호출.
+- 사내 RAGaaS의 인증·응답·자료 접근 정책.
 - 강의장 Windows PC의 설치, CodeMate UI, 사내 프록시·방화벽·컨플루언스 최신 과제.
 - 기존 `src/raw/`·`src/solution/` 전체의 최신 SDK 이관.
 
