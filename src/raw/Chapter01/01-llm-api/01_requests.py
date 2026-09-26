@@ -1,5 +1,4 @@
 import os
-import uuid
 from pprint import pprint
 
 import requests
@@ -19,21 +18,12 @@ if provider == 'openai':
         'Content-Type': 'application/json',
     }
 elif provider == 'samsung':
-    required = ('api_base_url', 'model', 'credential_key', 'send_system_name', 'user_id')
-    missing = [name for name in required if not os.getenv(name)]
-    if missing:
-        raise RuntimeError(f'사내 LLM 설정이 부족합니다: {missing}')
-    api_base_url = f'{os.getenv("api_base_url").rstrip("/")}/chat/completions'
-    model = os.getenv('model')
-    headers = {
-        'x-dep-ticket': os.getenv('credential_key'),
-        'Send-System-Name': os.getenv('send_system_name'),
-        'User-Id': os.getenv('user_id'),
-        'User-Type': 'AD_ID',
-        'Prompt-Msg-Id': str(uuid.uuid4()),
-        'Completion-Msg-Id': str(uuid.uuid4()),
-        'Content-Type': 'application/json',
-    }
+    # 사내 게이트웨이 주소·모델·인증 헤더는 config/samsung.py에 모아 두었다.
+    from config.samsung import llm_config
+    samsung = llm_config()
+    api_base_url = f'{samsung["base_url"].rstrip("/")}/chat/completions'
+    model = samsung['model']
+    headers = {**samsung['headers'], 'Content-Type': 'application/json'}
 else:
     raise ValueError(f'지원하지 않는 LLM_PROVIDER: {provider}')
 

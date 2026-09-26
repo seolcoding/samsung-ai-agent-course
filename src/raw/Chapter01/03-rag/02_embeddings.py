@@ -14,14 +14,13 @@ import os
 import numpy as np
 from dotenv import load_dotenv
 from config.embeddings import get_embeddings
+from config.samsung import embedding_config
 
 load_dotenv()
 
 import requests
 from langchain_core.embeddings import Embeddings
 
-API_URL = os.getenv('embedding_api_url')
-TICKET  = os.getenv('embedding_x_dep_ticket')
 BATCH   = 10  # API 한 번에 처리 가능한 최대 텍스트 수
 
 class SamsungEmbeddings(Embeddings):
@@ -30,10 +29,12 @@ class SamsungEmbeddings(Embeddings):
         # BATCH 개씩 나눠서 API 호출, 결과를 하나로 합침
         result = []
         for i in range(0, len(texts), BATCH):
+            # 사내 임베딩 주소와 인증 헤더는 config/samsung.py에 모아 두었다.
+            config = embedding_config()
             res = requests.post(
-                f'{API_URL}/v1/embeddings',
+                config['url'],
                 json={'input': texts[i:i + BATCH]},
-                headers={'x-dep-ticket': TICKET},
+                headers=config['headers'],
                 timeout=30,
             )
             res.raise_for_status()
@@ -46,8 +47,7 @@ class SamsungEmbeddings(Embeddings):
 
 provider = os.getenv('EMBED_PROVIDER', 'samsung').strip().lower()
 if provider == 'samsung':
-    if not API_URL or not TICKET:
-        raise RuntimeError('embedding_api_url과 embedding_x_dep_ticket이 필요합니다.')
+    embedding_config()  # 설정이 비어 있으면 여기서 멈춘다.
     embeddings = SamsungEmbeddings()
 else:
     # 사외에서는 같은 유사도 실습을 OpenAI 임베딩으로 실행한다.

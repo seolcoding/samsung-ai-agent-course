@@ -34,32 +34,30 @@ def get_embeddings(**kwargs):
     elif provider == "samsung":
         import requests
         from langchain_core.embeddings import Embeddings
-    
+        from config.samsung import embedding_config
+
         class _SamsungEmbeddings(Embeddings):
-            def __init__(self, api_url: str, ticket: str):
-                self.api_url = api_url
-                self.ticket = ticket
-    
+            def __init__(self, config: dict):
+                self.config = config
+
             def embed_documents(self, texts: list[str]) -> list[list[float]]:
-                resp = requests.post(
-                    f"{self.api_url}/v1/embeddings",
-                    json={"input": texts},
-                    headers={
-                        "Content-Type": "application/json",
-                        "x-dep-ticket": self.ticket,
-                    },
-                    timeout=120,
-                )
-                resp.raise_for_status()
-                return [item["embedding"] for item in resp.json()["data"]]
-    
+                # 02_embeddings.py와 같이 한 번에 10개씩 나눠 요청한다.
+                result = []
+                for i in range(0, len(texts), 10):
+                    resp = requests.post(
+                        self.config["url"],
+                        json={"input": texts[i:i + 10]},
+                        headers=self.config["headers"],
+                        timeout=120,
+                    )
+                    resp.raise_for_status()
+                    result.extend(item["embedding"] for item in resp.json()["data"])
+                return result
+
             def embed_query(self, text: str) -> list[float]:
                 return self.embed_documents([text])[0]
-    
-        return _SamsungEmbeddings(
-            api_url=_required("embedding_api_url"),
-            ticket=_required("embedding_x_dep_ticket"),
-        )
+
+        return _SamsungEmbeddings(embedding_config())
     # ─────────────────────────────────────────────────────────────────────────
 
     raise ValueError(f"지원하지 않는 EMBED_PROVIDER: {provider!r}. 'openai' 또는 'samsung'을 사용하세요.")

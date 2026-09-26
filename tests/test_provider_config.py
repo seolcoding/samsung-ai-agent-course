@@ -78,6 +78,36 @@ class ProviderConfigTests(unittest.TestCase):
             self.assertEqual(llm.options["default_headers"]["x-dep-ticket"], "test-ticket")
             self.assertEqual(os.environ["OPENAI_API_KEY"], "existing-key")
 
+    def test_internal_embeddings_share_gateway_settings_and_batch_requests(self):
+        calls = []
+
+        class Response:
+            def __init__(self, count):
+                self.count = count
+
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return {"data": [{"embedding": [0.0]} for _ in range(self.count)]}
+
+        requests = types.ModuleType("requests")
+        requests.post = lambda url, **kw: calls.append((url, kw)) or Response(len(kw["json"]["input"]))
+        values = {
+            "EMBED_PROVIDER": "samsung",
+            "embedding_api_url": "https://internal.example.invalid/",
+            "embedding_x_dep_ticket": "test-ticket",
+        }
+        with patch.dict(sys.modules, {"requests": requests}), patch.dict(os.environ, values, clear=True):
+            vectors = self.embeddings.get_embeddings().embed_documents([str(i) for i in range(23)])
+        self.assertEqual(len(vectors), 23)
+        self.assertEqual([len(kw["json"]["input"]) for _, kw in calls], [10, 10, 3])
+        self.assertEqual(calls[0][0], "https://internal.example.invalid/v1/embeddings")
+        self.assertEqual(calls[0][1]["headers"]["x-dep-ticket"], "test-ticket")
+        with patch.dict(os.environ, {"EMBED_PROVIDER": "samsung"}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "embedding_api_url"):
+                self.embeddings.get_embeddings()
+
     def test_luna_supports_chat_completions_tool_calls(self):
         values = {
             "LLM_PROVIDER": "openai",

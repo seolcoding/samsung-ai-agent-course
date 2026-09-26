@@ -53,24 +53,14 @@ def post_ragaas(endpoint: str, payload: dict, *, api_key: str | None = None):
     if provider != "samsung":
         raise ValueError(f"지원하지 않는 RAG_PROVIDER: {provider!r}. 'mock' 또는 'samsung'을 사용하세요.")
 
-    required = ("search_url", "rag_credential_key")
-    missing = [name for name in required if not os.getenv(name)]
-    api_key = api_key or os.getenv("rag_api_key")
-    if not api_key:
-        missing.append("rag_api_key")
-    if missing:
-        raise RuntimeError(f"사내 RAGaaS 설정이 부족합니다: {missing}")
-
     import requests
+    from config.samsung import ragaas_config
 
+    samsung = ragaas_config(api_key)
     response = requests.post(
-        f'{os.environ["search_url"].rstrip("/")}/dsllmrag/elastic/v2/{endpoint}',
+        f'{samsung["url"]}/{endpoint}',
         json=payload,
-        headers={
-            "Content-Type": "application/json",
-            "x-dep-ticket": os.environ["rag_credential_key"],
-            "api-key": api_key,
-        },
+        headers=samsung["headers"],
         # 문서 업로드는 서버가 청킹·임베딩까지 처리하므로 오래 걸릴 수 있다.
         timeout=300 if endpoint == "insert-doc" else 30,
     )

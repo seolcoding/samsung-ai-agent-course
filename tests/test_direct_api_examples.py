@@ -134,6 +134,19 @@ class DirectApiExamplesTests(unittest.TestCase):
                 self.assertEqual(os.environ["OPENAI_API_KEY"], "test-key")
             self.assertEqual(self.clients[-1], {"api_key": "test-key"})
 
+            values = {
+                "LLM_PROVIDER": "samsung",
+                "api_base_url": "https://internal.example.invalid/v1",
+                "model": "test-internal-model",
+                "credential_key": "test-ticket",
+                "send_system_name": "test-system",
+                "user_id": "test-user",
+            }
+            with patch.dict(os.environ, values, clear=True), contextlib.redirect_stdout(io.StringIO()):
+                runpy.run_path(str(ROOT / path), run_name="__main__")
+            self.assertEqual(self.clients[-1]["base_url"], values["api_base_url"])
+            self.assertEqual(self.clients[-1]["default_headers"]["x-dep-ticket"], "test-ticket")
+
 
 if __name__ == "__main__":
     unittest.main()

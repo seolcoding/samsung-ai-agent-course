@@ -67,6 +67,27 @@ uv run --extra notebooks streamlit run src/courseware/app.py
 - `gpt-6` 계열은 langchain-openai 1.6.6에서 도구가 있으면 Responses API로 자동 전환된다. 이때 `content`가 dict 목록으로 출력되어 사내 경로(Chat Completions, 문자열)와 화면이 달랐다. `src/config/llm.py`에서 `use_responses_api=False`로 고정해 두 경로의 출력 형식을 맞췄다.
 - Langfuse 실습 셀은 모의 모델을 기록하므로 "LLM model을 해석하지 못했다"는 경고가 출력된다. 기록 자체는 저장된다.
 
+### 기존 실습 코드의 사외 실제 연결 (2026-09-26)
+
+`src/solution/`의 실행 스크립트 38개를 같은 `.env`로 실행했다. MCP·A2A·캡스톤은 각 서버를 먼저 띄운 뒤 클라이언트를 실행했다.
+
+| 대상 | 결과 |
+| --- | --- |
+| Chapter01 LLM API·LangChain·LangGraph·멀티에이전트 | 모두 정상 종료 |
+| RAG (`03_vector_store`, `04_langchain_rag`, `00-review/03_langchain_rag`) | 질문에 답한 뒤 다음 입력을 기다리는 반복 구조. 입력이 끝나면 `EOFError`로 끝나며 오류가 아니다 |
+| MCP (SSE 서버 + 클라이언트) | 도구 5개 발견, 시간·BMI·할 일 도구 호출 |
+| A2A (서버 + 클라이언트) | Agent Card 조회, 응답 수신 |
+| Observability 01~05 | Langfuse에 기록. LLM Judge·사용자 점수 출력 |
+| 캡스톤 (`mcp_server.py` + `solution.py`) | 보고서 작성, Judge 종합 0.95, Langfuse 기록 |
+
+- Langfuse에는 16개 trace, 127개 observation이 저장됐다. 실제 OpenAI 호출은 모델명(`gpt-6-luna`)·토큰·비용이 함께 기록됐다.
+- 2026-09-16 이후 만든 Langfuse 조직에서는 `GET /api/public/traces` 같은 이전 조회 API가 410으로 막힌다. 교안 코드는 이 API를 쓰지 않는다. 검증 조회에는 `/api/public/v2/observations`를 썼다.
+- 캡스톤 `mcp_server.py`는 A2A 서버(`01_a2a_server.py`)와 같은 8001 포트를 쓴다. 두 서버를 동시에 띄우지 않는다.
+
+### 사내 API 설정 공통화
+
+사내 LLM·임베딩·RAGaaS의 주소와 인증 헤더를 `src/config/samsung.py`의 `llm_config()`, `embedding_config()`, `ragaas_config()`로 모았다. `config/llm.py`·`embeddings.py`·`ragaas.py`와 `01_requests`·`02_openai`·`02_embeddings`(raw·solution, 옆 노트북 포함)가 이 함수를 쓴다. 헤더 이름과 값의 출처는 원본과 같다. 공통 임베딩은 `02_embeddings.py`와 같이 10개씩 나눠 요청한다.
+
 ### 사내 임베딩·RAGaaS 기준
 
 사내 임베딩과 RAGaaS는 원본 교안 코드(최초 커밋 `addae97`)가 사내에서 동작한다고 보고, 현재 코드의 요청이 원본과 같은지 대조했다. 사내망 실행은 하지 않았다.

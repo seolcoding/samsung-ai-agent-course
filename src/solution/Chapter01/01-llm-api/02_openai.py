@@ -7,8 +7,6 @@ from openai import OpenAI
 
 load_dotenv()
 
-import uuid
-
 provider = os.getenv('LLM_PROVIDER', 'samsung').strip().lower()
 if provider == 'openai':
     model = os.getenv('OPENAI_MODEL')
@@ -17,22 +15,14 @@ if provider == 'openai':
         raise RuntimeError('OPENAI_MODEL과 OPENAI_API_KEY가 필요합니다.')
     client = OpenAI(api_key=api_key)
 elif provider == 'samsung':
-    model = os.getenv('model')
-    required = ('api_base_url', 'credential_key', 'send_system_name', 'user_id')
-    missing = [name for name in required if not os.getenv(name)]
-    if not model or missing:
-        raise RuntimeError(f'사내 LLM 설정이 부족합니다: {missing or ["model"]}')
+    # 사내 게이트웨이 주소·모델·인증 헤더는 config/samsung.py에 모아 두었다.
+    from config.samsung import llm_config
+    samsung = llm_config()
+    model = samsung['model']
     client = OpenAI(
         api_key='samsung-gateway',  # 실제 사내 인증은 x-dep-ticket 헤더에서 처리
-        base_url=os.getenv('api_base_url'),
-        default_headers={
-            'x-dep-ticket': os.getenv('credential_key'),
-            'Send-System-Name': os.getenv('send_system_name'),
-            'User-Id': os.getenv('user_id'),
-            'User-Type': 'AD_ID',
-            'Prompt-Msg-Id': str(uuid.uuid4()),
-            'Completion-Msg-Id': str(uuid.uuid4()),
-        },
+        base_url=samsung['base_url'],
+        default_headers=samsung['headers'],
     )
 else:
     raise ValueError(f'지원하지 않는 LLM_PROVIDER: {provider}')
