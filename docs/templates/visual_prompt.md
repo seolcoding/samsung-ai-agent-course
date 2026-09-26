@@ -28,13 +28,3 @@ Constraints: no logos, no brands, no readable words, no tiny UI text, no invente
 ```
 
 그림이 없어도 이해되는 장식 이미지는 만들지 않는다. 한 그림에는 주장이 하나여야 한다. 생성 결과에 잘못된 글자·UI·연결이 있으면 수업에 넣지 않는다. 최종 PNG는 `lessons/assets/`에 두고 노트북에는 Markdown attachment로 포함한다. 생성 원본과 노트북의 설명이 서로 같은 개념을 가리키는지 확인한다.
-
-## 적용 예: `chatbot_vs_agent.png`
-
-- 의미 번호: `1.1.2`
-- 구별할 것: 말로만 답하는 Chatbot과 도구 결과를 보고 답하는 Agent
-- 구성: 같은 사용자의 날씨 질문을 좌우 두 장면으로 비교
-- 설명: [`_prototype_agent_loop.ipynb`](../../lessons/_prototype_agent_loop.ipynb)의 **그림 1.1.2.1**
-- 한계: 도구 호출의 정확한 순서는 보여 주지 않는다. 그 부분은 `agent_loop.svg`에서 설명한다.
-
-사용한 이미지 생성 지시의 핵심 문장: *“Visualize the difference between a simple chatbot that only returns words and an AI agent that can use a tool and review the result. On the left, a person asks a question at a laptop and receives a speech bubble. On the right, the same laptop assistant consults a weather-data tool card, receives an observation, and prepares a grounded answer.”* 위 틀의 스타일·구도·금지 조건을 함께 적용했다.

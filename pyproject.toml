@@ -4,10 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["config*", "courseware*"]
-
-[tool.setuptools.package-data]
-courseware = ["data/*.json", "skills/*/SKILL.md"]
+include = ["config*"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
