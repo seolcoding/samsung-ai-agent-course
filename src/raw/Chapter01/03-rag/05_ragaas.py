@@ -24,9 +24,8 @@ load_dotenv()
 
 RAG_PROVIDER = os.getenv('RAG_PROVIDER', 'samsung').strip().lower()
 RAG_API_KEY = os.getenv('rag_api_key')
-INDEX_NAME = os.getenv('index_name') or ('mock-pet-insurance' if RAG_PROVIDER == 'mock' else '')
-if not INDEX_NAME:
-    raise RuntimeError('사내 RAGaaS에는 index_name 환경변수가 필요합니다.')
+# 사용할 인덱스 네임
+INDEX_NAME = 'rp-aicoa-meritz-pet'
 # 실제 사내 요청의 api-key 헤더에는 RAG_API_KEY가 들어간다.
 print(f'RAGaaS 모드: {RAG_PROVIDER}')
 

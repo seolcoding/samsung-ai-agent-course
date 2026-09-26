@@ -71,7 +71,8 @@ def post_ragaas(endpoint: str, payload: dict, *, api_key: str | None = None):
             "x-dep-ticket": os.environ["rag_credential_key"],
             "api-key": api_key,
         },
-        timeout=30,
+        # 문서 업로드는 서버가 청킹·임베딩까지 처리하므로 오래 걸릴 수 있다.
+        timeout=300 if endpoint == "insert-doc" else 30,
     )
     response.raise_for_status()
     return response

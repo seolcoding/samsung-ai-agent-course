@@ -67,10 +67,23 @@ uv run --extra notebooks streamlit run src/courseware/app.py
 - `gpt-6` 계열은 langchain-openai 1.6.6에서 도구가 있으면 Responses API로 자동 전환된다. 이때 `content`가 dict 목록으로 출력되어 사내 경로(Chat Completions, 문자열)와 화면이 달랐다. `src/config/llm.py`에서 `use_responses_api=False`로 고정해 두 경로의 출력 형식을 맞췄다.
 - Langfuse 실습 셀은 모의 모델을 기록하므로 "LLM model을 해석하지 못했다"는 경고가 출력된다. 기록 자체는 저장된다.
 
+### 사내 임베딩·RAGaaS 기준
+
+사내 임베딩과 RAGaaS는 원본 교안 코드(최초 커밋 `addae97`)가 사내에서 동작한다고 보고, 현재 코드의 요청이 원본과 같은지 대조했다. 사내망 실행은 하지 않았다.
+
+| 대상 | 원본과의 차이 | 처리 |
+| --- | --- | --- |
+| 임베딩 `config/embeddings.py` | 주소 `/v1/embeddings`, `x-dep-ticket` 헤더, `{"input": texts}` 동일. 필수값 검사·timeout 추가 | timeout을 120초로 설정 |
+| RAGaaS `config/ragaas.py` | 주소·`x-dep-ticket`·`api-key` 헤더 동일. `json=` 전송은 `data=json.dumps()`와 같은 본문 | 원본에 없던 timeout 중 `insert-doc`은 300초로 설정 |
+| `src/raw/.../05_ragaas.py` | 원본은 `rp-aicoa-meritz-pet` 인덱스를 코드에 고정. 개편본은 `index_name` 환경변수가 없으면 실패 | 원본 인덱스로 되돌림 |
+| 캡스톤 정답 `rag_search` | 원본 요청의 `fields_exclude` 누락 | 원본 요청으로 되돌림 |
+| 2.1.4 교안 셀 | 원본에 없는 요청 필드(`size`) 사용, 항상 mock | 원본 요청으로 바꾸고 `RUN_LIVE`와 `RAG_PROVIDER`를 따름 |
+
+- 원본 정답본 `05_ragaas.py`·캡스톤은 `api-key` 헤더 없이 요청했다. 원본 실습본과 이 프로젝트 규칙(AGENTS.md 6절 5번)에 따라 두 헤더를 모두 보낸다.
+
 아래는 아직 실행하지 않았다.
 
-- 삼성 사내 LLM·임베딩의 실제 응답과 도구 호출.
-- 사내 RAGaaS의 인증·응답·자료 접근 정책.
+- 삼성 사내 LLM의 실제 응답과 도구 호출.
 - 강의장 Windows PC의 설치, CodeMate UI, 사내 프록시·방화벽·컨플루언스 최신 과제.
 - 기존 `src/raw/`·`src/solution/` 전체의 최신 SDK 이관.
 

@@ -48,7 +48,7 @@ def get_embeddings(**kwargs):
                         "Content-Type": "application/json",
                         "x-dep-ticket": self.ticket,
                     },
-                    timeout=30,
+                    timeout=120,
                 )
                 resp.raise_for_status()
                 return [item["embedding"] for item in resp.json()["data"]]

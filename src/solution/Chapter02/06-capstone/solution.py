@@ -69,6 +69,7 @@ def rag_search(query: str) -> str:
         'permission_groups': ['rag-public'],
         'query_text': query,
         'num_result_doc': 3,
+        'fields_exclude': ['v_merge_title_content'],
     }
     response = post_ragaas('retrieve-rrf', payload)
     hits = response.json()['hits']['hits']

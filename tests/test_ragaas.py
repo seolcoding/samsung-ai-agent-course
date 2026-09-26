@@ -61,6 +61,9 @@ class RagProviderTests(unittest.TestCase):
         self.assertEqual(options["headers"]["x-dep-ticket"], "test-ticket")
         self.assertEqual(options["headers"]["api-key"], "test-api-key")
         self.assertEqual(options["timeout"], 30)
+        with patch.dict(os.environ, values, clear=True):
+            self.ragaas.post_ragaas("insert-doc", {"index_name": "test"})
+        self.assertEqual(self.calls[1][1]["timeout"], 300)
 
     def test_internal_missing_settings_fail_before_network(self):
         with patch.dict(os.environ, {"RAG_PROVIDER": "samsung"}, clear=True):
@@ -88,6 +91,29 @@ class RagProviderTests(unittest.TestCase):
         with patch.dict(os.environ, {"RAG_PROVIDER": "samsung"}, clear=True):
             with self.assertRaisesRegex(RuntimeError, "index_name"):
                 namespace["rag_search"]("AI Agent")
+        values = {
+            "RAG_PROVIDER": "samsung", "index_name": "test-index",
+            "search_url": "https://internal.example.invalid",
+            "rag_credential_key": "test-ticket", "rag_api_key": "test-api-key",
+        }
+        with patch.dict(os.environ, values, clear=True):
+            with self.assertRaises(AttributeError):  # 가짜 Response에는 json()이 없다.
+                namespace["rag_search"]("AI Agent")
+        # 원본 캡스톤과 같은 검색 요청을 보낸다.
+        self.assertEqual(self.calls[0][1]["json"], {
+            "index_name": "test-index",
+            "permission_groups": ["rag-public"],
+            "query_text": "AI Agent",
+            "num_result_doc": 3,
+            "fields_exclude": ["v_merge_title_content"],
+        })
+
+    def test_raw_lab_uses_the_original_prebuilt_index(self):
+        source = (
+            Path(__file__).resolve().parents[1]
+            / "src/raw/Chapter01/03-rag/05_ragaas.py"
+        )
+        self.assertIn("INDEX_NAME = 'rp-aicoa-meritz-pet'", source.read_text())
 
 
 if __name__ == "__main__":
