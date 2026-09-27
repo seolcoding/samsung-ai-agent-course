@@ -11,6 +11,7 @@
     show_scorecard   검증 규칙 통과 여부를 회차별로 비교
     show_order_quiz  순서 맞추기 퀴즈
     show_line_pick   코드에서 틀린 줄 찾기 퀴즈
+    run_step         원본 파일의 한 구간을 보여 주고 그대로 실행
 """
 
 import html
@@ -487,3 +488,49 @@ def show_line_pick(code, answer_lines, title="틀린 줄 찾기", explanation=""
   }});
 }})();
 </script>""")
+
+
+# 파일별 실행 이름공간. 같은 파일의 단계들은 변수를 이어서 쓴다.
+_STEP_SPACES = {}
+
+
+def run_step(path, start=None, end=None):
+    """원본 파일에서 start 표시가 든 줄부터 end 표시가 든 줄 직전까지를 보여 주고 실행한다.
+
+    start가 None이면 파일 처음부터, end가 None이면 파일 끝까지다. end는 start 뒤에서 찾는다.
+    원본은 고치지 않는다. 같은 파일의 단계를 순서대로 모두 실행하면 원본 전체를 한 번 실행한 것과 같다.
+    파일 처음(start=None)부터 다시 실행하면 그 파일의 변수를 새로 시작한다.
+    """
+    from IPython.display import display
+
+    path = Path(path).resolve()
+    lines = path.read_text(encoding="utf-8").splitlines()
+
+    def find(marker, begin):
+        hit = next((k for k in range(begin, len(lines)) if marker in lines[k]), None)
+        if hit is None:
+            raise ValueError(f"{path.name}에서 표시를 찾지 못했다: {marker!r}. 원본이 바뀌었는지 확인한다.")
+        return hit
+
+    first = 0 if start is None else find(start, 0)
+    last = len(lines) if end is None else find(end, first + 1)
+    if start is None or path not in _STEP_SPACES:
+        _STEP_SPACES[path] = {"__name__": "__main__", "__file__": str(path)}
+    space = _STEP_SPACES[path]
+
+    rows = "".join(
+        f'<div><span style="color:#8c959f;user-select:none;display:inline-block;width:3em">{k + 1}</span>'
+        f"{html.escape(lines[k]) or ' '}</div>"
+        for k in range(first, last)
+    )
+    display(HTML(
+        f'<div style="{BOX};max-width:1200px;padding:8px">'
+        f'<div style="color:#57606a;font-size:13px;margin-bottom:4px">{html.escape(path.name)} {first + 1}–{last}줄 (원본 그대로 실행)</div>'
+        f'<pre style="margin:0;white-space:pre;overflow:auto;font-family:Menlo,Consolas,monospace;font-size:14px;'
+        f'background:#f6f8fa;border-radius:6px;padding:8px">{rows}</pre></div>'
+    ))
+    # 줄 번호가 원본과 같도록 앞을 빈 줄로 채워 컴파일한다. 오류 위치가 원본 줄 번호로 나온다.
+    source = "\n" * first + "\n".join(lines[first:last]) + "\n"
+    exec(compile(source, str(path), "exec"), space)
+    return space
+

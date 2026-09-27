@@ -1,0 +1,91 @@
+[
+ {
+  "question": "LLM이 답을 만드는 방식으로 맞는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "완성된 답을 한 번에 꺼낸다",
+    "correct": false,
+    "feedback": "LLM은 완성된 답을 한 번에 꺼내지 않습니다 (p6)."
+   },
+   {
+    "answer": "다음 토큰을 하나씩 예측해 문맥 뒤에 붙이기를 반복한다",
+    "correct": true,
+    "feedback": "맞습니다. 후보 중 하나를 골라 문맥 뒤에 붙이고, 이를 되풀이해 답을 만듭니다 (p6)."
+   },
+   {
+    "answer": "학습한 문서 중 가장 비슷한 문서를 그대로 돌려준다",
+    "correct": false,
+    "feedback": "모델은 문맥을 보고 다음 토큰의 확률을 계산해 답을 만듭니다 (p6)."
+   }
+  ]
+ },
+ {
+  "question": "토큰에 대한 설명으로 맞지 않는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "토큰은 단어 하나와 항상 같다",
+    "correct": true,
+    "feedback": "정답입니다. 이 설명이 틀린 설명입니다. 토큰은 단어 하나와 항상 같지 않습니다 (p9)."
+   },
+   {
+    "answer": "단어의 일부, 공백, 기호, 숫자 조각이 토큰이 될 수 있다",
+    "correct": false,
+    "feedback": "p9에 적힌 설명 그대로입니다 (p9)."
+   },
+   {
+    "answer": "한국어는 조사와 어미 때문에 더 잘게 나뉠 수 있다",
+    "correct": false,
+    "feedback": "p9의 설명과 같습니다 (p9)."
+   },
+   {
+    "answer": "입력 프롬프트와 모델의 답변 모두 토큰 단위로 계산한다",
+    "correct": false,
+    "feedback": "p9에서 설명한 내용과 일치합니다 (p9)."
+   }
+  ]
+ },
+ {
+  "question": "이전 대화를 모델이 참고하게 하려면 어떻게 하나요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "아무것도 하지 않아도 모델이 기억한다",
+    "correct": false,
+    "feedback": "모델은 현재 요청에 담긴 컨텍스트 밖의 정보를 직접 참조하지 못합니다 (p14)."
+   },
+   {
+    "answer": "이전 대화를 다음 요청의 메시지 목록에 다시 넣는다",
+    "correct": true,
+    "feedback": "맞습니다. 실행 ②의 context += 줄이 이 일을 했습니다 (p14)."
+   },
+   {
+    "answer": "temperature를 낮춘다",
+    "correct": false,
+    "feedback": "temperature는 답의 다양성을 조정하는 값입니다 (p19)."
+   }
+  ]
+ },
+ {
+  "question": "실행 ③에서 \"너는 초보자를 위한 AI 튜터야\"는 어떤 역할의 메시지였나요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "System",
+    "correct": true,
+    "feedback": "맞습니다. 모델의 역할을 정하는 지시라서 System입니다. 03에서는 SystemMessage로 보냈습니다 (p18)."
+   },
+   {
+    "answer": "User",
+    "correct": false,
+    "feedback": "User는 사용자의 질문과 요청을 전합니다. 03의 User 메시지는 질문 문장입니다 (p18)."
+   },
+   {
+    "answer": "Assistant",
+    "correct": false,
+    "feedback": "Assistant는 LLM이 만든 답입니다 (p18)."
+   }
+  ]
+ }
+]
