@@ -190,3 +190,7 @@ pyrightconfig.json
 *.key
 node_modules/
 ~$*
+
+
+study_materials/
+infra/langfuse/docker-compose.override.yml
