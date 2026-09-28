@@ -5,22 +5,22 @@ argument-hint: "[노트북 경로] [실행]"
 
 # /notebook-qc
 
-**목적:** `lessons/Chapter*/` 교안 노트북이 지금까지 정한 QC 기준을 지키는지 확인한다. 고치지 않고 보고만 한다.
+**목적:** `course/Chapter*/notebooks/` 교안 노트북(수강생본)이 지금까지 정한 QC 기준을 지키는지 확인한다. 고치지 않고 보고만 한다.
 
 노트북은 두 종류이고, 파일 이름 끝으로 구분한다.
 - **강의** `*_LEC.ipynb`: 슬라이드(`show_slides`) + 설명 + 퀴즈. 실습 코드 도구는 없다.
-- **실습** `*_LAB.ipynb`: `lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`과 원본 코드로 조립한다. 원본 파일마다 준비 코드(접힘) → 구획마다 예제(완성 코드 실행, `# ✍️ CHANGE_HERE:` 줄의 값만 바꿔 보기 → 🟢/⛔ 성공 기준) 또는 과제(설명 → 프롬프트 힌트(3문장 이내) → 🟢/⛔ 성공 기준 → `# ✍️ WRITE_HERE:` 아래 빈칸(`...  # ✍️ …`) 셀 → 정답 보기(접힘)). 성공 기준은 자동 검사하지 않고 수강생이 스스로 판단한다. TODO가 없는 파일은 끝에 "AI에게 물어보기"(프롬프트 힌트 + 성공 기준). 제목 옆 표시는 `(예제)`·`(과제)`이고, ✍️ 표시 주석은 대상 줄 바로 위에 같은 들여쓰기로 한 줄을 차지한다. 수강생 글에서는 CodeMate 대신 "AI"라고 쓴다. 지시문 완성본은 주지 않는다. 실행되지 않는 참고 코드는 "참고:" 절의 ```` ```python ```` 블록.
+- **실습** `*_LAB.ipynb`: `dev/builders/build_lab.py`가 `dev/builders/labs/<폴더>.json`과 원본 코드로 조립한다. 원본 파일마다 준비 코드(접힘) → 구획마다 예제(완성 코드 실행, `# ✍️ CHANGE_HERE:` 줄의 값만 바꿔 보기 → 🟢/⛔ 성공 기준) 또는 과제(설명 → 프롬프트 힌트(3문장 이내) → 🟢/⛔ 성공 기준 → `# ✍️ WRITE_HERE:` 아래 빈칸(`...  # ✍️ …`) 셀 → 정답 보기(접힘)). 성공 기준은 자동 검사하지 않고 수강생이 스스로 판단한다. TODO가 없는 파일은 끝에 "AI에게 물어보기"(프롬프트 힌트 + 성공 기준). 제목 옆 표시는 `(예제)`·`(과제)`이고, ✍️ 표시 주석은 대상 줄 바로 위에 같은 들여쓰기로 한 줄을 차지한다. 수강생 글에서는 CodeMate 대신 "AI"라고 쓴다. 지시문 완성본은 주지 않는다. 실행되지 않는 참고 코드는 "참고:" 절의 ```` ```python ```` 블록.
 
 수강생은 노트북만 받는다(.py 파일은 보이지 않는다). 노트북 하나로 완결되어야 한다.
 
-**인자:** `$ARGUMENTS` = 노트북 경로. 비어 있으면 `lessons/Chapter*/*.ipynb` 전부.
+**인자:** `$ARGUMENTS` = 노트북 경로. 비어 있으면 `course/Chapter*/notebooks/*.ipynb` 전부.
 사용자가 "실행"·"execute"를 말하면 새 커널 실행까지 한다.
 
 ## 1단계: 하네스 실행 (규칙으로 판정되는 것)
 
 ```
-uv run python lessons/qc/notebook_qc.py $ARGUMENTS
-uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute   # 실행을 요청받았을 때
+uv run python dev/qc/notebook_qc.py $ARGUMENTS
+uv run --extra notebooks python dev/qc/notebook_qc.py $ARGUMENTS --execute   # 실행을 요청받았을 때
 ```
 
 - 하네스가 보는 것
@@ -33,7 +33,7 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
 
 ## 2단계: 판단 점검표 (노트북을 직접 읽고 본다)
 
-노트북, 퀴즈 JSON(`lessons/assets/quizzes/<권>/`), 원본(`src/raw/`, `docs/raw/` PDF)을 대조한다. 실습은 `src/solution/`(정답 보기와 대조)과 `lessons/drafts/labs/<폴더>.json`도 본다.
+노트북, 퀴즈 JSON(`course/assets/quizzes/<권>/`), 원본(`course/ChapterNN/code/raw/`, `course/ChapterNN/slides/` PDF)을 대조한다. 실습은 `course/ChapterNN/code/solution/`(정답 보기와 대조)과 `lessons/drafts/labs/<폴더>.json`도 본다.
 
 **공통**
 
@@ -49,7 +49,7 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
 10. **문체:** 수강생 글은 합니다체다.
 11. **구조:** 번호 목차가 맨 위에 있고, 제목 옆에 (슬라이드)(퀴즈)(코드)(예제)(과제) 표시가 내용과 맞다.
 12. **슬라이드:** PDF.js로 그린다. 외부 CDN·외부 주소가 없다.
-13. **원본 보호:** `src/`가 바뀌지 않았다 (`git status src/`로 확인).
+13. **원본 보호:** `course/*/code/`가 바뀌지 않았다 (`git status course/*/code`로 확인). 수강생본에 강사용 메모가 없고 강사본(`dev/instructor/`)에만 있다.
 14. **실행:** 새 커널에서 오류 0, 키 값이 출력되지 않는다.
 15. **커밋 전:** 노트북 출력과 실행 번호를 비웠다.
 16. **노트북 하나로 완결:** 수강생 글이 다른 노트북("강의에서 본", "실습 노트북에서")이나 다른 파일을 언급하지 않는다. 이 노트북만 열어도 따라갈 수 있다.
@@ -82,4 +82,4 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
 ```
 
 - 사용자가 고치라고 하기 전에는 파일을 고치지 않는다.
-- 노트북을 고칠 때는 빌더(`lessons/drafts/build_*.py`)와 `lessons/drafts/*.json`, `lessons/drafts/labs/*.json`을 고치고 다시 조립한다. 노트북을 직접 고치지 않는다.
+- 노트북을 고칠 때는 빌더(`dev/builders/build_*.py`)와 `dev/builders/*.json`, `dev/builders/labs/*.json`을 고치고 다시 조립한다. 노트북을 직접 고치지 않는다.
