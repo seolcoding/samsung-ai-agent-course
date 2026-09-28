@@ -49,6 +49,14 @@ def fmt(src):
     return done.stdout.rstrip("\n") if done.returncode == 0 else src
 
 
+SELF_HELP = """**막혔을 때: 스스로 먼저 확인합니다**
+
+1. 오류가 난 셀과 오류의 마지막 줄을 AI에게 붙여 넣고, 원인과 고칠 곳을 물어봅니다. 처음 한 번은 "저장소 맨 위 AGENTS.md를 읽고 도와줘"라고 먼저 말합니다. AI가 설치·경로·연결 문제의 해결 순서를 알게 됩니다.
+2. 설정 문제로 보이면 맨 위 환경 점검 셀을 다시 실행하고, ⛔ 줄의 → 안내대로 고칩니다.
+3. 커널을 다시 시작하고 맨 위 셀부터 다시 실행합니다.
+4. 옆 사람 화면과 비교해 봅니다.
+5. 그래도 안 되면 오류 화면을 그대로 두고 강사에게 보여 줍니다. 그동안 그 셀은 건너뛰고 다음 절을 진행해도 됩니다."""
+
 QUIET_CALLS = {"load_dotenv", "add_edge", "add_node", "add_conditional_edges", "set_entry_point"}
 
 

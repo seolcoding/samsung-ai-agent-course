@@ -31,7 +31,7 @@ from pathlib import Path
 from pprint import pformat
 
 sys.path.insert(0, str(Path(__file__).parent))
-from nbkit import Notebook, fmt  # noqa: E402
+from nbkit import SELF_HELP, Notebook, fmt  # noqa: E402
 
 HERE = Path(__file__).parent
 ROOT = HERE.parents[1]
@@ -203,6 +203,7 @@ def build(folder):
 
     nb.h(2, "1. 실습 방법")
     nb.md(PROMPT_GUIDE)
+    nb.md(SELF_HELP)
 
     for n, f in enumerate(spec["files"], start=2):
         # 원본을 먼저 정돈한다(읽기 쉽게). 원본·솔루션이 다르면 spec의 source로 깔끔한 쪽을 고른다

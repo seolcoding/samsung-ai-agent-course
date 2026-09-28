@@ -18,7 +18,7 @@ import textwrap
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from nbkit import Notebook  # noqa: E402
+from nbkit import SELF_HELP, Notebook  # noqa: E402
 
 HERE = Path(__file__).parent
 ROOT = HERE.parents[1]
@@ -198,7 +198,7 @@ SERVER = f"""VS Code 메뉴 **터미널 → 새 터미널**로 터미널을 엽�
 SERVER_OK = criteria(
     ["터미널 A에 `Application startup complete.`가 나오고, 명령이 끝나지 않고 기다립니다."],
     ["`address already in use` 오류가 납니다 → 8001 포트를 다른 서버(3일차 A2A 서버 등)가 쓰고 있습니다. 그 서버를 띄운 터미널에서 **Ctrl+C**로 끄고 다시 실행합니다.",
-     "환경 점검 셀에서 Langfuse가 ⛔입니다 → 강사에게 알립니다. 보고서와 점수는 나오지만 Langfuse에 기록되지 않습니다."])
+     "환경 점검 셀에서 Langfuse가 ⛔입니다 → `.env`의 Langfuse 값 세 개를 확인합니다. 그대로 진행해도 보고서와 점수는 나오지만 Langfuse에 기록되지 않습니다."])
 
 STEPS_NOTE = """`capstone/starter.py`의 `TODO` 11개를 일곱 단계로 묶었습니다. 단계 1~5는 코드만 고치고, 실행 확인은 6단계를 마친 뒤 7장에서 한 번에 합니다. 각 단계의 🟢/⛔는 그때 볼 화면입니다.
 
@@ -216,10 +216,11 @@ def build():
             'check_env(["EMBED_PROVIDER", "RAG_PROVIDER", "LANGFUSE"])', kind="")
     nb.code("from langfuse import get_client\n\n"
             "# Langfuse 키가 맞는지 한 번 확인합니다(키 값은 출력하지 않습니다)\n"
-            'print("🟢 Langfuse 연결 확인" if get_client().auth_check() else "⛔ Langfuse 연결 실패: 강사에게 알립니다")',
+            'print("🟢 Langfuse 연결 확인" if get_client().auth_check() else "⛔ Langfuse 연결 실패: .env의 LANGFUSE_ 값 세 개를 확인하세요")',
             kind="")
     nb.md("**볼 지점**\n- \"준비 완료\"와 \"🟢 Langfuse 연결 확인\"이 나오면 다음으로 넘어갑니다.\n"
-          "- ⛔가 나오면 강사에게 알립니다.\n- 키 값은 화면에 나오지 않습니다. 혹시 나오면 강사에게 알립니다.")
+          "- ⛔가 나오면 ⛔ 줄의 → 안내대로 `.env`를 고친 뒤 다시 실행합니다. 모르겠으면 출력을 AI에게 붙여 넣고 물어봅니다.\n- 키 값은 화면에 나오지 않습니다. 혹시 나오면 셀 출력을 지우고, 다른 곳에 붙여 넣지 않습니다.")
+    nb.md(SELF_HELP)
     nb.meta("- 사용자 결정 3: Langfuse 키는 `get_client().auth_check()`로 실제 인증까지 확인합니다. 맥 `.env`의 `LANGFUSE_BASE_URL` 줄이 깨져 있어 제작 때는 환경변수로 `https://jp.cloud.langfuse.com`을 주어 확인했습니다.\n"
             "- 캡스톤은 임베딩을 쓰지 않지만 공통 지침대로 `EMBED_PROVIDER`도 점검합니다.")
 
@@ -371,7 +372,7 @@ def build():
 
 같은 Langfuse 프로젝트를 여럿이 함께 쓰면 다른 사람의 trace도 섞여 보입니다. 실행한 시각으로 내 것을 고릅니다.""")
     nb.md(criteria(["방금 실행한 시각에 위 세 trace가 있고, 채점 trace에 점수 네 개가 붙어 있습니다."],
-                   ["trace가 하나도 없습니다 → 환경 점검 셀의 Langfuse 결과를 다시 봅니다. ⛔이면 강사에게 알립니다."]))
+                   ["trace가 하나도 없습니다 → 환경 점검 셀의 Langfuse 결과를 다시 봅니다. ⛔이면 `.env`의 Langfuse 값을 고치고 7장을 다시 실행합니다."]))
     nb.meta("- trace 이름은 2026-09-28 사외 실행으로 확인했습니다(Researcher·Writer: `LangGraph`, Judge: `RunnableSequence`). 원본 코드는 trace 이름·태그를 붙이지 않으므로 시각으로 찾습니다. Supervisor 호출은 추적 설정이 없어 trace가 없습니다.\n"
             "- 채점 trace에 score 네 개가 보이는지는 Langfuse 조회 API 제한으로 자동 확인하지 못했습니다(미확인). 수업 전에 대시보드에서 직접 확인합니다.\n"
             "- 강의장 사내 게이트웨이에서 Supervisor·Judge의 구조화 출력(`with_structured_output`)과 Deep Agent의 도구 호출은 미검증입니다. 사내 Langfuse 구성도 미정입니다.\n"

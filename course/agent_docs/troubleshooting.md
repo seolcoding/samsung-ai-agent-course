@@ -38,11 +38,11 @@
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| `AuthenticationError` / 401 | 키가 틀리거나 만료됨 | `.env`의 키를 강사에게 다시 받는다. 키를 화면에 출력해 확인하지 않는다 |
+| `AuthenticationError` / 401 | 키가 틀리거나 만료됨 | 사내는 교육 페이지의 값을, 사외는 받은 값을 `.env`에 다시 복사한다(앞뒤 공백·따옴표 확인). 키를 화면에 출력해 확인하지 않는다 |
 | `NotFoundError` / 404, "model … does not exist" | 모델 이름이 틀림 | `.env`의 `OPENAI_MODEL`(사내는 `model`) 값을 확인 |
 | `APIConnectionError`, 연결 시간 초과 | 네트워크. 사내 값은 사내망에서만, `openai`는 인터넷이 필요 | 네트워크 확인. 사외에서는 `openai` 설정을 쓴다 |
 | `RateLimitError` / 429 | 짧은 시간에 요청이 몰림 | 잠시 뒤 다시 실행 |
-| 사내 환경에서 SDK 셀(`client.responses…`), 도구 호출(`bind_tools`), 구조화 출력(`with_structured_output`)만 실패 | 사내 게이트웨이가 그 기능을 지원하는지 아직 확인되지 않음 | 오류 메시지를 강사에게 알린다. 코드를 바꿔 우회하지 않는다 |
+| 사내 환경에서 SDK 셀(`client.responses…`), 도구 호출(`bind_tools`), 구조화 출력(`with_structured_output`)만 실패 | 사내 게이트웨이가 그 기능을 지원하는지 아직 확인되지 않음 | ① `uv run python -m config.check --live`로 기본 호출이 되는지 본다. ② 기본 호출이 되면 그 기능만 막힌 것이다. 오류 마지막 줄로 원인을 설명해 주고, 그 셀은 건너뛰고 다음 절을 진행하게 한다. ③ 코드를 바꿔 우회하지 않는다. 강사에게는 셀 이름과 오류 마지막 줄을 정리해 전하게 한다 |
 | 사내 RAGaaS 인증 실패 | `rag_api_key`(api-key 헤더)와 `rag_credential_key`(x-dep-ticket) 둘 다 필요 | 두 값이 모두 있는지 확인. 사외에서는 `RAG_PROVIDER=mock` |
 
 ## 실습 중
@@ -89,4 +89,9 @@
 
 ## 그래도 안 되면
 
-오류 메시지 전체(키 값이 없는지 확인한 뒤), 실행한 셀, `os.getcwd()` 결과, 고른 커널 이름을 강사에게 알린다.
+수강생이 스스로 먼저 확인하는 순서(노트북의 "막혔을 때"와 같다):
+
+1. 오류 마지막 줄로 이 문서의 표를 찾아 해결한다.
+2. `uv run python -m config.check`(필요하면 `--live`, `--langfuse`)로 설정을 다시 본다.
+3. 커널을 다시 시작하고 맨 위 셀부터 다시 실행한다. 경로 문제면 [paths.md](paths.md)를 본다.
+4. 풀리지 않으면 그 셀은 건너뛰고 다음 절을 진행하게 하고, 강사에게 보여 줄 내용을 정리해 준다: 오류 마지막 줄(키 값이 없는지 확인한 뒤), 실행한 셀, `os.getcwd()` 결과, 고른 커널 이름.

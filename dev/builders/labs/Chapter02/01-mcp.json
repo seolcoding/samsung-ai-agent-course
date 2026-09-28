@@ -209,7 +209,7 @@
       "(\"stdio\"로 바꾸고 다시 실행한 뒤) 시간·BMI 답은 SSE 때와 같지만, 할 일 질문에는 추가했는데 목록이 비어 있다는 식으로 답한다"
      ],
      "fail": [
-      "(\"stdio\"로 바꾼 뒤) 오류에 `FileNotFoundError`나 `NotImplementedError`가 보인다 → 강사에게 알립니다"
+      "(\"stdio\"로 바꾼 뒤) 오류에 `FileNotFoundError`나 `NotImplementedError`가 보인다 → 이 PC에서 stdio 방식이 서버 프로그램을 띄우지 못한 것입니다. 오류를 AI에게 보여 원인을 물어보고, 풀리지 않으면 `\"sse\"`로 되돌려 넘어갑니다"
      ]
     },
     "질문하기": {

@@ -142,7 +142,7 @@ def check_env(groups=(), live=False):
     blocked = [i for i in items if i["status"] == "⛔"]
     print()
     if blocked:
-        print(f"준비가 덜 되었습니다. 고칠 곳 {len(blocked)}개가 있습니다. 위 ⛔ 줄의 → 안내를 따르거나 강사에게 알려 주세요.")
+        print(f"준비가 덜 되었습니다. 고칠 곳 {len(blocked)}개가 있습니다. 위 ⛔ 줄의 → 안내대로 고친 뒤 다시 실행합니다. 모르겠으면 이 출력을 AI에게 붙여 넣고 물어봅니다.")
     else:
         print("준비 완료: 실습에 필요한 설정이 모두 있습니다.")
     return not blocked
