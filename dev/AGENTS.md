@@ -58,6 +58,7 @@
 
 ## 6. 경로·용량·커밋
 
+- Chapter02 LAB spec은 `dev/builders/labs/Chapter02/<폴더>.json`이다. 서버(MCP·A2A)처럼 계속 떠 있어야 하는 코드는 spec에 `"writefile": "<파일>.py", "run": "terminal"`을 주어 셀이 노트북 폴더에 파일을 쓰게 하고(구획마다 `%%writefile -a`로 이어 씀), 실행은 터미널 안내로 한다. 노트북 셀에서 서버를 띄우지 않는다. 캡스톤은 `course/Chapter02/capstone/` 프로젝트 폴더와 `build_capstone_guide.py`가 만드는 안내 노트북이다.
 - 코드 셀 안의 경로는 노트북이 있는 폴더(`course/Chapter01/notebooks/` 등) 기준이다. 준비 셀에서 `sys.path.insert(0, '..')`로 챕터 폴더의 `assets`(`course/ChapterNN/assets/`)를 불러온다. assets는 챕터마다 따로 둔다. 실습 자료는 `notebooks/data/`에 둔다. 마크다운에 적는 명령은 프로젝트 루트 기준이다.
 - 원본(`course/ChapterNN/code/`)은 고치지 않는다. 노트북에서만 손볼 것은 spec의 `patch`로 한다. 작업 복사본은 `dev/work/`(Git 제외)에 둔다.
 - 출력을 저장하면 슬라이드 이미지가 노트북 파일에 들어가 수 MB가 된다. 커밋 전에 출력을 지운다.

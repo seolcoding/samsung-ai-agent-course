@@ -77,11 +77,14 @@ course/                    ← 수강생 전달본. 수강생에게 필요한 �
     code/raw/, code/solution/  받은 원본 실습 코드와 정답(.py와 코드가 읽는 data·md)
     slides/                교안 PDF 정본(day01/, day02/)과 커리큘럼 제안서 PDF
     assets/                이 챕터 노트북의 도구(widgets.py, PDF.js, 퀴즈 파일). 챕터마다 따로 둔다
-  Chapter02/               code/raw·solution, slides (노트북 방식은 Chapter02 작업 때 따로 정한다)
+  Chapter02/
+    notebooks/             M2 노트북 14권(3-1~4-3 LEC/LAB) + data/. MCP·A2A 서버는 LAB 셀이 %%writefile로 이 폴더에 쓰고 터미널에서 띄운다(쓴 .py는 git 제외)
+    capstone/              4-3 캡스톤 프로젝트 폴더(수강생이 AI와 함께 고침). starter.py, mcp_server.py, skills/, data/, README.md
+    code/raw/, code/solution/, slides/, assets/   Chapter01과 같은 역할
   config/                  환경에 따른 LLM·임베딩·RAGaaS 공통 코드(패키지 `config`, 챕터 공통)
 dev/                       ← 강사·개발용. 전달하지 않는다
   AGENTS.md                노트북 제작 규칙
-  builders/                노트북 빌더(build_lab.py, build_lecture_*.py, nbkit.py)와 글·spec(labs/*.json, *_cells*.json, *_outline.md)
+  builders/                노트북 빌더(build_lab.py, build_lecture_*.py, build_capstone_guide.py, nbkit.py)와 글·spec(labs/*.json, labs/Chapter02/*.json, *_cells*.json, *_outline.md)
   qc/                      노트북 QC 하네스
   instructor/ChapterNN/    강사본 노트북(강사용 메모 포함, 빌드 산출)
   demos/                   교수법 데모 노트북과 그 자산
@@ -128,6 +131,8 @@ scripts/release.sh         전달 브랜치 release/course 갱신
 - `course/Chapter02/code/raw/06-capstone/` — `mcp_server.py`와 `skills/`가 정답본에만 있다. 배점 20점이 배포본에서 불가능하다.
 - 기존 `course/Chapter02/code/solution/06-capstone/`에는 배점 대상인 Streamlit UI가 없다.
 - 원본 A2A 코드와 현재 SDK 1.x의 API가 다르다. 기존 raw/solution은 별도 이관 대상이다.
+- `course/Chapter02/code/solution/06-capstone/solution.py` — `skills=['skills/researcher/']`가 SKILL.md가 든 폴더를 가리켜 deepagents 0.7.18이 skill을 0개 찾는다. 오류 없이 돌지만 skill 양식을 따르지 않는다. 수강생용 `course/Chapter02/capstone/`에서는 skill 폴더를 한 단계 더 넣어 고쳤다(2026-09-28).
+- 사내 게이트웨이의 도구 호출(`bind_tools`)·구조화 출력이 확인되지 않았다. M2의 MCP·A2A·Harness(deepagents)·캡스톤은 모든 단계가 도구 호출이라 강의장 사전 점검 1순위다.
 
 ## 8. 되돌리기
 

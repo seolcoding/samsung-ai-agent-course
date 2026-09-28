@@ -94,7 +94,7 @@
       "end": "# ── 대화형 실행"
      },
      "explain": "빈칸에 `create_deep_agent(...)`로 Agent를 만들어 `agent`에 담는 코드를 넣습니다. 모델은 `get_llm()`, 도구는 위 셀의 `search_web`, 작업 공간은 바로 위 줄의 `backend`, 스킬 폴더는 `\"skills/\"`, 체크포인터는 `MemorySaver()`입니다. 시스템 프롬프트에는 보고서·리서치와 관계없는 요청(코드 작성 등)을 정중히 거절하라고 적습니다. 이 셀은 Agent만 만들고 아무것도 출력하지 않습니다. 결과는 다음 셀에서 봅니다.",
-     "hint": "이 셀 전체를 붙여 넣고, 모델·검색 도구·위의 backend·스킬 폴더·체크포인터를 넣어 `create_deep_agent`로 `agent`를 만들어 달라고 합니다. 시스템 프롬프트에는 어떤 요청을 거절해야 하는지 구체적으로 적어 달라고 합니다. 빈칸 밖의 줄은 고치지 말라고 적습니다.",
+     "hint": "이 셀 전체를 붙여 넣고, `create_deep_agent`에 `model`·`tools`·`backend`·`skills`·`system_prompt`·`checkpointer` 인자를 넣어 `agent`를 만들어 달라고 합니다. `skills`에는 스킬 폴더들을 담은 상위 폴더 `\"skills/\"` 하나만 넣으라고 알려 줍니다. `system_prompt`에는 보고서·리서치 범위를 벗어난 요청(코드 작성, 수학 계산 등)을 거절하라고 적어 달라고 합니다.",
      "checks": [
       "이 셀이 오류 없이 끝나고 아무것도 출력하지 않는다",
       "다음 셀의 사례 1에서 `[ToolMessage]` 줄 아래에 SKILL.md의 첫 줄들(`name:`, `description:`)이 보인다(Agent가 SKILL.md를 읽었다)",
