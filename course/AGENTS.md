@@ -23,3 +23,18 @@
 - 모델은 `config.llm.get_llm()`, 임베딩은 `config.embeddings.get_embeddings()`로 부른다. 주소·모델 이름·키를 코드에 직접 쓰지 않는다.
 - `.env`의 키와 토큰은 출력하거나 파일에 쓰지 않는다.
 - `code/`, `assets/`, `config/`의 파일은 고치지 않는다.
+
+## 문제가 생기면 (설치·경로·연결)
+
+아래 문서를 먼저 읽고, 그 순서대로 진단한 뒤 수강생 PC를 설정해 준다. 추측으로 코드를 고쳐 우회하지 않는다.
+
+- 설치·커널·`.env`·모델 부르는 법: [agent_docs/setup.md](agent_docs/setup.md)
+- 파일을 못 찾을 때, 경로를 쓸 때: [agent_docs/paths.md](agent_docs/paths.md)
+- 오류 메시지별 원인과 해결: [agent_docs/troubleshooting.md](agent_docs/troubleshooting.md)
+
+진단 순서:
+1. 오류의 마지막 줄을 읽고 troubleshooting.md에서 찾는다.
+2. 커널이 저장소 `.venv`인지, `os.getcwd()`가 `…/course/ChapterNN/notebooks`인지 본다.
+3. 설치 문제면 저장소 맨 위에서 `uv sync --extra notebooks`를 안내하거나 실행한다.
+4. 연결 문제면 노트북 맨 위 환경 점검 셀을 실행해 빠진 설정 이름을 확인한다. `.env`의 값은 출력하지 않는다.
+5. 고친 뒤 맨 위 셀부터 다시 실행한다. 사내 기능 지원 여부처럼 문서에 "확인되지 않음"으로 적힌 것은 강사에게 알린다.

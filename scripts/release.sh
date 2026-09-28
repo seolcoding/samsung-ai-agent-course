@@ -62,7 +62,8 @@ git -C "$WT" read-tree --empty  # 색인을 비우고
 git -C "$WT" clean -fdq           # 작업 폴더의 파일도 비운다(새 내용으로 통째로 바꾸기 위해)
 git archive "$REV" "${FILES[@]}" | tar -x -C "$WT"
 cp "$WT/course/README.md" "$WT/README.md"
-cp "$WT/course/AGENTS.md" "$WT/AGENTS.md"
+# 맨 위로 복사한 안내의 문서 링크는 course/ 기준으로 바꾼다
+sed -e 's#](agent_docs/#](course/agent_docs/#g' "$WT/course/AGENTS.md" > "$WT/AGENTS.md"
 git -C "$WT" add -A
 if git -C "$WT" diff --cached --quiet; then
   echo "✔ [3/5] 전달 브랜치 $BRANCH: 바뀐 내용 없음"

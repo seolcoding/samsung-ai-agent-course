@@ -71,6 +71,7 @@ upstream 깃 히스토리는 받지 못했고, 로컬 `main`의 최초 커밋이
 ```
 course/                    ← 수강생 전달본. 수강생에게 필요한 것만 둔다(dev/를 참조하지 않는다)
   README.md, AGENTS.md     수강생용 설치·실행 안내, 수강생 쪽 AI 코딩 도우미용 맥락
+  agent_docs/              설치·경로·오류 해결 문서(setup.md, paths.md, troubleshooting.md). 환경 문제는 강사 PC에서도 이것부터 본다
   Chapter01/
     notebooks/             수업 노트북 13권(LEC/LAB, 강사용 메모 없는 수강생본) + data/
     code/raw/, code/solution/  받은 원본 실습 코드와 정답(.py와 코드가 읽는 data·md)
