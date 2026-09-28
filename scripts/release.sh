@@ -58,8 +58,8 @@ if git show-ref --verify -q "refs/heads/$BRANCH"; then
 else
   git -C "$WT" checkout -q --orphan "$BRANCH"
 fi
-git -C "$WT" rm -rq --ignore-unmatch .
-git -C "$WT" clean -fdq
+git -C "$WT" read-tree --empty  # 색인을 비우고
+git -C "$WT" clean -fdq           # 작업 폴더의 파일도 비운다(새 내용으로 통째로 바꾸기 위해)
 git archive "$REV" "${FILES[@]}" | tar -x -C "$WT"
 cp "$WT/course/README.md" "$WT/README.md"
 cp "$WT/course/AGENTS.md" "$WT/AGENTS.md"
