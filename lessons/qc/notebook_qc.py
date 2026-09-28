@@ -339,6 +339,11 @@ def is_head(c):
     return c.cell_type == "markdown" and not is_box(c) and re.match(r"#{1,4} ", c.source.lstrip()) is not None
 
 
+def py_only(src):
+    """셀 매직(%%writefile 등)과 셸 명령(!…) 줄을 빼고 파이썬 코드만 남긴다(문법 검사용)."""
+    return "\n".join("" if ln.lstrip().startswith(("%%", "!")) else ln for ln in src.splitlines())
+
+
 def fill_blanks(src, answers):
     """빈칸 줄(`...  # ✍️`)을 정답 코드로 차례대로 바꾼다(빈칸 줄의 들여쓰기를 유지)."""
     out, k = [], 0
@@ -405,7 +410,7 @@ def check_lab(nb, R):
                 edit_bad.append((i, "CHANGE_HERE 줄이 있는데 같은 장 뒤쪽에 🟢 **성공 기준** 글이 없음"))
             continue
         try:
-            ast.parse(c.source)
+            ast.parse(py_only(c.source))
         except SyntaxError as e:
             syntax.append((i, f"빈칸 상태로 문법 오류: {e.msg} ({e.lineno}행)"))
         # (b) 같은 절 앞쪽의 힌트와 성공 기준
@@ -428,7 +433,7 @@ def check_lab(nb, R):
             answer_bad.append((box, f"빈칸 {n_blank}곳인데 정답 코드 블록 {len(answers)}개"))
             continue
         try:
-            ast.parse(fill_blanks(c.source, answers))
+            ast.parse(py_only(fill_blanks(c.source, answers)))
         except SyntaxError as e:
             answer_bad.append((box, f"정답을 끼운 셀 {i}가 문법 오류: {e.msg} ({e.lineno}행)"))
     R("실습", "✍️ 셀이 보이고, 빈칸 상태 그대로 파이썬 문법에 맞음", syntax)

@@ -25,11 +25,12 @@
 
 import ast
 import json
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from nbkit import Notebook  # noqa: E402
+from nbkit import Notebook, fmt  # noqa: E402
 
 HERE = Path(__file__).parent
 LESSONS = HERE.parent
@@ -62,8 +63,14 @@ BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
 MARK_TASK, MARK_EDIT = "# ✍️ WRITE_HERE:", "# ✍️ CHANGE_HERE:"
 
 
+def _norm(text):
+    """따옴표·공백 차이를 무시하고 비교한다(원본을 정돈한 뒤에도 표시 문자열이 맞도록)."""
+    return re.sub(r"\s+", "", text.replace("'", '"'))
+
+
 def _find(lines, marker, begin):
-    return next((k for k in range(begin, len(lines)) if marker in lines[k]), None)
+    m = _norm(marker)
+    return next((k for k in range(begin, len(lines)) if m in _norm(lines[k])), None)
 
 
 def _blank(lines, blanks):
@@ -72,7 +79,11 @@ def _blank(lines, blanks):
     for b in blanks:
         a = _find(lines, b["start"], cursor)
         end = b.get("end")
-        e = a + 1 if end is None else len(lines) if end == "EOF" else _find(lines, end, a + 1)
+        e = None if a is None else a + 1 if end is None else len(lines) if end == "EOF" else _find(lines, end, a + 1)
+        if e is None:  # 표시 줄을 찾지 못함: 이 빈칸은 건너뛴다(정답 None)
+            print(f"✖ 빈칸 범위 없음: {b['start'][:40]!r} | 원본에서 표시 줄을 찾지 못함 | labs/*.json의 blank를 고친다")
+            answers.append(None)
+            continue
         out += lines[k:a]
         indent = lines[a][: len(lines[a]) - len(lines[a].lstrip())]
         out.append(indent + BLANK_LINE)
@@ -139,19 +150,23 @@ def build(folder):
     nb.md(PROMPT_GUIDE)
 
     for n, f in enumerate(spec["files"], start=2):
-        raw = (ROOT / "src" / "raw" / "Chapter01" / folder / f["name"]).read_text(encoding="utf-8").splitlines()
+        # 원본을 먼저 정돈한다(읽기 쉽게). 원본·솔루션이 다르면 spec의 source로 깔끔한 쪽을 고른다
+        src_dir = ROOT / "src" / f.get("source", "raw") / "Chapter01" / folder
+        raw = fmt((src_dir / f["name"]).read_text(encoding="utf-8")).splitlines()
         todos = [t for t in f.get("todos", []) if t.get("blank")]  # 빈칸 범위가 없는 TODO(뼈대 미완성)는 건너뛴다
         for t in f.get("todos", []):
             if not t.get("blank"):
                 print(f"✖ {folder}/{f['name']} TODO 빈칸 범위 없음 | 뼈대 추정 실패 | labs/{folder}.json의 blank를 채운다")
         lines, answers = _blank(raw, [t["blank"] for t in todos]) if todos else (raw, [])
+        todos, answers = [t for t, x in zip(todos, answers) if x is not None], [x for x in answers if x is not None]
         edits = f.get("edits", [])
         lines, edit_at = _mark(lines, edits)
         # WRITE_HERE 주석 줄 위치로 어느 구획에 속하는지 정한다(찾지 못하면 순서대로 WRITE_HERE 줄을 쓴다)
         todo_lines = [k for k, ln in enumerate(lines) if MARK_TASK in ln]
         todo_at = [next((k for k in todo_lines if t["todo"][:12] in lines[k]), todo_lines[min(i, len(todo_lines) - 1)] if todo_lines else 0)
                    for i, t in enumerate(todos)]
-        split = f.get("split") or [ln.strip() for ln in lines if ln.startswith("# ──")]
+        wf = f.get("writefile")  # Streamlit 앱처럼 파일로 띄워야 하는 코드: 한 셀로 묶어 파일로 쓰고 따로 실행한다
+        split = [] if wf else f.get("split") or [ln.strip() for ln in lines if ln.startswith("# ──")]
         nb.h(2, f"{n}. {f['title']}")
         nb.md(f["intro"])
         nb.meta(f.get("intro__meta"))
@@ -171,7 +186,9 @@ def build(folder):
                 nb.h(3, f"{n}.{sub} 참고: {(f.get('titles') or {}).get(title or '', title) or '실행하지 않는 코드'}")
                 nb.md("문자열로 감싸 두어 실행되지 않는 참고 코드입니다. 읽어만 봅니다.\n\n```python\n" + (notes + "\n" if notes else "") + ref + "\n```")
                 continue
-            if c == 0 and f.get("hide_first", True):  # 준비 코드: 불러오기·환경 설정. 접어 둔다
+            if wf:
+                text = f"%%writefile {wf}\n" + text
+            elif c == 0 and f.get("hide_first", True):  # 준비 코드: 불러오기·환경 설정. 접어 둔다
                 nb.md(f.get("setup_note", "준비 코드입니다. 필요한 도구를 불러오고 모델을 준비합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다."))
                 nb.code(text, kind="")
                 continue
@@ -199,6 +216,9 @@ def build(folder):
                 # 정답은 원본에서 지운 줄이 기본이고, 솔루션과 다른 곳은 spec의 answer로 바꿔 보여 준다
                 ans = "\n\n".join("```python\n" + _dedent_common("\n".join(todos[i].get("answer") or answers[i])) + "\n```" for i in mine)
                 nb.md(f"<details><summary>정답 보기</summary>\n\n{ans}\n\n</details>")
+        if wf:
+            nb.md(f.get("run_note", "위 셀을 실행하면 이 폴더에 앱 파일이 만들어집니다. 아래 셀을 실행하면 브라우저에 앱이 열립니다. 앱을 멈출 때는 이 셀의 실행을 중지(■)합니다."))
+            nb.code(f"!streamlit run {wf}", visible=True, kind=KIND_EXAMPLE)
         nb.md(f["look"])
         nb.meta(f.get("look__meta"))
         ask = f.get("ask")

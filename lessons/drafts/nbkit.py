@@ -4,11 +4,14 @@
   맨 위에 같은 표시를 단 목차를 만든다(finish에서 셀 종류를 보고 자동으로 계산).
 - 교안 도구를 부르는 코드 셀은 입력 칸을 접는다(source_hidden). 수강생이 직접 쓰는 셀만 보인다.
 - 강사용 메모는 절마다 한 상자로 모아 접어 둔다.
+- 코드 셀은 ruff format(한 줄 88자, 큰따옴표)으로 정돈해 읽기 쉽게 한다. 문법 오류인 셀은 그대로 둔다.
 - 수강생 글에는 "(p6)" 같은 쪽 인용을 넣지 않는다. 퀴즈는 4지선다·정답 1개이고 문제는 파일로 둔다.
 """
 
 import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 import nbformat as nbf
@@ -35,6 +38,15 @@ def tags_of(cell):
             return set()
         return {"코드"}
     return set()
+
+
+def fmt(src):
+    """코드를 ruff format으로 정돈한다. ruff가 없으면 멈추고, 문법 오류인 코드는 그대로 돌려준다."""
+    ruff = shutil.which("ruff")
+    if ruff is None:
+        raise SystemExit("✖ 코드 정돈 실패 | ruff가 없음 | `brew install ruff` 또는 `uv tool install ruff`로 설치한다")
+    done = subprocess.run([ruff, "format", "--line-length", "88", "-"], input=src, capture_output=True, text=True)
+    return done.stdout.rstrip("\n") if done.returncode == 0 else src
 
 
 class Notebook:
@@ -86,6 +98,9 @@ class Notebook:
         """제목 옆 표시와 맨 위 목차를 채우고 파일로 쓴다."""
         self.flush()
         cells = self.cells
+        for cell in cells:
+            if cell.cell_type == "code":
+                cell.source = fmt(cell.source)
         heads = [k for k, cell in enumerate(cells) if "heading" in cell.metadata]
         toc = []
         for n, k in enumerate(heads):
