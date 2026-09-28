@@ -1,0 +1,28 @@
+[
+ {
+  "question": "클라이언트가 Agent의 능력과 연결 정보를 알아내려고 읽는 주소는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "/.well-known/agent-card.json",
+    "correct": true,
+    "feedback": "Agent Card는 이 주소에서 JSON으로 공개됩니다."
+   },
+   {
+    "answer": "/agent/execute",
+    "correct": false,
+    "feedback": "슬라이드에 없는 주소입니다. Agent Card는 /.well-known/agent-card.json에서 공개됩니다."
+   },
+   {
+    "answer": "/skills",
+    "correct": false,
+    "feedback": "Skill은 카드 안의 한 항목입니다. 카드 전체는 /.well-known/agent-card.json에서 읽습니다."
+   },
+   {
+    "answer": "/message/send",
+    "correct": false,
+    "feedback": "메시지를 보내는 주소가 아니라 카드를 읽는 주소를 묻습니다. 답은 /.well-known/agent-card.json입니다."
+   }
+  ]
+ }
+]

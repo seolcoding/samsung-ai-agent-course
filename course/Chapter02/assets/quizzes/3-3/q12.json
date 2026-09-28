@@ -1,0 +1,28 @@
+[
+ {
+  "question": "MCP와 비교할 때 A2A의 핵심으로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "도구 사용",
+    "correct": false,
+    "feedback": "도구 사용은 MCP의 핵심입니다. MCP는 Agent와 Tool·데이터 소스를 연결합니다."
+   },
+   {
+    "answer": "데이터 소스 연결",
+    "correct": false,
+    "feedback": "데이터 소스 연결은 MCP가 맡습니다. A2A는 Agent와 Agent를 연결합니다."
+   },
+   {
+    "answer": "작업 위임과 협업",
+    "correct": true,
+    "feedback": "A2A는 Agent끼리 작업을 맡기고 협업하는 연결 표준입니다."
+   },
+   {
+    "answer": "화면 표시",
+    "correct": false,
+    "feedback": "화면 표시는 두 표준 어느 쪽의 핵심도 아닙니다. A2A의 핵심은 작업 위임과 협업입니다."
+   }
+  ]
+ }
+]

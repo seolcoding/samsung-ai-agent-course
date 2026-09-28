@@ -1,0 +1,28 @@
+[
+ {
+  "question": "사용자가 새 대화(새 thread)를 열어도 그 사용자의 취미를 기억하게 하려면 어디에 저장해야 하나요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Checkpointer의 현재 thread",
+    "correct": false,
+    "feedback": "Checkpointer는 thread 단위로 State를 저장합니다. 새 thread에서는 앞 thread의 State를 이어받지 않습니다."
+   },
+   {
+    "answer": "Memory Store",
+    "correct": true,
+    "feedback": "Memory Store는 thread를 넘어 공유되는 장기 기억을 저장합니다. 사용자별 namespace로 찾아 씁니다."
+   },
+   {
+    "answer": "노드 함수의 지역 변수",
+    "correct": false,
+    "feedback": "지역 변수는 함수 호출이 끝나면 사라집니다. 다음 대화까지 남지 않습니다."
+   },
+   {
+    "answer": "Subgraph의 State",
+    "correct": false,
+    "feedback": "Subgraph의 State는 그 자식 그래프를 한 번 실행하는 동안만 쓰입니다. 장기 기억 저장소가 아닙니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,80 @@
+[
+ {
+  "question": "단계와 그 단계를 맡는 기술의 짝이 **틀린** 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "자료 수집 — MCP 문서 도구와 RAGaaS",
+    "correct": false,
+    "feedback": "Researcher는 MCP 문서 도구, RAGaaS, 웹 검색으로 자료를 모읍니다."
+   },
+   {
+    "answer": "보고서 작성 승인 — Human-in-the-loop",
+    "correct": false,
+    "feedback": "Writer 실행 전에 사용자 승인을 받는 구조가 Human-in-the-loop입니다."
+   },
+   {
+    "answer": "보고서 양식 규칙 — Writer Skill",
+    "correct": false,
+    "feedback": "보고서 양식은 Writer Skill 문서에 들어 있으니 올바른 짝입니다."
+   },
+   {
+    "answer": "실행 기록과 평가 점수 — MemorySaver",
+    "correct": true,
+    "feedback": "실행 Trace와 평가 Score는 Langfuse에 남깁니다. MemorySaver는 Agent별 실행 상태를 유지합니다."
+   }
+  ]
+ },
+ {
+  "question": "\"보고서 구성이 완성되어 있는가\"를 보는 평가 항목은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Relevance",
+    "correct": false,
+    "feedback": "Relevance는 주제와 관련 있는지를 봅니다."
+   },
+   {
+    "answer": "Faithfulness",
+    "correct": false,
+    "feedback": "Faithfulness는 리서치 근거에 충실한지를 봅니다."
+   },
+   {
+    "answer": "Completeness",
+    "correct": true,
+    "feedback": "Completeness는 보고서 구성이 완성되어 있는지를 봅니다."
+   },
+   {
+    "answer": "Clarity",
+    "correct": false,
+    "feedback": "Clarity는 문장과 구조가 명확한지를 봅니다."
+   }
+  ]
+ },
+ {
+  "question": "LLM Judge가 항목마다 매기는 점수의 범위는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "0.0~1.0",
+    "correct": true,
+    "feedback": "각 항목을 0.0~1.0으로 채점하고, 항목별 근거와 평균 점수를 함께 남깁니다."
+   },
+   {
+    "answer": "0~10",
+    "correct": false,
+    "feedback": "10점 만점이 아닙니다. 항목마다 0.0~1.0으로 채점합니다."
+   },
+   {
+    "answer": "1~5",
+    "correct": false,
+    "feedback": "5단계 척도가 아니라 0.0~1.0 사이 점수입니다."
+   },
+   {
+    "answer": "0~100",
+    "correct": false,
+    "feedback": "백분율이 아닙니다. 1.0이 가장 높은 점수입니다."
+   }
+  ]
+ }
+]

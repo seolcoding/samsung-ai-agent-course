@@ -1,0 +1,28 @@
+[
+ {
+  "question": "하네스가 모델에게 주는 것으로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "일이 끝나는 조건",
+    "correct": true,
+    "feedback": "하네스는 더 긴 지시문이 아니라 어디까지 하면 끝인지를 줍니다."
+   },
+   {
+    "answer": "더 길고 자세한 지시문",
+    "correct": false,
+    "feedback": "슬라이드는 더 긴 지시문을 주는 것이 아니라고 말합니다."
+   },
+   {
+    "answer": "더 큰 모델",
+    "correct": false,
+    "feedback": "하네스는 모델을 바꾸는 일이 아니라 모델이 일할 환경을 설계하는 일입니다."
+   },
+   {
+    "answer": "한 번에 끝나는 답변 형식",
+    "correct": false,
+    "feedback": "좋은 하네스는 AI를 답변기에서 실행 주체로 바꿉니다. 한 번의 답변이 목표가 아닙니다."
+   }
+  ]
+ }
+]

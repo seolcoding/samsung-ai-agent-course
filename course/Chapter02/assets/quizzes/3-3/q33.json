@@ -1,0 +1,28 @@
+[
+ {
+  "question": "RequestHandler에 연결하는 task_store와 queue_manager가 맡는 일은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Agent Card를 JSON으로 공개하기",
+    "correct": false,
+    "feedback": "카드 공개는 Agent Card 조회 라우트가 맡습니다."
+   },
+   {
+    "answer": "작업 상태와 이벤트 관리",
+    "correct": true,
+    "feedback": "task_store는 작업 상태를, queue_manager는 이벤트를 관리합니다."
+   },
+   {
+    "answer": "내부 LangGraph Agent 실행",
+    "correct": false,
+    "feedback": "실제 실행은 agent_executor에 연결한 AgentExecutor가 맡습니다."
+   },
+   {
+    "answer": "사용자 입력을 t.Message로 감싸 보내기",
+    "correct": false,
+    "feedback": "요청을 t.Message로 감싸 보내는 일은 클라이언트가 합니다."
+   }
+  ]
+ }
+]

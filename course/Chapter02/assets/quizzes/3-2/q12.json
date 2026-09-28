@@ -1,0 +1,28 @@
+[
+ {
+  "question": "MCP에서 도구와 데이터를 제공하는 쪽은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "MCP Server",
+    "correct": true,
+    "feedback": "Agent가 도구를 직접 품는 대신 MCP Server가 도구와 데이터를 제공합니다."
+   },
+   {
+    "answer": "Host",
+    "correct": false,
+    "feedback": "Host는 필요한 Server에 연결해서 기능을 가져와 쓰는 쪽입니다."
+   },
+   {
+    "answer": "Client",
+    "correct": false,
+    "feedback": "Client는 Host와 Server 사이의 통신을 맡습니다. 도구를 가지고 있지는 않습니다."
+   },
+   {
+    "answer": "LLM",
+    "correct": false,
+    "feedback": "LLM은 도구를 고르고 호출을 요청할 뿐, 도구를 제공하지 않습니다."
+   }
+  ]
+ }
+]

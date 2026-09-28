@@ -1,0 +1,28 @@
+[
+ {
+  "question": "응답 품질을 수치로 나타내는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Trace",
+    "correct": false,
+    "feedback": "Trace는 모델 호출·도구 실행·체인 흐름을 확인하는 기록입니다."
+   },
+   {
+    "answer": "Score",
+    "correct": true,
+    "feedback": "Score가 응답 품질을 수치로 나타냅니다."
+   },
+   {
+    "answer": "Subgraph",
+    "correct": false,
+    "feedback": "Subgraph는 LangGraph에서 그래프를 모듈로 나누는 기능입니다."
+   },
+   {
+    "answer": "Memory Store",
+    "correct": false,
+    "feedback": "Memory Store는 장기 기억을 관리하는 기능입니다."
+   }
+  ]
+ }
+]

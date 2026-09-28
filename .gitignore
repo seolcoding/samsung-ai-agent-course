@@ -202,3 +202,4 @@ dev/work/
 # Chapter02 노트북이 %%writefile로 만드는 서버 파일·하네스 작업 폴더
 course/Chapter02/notebooks/*.py
 course/Chapter02/notebooks/harness/
+course/Chapter02/capstone/solution.py

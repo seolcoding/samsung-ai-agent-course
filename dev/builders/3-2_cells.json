@@ -1,0 +1,287 @@
+{
+ "title": "# [LEC] MCP - Model Context Protocol\n\n슬라이드와 설명, 퀴즈로 MCP가 무엇이고 서버와 클라이언트를 어떻게 만드는지 익힙니다.",
+ "title__meta": "| 항목 | 내용 |\n|---|---|\n| 버전 | C (슬라이드 요약 + 내용 있는 곳만 \"왜 배우나\") |\n| 원본 PDF | `course/Chapter02/slides/day01/3-2-model-context-protocol.pdf` (12쪽. 표지 p1, 목차 p2, 장 표지 p3·p7·p10) |\n| 원본 코드 | 이 노트북에는 없습니다. `course/Chapter02/code/raw/01-mcp/`의 두 파일은 `3-2_mcp_LAB.ipynb`에서 다룹니다. |\n| API 호출 | 없습니다. 슬라이드 준비 셀만 실행하면 됩니다. |\n| 시간 | 목차 단계에서 강의 25분 + 실습 65분을 가정했습니다(커리큘럼 3.2, 1.5H). |",
+ "intro": "이번 시간은 LLM 애플리케이션과 외부 도구를 표준 방식으로 잇는 MCP(Model Context Protocol)를 봅니다.\n\n1. MCP: 함수 호출의 문제점, MCP의 등장, 구성요소(Server, Host, Client)\n2. MCP Server 구현: FastMCP, 3대 Primitive(Resources, Tools, Prompts)\n3. MCP Client 구현: LangChain으로 연결, get_tools\n\n**왜 배우나:** 지금까지는 도구를 Agent 코드 안에 함수로 직접 만들어 붙였습니다. MCP를 쓰면 도구를 따로 떨어진 서버에 두고, 여러 Agent가 같은 방식으로 연결해 씁니다. Notion, YouTube처럼 이미 만들어진 MCP 서버가 있으면, 직접 만들지 않은 도구도 연결만으로 가져다 쓸 수 있습니다.",
+ "intro__meta": "- 11차수 피드백에 \"MCP가 무엇인지\"와 \"어려운 용어\" 요청이 있었습니다. 1장 설명은 프로토콜·Host·전송 방식 같은 용어를 한 문장씩 풀어 썼습니다.\n- \"Notion, YouTube처럼 이미 만들어진 MCP 서버\"는 슬라이드 p4·p5 그림(Notion, YouTube)에 근거합니다. 사내에서 쓸 수 있는 MCP 서버 목록은 확인하지 않았습니다(미확인).",
+ "p4": "Function Calling(1일차의 Tool Calling)은 LLM이 외부 함수를 쓸 수 있게 해 줍니다. 그런데 도구를 잇는 방식이 애플리케이션마다 흩어지기 쉽습니다.\n\n- 함수 이름, 설명, 입력 스키마를 애플리케이션 코드 안에서 직접 관리합니다.\n- 도구가 늘어날수록 연결 코드와 권한 관리 코드도 함께 늘어납니다.\n- 같은 도구를 다른 Agent나 다른 앱에서 다시 쓰기 어렵습니다.\n- 파일, DB, API처럼 시스템마다 연결 방식이 달라 유지보수가 복잡해집니다.\n\n**왜 배우나:** 1일차에는 `@tool`로 만든 함수를 Agent 코드에 바로 붙였습니다. 도구가 몇 개일 때는 편하지만, 여러 Agent와 여러 시스템으로 늘어나면 어디서 막히는지를 먼저 짚어야 MCP가 무엇을 푸는지 보입니다.",
+ "sum11": "**정리:** 도구를 앱 코드 안에 직접 두면 도구가 늘수록 코드가 늘고, 다른 곳에서 다시 쓰기 어렵고, 시스템마다 연결법이 달라 관리가 복잡해집니다.",
+ "p5": "MCP(Model Context Protocol)는 LLM 애플리케이션과 외부 도구·데이터를 **표준 방식**으로 연결하기 위한 프로토콜입니다. 프로토콜은 서로 주고받는 형식과 순서를 정한 약속입니다.\n\n- Agent가 도구를 직접 품고 있는 대신, MCP Server가 도구와 데이터를 제공합니다.\n- Host는 필요한 MCP Server에 연결해서 기능을 가져옵니다.\n- Client는 Host와 Server 사이의 통신을 맡습니다.\n- 그래서 도구 구현과 Agent 실행 로직을 나눌 수 있습니다.\n\n**왜 배우나:** 앞 슬라이드의 \"다시 쓰기 어렵다\"는 문제를 \"도구는 서버에, Agent는 연결만\"으로 풉니다. 도구를 고쳐도 Agent 코드를 건드리지 않고, 한 서버를 여러 Agent가 함께 씁니다.",
+ "sum12": "**정리:** MCP는 도구와 데이터를 Server가 제공하고 Host가 연결해 쓰는 표준 약속입니다. 도구 구현과 Agent 로직이 나뉩니다.",
+ "p6": "MCP는 Server, Host, Client 세 가지의 관계로 이해하면 쉽습니다.\n\n- **Server:** 외부 도구, 데이터, 프롬프트를 MCP 형태로 제공합니다.\n- **Host:** 사용자가 실제로 쓰는 LLM 애플리케이션입니다. 그림의 Claude 같은 앱, 또는 우리가 직접 만든 Agent 코드가 여기에 해당합니다.\n- **Client:** Host 안에서 MCP Server와 통신하는 연결 계층입니다. Host 하나가 Server 여러 개에 연결할 수 있습니다.\n\n**왜 배우나:** 실습 구조가 이 그림과 같습니다. 터미널에 따로 띄우는 서버가 Server이고, 노트북에서 만드는 Agent가 Host이며, 그 안에서 서버에 접속하는 연결 객체가 Client입니다. 오류가 났을 때 셋 중 어디의 문제인지 가를 수 있어야 합니다.",
+ "p6__meta": "- 슬라이드 그림에는 Host 자리에 `client.py`라는 글자가 있습니다. 실습의 클라이언트 코드(`02_mcp_client.py`)를 가리킵니다. 수강생 글에서는 파일 이름을 쓰지 않았습니다.",
+ "sum13": "**정리:** Server는 제공하고, Host는 사용하고, Client는 Host 안에서 Server와 통신합니다.",
+ "p8": "FastMCP는 MCP Server를 빠르게 만들기 위한 고수준 서버 구현 도구입니다.\n\n- 데코레이터(`@mcp.tool()` 등 함수 위에 붙이는 표시)로 Tool, Resource, Prompt를 정의합니다.\n- HTTP/SSE 모드와 stdio 모드로 실행할 수 있습니다.\n- Claude Code 같은 MCP Host와도 stdio 방식으로 연결할 수 있습니다.\n\n슬라이드 코드는 `FastMCP(\"AI 강의 튜토리얼 서버\")`로 서버를 만들고, `mcp.run(transport=\"sse\", host=\"0.0.0.0\", port=8000)`으로 8000번 포트에서 HTTP/SSE 모드로 띄웁니다.\n\n**왜 배우나:** 두 실행 방식은 서버를 누가 켜느냐가 다릅니다. HTTP/SSE는 서버를 먼저 따로 켜 두고 클라이언트가 주소로 접속합니다. stdio는 Host가 서버 프로그램을 직접 실행하고 표준 입출력(글자를 주고받는 통로)으로 주고받습니다. 실습에서 두 방식을 한 줄만 바꿔 비교합니다.",
+ "p8__meta": "- \"누가 켜느냐\" 설명은 커리큘럼 3.2 \"SSE/stdio 전송 방식 이해\"에 근거한 설명 문장입니다. 슬라이드에는 두 방식의 차이 설명이 없어 퀴즈 정답으로는 쓰지 않았습니다.\n- 실습 원본 서버는 인자 `--stdio`가 있으면 stdio, 없으면 SSE(포트 8000)로 실행합니다. 원본 클라이언트는 stdio가 켜져 있고 SSE가 주석 처리되어 있어(알려진 결함), 실습 노트북에서는 두 설정을 모두 두고 `TRANSPORT` 한 줄로 고르게 바꿨습니다. 기본은 슬라이드와 같은 SSE입니다.\n- fastmcp 3.4.7은 SSE를 쓸 수 있지만 새 방식(Streamable HTTP)도 있습니다. 슬라이드·원본대로 SSE를 씁니다.",
+ "sum21": "**정리:** FastMCP는 데코레이터로 기능을 정의하고, HTTP/SSE 또는 stdio로 서버를 실행합니다.",
+ "p9": "MCP Server가 제공하는 기능은 세 종류이고, 이를 MCP의 3대 Primitive(기본 구성 단위)라고 합니다.\n\n- **Tools:** LLM이 실제 행동을 하려고 호출하는 함수입니다. 예: `@mcp.tool()`을 붙인 `calculate_bmi`\n- **Resources:** LLM이나 Host가 읽을 수 있는 데이터나 맥락 자료입니다. 등록된 서버에 대한 정보를 얻는 데 씁니다. 예: `@mcp.resource(\"config://app-info\")`를 붙인 `get_app_info`\n- **Prompts:** 반복해서 쓸 수 있는 프롬프트 템플릿입니다. 이를 이용해 단축 명령어를 제공하기도 합니다. 예: `@mcp.prompt()`를 붙인 `task_summary_prompt`\n\n**왜 배우나:** 실습 서버에는 세 가지가 모두 들어 있습니다. 그런데 Agent가 도구로 쓰는 것은 Tools뿐입니다. 서버에 무엇을 넣었는지와 Agent가 무엇을 받아 쓰는지를 구분해야 실행 결과를 읽을 수 있습니다.",
+ "p9__meta": "- 실습 서버의 Tool은 5개(`get_current_time`, `calculate_bmi`, `add_task`, `list_tasks`, `complete_task`), Resource 1개, Prompt 1개입니다. 클라이언트의 `get_tools()`는 Tool 5개만 가져옵니다(사외 실측 2026-09-28).",
+ "sum22": "**정리:** Tools는 행동, Resources는 읽을 자료, Prompts는 다시 쓰는 템플릿입니다.",
+ "p11": "LangChain에서는 `langchain_mcp_adapters`의 `MultiServerMCPClient`로 MCP Server에 연결합니다.\n\n- MCP 설정에 서버 이름, transport(연결 방식), url(서버 주소)을 적습니다.\n- Client 하나로 여러 MCP Server를 동시에 다룰 수 있습니다. 설정에 서버를 더 적기만 하면 됩니다.\n- 가져온 도구는 LangChain/LangGraph의 Tool처럼 쓸 수 있습니다.\n\n슬라이드 코드는 `\"tutorial\"`이라는 이름으로 `http://localhost:8000/sse`에 SSE로 연결하는 설정(`MCP_CONFIG`)을 만들고, 이 설정으로 `MultiServerMCPClient(MCP_CONFIG)`를 만듭니다.",
+ "sum31": "**정리:** 설정에 서버 이름·transport·url을 적고 `MultiServerMCPClient`에 넘기면, 한 Client로 여러 서버에 연결합니다.",
+ "p12": "`get_tools`는 MCP Server에 접속해서 쓸 수 있는 Tool 목록을 LangChain Tool 형태로 가져오는 메서드입니다.\n\n- 서버가 제공하는 Tool 이름과 설명을 읽어 옵니다.\n- LLM이 이해할 수 있는 도구 스키마로 바꿉니다.\n- `bind_tools`에 넘겨 Tool Calling 대상으로 씁니다.\n\n그다음부터는 LangChain의 다른 Tool처럼 쓸 수 있습니다. 슬라이드 코드는 `tools = await client.get_tools()`로 도구를 가져와 `get_llm().bind_tools(tools)`로 LLM에 넘깁니다. `await`는 서버와 주고받는 동안 기다린다는 표시입니다.\n\n**왜 배우나:** 1일차에 배운 `bind_tools`와 ToolNode를 그대로 씁니다. 새로 배우는 것은 \"도구를 어디서 가져오느냐\"뿐입니다. 서버의 도구 설명이 LLM이 도구를 고르는 근거가 되므로, 설명을 바꾸면 Agent의 선택도 달라질 수 있습니다.",
+ "p12__meta": "- `get_tools()`는 코루틴이라 `await`가 필요합니다. 원본은 `async def main()` 안에서 `asyncio.run(main())`으로 실행합니다. 노트북은 이미 이벤트 루프가 돌고 있어 `asyncio.run`이 오류를 내므로, 실습 노트북에서는 `main()`을 풀어 셀에서 바로 `await`를 씁니다.\n- \"설명을 바꾸면 선택이 달라질 수 있다\"는 솔루션본 서버 주석(\"도구에 대한 설명을 작성해 두면 MCP Client의 LLM이 도구 호출 시 판단 근거로 사용\")에 근거합니다.",
+ "sum32": "**정리:** `get_tools`로 서버의 도구를 LangChain Tool로 받아 `bind_tools`에 넘기면, 그다음은 1일차와 똑같이 씁니다.",
+ "q11": {
+  "question": "Function Calling 방식의 문제로 슬라이드가 든 것이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "함수 이름, 설명, 입력 스키마를 앱 코드 안에서 직접 관리한다",
+    "correct": false,
+    "feedback": "슬라이드가 든 문제입니다. 도구 정보가 앱 코드 안에 흩어집니다."
+   },
+   {
+    "answer": "같은 도구를 다른 Agent나 다른 앱에서 다시 쓰기 어렵다",
+    "correct": false,
+    "feedback": "이것도 문제로 들었습니다. MCP가 이 문제를 서버로 풉니다."
+   },
+   {
+    "answer": "LLM이 외부 함수를 호출할 수 없다",
+    "correct": true,
+    "feedback": "Function Calling은 LLM이 외부 함수를 쓸 수 있게 해 줍니다. 문제는 호출이 안 되는 것이 아니라, 연결 방식이 앱마다 흩어지는 것입니다."
+   },
+   {
+    "answer": "시스템마다 연결 방식이 달라 유지보수가 복잡하다",
+    "correct": false,
+    "feedback": "맞는 설명이라 답이 아닙니다. 파일, DB, API마다 잇는 방법이 다릅니다."
+   }
+  ]
+ },
+ "q12": {
+  "question": "MCP에서 도구와 데이터를 제공하는 쪽은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "MCP Server",
+    "correct": true,
+    "feedback": "Agent가 도구를 직접 품는 대신 MCP Server가 도구와 데이터를 제공합니다."
+   },
+   {
+    "answer": "Host",
+    "correct": false,
+    "feedback": "Host는 필요한 Server에 연결해서 기능을 가져와 쓰는 쪽입니다."
+   },
+   {
+    "answer": "Client",
+    "correct": false,
+    "feedback": "Client는 Host와 Server 사이의 통신을 맡습니다. 도구를 가지고 있지는 않습니다."
+   },
+   {
+    "answer": "LLM",
+    "correct": false,
+    "feedback": "LLM은 도구를 고르고 호출을 요청할 뿐, 도구를 제공하지 않습니다."
+   }
+  ]
+ },
+ "q13": {
+  "question": "\"Host 안에서 MCP Server와 통신하는 연결 계층\"은 무엇인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Server",
+    "correct": false,
+    "feedback": "Server는 도구, 데이터, 프롬프트를 MCP 형태로 제공하는 쪽입니다."
+   },
+   {
+    "answer": "Host",
+    "correct": false,
+    "feedback": "Host는 사용자가 실제로 쓰는 LLM 애플리케이션입니다. 연결 계층은 그 안에 있습니다."
+   },
+   {
+    "answer": "Prompt",
+    "correct": false,
+    "feedback": "Prompt는 Server가 제공하는 기능(Primitive) 중 하나입니다."
+   },
+   {
+    "answer": "Client",
+    "correct": true,
+    "feedback": "Client는 Host 안에 있으면서 Server와 통신합니다."
+   }
+  ]
+ },
+ "q21": {
+  "question": "FastMCP로 만든 서버를 실행하는 방식 두 가지로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "REST 모드와 GraphQL 모드",
+    "correct": false,
+    "feedback": "슬라이드가 든 실행 방식이 아닙니다."
+   },
+   {
+    "answer": "HTTP/SSE 모드와 stdio 모드",
+    "correct": true,
+    "feedback": "FastMCP는 HTTP/SSE 모드와 stdio 모드로 실행할 수 있습니다. Claude Code 같은 Host와는 stdio로 연결합니다."
+   },
+   {
+    "answer": "동기 모드와 비동기 모드",
+    "correct": false,
+    "feedback": "슬라이드는 서버를 실행하는 방식으로 HTTP/SSE와 stdio를 듭니다."
+   },
+   {
+    "answer": "로컬 모드와 클라우드 모드",
+    "correct": false,
+    "feedback": "실행 위치가 아니라 통신 방식으로 나눕니다. HTTP/SSE와 stdio입니다."
+   }
+  ]
+ },
+ "q22": {
+  "question": "반복해서 쓸 수 있는 프롬프트 템플릿에 해당하는 Primitive는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Tools",
+    "correct": false,
+    "feedback": "Tools는 LLM이 실제 행동을 하려고 호출하는 함수입니다."
+   },
+   {
+    "answer": "Resources",
+    "correct": false,
+    "feedback": "Resources는 LLM이나 Host가 읽는 데이터나 맥락 자료입니다."
+   },
+   {
+    "answer": "Prompts",
+    "correct": true,
+    "feedback": "Prompts는 다시 쓰는 프롬프트 템플릿이고, 단축 명령어로 제공하기도 합니다."
+   },
+   {
+    "answer": "Messages",
+    "correct": false,
+    "feedback": "Messages는 MCP의 3대 Primitive가 아닙니다. 3대 Primitive는 Tools, Resources, Prompts입니다."
+   }
+  ]
+ },
+ "q31": {
+  "question": "MCP 설정(MCP_CONFIG)에 적는 항목이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "서버 이름",
+    "correct": false,
+    "feedback": "슬라이드 설정의 `\"tutorial\"`이 서버 이름입니다."
+   },
+   {
+    "answer": "transport",
+    "correct": false,
+    "feedback": "연결 방식입니다. 슬라이드 설정은 `\"sse\"`입니다."
+   },
+   {
+    "answer": "url",
+    "correct": false,
+    "feedback": "서버 주소입니다. 슬라이드 설정은 `http://localhost:8000/sse`입니다."
+   },
+   {
+    "answer": "모델 이름",
+    "correct": true,
+    "feedback": "MCP 설정은 서버에 연결하는 방법만 적습니다. 어떤 LLM을 쓸지는 Agent 쪽에서 정합니다."
+   }
+  ]
+ },
+ "q32": {
+  "question": "`get_tools`로 가져온 도구를 LLM에 넘겨 Tool Calling 대상으로 쓸 때 쓰는 메서드는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "`invoke`",
+    "correct": false,
+    "feedback": "`invoke`는 LLM이나 그래프를 실행하는 메서드입니다. 도구를 넘기는 메서드가 아닙니다."
+   },
+   {
+    "answer": "`with_structured_output`",
+    "correct": false,
+    "feedback": "구조화 출력 형식을 정하는 메서드입니다. 도구 목록을 넘길 때는 쓰지 않습니다."
+   },
+   {
+    "answer": "`add_node`",
+    "correct": false,
+    "feedback": "`add_node`는 LangGraph 그래프에 노드를 더합니다. LLM에 도구를 알려 주지는 않습니다."
+   },
+   {
+    "answer": "`bind_tools`",
+    "correct": true,
+    "feedback": "`get_llm().bind_tools(tools)`로 넘기면 LLM이 서버의 도구를 호출 대상으로 씁니다."
+   }
+  ]
+ },
+ "final": [
+  {
+   "question": "사내 문서 검색 기능을 MCP 형태로 만들어 여러 Agent가 연결해 쓰게 하려고 합니다. 이 검색 기능을 담은 프로그램은 무엇인가요?",
+   "type": "multiple_choice",
+   "answers": [
+    {
+     "answer": "MCP Host",
+     "correct": false,
+     "feedback": "Host는 사용자가 쓰는 LLM 애플리케이션입니다. 기능을 가져와 쓰는 쪽입니다."
+    },
+    {
+     "answer": "MCP Server",
+     "correct": true,
+     "feedback": "도구와 데이터를 MCP 형태로 제공하는 쪽이 Server입니다. 여러 Host가 같은 Server에 연결해 씁니다."
+    },
+    {
+     "answer": "MCP Client",
+     "correct": false,
+     "feedback": "Client는 Host 안에서 Server와 통신하는 연결 계층입니다."
+    },
+    {
+     "answer": "Function Calling",
+     "correct": false,
+     "feedback": "Function Calling은 LLM이 함수를 쓰게 하는 방식입니다. 기능을 앱 코드 안에 두면 다른 Agent가 다시 쓰기 어렵습니다."
+    }
+   ]
+  },
+  {
+   "question": "LLM이나 Host가 등록된 서버에 대한 정보를 얻으려고 읽는 데이터나 맥락 자료는 어떤 Primitive인가요?",
+   "type": "multiple_choice",
+   "answers": [
+    {
+     "answer": "Resources",
+     "correct": true,
+     "feedback": "Resources는 읽을 수 있는 데이터나 맥락 자료입니다. 실습 서버의 `config://app-info`가 이것입니다."
+    },
+    {
+     "answer": "Tools",
+     "correct": false,
+     "feedback": "Tools는 행동을 하려고 호출하는 함수입니다."
+    },
+    {
+     "answer": "Prompts",
+     "correct": false,
+     "feedback": "Prompts는 다시 쓰는 프롬프트 템플릿입니다."
+    },
+    {
+     "answer": "Transport",
+     "correct": false,
+     "feedback": "Transport는 연결 방식(SSE, stdio)입니다. Primitive가 아닙니다."
+    }
+   ]
+  },
+  {
+   "question": "Claude Code 같은 MCP Host와 FastMCP 서버를 연결할 때 슬라이드가 든 방식은?",
+   "type": "multiple_choice",
+   "answers": [
+    {
+     "answer": "HTTP/SSE",
+     "correct": false,
+     "feedback": "HTTP/SSE도 FastMCP의 실행 방식이지만, 슬라이드는 Claude Code 같은 Host와는 stdio로 연결한다고 합니다."
+    },
+    {
+     "answer": "WebSocket",
+     "correct": false,
+     "feedback": "슬라이드가 든 방식이 아닙니다."
+    },
+    {
+     "answer": "stdio",
+     "correct": true,
+     "feedback": "Claude Code 같은 MCP Host와는 stdio 방식으로 연결할 수 있습니다."
+    },
+    {
+     "answer": "gRPC",
+     "correct": false,
+     "feedback": "슬라이드가 든 방식이 아닙니다."
+    }
+   ]
+  }
+ ],
+ "closing": "**이 노트북에서 본 것**\n- Function Calling은 도구를 앱 코드 안에서 관리해, 도구가 늘수록 코드가 늘고 다른 곳에서 다시 쓰기 어렵습니다.\n- MCP는 LLM 애플리케이션과 외부 도구·데이터를 표준 방식으로 잇는 프로토콜입니다. Server가 제공하고, Host가 쓰고, Client가 Host 안에서 Server와 통신합니다.\n- FastMCP는 데코레이터로 Tools·Resources·Prompts를 정의하고, HTTP/SSE 또는 stdio로 서버를 실행합니다.\n- `MultiServerMCPClient`에 서버 이름·transport·url을 적어 연결하고, `get_tools`로 가져온 도구를 `bind_tools`에 넘겨 1일차와 똑같이 씁니다."
+}

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Function Calling 방식의 문제로 슬라이드가 든 것이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "함수 이름, 설명, 입력 스키마를 앱 코드 안에서 직접 관리한다",
+    "correct": false,
+    "feedback": "슬라이드가 든 문제입니다. 도구 정보가 앱 코드 안에 흩어집니다."
+   },
+   {
+    "answer": "같은 도구를 다른 Agent나 다른 앱에서 다시 쓰기 어렵다",
+    "correct": false,
+    "feedback": "이것도 문제로 들었습니다. MCP가 이 문제를 서버로 풉니다."
+   },
+   {
+    "answer": "LLM이 외부 함수를 호출할 수 없다",
+    "correct": true,
+    "feedback": "Function Calling은 LLM이 외부 함수를 쓸 수 있게 해 줍니다. 문제는 호출이 안 되는 것이 아니라, 연결 방식이 앱마다 흩어지는 것입니다."
+   },
+   {
+    "answer": "시스템마다 연결 방식이 달라 유지보수가 복잡하다",
+    "correct": false,
+    "feedback": "맞는 설명이라 답이 아닙니다. 파일, DB, API마다 잇는 방법이 다릅니다."
+   }
+  ]
+ }
+]

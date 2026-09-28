@@ -1,0 +1,28 @@
+[
+ {
+  "question": "LLM Judge의 평가 점수는 어디에 저장하나요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Writer의 Skill 파일",
+    "correct": false,
+    "feedback": "Skill 파일은 Writer가 읽는 규칙 문서입니다. 점수를 저장하지 않습니다."
+   },
+   {
+    "answer": "MCP 서버의 `data` 경로",
+    "correct": false,
+    "feedback": "`data` 경로는 Researcher가 읽는 문서가 있는 곳입니다."
+   },
+   {
+    "answer": "Langfuse Score",
+    "correct": true,
+    "feedback": "평가 점수를 Langfuse Score로 저장하고, 평가 과정은 별도 Trace로 남깁니다."
+   },
+   {
+    "answer": "MemorySaver",
+    "correct": false,
+    "feedback": "MemorySaver는 Agent별 실행 상태를 유지합니다. 평가 점수는 Langfuse Score에 저장합니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "보고서, 코드, 파일처럼 Agent가 만들어 낸 산출물을 가리키는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Task",
+    "correct": false,
+    "feedback": "Task는 Agent에게 위임되는 작업의 단위입니다."
+   },
+   {
+    "answer": "Message",
+    "correct": false,
+    "feedback": "Message는 요청, 질문, 중간 응답을 주고받는 말입니다."
+   },
+   {
+    "answer": "Artifact",
+    "correct": true,
+    "feedback": "Artifact는 최종 또는 중간 산출물입니다."
+   },
+   {
+    "answer": "Agent Card",
+    "correct": false,
+    "feedback": "Agent Card는 Agent가 누구이고 무엇을 할 수 있는지 알리는 메타데이터입니다."
+   }
+  ]
+ }
+]

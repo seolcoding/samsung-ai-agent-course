@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Building Effective Agents가 말하는, 복잡한 구조를 더해도 되는 때는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "성능이 분명히 좋아질 때",
+    "correct": true,
+    "feedback": "먼저 단순한 방법으로 되는지 보고, 복잡한 구조는 분명한 개선이 있을 때만 더합니다."
+   },
+   {
+    "answer": "새 프레임워크가 나왔을 때",
+    "correct": false,
+    "feedback": "슬라이드는 복잡한 프레임워크보다 단순하고 조합할 수 있는 패턴을 강조합니다."
+   },
+   {
+    "answer": "구조가 복잡할수록 믿을 만해 보일 때",
+    "correct": false,
+    "feedback": "하네스는 복잡해야 좋은 것이 아니라 문제에 맞게 충분해야 좋습니다."
+   },
+   {
+    "answer": "처음 설계를 시작할 때",
+    "correct": false,
+    "feedback": "처음에는 단순한 프롬프트·검색·도구 한 번 호출로 되는지부터 확인합니다."
+   }
+  ]
+ }
+]

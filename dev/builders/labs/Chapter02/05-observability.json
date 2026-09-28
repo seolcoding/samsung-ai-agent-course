@@ -1,0 +1,477 @@
+{
+ "title": "Langfuse로 실행 기록하고 평가하기",
+ "intro": "LLM 애플리케이션의 실행을 Langfuse에 기록하고(Trace), 답변 품질에 점수를 남겨(Score) 봅니다. 셀의 출력은 기록을 붙이든 안 붙이든 똑같이 보입니다. 그래서 이 노트북의 성공 기준은 대부분 **Langfuse 화면**에서 확인합니다. 셀을 실행한 뒤 브라우저의 Langfuse 화면을 함께 봅니다.\n\n- **2장 체인 실행 기록하기** (과제): 체인을 실행할 때 기록 도구(CallbackHandler)를 넘깁니다. 빈칸 두 곳.\n- **3장 그래프 실행 기록하기** (과제): LangGraph 그래프에 기록 도구를 기본 설정으로 붙입니다. 빈칸 한 곳.\n- **4장 체인 밖 함수 기록하기** (예제): `@observe`로 검색 같은 일반 함수도 같은 기록에 넣습니다.\n- **5~7장 점수 남기기** (예제): 규칙, LLM 채점(LLM-as-a-Judge), 사용자 피드백으로 점수를 남깁니다.\n- **8장 RAG 답변을 세 기준으로 채점하기** (예제): 정확성·관련성·완성도를 LLM이 채점합니다.\n\n셀은 위에서부터 차례로 실행합니다. 각 장 첫머리의 접힌 준비 코드도 실행해야 그 아래 셀이 동작합니다.\n\n**내 trace 찾기** Langfuse 화면 왼쪽 메뉴의 **Tracing**을 엽니다. 목록은 가장 최근 것이 맨 위에 있습니다. 여러 사람이 같은 프로젝트를 쓰면 남의 기록도 섞여 보이므로, 다음 세 가지로 내 것을 고릅니다.\n\n1. **이름**: 목록의 이름 칸에 보이는 이름으로 검색 칸에서 거릅니다. 이 노트북의 코드는 장마다 이름이 정해져 있습니다(각 장에서 알려 드립니다).\n2. **시각**: 셀을 실행한 시각과 같은 시각의 기록을 봅니다.\n3. **입력**: 기록을 열어 입력(Input)에 내가 보낸 질문이 있는지 봅니다.\n\n기록은 몇 초 늦게 도착합니다. 셀 끝의 `flush()`까지 실행한 뒤 화면을 새로고침합니다.",
+ "intro__meta": "- 원본: `course/Chapter02/code/raw/05-observability/` 다섯 파일. 01~03·05는 raw(solution과 docstring 경로 한 줄만 다름), 04는 solution을 씁니다(4-2 목차 3절). 파일 맨 위 docstring(클라우드 주소, 실행 경로)은 노트북에서 뺐습니다.\n- **Langfuse 서버**: 받은 코드와 `.env.sample`은 클라우드(`jp.cloud.langfuse.com`), 강사 맥에는 self-host(`infra/langfuse/`)가 있습니다. 강의장에서 어느 주소를 쓸지, 수강생마다 프로젝트(키)를 따로 줄지 한 프로젝트를 같이 쓸지 **미정**입니다. 같이 쓰면 위 \"내 trace 찾기\"(이름·시각·입력)로 고릅니다(2026-09-28 사용자 결정 3).\n- 키 확인: 2장 준비 코드에서 `get_client().auth_check()`를 부릅니다(사용자 결정 3). 키가 틀리면 Langfuse는 경고만 내고 코드는 정상 실행되어 \"조용히 틀린 데모\"가 됩니다. 환경 점검 셀(`check_env([\"LANGFUSE\"])`)은 키 **이름**만 봅니다.\n- Langfuse 화면 메뉴 이름(Tracing, Scores)과 검색 칸 동작은 받은 코드의 출력 문구와 일반 화면 기준으로 적었습니다. 강의장에서 쓸 Langfuse 버전 화면으로는 **미확인**입니다. 클라우드 새 조직은 공개 API `GET /api/public/traces`가 막혀 있었습니다(2026-09-28, 410 LEGACY_API). 화면 확인은 영향 없음.\n- 사외 실측(2026-09-28, `COURSE_ENV=out`, OpenAI, jp 클라우드): 01 약 16초, 02 약 8초, 03 약 8초, 04 약 13초, 05 약 10초. 사내 게이트웨이 시간은 미확인입니다.\n- 사외 실측 trace 이름: 01·04 `RunnableSequence`, 02 `LangGraph`, 03·05 `rag-pipeline`.\n- 11차수 피드백: 뒷자리에서 Langfuse 화면이 안 보였습니다. 성공 기준은 수강생 각자 PC 화면에서 확인하도록 썼고, 강사 화면은 확대합니다.",
+ "env": [
+  "LANGFUSE"
+ ],
+ "files": [
+  {
+   "name": "01_tracing_basic.py",
+   "title": "체인 실행 기록하기",
+   "intro": "프롬프트 → 모델 → 출력 파서로 이어진 체인을 실행하면서 Langfuse에 기록을 남깁니다. 기록 도구는 `CallbackHandler`입니다. `.env`의 Langfuse 설정을 스스로 읽으므로 만들기만 하면 되고, 체인을 실행할 때 `config`의 `callbacks` 목록에 넣어 넘기면 그 실행의 모든 단계가 기록됩니다.\n\n`invoke`를 한 번 호출할 때마다 trace가 하나씩 생깁니다. 이 장은 질문 하나, 그다음 질문 두 개를 실행하므로 trace가 세 개 생깁니다. 이 장의 trace 이름은 `RunnableSequence`입니다(체인의 기본 이름).\n\n**왜 배우나:** 실행 결과만 출력해서는 모델에 실제로 어떤 프롬프트가 갔는지, 어느 단계가 오래 걸렸는지 알 수 없습니다. 기록 도구를 붙이는 것이 관찰의 첫걸음입니다.",
+   "intro__meta": "- 원본 01은 TODO 두 곳이 모두 같은 문장(\"config의 callback으로 `langfuse_handler`를 전달\")입니다. 슬라이드 CallbackHandler 쪽 코드와 같은 모양이라 과제로 냈습니다.",
+   "setup_note": "준비 코드입니다. 필요한 도구를 불러오고, **Langfuse에 연결되는지 확인**합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다. 출력에 🟢가 나오면 다음으로 넘어갑니다. ⛔가 나오면 강사에게 알립니다.",
+   "patch": [
+    {
+     "find": "\"\"\"",
+     "until": "05-observability/01_tracing_basic.py",
+     "lines": []
+    },
+    {
+     "find": "\"\"\"",
+     "lines": []
+    },
+    {
+     "find": "load_dotenv()",
+     "lines": [
+      "load_dotenv()",
+      "",
+      "# Langfuse 서버에 연결되고 키가 맞는지 확인합니다.",
+      "# 키가 틀려도 아래 실습 코드는 오류 없이 돌아가므로, 여기서 먼저 봅니다.",
+      "try:",
+      "    langfuse_ok = get_client().auth_check()",
+      "except Exception as e:",
+      "    langfuse_ok = False",
+      "    print(f'오류 종류: {type(e).__name__}')",
+      "if langfuse_ok:",
+      "    print('🟢 Langfuse 연결 확인: 키가 맞습니다.')",
+      "else:",
+      "    print('⛔ Langfuse에 연결하지 못했습니다. 강사에게 알려 주세요.')"
+     ]
+    },
+    {
+     "find": "for q in questions:",
+     "until": "# TODO: chain.invoke를 호출하면서",
+     "lines": [
+      "for q in questions:",
+      "    # TODO: 반복문 안에서도 chain.invoke를 호출하면서, config의 callback으로 `langfuse_handler`를 전달하세요."
+     ]
+    }
+   ],
+   "split": [
+    "# CallbackHandler: .env의 LANGFUSE_*",
+    "print(\"=== 단일 질문 트레이싱 ===\")",
+    "print(\"=== 여러 질문 배치 트레이싱 ===\")"
+   ],
+   "chunk_titles": [
+    "기록 도구와 체인 준비",
+    "질문 하나 기록하기",
+    "질문 여러 개 기록하기"
+   ],
+   "todos": [
+    {
+     "todo": "chain.invoke를 호출하면서, config의 callback으로 `langfuse_handler`를 전달하세요.",
+     "blank": {
+      "start": "result = chain.invoke(",
+      "end": "print(result)"
+     },
+     "explain": "질문 하나를 체인에 넣어 실행하고, 답변을 `result`에 담습니다. 이때 위에서 만든 `langfuse_handler`를 함께 넘겨야 이 실행이 Langfuse에 기록됩니다.",
+     "hint": "이 셀을 붙여 넣고, 빈칸에서 `chain`을 질문 하나로 실행하되 `langfuse_handler`가 실행을 기록하도록 설정으로 넘겨 달라고 합니다. 질문 문장과 결과를 담을 이름(`result`)은 빈칸 위 주석과 아래 줄에 맞추라고 적습니다.",
+     "checks": [
+      "셀 출력에 LangGraph와 LangChain의 차이를 설명한 답변이 나온다",
+      "Langfuse Tracing 목록에 `RunnableSequence` trace가 새로 하나 생겼다(아래 셀까지 실행한 뒤 확인해도 됩니다)"
+     ],
+     "fail": [
+      "답변은 나오는데 새 trace가 없다 → 핸들러를 `config`의 `callbacks`로 넘겼는지 다시 봅니다"
+     ]
+    },
+    {
+     "todo": "반복문 안에서도 chain.invoke를 호출하면서, config의 callback으로 `langfuse_handler`를 전달하세요.",
+     "blank": {
+      "start": "answer = chain.invoke(q, config="
+     },
+     "explain": "질문 두 개를 차례로 실행합니다. 반복문 안에서 질문(`q`)마다 체인을 실행해 `answer`에 담고, 이번에도 `langfuse_handler`를 넘깁니다. 셀 끝의 `flush()`는 모아 둔 기록을 Langfuse 서버로 바로 보냅니다.",
+     "hint": "이 셀을 붙여 넣고, 반복문 안의 빈칸 한 줄에서 `q`로 `chain`을 실행하고 앞 셀과 같은 방법으로 기록 도구를 넘겨 달라고 합니다. 빈칸 밖의 줄은 고치지 말라고 적습니다.",
+     "checks": [
+      "셀 출력에 `Q:`와 `A:` 두 쌍이 나오고 마지막 줄에 `Tracing에서 확인`이 출력된다",
+      "Langfuse Tracing 목록에 이 장에서 생긴 `RunnableSequence` trace가 모두 **세 개**다",
+      "trace 하나를 열면 `ChatPromptTemplate` → `ChatOpenAI`(모델 호출) → `StrOutputParser` 단계가 보이고, 단계를 누르면 입력·출력과 걸린 시간이 보인다"
+     ],
+     "fail": [
+      "새 trace가 하나뿐이다 → 이 셀의 빈칸에도 핸들러를 넘겼는지 봅니다",
+      "trace가 아직 안 보인다 → 몇 초 기다렸다가 화면을 새로고침합니다"
+     ]
+    }
+   ],
+   "look": "**볼 지점**\n- 셀 출력은 기록을 붙이기 전과 똑같습니다. 기록이 남았는지는 Langfuse 화면에서만 알 수 있습니다.\n- trace를 열면 체인의 세 단계가 트리로 보입니다. 모델 호출 단계에는 실제로 모델에 간 메시지(시스템 메시지 \"한국어로 간결하게 답변하세요.\"와 질문)가 들어 있습니다.\n- 모델 호출 단계에서 걸린 시간과 토큰 수도 확인합니다. 비용이 어디서 생기는지 보는 자리입니다.",
+   "look__meta": "- 모델 호출 단계 이름은 사외(OpenAI)에서 `ChatOpenAI`였습니다. 사내 게이트웨이 모델 클래스 이름은 미확인입니다(성공 기준의 `ChatOpenAI` 괄호는 \"모델 호출\"로 읽어 주세요)."
+  },
+  {
+   "name": "02_tracing_langgraph.py",
+   "title": "그래프 실행 기록하기",
+   "intro": "날씨 도구를 쓰는 LangGraph Agent를 기록합니다. 그래프는 agent 노드(모델)와 tools 노드(도구 실행)를 오가며 답을 만듭니다.\n\n앞 장에서는 `invoke`를 호출할 때마다 핸들러를 넘겼습니다. 이번에는 그래프를 만들 때 `with_config`로 핸들러를 **기본 설정**으로 붙입니다. 그러면 이후 `invoke`에는 아무것도 넘기지 않아도 모든 실행이 기록됩니다. 이 장의 trace 이름은 `LangGraph`입니다.\n\n**왜 배우나:** Agent는 모델과 도구를 여러 번 오갑니다. 어느 노드에서 어떤 도구를 어떤 입력으로 불렀는지, 어디서 시간이 걸렸는지를 노드 순서대로 볼 수 있어야 틀린 답의 원인을 가를 수 있습니다.",
+   "intro__meta": "- 원본 02 raw 사용. `bind_tools`를 씁니다. 사내 게이트웨이의 도구 호출 동작은 M1 2-1과 같은 조건이며 이 권에서는 미확인입니다.\n- 사외 실측: \"부산이랑 제주\" 질문에서 `get_weather`가 두 번(부산, 제주) 호출되었습니다.",
+   "setup_note": "준비 코드입니다. 그래프와 도구에 필요한 것을 불러옵니다. 실행만 합니다.",
+   "patch": [
+    {
+     "find": "\"\"\"",
+     "until": "05-observability/02_tracing_langgraph.py",
+     "lines": []
+    },
+    {
+     "find": "\"\"\"",
+     "lines": []
+    }
+   ],
+   "split": [
+    "@tool",
+    "builder = StateGraph(State)",
+    "print(\"=== LangGraph 트레이싱 ===\")"
+   ],
+   "chunk_titles": [
+    "날씨 도구와 Agent 노드",
+    "그래프 조립과 기록 도구 붙이기",
+    "실행하기"
+   ],
+   "todos": [
+    {
+     "todo": "그래프를 컴파일 하면서, with_config 메서드를 통해 callback으로 `langfuse_handler`를 전달하세요.",
+     "blank": {
+      "start": "app = builder.compile()"
+     },
+     "explain": "노드와 엣지를 연결한 `builder`를 실행할 수 있는 그래프로 만들고(`compile`), 거기에 `with_config`로 `langfuse_handler`를 기본 설정으로 붙여 `app`에 담습니다. 이 셀은 아무것도 출력하지 않습니다. 결과는 아래 \"실행하기\" 셀에서 봅니다.",
+     "hint": "이 셀을 붙여 넣고, 빈칸 한 줄에서 `builder`를 컴파일한 그래프에 `langfuse_handler`를 기본 설정으로 붙여 `app`에 담아 달라고 합니다. `invoke`에 핸들러를 넘기는 방식은 쓰지 말라고 적습니다.",
+     "checks": [
+      "이 셀이 오류 없이 끝나고, 아래 \"실행하기\" 셀에서 `Q:`와 `A:` 두 쌍이 나오며 답에 날씨(예: `맑음 23°C`)가 들어 있다",
+      "Langfuse Tracing 목록에 `LangGraph` trace가 새로 **두 개** 생겼다",
+      "\"부산이랑 제주\" trace를 열면 `agent` → `tools`(`get_weather`) → `agent` 순서로 노드가 보인다"
+     ],
+     "fail": [
+      "답은 나오는데 새 trace가 없다 → `invoke`가 아니라 그래프(`app`)에 핸들러를 붙였는지 봅니다",
+      "\"실행하기\" 셀에서 `app`이 없다는 오류가 난다 → 이 셀의 빈칸이 `app`에 담는지 봅니다"
+     ]
+    }
+   ],
+   "look": "**볼 지점**\n- `LangGraph` trace 안에 `agent`, `tools_condition`, `tools`, `get_weather`가 실행 순서대로 보입니다. `tools_condition`은 도구를 부를지 끝낼지 정한 갈림길입니다.\n- `get_weather` 단계를 누르면 모델이 도구에 넘긴 입력(도시 이름)과 도구가 돌려준 날씨가 보입니다. \"부산이랑 제주\" 질문에서는 도구가 몇 번 호출되었는지 셉니다.\n- 두 번째 `agent` 단계의 모델 호출이 도구 결과를 받아 최종 답을 씁니다."
+  },
+  {
+   "name": "03_observe_decorator.py",
+   "title": "체인 밖 함수 기록하기",
+   "intro": "RAG처럼 \"문서 검색 → 문맥 정리 → 모델 호출\"로 이어지는 흐름을 기록합니다. 검색과 문맥 정리는 LangChain 체인이 아닌 일반 Python 함수라서 CallbackHandler로는 보이지 않습니다. 이런 함수에는 `@observe`를 붙입니다. `name`에 적은 이름이 Langfuse 화면에 표시됩니다.\n\n`@observe`를 붙인 함수 안에서 다른 `@observe` 함수나 체인을 호출하면, 그 실행이 부모 아래 자식으로 묶여 트리가 됩니다. 이 장의 trace 이름은 가장 바깥 함수의 이름 `rag-pipeline`입니다. 검색은 실제로 하지 않고 정해 둔 문서 두 개를 돌려줍니다.\n\n코드는 완성되어 있습니다. 먼저 끝까지 실행하고, `# ✍️ CHANGE_HERE:` 줄을 바꿔 다시 실행합니다.",
+   "setup_note": "준비 코드입니다. `observe`를 불러오고 Langfuse 클라이언트, 기록 도구, 모델을 준비합니다. 실행만 합니다.",
+   "patch": [
+    {
+     "find": "\"\"\"",
+     "until": "05-observability/03_observe_decorator.py",
+     "lines": []
+    },
+    {
+     "find": "\"\"\"",
+     "lines": []
+    }
+   ],
+   "split": [
+    "# @observe(): 이 함수의 호출이 Langfuse에 span으로 기록됨",
+    "# @observe로 감싼 함수 안에서 LangChain 체인을 호출하면",
+    "print(\"=== @observe 데코레이터 트레이싱 ===\")"
+   ],
+   "chunk_titles": [
+    "검색·정리 함수에 이름 붙이기",
+    "RAG 흐름 묶기",
+    "실행하기"
+   ],
+   "edits": [
+    {
+     "line": "@observe(name=\"retrieve-documents\")",
+     "todo": "검색 함수가 화면에 표시될 이름을 바꿔 봅니다",
+     "explain": "먼저 그대로 \"실행하기\"까지 실행하고 Langfuse 화면에서 트리를 봅니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 `name` 값을 원하는 이름(예: 내 이름을 넣은 `\"retrieve-hong\"`)으로 바꿉니다. 따옴표는 남깁니다. **이 셀부터 아래 셀을 차례로 다시 실행**합니다."
+    }
+   ],
+   "chunk_success": {
+    "실행하기": {
+     "success": [
+      "`Q:`와 `A:` 두 쌍이 나오고, 마지막에 `Tracing에서 확인`이 출력된다",
+      "Langfuse의 새 `rag-pipeline` trace를 열면 그 아래에 `retrieve-documents`, `format-context`, 체인(`RunnableSequence`)이 자식으로 보인다",
+      "이름을 바꿔 다시 실행한 뒤 새로 생긴 trace에는 `retrieve-documents` 대신 바꾼 이름이 보인다"
+     ],
+     "fail": [
+      "`rag-pipeline`만 있고 자식이 없다 → 이 장의 셀을 준비 코드부터 차례로 다시 실행합니다",
+      "바꾼 이름이 안 보인다 → 이름을 바꾼 셀과 \"RAG 흐름 묶기\" 셀을 다시 실행했는지 봅니다"
+     ]
+    }
+   },
+   "look": "**볼 지점**\n- `retrieve-documents`를 누르면 함수의 입력(질문)과 출력(문서 두 개)이 보입니다. `@observe`가 함수의 입력과 반환값을 기록합니다.\n- 체인(`RunnableSequence`)은 `rag-pipeline` 아래에 붙어 있습니다. `rag_pipeline` 안에서 체인에 핸들러를 넘겼기 때문입니다.\n- 검색·정리·모델 호출이 한 trace 안에 모여 있어서, 답이 이상할 때 검색 결과부터 차례로 따라가 볼 수 있습니다.",
+   "ask": {
+    "hint": "\"RAG 흐름 묶기\" 셀을 붙여 넣고, `chain.invoke`에서 `config`의 `callbacks`를 빼면 Langfuse의 trace 트리가 어떻게 달라지는지 설명해 달라고 합니다. 코드는 고치지 말고 설명만 해 달라고 적습니다.",
+    "success": [
+     "`callbacks`를 빼면 모델 호출(체인) 기록이 트리에서 빠지고 `@observe`를 붙인 함수들만 남는다는 점을 짚었다",
+     "`@observe`는 붙인 함수만 기록하고, 체인 안의 단계는 CallbackHandler가 기록한다는 점을 짚었다"
+    ],
+    "fail": [
+     "코드를 고쳐 왔다 → 고치지 말라고 다시 적습니다",
+     "\"아무 차이 없다\"고 답했다 → 셀의 `# CallbackHandler를 여기서도 전달해야` 주석을 함께 붙여 다시 묻습니다"
+    ]
+   }
+  },
+  {
+   "name": "04_evaluation.py",
+   "source": "solution",
+   "title": "규칙으로 채점하기",
+   "intro": "여기부터는 기록(Trace)에 **점수(Score)**를 붙입니다. 점수는 `langfuse.create_score`로 남기고, 어느 trace에 붙일지는 trace ID로 정합니다. 핸들러의 `last_trace_id`에 방금 실행한 trace의 ID가 들어 있습니다.\n\n이 장은 규칙 기반 평가입니다. 답변에 예시가 들어 있는지를 코드로 판단해 1.0 또는 0.0을 `has-example`이라는 이름으로 남깁니다. 답변 체인 `run_chain`은 시스템 메시지로 \"반드시 예시를 포함하세요\"라고 지시합니다.\n\n코드는 완성되어 있습니다. 먼저 그대로 실행하고, `# ✍️ CHANGE_HERE:` 줄을 바꿔 다시 실행합니다.\n\n**왜 배우나:** 기록만으로는 답이 좋은지 알 수 없습니다. 점수를 남겨 두면 프롬프트를 바꿨을 때 품질이 나아졌는지 숫자로 비교할 수 있습니다.",
+   "intro__meta": "- 원본: `course/Chapter02/code/solution/05-observability/04_evaluation.py`. raw 102~104행의 이전 강사 메모 주석(병렬 실행·승인 대기, 코드와 무관, 들여쓰기 어긋남)이 없는 solution을 썼습니다.\n- 원본은 한 파일에 규칙 기반 → LLM-as-a-Judge → 수동 평가 세 구획이 있습니다. 노트북에서는 구획마다 장을 따로 두고(커리큘럼의 평가 방법 3가지에 대응), 장마다 접힌 준비 코드가 `langfuse`·`llm`·`run_chain`을 다시 만듭니다. 장 끝마다 `langfuse.flush()`를 넣었습니다(원본은 파일 끝에 한 번).\n- 원본 주석 `# get_trace_id(): …`는 코드(`handler.last_trace_id`)와 달라 노트북에서만 `# last_trace_id: …`로 고쳤습니다.",
+   "setup_note": "준비 코드입니다. Langfuse 클라이언트(`langfuse`)와 모델을 준비합니다. 실행만 합니다.",
+   "patch": [
+    {
+     "find": "\"\"\"",
+     "until": "05-observability/04_evaluation.py",
+     "lines": []
+    },
+    {
+     "find": "\"\"\"",
+     "lines": []
+    },
+    {
+     "find": "# get_trace_id(): 직전 invoke에서 생성된 trace의 ID를 반환",
+     "lines": [
+      "# last_trace_id: 직전 invoke에서 생성된 trace의 ID"
+     ]
+    },
+    {
+     "find": "# ── 2. LLM-as-a-Judge 평가",
+     "until": "print(\"✓ 대시보드 [Scores] 탭에서 평가 결과를 확인하세요.\")",
+     "lines": [
+      "langfuse.flush()"
+     ]
+    }
+   ],
+   "split": [
+    "def run_chain",
+    "# ── 1. 규칙 기반 평가"
+   ],
+   "chunk_titles": [
+    "답변 체인",
+    "예시 포함 여부 채점하기"
+   ],
+   "edits": [
+    {
+     "line": "(\"system\", \"한국어로 간결하게 답변하세요. 반드시 예시를 포함하세요.\"),",
+     "todo": "예시를 넣으라는 지시를 빼 봅니다",
+     "explain": "먼저 그대로 두 셀을 실행해 점수를 봅니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄에서 \"반드시 예시를 포함하세요.\"를 지웁니다. 따옴표는 남깁니다. **이 셀과 아래 셀을 다시 실행**하고 점수가 달라지는지 봅니다."
+    }
+   ],
+   "chunk_success": {
+    "예시 포함 여부 채점하기": {
+     "success": [
+      "답변 아래에 `예시 포함 여부: ✓ (score=1.0)` 또는 `✗ (score=0.0)` 줄이 출력된다",
+      "Langfuse의 새 `RunnableSequence` trace를 열면 점수(Scores)에 `has-example`과 코멘트 \"예시 포함 여부 자동 검사\"가 보인다",
+      "예시 지시를 뺀 뒤 다시 실행해 점수를 비교했다(예시가 없어 보이는데 `✓`가 나오면 그 이유를 아래 \"AI에게 물어보기\"에서 찾습니다)"
+     ],
+     "fail": [
+      "점수가 화면에 없다 → 셀 끝 `flush()`까지 실행되었는지 보고 화면을 새로고침합니다"
+     ]
+    }
+   },
+   "look": "**볼 지점**\n- 점수는 코드가 정합니다. 같은 답변이면 몇 번을 채점해도 같은 점수가 나옵니다(재현성).\n- 규칙은 키워드 목록 중 하나라도 답변에 들어 있으면 예시가 있다고 봅니다. 키워드 목록을 읽어 보고, 예시가 아닌데도 걸릴 만한 것이 있는지 찾아봅니다.",
+   "look__meta": "- 사외 실측: 원본 그대로 `✓ (score=1.0)`. 규칙의 `'('`·`'['`는 괄호만 있어도 참이라, 예시 지시를 빼도 1.0이 나오기 쉽습니다. 이것이 물어보기 소재입니다.",
+   "ask": {
+    "hint": "\"예시 포함 여부 채점하기\" 셀을 붙여 넣고, 이 규칙이 예시가 없는 답변에도 1.0을 줄 수 있는지 리뷰해 달라고 합니다. 코드는 고치지 말고, 근거가 되는 키워드를 짚어 달라고 적습니다.",
+    "success": [
+     "키워드 목록의 `(`나 `[`는 괄호만 있어도 참이 되어, 예시가 없어도 1.0이 될 수 있다는 점을 짚었다",
+     "이런 규칙은 빠르고 재현성이 높지만 \"예시다운 예시인가\" 같은 품질은 판단하지 못한다는 점을 짚었다"
+    ],
+    "fail": [
+     "설명 대신 고친 코드를 받았다 → 리뷰만 해 달라고 다시 적습니다",
+     "\"규칙이 정확하다\"고만 답했다 → 키워드 하나하나가 어떤 글에서 참이 되는지 다시 묻습니다"
+    ]
+   }
+  },
+  {
+   "name": "04_evaluation.py",
+   "source": "solution",
+   "title": "LLM이 채점하기",
+   "intro": "이번에는 다른 LLM이 답변 품질을 0.0~1.0 사이 숫자로 채점합니다(LLM-as-a-Judge). 채점 결과를 `llm-judge-quality`라는 이름으로 답변 trace에 남깁니다. Judge 호출에는 핸들러를 넘기지 않아서 Judge 자체는 따로 기록되지 않습니다. 점수만 답변 trace에 붙습니다.\n\n이번에도 먼저 원본 그대로 결과를 본 뒤 `# ✍️ CHANGE_HERE:` 줄을 바꿉니다.",
+   "setup_note": "준비 코드입니다. 앞 장과 같은 모델과 답변 체인 `run_chain`을 다시 준비합니다. 실행만 합니다.",
+   "patch": [
+    {
+     "find": "\"\"\"",
+     "until": "05-observability/04_evaluation.py",
+     "lines": []
+    },
+    {
+     "find": "\"\"\"",
+     "lines": []
+    },
+    {
+     "find": "# get_trace_id(): 직전 invoke에서 생성된 trace의 ID를 반환",
+     "lines": [
+      "# last_trace_id: 직전 invoke에서 생성된 trace의 ID"
+     ]
+    },
+    {
+     "find": "# ── 1. 규칙 기반 평가",
+     "until": "print()",
+     "lines": []
+    },
+    {
+     "find": "# ── 3. 수동 평가 시뮬레이션",
+     "until": "print(\"✓ 대시보드 [Scores] 탭에서 평가 결과를 확인하세요.\")",
+     "lines": [
+      "langfuse.flush()"
+     ]
+    }
+   ],
+   "split": [
+    "# ── 2. LLM-as-a-Judge 평가"
+   ],
+   "chunk_titles": [
+    "LLM Judge로 채점하기"
+   ],
+   "edits": [
+    {
+     "line": "\"아래 답변의 품질을 0.0~1.0 사이 숫자 하나만 출력하세요. 다른 텍스트는 출력하지 마세요.\",",
+     "todo": "Judge에게 평가 기준을 하나 더 줘 봅니다",
+     "explain": "먼저 그대로 실행해 점수를 봅니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 따옴표 안 맨 앞에 평가 기준 한 가지를 더합니다(예: \"초등학생도 이해할 수 있어야 좋은 답입니다. \"). 따옴표는 남깁니다. 이 셀을 다시 실행하고 점수를 비교합니다."
+    }
+   ],
+   "chunk_success": {
+    "LLM Judge로 채점하기": {
+     "success": [
+      "답변 아래에 `LLM 채점 점수: 0.x`(또는 `1.0`)가 출력된다",
+      "Langfuse의 새 `RunnableSequence` trace 점수(Scores)에 `llm-judge-quality`와 코멘트 \"LLM 자동 채점: …\"이 보인다",
+      "평가 기준을 더한 뒤 점수가 달라졌는지 비교했다(LLM이 채점하므로 달라지지 않을 수도 있다)"
+     ],
+     "fail": [
+      "점수가 정확히 `0.5`이고 코멘트에 숫자가 아닌 글이 있다 → Judge가 숫자 하나만 답하지 않았습니다. 더한 기준 문장을 다시 봅니다"
+     ]
+    }
+   },
+   "look": "**볼 지점**\n- Judge에게 준 시스템 메시지가 곧 평가 기준입니다. 지금은 \"품질\"이라는 말뿐이라, 무엇을 기준으로 채점했는지 알기 어렵습니다.\n- 코멘트에는 Judge가 돌려준 글이 그대로 남습니다. 점수가 이상하면 코멘트부터 봅니다.",
+   "look__meta": "- 사외 실측: 원본 그대로 `LLM 채점 점수: 1.0`. Judge 응답을 `float()`로 바꾸지 못하면 **조용히 0.5**가 기록됩니다(원본 코드). 고치지 않고 물어보기 소재로 씁니다.",
+   "ask": {
+    "hint": "\"LLM Judge로 채점하기\" 셀을 붙여 넣고, Judge가 숫자가 아닌 글을 돌려주면 Langfuse에 어떤 점수가 기록되는지 리뷰해 달라고 합니다. 코드는 고치지 말고 근거가 되는 줄을 짚어 달라고 적습니다.",
+    "success": [
+     "숫자로 바꾸지 못하면 오류 없이 `0.5`가 기록된다는 점을 짚었다",
+     "그래서 화면의 0.5가 \"보통 품질\"인지 \"채점 실패\"인지 점수만으로는 구분할 수 없다는 점을 짚었다"
+    ],
+    "fail": [
+     "고친 코드를 먼저 내놓았다 → 고치지 말고 설명만 해 달라고 적습니다",
+     "\"오류가 난다\"고 답했다 → `try`와 `except` 부분을 다시 읽어 달라고 합니다"
+    ]
+   }
+  },
+  {
+   "name": "04_evaluation.py",
+   "source": "solution",
+   "title": "사용자 피드백 기록하기",
+   "intro": "실제 서비스에서는 사용자가 누른 좋아요·싫어요를 점수로 남깁니다. 이 장은 사용자가 좋아요를 눌렀다고 가정하고 `user-feedback` 점수를 1.0으로 남깁니다. 버튼이 없으므로 값을 코드에 직접 적었습니다.\n\n원본 그대로 한 번, 값을 바꿔 한 번 실행해 두 점수를 비교합니다.",
+   "setup_note": "준비 코드입니다. 앞 장과 같은 모델과 답변 체인 `run_chain`을 다시 준비합니다. 실행만 합니다.",
+   "patch": [
+    {
+     "find": "\"\"\"",
+     "until": "05-observability/04_evaluation.py",
+     "lines": []
+    },
+    {
+     "find": "\"\"\"",
+     "lines": []
+    },
+    {
+     "find": "# ── 1. 규칙 기반 평가",
+     "until": "# ── 3. 수동 평가 시뮬레이션",
+     "lines": [
+      "# ── 3. 수동 평가 시뮬레이션 ──"
+     ]
+    }
+   ],
+   "split": [
+    "# ── 3. 수동 평가 시뮬레이션"
+   ],
+   "chunk_titles": [
+    "사용자 피드백 점수 남기기"
+   ],
+   "edits": [
+    {
+     "line": "user_feedback = 1.0",
+     "todo": "싫어요(0.0)를 누른 것으로 바꿔 봅니다",
+     "explain": "먼저 그대로 실행합니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 `1.0`을 `0.0`으로 바꿔 다시 실행하고, Langfuse 화면에서 두 trace의 점수를 비교합니다."
+    }
+   ],
+   "chunk_success": {
+    "사용자 피드백 점수 남기기": {
+     "success": [
+      "답변과 `사용자 평가: 👍 (score=…)` 줄이 나오고, 마지막 줄에 `✓ 대시보드 [Scores] 탭에서 평가 결과를 확인하세요.`가 출력된다",
+      "Langfuse 왼쪽 메뉴의 **Scores** 화면에 `has-example`, `llm-judge-quality`, `user-feedback` 세 이름의 점수가 모두 보인다",
+      "0.0으로 바꿔 실행한 뒤에는 새 `user-feedback` 점수가 0으로 보인다"
+     ],
+     "fail": [
+      "세 점수 중 빠진 이름이 있다 → 해당 장의 셀을 준비 코드부터 다시 실행하고 화면을 새로고침합니다"
+     ]
+    }
+   },
+   "look": "**볼 지점**\n- 0.0으로 바꿔도 출력의 👍 표시는 그대로입니다. 출력 문구는 고정된 글자이고, 실제로 남은 점수는 `score=` 뒤 숫자와 Langfuse 화면으로 확인합니다.\n- 규칙, LLM Judge, 사용자 피드백 세 가지 점수가 모두 같은 방법(`create_score`)으로 trace에 붙었습니다. 점수를 누가 매기느냐만 다릅니다.",
+   "look__meta": "- 원본 출력 문구는 \"👍\" 고정이라 0.0으로 바꿔도 화면 글자는 그대로입니다. 볼 지점에 적었습니다."
+  },
+  {
+   "name": "05_rag_evaluation_extra.py",
+   "title": "RAG 답변을 세 기준으로 채점하기",
+   "intro": "앞 장들을 합칩니다. `@observe`로 검색(`retrieve`)과 답변 생성(`generate`)을 기록하고, LLM Judge가 답변을 **정확성·관련성·완성도** 세 기준으로 따로 채점해 trace에 점수 세 개를 남깁니다. Judge는 정해진 형식(`EvalScore`)으로만 답하게 해서, 앞 장처럼 숫자가 아닌 글을 돌려주는 일을 막습니다.\n\n검색은 흉내만 냅니다. 문서 세 개(LangGraph 설명, RAG 설명, 날씨 글) 중 `doc_key`로 하나를 고릅니다. 세 케이스는 이렇습니다.\n\n- CASE A: 질문에 맞는 문서\n- CASE B: 문서 없음(검색 실패)\n- CASE C: 엉뚱한 문서(날씨 글)\n\n이 장의 trace 이름은 `rag-pipeline`입니다.",
+   "intro__meta": "- 원본 05 raw 사용(파일 이름에 Extra). 커리큘럼 \"다차원 점수화(정확성/관련성/완성도)\"를 다루는 유일한 코드라 모두 함께 하는 마지막 예제로 두었습니다(목차 5절 질문 2 제안대로). **시간이 모자라면 강사 화면 시연으로 바꿉니다.**\n- `with_structured_output`(EvalScore) 사용. 사내 게이트웨이 동작은 미확인입니다. 실패하면 강사 시연으로 대체합니다.\n- 사외 실측 3회: A는 세 점수 모두 1.0. B는 정확성 1.0·관련성 0.2~0.5·완성도 0.0. C는 2회가 관련성 0.5~0.7·완성도 0.0이었고, 1회는 모델이 문서를 무시하고 아는 내용으로 답해 세 점수 모두 1.0이었습니다. 원본 docstring의 \"C → 낮은 정확성\"과 달리 정확성은 B·C도 1.0이 나왔습니다(\"문서에 정보가 없다\"는 답은 사실이라서). 그래서 성공 기준을 \"완성도\" 중심으로 썼습니다.\n- **노트북에서만 고친 곳**: 원본 그대로 Jupyter 커널에서 실행하면 \"실행하기\" 셀이 CASE A에서 멈춥니다(2026-09-28 재현, 300초 초과). `@observe`가 함수 인자로 받은 `CallbackHandler` 객체를 입력으로 직렬화하다 끝나지 않습니다(langfuse 4.15.4 serializer가 공유 객체를 반복 탐색). `.py` 실행에서는 약 10초로 정상입니다. 그래서 `generate`·`rag-pipeline`에 `capture_input=False`를 patch했습니다. 대신 이 두 단계의 입력 칸은 비어 보입니다(출력·자식 체인의 입력은 보임).\n- CHANGE_HERE는 목차대로 CASE C의 `doc_key`를 `\"rag\"`로 바꿉니다. 바꾸면 C의 완성도가 올라가는 쪽이 많을 것으로 봅니다(바꾼 뒤 실측은 제작 검증에서 1회).",
+   "setup_note": "준비 코드입니다. `observe`, 정해진 형식을 만드는 `BaseModel`, Langfuse 클라이언트와 모델을 준비합니다. 실행만 합니다.",
+   "patch": [
+    {
+     "find": "\"\"\"",
+     "until": "05-observability/05_rag_evaluation_extra.py",
+     "lines": []
+    },
+    {
+     "find": "\"\"\"",
+     "lines": []
+    },
+    {
+     "find": "@observe(name=\"generate\")",
+     "lines": [
+      "# 인자로 받은 기록 도구(handler)까지 입력으로 기록하려다 셀이 멈추므로, 입력 기록을 끕니다",
+      "@observe(name=\"generate\", capture_input=False)"
+     ]
+    },
+    {
+     "find": "@observe(name=\"rag-pipeline\")",
+     "lines": [
+      "# 여기도 handler를 인자로 받으므로 입력 기록을 끕니다",
+      "@observe(name=\"rag-pipeline\", capture_input=False)"
+     ]
+    }
+   ],
+   "split": [
+    "# ── 가상 문서 저장소",
+    "# ── 평가 결과를 구조화하기 위한 Pydantic 모델",
+    "# ── RAG 단계별 함수",
+    "# ── LLM Judge",
+    "# ── 테스트 케이스",
+    "print(\"=== RAG 파이프라인 다차원 평가 ===\\n\")"
+   ],
+   "chunk_titles": [
+    "문서 세 개",
+    "채점 결과 형식",
+    "검색과 답변 생성 기록하기",
+    "세 기준으로 채점하는 Judge",
+    "테스트 케이스",
+    "실행하기"
+   ],
+   "edits": [
+    {
+     "line": "\"doc_key\": \"noise\",",
+     "todo": "CASE C에 질문에 맞는 문서를 줘 봅니다",
+     "explain": "먼저 그대로 \"실행하기\"까지 실행해 세 케이스의 점수를 봅니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 `\"noise\"`를 `\"rag\"`로 바꿉니다. **이 셀과 \"실행하기\" 셀을 다시 실행**하고 CASE C의 점수를 비교합니다."
+    }
+   ],
+   "chunk_success": {
+    "실행하기": {
+     "success": [
+      "CASE A·B·C마다 `채점 → 정확성: … | 관련성: … | 완성도: …`와 `근거:` 줄이 출력된다",
+      "CASE A는 세 점수가 높고, CASE B는 완성도가 낮다(LLM이 채점하므로 숫자는 실행마다 다르다)",
+      "Langfuse의 `rag-pipeline` trace마다 점수 `correctness`·`relevance`·`completeness` 세 개가 붙어 있고, 트리에 `retrieve`와 `generate`가 보인다",
+      "CASE C를 `\"rag\"`로 바꾼 뒤에는 C의 답변이 RAG 원리를 설명하고 완성도가 올라간다"
+     ],
+     "fail": [
+      "Judge 단계에서 오류가 난다 → 강사에게 알립니다(정해진 형식으로 답하게 하는 기능을 모델이 지원하지 않을 수 있습니다)",
+      "바꾼 뒤에도 C의 답변이 \"정보가 없다\"로 나온다 → 테스트 케이스 셀을 다시 실행했는지 봅니다"
+     ]
+    }
+   },
+   "look": "**볼 지점**\n- 점수를 세 기준으로 나누면 \"어디가 부족한지\"가 보입니다. CASE B의 \"문서에 정보가 없어 답할 수 없다\"는 답은 사실이라 정확성은 높고, 질문에 답하지 못해 완성도는 낮습니다.\n- CASE C는 실행마다 결과가 다를 수 있습니다. 모델이 엉뚱한 문서를 무시하고 아는 내용으로 답하면 점수가 높게 나옵니다. `근거:` 줄로 Judge가 왜 그렇게 채점했는지 봅니다.\n- Langfuse Scores 화면에서 `completeness`로 거르면 케이스별 차이를 한눈에 봅니다."
+  }
+ ],
+ "closing": "실행 기록(Trace)을 남기는 방법 세 가지와 점수(Score)를 남기는 방법 네 가지를 보았습니다.\n\n| 장 | 방법 | Langfuse 화면에서 확인한 것 |\n|---|---|---|\n| 2. 체인 실행 기록하기 | `invoke`에 `callbacks`로 핸들러 넘기기 | `RunnableSequence` trace 세 개, 프롬프트 → 모델 → 파서 단계 |\n| 3. 그래프 실행 기록하기 | `with_config`로 그래프에 핸들러 붙이기 | `LangGraph` trace, agent → tools → agent 노드 순서 |\n| 4. 체인 밖 함수 기록하기 | `@observe(name=…)` | `rag-pipeline` 아래 검색·정리·체인 트리 |\n| 5. 규칙으로 채점하기 | 코드로 판단(`has-example`) | 빠르고 재현성이 높지만 규칙이 느슨할 수 있음 |\n| 6. LLM이 채점하기 | LLM Judge(`llm-judge-quality`) | 평가 기준이 흐리면 점수 근거도 흐림 |\n| 7. 사용자 피드백 기록하기 | 사람의 좋아요·싫어요(`user-feedback`) | Scores 화면의 세 점수 |\n| 8. RAG 답변을 세 기준으로 채점하기 | 정확성·관련성·완성도 | 어느 기준이 부족한지 나눠 보기 |\n\n내 trace는 이름, 시각, 입력으로 찾았습니다. 기록은 몇 초 늦게 도착하므로 `flush()` 뒤 화면을 새로고침합니다."
+}

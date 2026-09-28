@@ -1,0 +1,28 @@
+[
+ {
+  "question": "SKILL.md를 쓰는 이유로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "작업별 지침을 프롬프트에서 나눠 두고, Agent가 필요한 것을 골라 따르게 하려고",
+    "correct": true,
+    "feedback": "모든 지침을 프롬프트 하나에 넣지 않고 작업별로 나눕니다. Agent는 필요한 Skill을 골라 따릅니다."
+   },
+   {
+    "answer": "모든 지침을 시스템 프롬프트 하나에 모으려고",
+    "correct": false,
+    "feedback": "반대입니다. Skill은 지침을 작업별로 나누기 위한 것입니다."
+   },
+   {
+    "answer": "모델을 새로 학습시키려고",
+    "correct": false,
+    "feedback": "SKILL.md는 Agent가 읽는 절차 문서입니다. 모델을 바꾸지 않습니다."
+   },
+   {
+    "answer": "Agent가 도구를 쓰지 못하게 막으려고",
+    "correct": false,
+    "feedback": "Skill은 작업을 언제·어떻게 할지 알려 줍니다. 도구를 막는 장치가 아닙니다."
+   }
+  ]
+ }
+]

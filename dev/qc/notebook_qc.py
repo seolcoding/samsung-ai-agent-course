@@ -232,7 +232,7 @@ def check_student_text(nb, quizzes, R):
                 continue
             if re.search(r"다\.$", s) and not re.search(r"니다\.$", s):
                 plain.append((i, excerpt(s)))
-            if len(s) >= 12:
+            if len(s) >= 12 and not re.fullmatch(r"[|\-: ]+", s):  # 표 구분 줄(|---|---|)은 문장이 아니다
                 seen.setdefault(s, []).append(i)
     R("수강생 글", "합니다체 (…한다. …이다. 없음)", plain, warn=True)
     R("수강생 글", "같은 문장 3회 이상 반복 없음",
@@ -315,7 +315,7 @@ def check_structure(nb, kind, R):
                 section_code = False
             elif c.cell_type == "code" and section_code is False:
                 section_code = True
-                if not hidden(c) and BLANK not in c.source:
+                if not hidden(c) and BLANK not in c.source and not c.source.startswith("%%writefile"):  # 파일로 쓰는 셀은 보여야 한다
                     first_open.append((i, f"절의 첫 코드 셀이 보임: {excerpt(c.source, 40)}"))
         R("구조", "원본 파일 절의 첫 코드(준비 코드)는 접힘", first_open, warn=True)
 

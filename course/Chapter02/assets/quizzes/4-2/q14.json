@@ -1,0 +1,28 @@
+[
+ {
+  "question": "체인을 실행할 때 CallbackHandler를 넘기는 방법으로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "`chain.invoke(입력, config={\"callbacks\": [langfuse_handler]})`",
+    "correct": true,
+    "feedback": "슬라이드의 방법입니다. `config`의 `callbacks` 목록에 핸들러를 넣습니다."
+   },
+   {
+    "answer": "`chain.invoke(입력, langfuse_handler)`",
+    "correct": false,
+    "feedback": "핸들러는 두 번째 인자로 바로 넘기지 않습니다. `config`의 `callbacks`로 넘깁니다."
+   },
+   {
+    "answer": "`print(langfuse_handler)`",
+    "correct": false,
+    "feedback": "출력은 연결이 아닙니다. 실행할 때 핸들러를 넘겨야 기록됩니다."
+   },
+   {
+    "answer": "핸들러를 만들기만 하면 모든 체인이 자동으로 기록된다",
+    "correct": false,
+    "feedback": "만들기만 해서는 연결되지 않습니다. `callbacks`로 넘기거나 `with_config`로 붙여야 합니다."
+   }
+  ]
+ }
+]
