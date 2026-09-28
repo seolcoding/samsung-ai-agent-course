@@ -1,0 +1,28 @@
+[
+ {
+  "question": "답변 스트리밍이 끝난 뒤 `session_state`에 assistant 메시지로 저장하는 `response`(`st.write_stream`이 돌려준 값)는 무엇일까요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "화면에 출력된 전체 답변 문자열",
+    "correct": true,
+    "feedback": "`st.write_stream`은 조각을 모두 출력한 뒤 이어 붙인 전체 답변을 돌려줍니다."
+   },
+   {
+    "answer": "마지막으로 받은 답변 조각 하나",
+    "correct": false,
+    "feedback": "조각 하나만 저장하면 다음 재실행 때 답변 끝부분만 보입니다. 돌려받는 값은 전체 답변입니다."
+   },
+   {
+    "answer": "`load_rag_chain()`이 만든 체인",
+    "correct": false,
+    "feedback": "체인은 `rag_chain` 변수에 있고 cache_resource로 보관됩니다. 대화 기록에 넣는 것은 답변입니다."
+   },
+   {
+    "answer": "사용자가 입력한 질문",
+    "correct": false,
+    "feedback": "질문은 앞에서 user 메시지로 이미 저장했습니다. 여기서는 AI 답변을 저장합니다."
+   }
+  ]
+ }
+]

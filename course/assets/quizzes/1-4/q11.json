@@ -1,0 +1,28 @@
+[
+ {
+  "question": "사내 제품 매뉴얼이 자주 바뀝니다. 모델이 늘 최신 매뉴얼 내용으로 답변하게 하려면 무엇이 가장 알맞을까요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "매뉴얼로 모델을 Fine-Tuning한다",
+    "correct": false,
+    "feedback": "Fine-Tuning은 말투·출력 형식 조정에 유리합니다. 매뉴얼이 바뀔 때마다 다시 학습시켜야 합니다."
+   },
+   {
+    "answer": "매뉴얼을 검색해 넣는 RAG를 쓴다",
+    "correct": true,
+    "feedback": "RAG는 모델을 다시 학습시키지 않고, 찾아볼 문서만 바꿔 최신 내용을 반영합니다."
+   },
+   {
+    "answer": "temperature를 낮춰 답변을 고정한다",
+    "correct": false,
+    "feedback": "temperature는 답변의 다양성을 조정하는 값입니다. 모델이 모르는 매뉴얼 내용을 알려 주지는 못합니다."
+   },
+   {
+    "answer": "질문을 더 길고 자세하게 쓴다",
+    "correct": false,
+    "feedback": "질문을 길게 써도 모델이 학습하지 않은 매뉴얼 내용은 요청 안에 들어가지 않습니다."
+   }
+  ]
+ }
+]

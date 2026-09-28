@@ -1,0 +1,28 @@
+[
+ {
+  "question": "ReAct에서 함수의 결과를 다시 입력으로 넣어 다음 출력을 만드는 단계는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Reason",
+    "correct": false,
+    "feedback": "Reason은 무슨 행동을 해야 할지 생성하는 단계입니다."
+   },
+   {
+    "answer": "Action",
+    "correct": false,
+    "feedback": "Action은 호출할 함수를 정하는 단계입니다."
+   },
+   {
+    "answer": "Observation",
+    "correct": true,
+    "feedback": "함수 결과를 다시 넣어 다음 출력을 만드는 단계가 Observation입니다."
+   },
+   {
+    "answer": "Fine-Tuning",
+    "correct": false,
+    "feedback": "Fine-Tuning은 모델을 추가로 학습시키는 일로, ReAct 반복의 단계가 아닙니다."
+   }
+  ]
+ }
+]

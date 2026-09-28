@@ -1,0 +1,106 @@
+[
+ {
+  "question": "Agent를 순환 그래프로 표현하는 이유로 가장 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "판단 → 도구 사용 → 관찰을 결과에 따라 되풀이해야 해서",
+    "correct": true,
+    "feedback": "결과를 보고 다시 판단하려면 앞 단계로 되돌아가는 길이 있어야 합니다."
+   },
+   {
+    "answer": "모델 호출 비용을 줄이려고",
+    "correct": false,
+    "feedback": "순환 그래프는 비용이 아니라 반복하는 흐름을 표현하려고 씁니다."
+   },
+   {
+    "answer": "프롬프트를 짧게 쓰려고",
+    "correct": false,
+    "feedback": "프롬프트 길이와는 관계없습니다. 흐름의 모양을 표현하는 방법입니다."
+   },
+   {
+    "answer": "항상 같은 순서로 한 번만 실행하려고",
+    "correct": false,
+    "feedback": "한 번만 가는 흐름이라면 한 방향 체인으로 충분합니다."
+   }
+  ]
+ },
+ {
+  "question": "Node, Edge, State를 바르게 짝지은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Node: 작업 단위 / Edge: 다음 이동 / State: 공유 데이터",
+    "correct": true,
+    "feedback": "Node가 일을 하고, Edge가 행선지를 정하고, State를 노드들이 함께 씁니다."
+   },
+   {
+    "answer": "Node: 공유 데이터 / Edge: 작업 단위 / State: 다음 이동",
+    "correct": false,
+    "feedback": "실제 작업을 하는 쪽은 Node입니다."
+   },
+   {
+    "answer": "Node: 다음 이동 / Edge: 공유 데이터 / State: 작업 단위",
+    "correct": false,
+    "feedback": "다음 이동을 정하는 쪽은 Edge입니다."
+   },
+   {
+    "answer": "Node: 작업 단위 / Edge: 공유 데이터 / State: 다음 이동",
+    "correct": false,
+    "feedback": "State는 행선지가 아니라 노드들이 함께 쓰는 데이터입니다."
+   }
+  ]
+ },
+ {
+  "question": "Reducer의 역할은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "여러 노드가 같은 필드를 고칠 때 값을 합치는 규칙을 정한다",
+    "correct": true,
+    "feedback": "메시지는 쌓고, 카운터는 더하거나 바꾸는 식으로 필드마다 규칙을 정합니다."
+   },
+   {
+    "answer": "다음에 실행할 노드를 고른다",
+    "correct": false,
+    "feedback": "다음 노드를 고르는 것은 조건부 Edge의 일입니다."
+   },
+   {
+    "answer": "실행 상태를 저장해 이어서 실행하게 한다",
+    "correct": false,
+    "feedback": "상태 저장과 재개는 Checkpointer의 일입니다."
+   },
+   {
+    "answer": "도구를 실행하고 결과를 돌려준다",
+    "correct": false,
+    "feedback": "도구 실행은 Tool Node의 일입니다."
+   }
+  ]
+ },
+ {
+  "question": "사람이 도구 실행을 거부했을 때 그 결과도 State에 기록하는 이유는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "이후 실행이 거부 결정을 참조해 그 도구를 실행하지 않고 이어 가도록",
+    "correct": true,
+    "feedback": "기록이 있어야 Agent가 거부 사실을 알고 다음 행동을 정합니다."
+   },
+   {
+    "answer": "기록해야 그래프가 빨리 끝나서",
+    "correct": false,
+    "feedback": "속도 때문이 아닙니다. 이후 실행이 같은 결정을 참조하게 하려는 것입니다."
+   },
+   {
+    "answer": "거부하면 State가 자동으로 지워져서",
+    "correct": false,
+    "feedback": "거부해도 State는 지워지지 않습니다. 그래서 거부 결과를 따로 남겨야 합니다."
+   },
+   {
+    "answer": "기록하지 않아도 결과는 같지만 형식상 남기려고",
+    "correct": false,
+    "feedback": "기록하지 않으면 멈춘 곳부터 그대로 이어져 거부한 도구가 실행될 수 있습니다."
+   }
+  ]
+ }
+]

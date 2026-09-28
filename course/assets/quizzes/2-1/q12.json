@@ -1,0 +1,28 @@
+[
+ {
+  "question": "다음 중 LangGraph가 더 알맞은 경우는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "메일을 보내기 전에 사람 승인을 받고, 승인되면 이어서 실행하는 Agent",
+    "correct": true,
+    "feedback": "중단·재개·승인 같은 서비스 요구사항은 상태를 가진 그래프로 구조화하기 좋습니다."
+   },
+   {
+    "answer": "문장 하나를 번역해 한 번 출력하는 기능",
+    "correct": false,
+    "feedback": "입력에서 출력까지 한 방향인 흐름은 LangChain 체인으로 간결하게 만들 수 있습니다."
+   },
+   {
+    "answer": "프롬프트 → 모델 → 파서 순서로 요약문을 만드는 기능",
+    "correct": false,
+    "feedback": "순서가 정해진 파이프라인이라 LCEL로 잇는 것이 잘 맞습니다."
+   },
+   {
+    "answer": "정해진 질문 하나에 답을 한 번 받는 기능",
+    "correct": false,
+    "feedback": "분기도 반복도 없는 일이라 그래프로 나눌 이유가 적습니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Reviewer Agent를 평가하는 기준으로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "근거 수집 품질",
+    "correct": false,
+    "feedback": "근거 수집 품질은 Researcher를 평가하는 기준입니다."
+   },
+   {
+    "answer": "구조와 표현 품질",
+    "correct": false,
+    "feedback": "구조와 표현 품질은 Writer를 평가하는 기준입니다."
+   },
+   {
+    "answer": "누락, 오류, 근거 일치 여부",
+    "correct": true,
+    "feedback": "Reviewer는 빠진 것, 틀린 것, 근거와 어긋난 것을 찾는 역할입니다."
+   },
+   {
+    "answer": "호출한 도구의 개수",
+    "correct": false,
+    "feedback": "도구를 몇 번 호출했는지는 역할의 품질 기준이 아닙니다. 역할마다 맡은 일을 잘했는지로 평가합니다."
+   }
+  ]
+ }
+]
