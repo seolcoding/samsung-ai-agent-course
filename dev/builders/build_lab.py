@@ -244,7 +244,7 @@ def build(folder):
                 nb.md("문자열로 감싸 두어 실행되지 않는 참고 코드입니다. 읽어만 봅니다.\n\n```python\n" + (notes + "\n" if notes else "") + ref + "\n```")
                 continue
             if wf:
-                text = f"%%writefile {'-a ' if c else ''}{wf}\n" + text + ("\n\n" if split else "")
+                text = f"%%writefile {'-a ' if c else ''}{wf}\n" + text  # IPython이 끝에 줄바꿈을 붙여 이어 쓴다
             elif c == 0 and f.get("hide_first", True):  # 준비 코드: 불러오기·환경 설정. 접어 둔다
                 nb.md(f.get("setup_note", "준비 코드입니다. 필요한 도구를 불러오고 모델을 준비합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다."))
                 nb.code(text, kind="")
