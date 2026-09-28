@@ -1,0 +1,28 @@
+[
+ {
+  "question": "`st.chat_input`이 입력한 문자열을 돌려주는 때는 언제일까요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "글자를 한 자 입력할 때마다",
+    "correct": false,
+    "feedback": "입력 도중에는 값을 돌려주지 않습니다. Enter를 눌러 보낼 때 돌려줍니다."
+   },
+   {
+    "answer": "사용자가 입력하고 Enter를 눌렀을 때",
+    "correct": true,
+    "feedback": "Enter를 누르면 스크립트가 다시 실행되고, 이때 입력한 문자열을 돌려줍니다."
+   },
+   {
+    "answer": "앱이 처음 열렸을 때 입력창의 안내 문구를",
+    "correct": false,
+    "feedback": "입력창의 안내 문구는 화면에만 보이는 글자입니다. 돌려주는 값이 아닙니다."
+   },
+   {
+    "answer": "AI 답변 스트리밍이 끝났을 때",
+    "correct": false,
+    "feedback": "`st.chat_input`은 사용자 질문을 받는 입력창입니다. AI 답변과는 관계가 없습니다."
+   }
+  ]
+ }
+]
