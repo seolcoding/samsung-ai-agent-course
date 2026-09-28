@@ -28,22 +28,27 @@
 
 ## 3. `.env` (연결 설정)
 
-- `.env.sample`을 복사해 저장소 맨 위에 **`.env`** 라는 이름으로 만든다. 노트북은 이 이름만 읽는다.
-  - 노트북 폴더에서 위쪽 폴더로 올라가며 `.env`를 찾는다(`find_dotenv`). 그래서 저장소 맨 위에 두면 된다.
-- 값은 강사가 알려 준다. 키·토큰 값은 화면에 출력하거나 다른 파일·채팅에 붙여 넣지 않는다.
-- 어떤 이름이 필요한지는 환경에 따라 다르다.
+1. 저장소 맨 위의 `.env.sample`을 같은 자리에 **`.env`** 라는 이름으로 복사한다. 노트북은 이 이름만 읽는다(노트북 폴더에서 위로 올라가며 `.env`를 찾는다).
+2. `.env`의 **① 실행 환경**에서 하나만 남긴다.
+   - 강의장(삼성 인트라넷) PC: `[사내]` 세 줄 — `LLM_PROVIDER=samsung`, `EMBED_PROVIDER=samsung`, `RAG_PROVIDER=samsung`. 견본의 기본값이다.
+   - 사내망 밖: `[사외]` 세 줄 — `openai`, `openai`, `mock`. 사내 세 줄 앞에는 `#`을 붙인다.
+3. 고른 환경의 칸만 채운다. **② 사내 값**은 사내 교육 페이지의 환경·API 키 안내에 있고, **③ 사외 값**은 강사가 알려 준다.
+4. 노트북 맨 위 "환경 점검" 셀을 실행한다. "준비 완료"가 나오면 끝이다. 빠진 이름이 나오면 그 이름을 채우고 다시 실행한다.
+
+- 값 뒤에 `# 설명`을 붙이지 않는다. 빈 값 뒤의 주석은 값으로 읽힌다. 설명은 윗줄에 쓴다.
+- 키·토큰 값은 화면에 출력하거나 다른 파일·채팅에 붙여 넣지 않는다. 있는지만 확인한다.
+- 환경별로 있어야 하는 이름:
 
 | 설정 | 값 | 함께 있어야 하는 이름 |
 |---|---|---|
-| `LLM_PROVIDER` | `openai`(사외) | `OPENAI_API_KEY`, `OPENAI_MODEL` |
-| | `samsung`(사내, 기본값) | `api_base_url`, `model`, `credential_key`, `send_system_name`, `user_id` |
-| `EMBED_PROVIDER` | `openai` | `OPENAI_API_KEY`, `OPENAI_EMBEDDING_MODEL` |
-| | `samsung` | `embedding_api_url`, `embedding_x_dep_ticket` |
-| `RAG_PROVIDER` | `mock`(연습용, 네트워크 없음) | 없음 |
-| | `samsung` | `search_url`, `rag_credential_key`, `rag_api_key` |
+| `LLM_PROVIDER` | `samsung`(사내, 비워 두어도 이 값) | `api_base_url`, `model`, `credential_key`, `send_system_name`, `user_id` |
+| | `openai`(사외) | `OPENAI_API_KEY`, `OPENAI_MODEL` |
+| `EMBED_PROVIDER` | `samsung` | `embedding_api_url`, `embedding_x_dep_ticket` |
+| | `openai` | `OPENAI_API_KEY`, `OPENAI_EMBEDDING_MODEL` |
+| `RAG_PROVIDER` | `samsung` | `search_url`, `rag_credential_key`, `rag_api_key` (`index_name`은 견본 값 그대로) |
+| | `mock`(연습용, 네트워크 없음) | 없음 |
 
-- `LLM_PROVIDER`를 비워 두면 `samsung`으로 동작한다. 사외 PC에서 사내 값을 쓰면 연결되지 않는다.
-- 실습 노트북 맨 위 "환경 점검" 셀이 빠진 이름의 **개수와 이름**만 알려 준다(값은 보여 주지 않는다). 빠진 이름을 `.env`에 채운 뒤 그 셀을 다시 실행한다.
+- 사내 주소는 끝부분을 붙이지 않고 적는다. 코드가 `api_base_url` 뒤에 `/chat/completions`, `embedding_api_url` 뒤에 `/v1/embeddings`를 붙인다.
 
 ## 4. 모델·임베딩 부르는 법
 
