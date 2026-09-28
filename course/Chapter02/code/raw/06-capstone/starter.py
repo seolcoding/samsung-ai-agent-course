@@ -8,9 +8,9 @@
   사용자 입력 → Supervisor → Researcher(MCP+RAG+웹검색) → [HITL 승인]
                → Writer(SDS 보고서 작성) → 최종 출력
 
-실습 파일: src/raw/Chapter02/06-capstone/starter.py
-정답 참고: src/solution/Chapter02/06-capstone/solution.py
-정답용 MCP 서버: src/solution/Chapter02/06-capstone/mcp_server.py
+실습 파일: course/Chapter02/code/raw/06-capstone/starter.py
+정답 참고: course/Chapter02/code/solution/06-capstone/solution.py
+정답용 MCP 서버: course/Chapter02/code/solution/06-capstone/mcp_server.py
 
 starter.py는 구현할 부분이 남아 있는 실습 뼈대다.
 사외에서는 RAG_PROVIDER=mock으로 RAGaaS 응답 형식을 모의 실행한다.

@@ -10,7 +10,7 @@
       3. LLM 평가   — 다른 LLM이 응답 품질을 채점 (LLM-as-a-Judge)
 
 실행:
-  python src/raw/Chapter02/05-observability/04_evaluation.py
+  python course/Chapter02/code/raw/05-observability/04_evaluation.py
 """
 
 from dotenv import load_dotenv

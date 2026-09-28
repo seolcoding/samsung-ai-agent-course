@@ -12,7 +12,7 @@ RAG 파이프라인 다차원 평가 (Extra)
   - CASE C: 오염된 컨텍스트 (엉뚱한 문서) → 낮은 정확성
 
 실행:
-  python src/raw/Chapter02/05-observability/05_rag_evaluation_extra.py
+  python course/Chapter02/code/raw/05-observability/05_rag_evaluation_extra.py
 """
 
 from dotenv import load_dotenv

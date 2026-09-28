@@ -8,7 +8,7 @@
   - 중첩 함수에 각각 @observe를 붙이면 부모-자식 트리 구조로 기록됨
 
 실행:
-  python src/raw/Chapter02/05-observability/03_observe_decorator.py
+  python course/Chapter02/code/raw/05-observability/03_observe_decorator.py
 """
 
 from dotenv import load_dotenv

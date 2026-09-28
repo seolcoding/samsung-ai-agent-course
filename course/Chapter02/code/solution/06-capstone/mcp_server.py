@@ -4,7 +4,7 @@
 data/ 폴더의 문서를 Researcher 에이전트가 검색할 수 있도록 MCP 도구로 제공한다.
 
 실행 (solution.py 실행 전 먼저 실행):
-  python src/solution/Chapter02/06-capstone/mcp_server.py
+  python course/Chapter02/code/solution/06-capstone/mcp_server.py
 """
 
 import os

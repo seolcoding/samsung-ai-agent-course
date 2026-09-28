@@ -191,7 +191,7 @@
      ]
     },
     {
-     "find": "# get_embeddings(): src/config/embeddings.py",
+     "find": "# get_embeddings(): course/config/embeddings.py",
      "until": "print()",
      "lines": [
       "# 이 셀을 다시 실행해도 같은 청크가 겹쳐 쌓이지 않게, 앞서 만든 벡터 저장소를 비웁니다.",

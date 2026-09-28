@@ -49,7 +49,7 @@ MCP_CONFIG = {
     # 'tutorial': {
     #     "transport": "stdio",
     #     "command": "python",
-    #     "args": ["src/raw/Chapter02/01-mcp/01_mcp_server.py", '--stdio'],
+    #     "args": ["course/Chapter02/code/raw/01-mcp/01_mcp_server.py", '--stdio'],
     # },
 }
 

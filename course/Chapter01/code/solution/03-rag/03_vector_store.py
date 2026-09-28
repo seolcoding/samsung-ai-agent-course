@@ -19,7 +19,7 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 chunks = text_splitter.split_documents(documents)
 
-# get_embeddings(): src/config/embeddings.py 에서 EMBED_PROVIDER 환경변수로 전환
+# get_embeddings(): course/config/embeddings.py 에서 EMBED_PROVIDER 환경변수로 전환
 # 로컬: OpenAIEmbeddings / 사내: SamsungEmbeddings (02_embeddings.py에서 직접 구현한 그것)
 embeddings = get_embeddings()
 vectorstore = Chroma.from_documents(

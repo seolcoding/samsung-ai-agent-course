@@ -8,7 +8,7 @@ LangGraph 트레이싱: StateGraph 실행 흐름 전체 기록하기
     invoke() 호출마다 자동으로 추적됨
 
 실행:
-  python src/solution/Chapter02/05-observability/02_tracing_langgraph.py
+  python course/Chapter02/code/solution/05-observability/02_tracing_langgraph.py
 """
 
 from typing import Annotated

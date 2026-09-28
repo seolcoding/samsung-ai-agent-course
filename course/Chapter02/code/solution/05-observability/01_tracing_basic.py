@@ -14,7 +14,7 @@ LangChain 트레이싱: Langfuse로 LLM 호출 흐름 기록하기
        LANGFUSE_BASE_URL=https://jp.cloud.langfuse.com
 
 실행:
-  python src/solution/Chapter02/05-observability/01_tracing_basic.py
+  python course/Chapter02/code/solution/05-observability/01_tracing_basic.py
 """
 
 from dotenv import load_dotenv
