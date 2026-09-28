@@ -75,9 +75,9 @@ course/                    ← 수강생 전달본. 수강생에게 필요한 �
     notebooks/             수업 노트북 13권(LEC/LAB, 강사용 메모 없는 수강생본) + data/
     code/raw/, code/solution/  받은 원본 실습 코드와 정답(.py와 코드가 읽는 data·md)
     slides/                교안 PDF 정본(day01/, day02/)과 커리큘럼 제안서 PDF
+    assets/                이 챕터 노트북의 도구(widgets.py, PDF.js, 퀴즈 파일). 챕터마다 따로 둔다
   Chapter02/               code/raw·solution, slides (노트북 방식은 Chapter02 작업 때 따로 정한다)
-  config/                  환경에 따른 LLM·임베딩·RAGaaS 공통 코드(패키지 `config`)
-  assets/                  노트북 도구(widgets.py, PDF.js, 퀴즈 파일)
+  config/                  환경에 따른 LLM·임베딩·RAGaaS 공통 코드(패키지 `config`, 챕터 공통)
 dev/                       ← 강사·개발용. 전달하지 않는다
   AGENTS.md                노트북 제작 규칙
   builders/                노트북 빌더(build_lab.py, build_lecture_*.py, nbkit.py)와 글·spec(labs/*.json, *_cells*.json, *_outline.md)

@@ -33,7 +33,7 @@ uv run --extra notebooks python dev/qc/notebook_qc.py $ARGUMENTS --execute   # �
 
 ## 2단계: 판단 점검표 (노트북을 직접 읽고 본다)
 
-노트북, 퀴즈 JSON(`course/assets/quizzes/<권>/`), 원본(`course/ChapterNN/code/raw/`, `course/ChapterNN/slides/` PDF)을 대조한다. 실습은 `course/ChapterNN/code/solution/`(정답 보기와 대조)과 `lessons/drafts/labs/<폴더>.json`도 본다.
+노트북, 퀴즈 JSON(`course/ChapterNN/assets/quizzes/<권>/`), 원본(`course/ChapterNN/code/raw/`, `course/ChapterNN/slides/` PDF)을 대조한다. 실습은 `course/ChapterNN/code/solution/`(정답 보기와 대조)과 `lessons/drafts/labs/<폴더>.json`도 본다.
 
 **공통**
 

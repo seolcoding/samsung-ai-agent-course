@@ -24,7 +24,7 @@ P9_SENTENCE = "LangChain으로 AI Agent를 만든다."
 def build():
     common = json.loads((HERE / "1-2_cells_common.json").read_text(encoding="utf-8"))
     text = json.loads((HERE / "1-2_cells_C.json").read_text(encoding="utf-8"))
-    nb = Notebook(COURSE / "assets" / "quizzes" / "1-2", "../../assets/quizzes/1-2")
+    nb = Notebook(COURSE / "Chapter01" / "assets" / "quizzes" / "1-2", "../assets/quizzes/1-2")
 
     def v(key):  # 설명 셀과 그 강사용 메모
         nb.md(text[key])
@@ -39,7 +39,7 @@ def build():
     nb.md(common["title"])
     nb.meta(common.get("title__meta", "").replace("{VERSION}", "C"))
     nb.code(
-        "import json\nimport sys\n\nsys.path.insert(0, '../..')  # course/assets 도구를 불러오기 위한 경로\n\n"
+        "import json\nimport sys\n\nsys.path.insert(0, '..')  # 챕터 폴더의 assets 도구를 불러오기 위한 경로\n\n"
         "from assets.widgets import show_order_quiz, show_quiz, show_slides, slide_setup\n\n"
         "slide_setup()  # 슬라이드 뷰어(PDF.js)를 불러옵니다. 슬라이드가 비어 보이면 이 셀을 다시 실행합니다."
     )
@@ -61,7 +61,7 @@ def build():
     nb.md("**먼저 예측해 봅니다.** 다음 쪽을 보기 전에, 요청을 보내고 응답을 받기까지의 순서를 맞혀 보세요.")
     (nb.quiz_dir / "order12.json").parent.mkdir(parents=True, exist_ok=True)
     (nb.quiz_dir / "order12.json").write_text(json.dumps(common["order12"], ensure_ascii=False, indent=1), encoding="utf-8")
-    nb.code('show_order_quiz(**json.load(open("../../assets/quizzes/1-2/order12.json", encoding="utf-8")))')
+    nb.code('show_order_quiz(**json.load(open("../assets/quizzes/1-2/order12.json", encoding="utf-8")))')
     slides(7)
     v("p7")
     v("sum12")

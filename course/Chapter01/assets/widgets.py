@@ -118,7 +118,7 @@ def _plain(value):
 # 슬라이드는 원본 PDF를 PDF.js로 그대로 그린다(벡터라 선명하고, 글자를 선택·복사할 수 있다).
 # PDF.js는 사내망 규칙대로 assets/vendor에 두고 HTML 안에 넣는다. 외부 주소는 쓰지 않는다.
 PDFJS = ASSETS / "vendor" / "pdfjs-3.11.174"
-COURSE = ASSETS.parent  # course/: 슬라이드는 course/ChapterNN/slides/ 아래
+COURSE = ASSETS.parents[1]  # course/: 이 도구는 course/ChapterNN/assets/에 있고, 슬라이드는 course/ChapterNN/slides/ 아래
 _PDF_SENT = {"lib": False, "decks": set()}  # 이 커널에서 화면에 이미 보낸 것
 
 _TEXT_LAYER_CSS = """

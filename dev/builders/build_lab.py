@@ -189,7 +189,7 @@ def _mark(lines, edits):
 def build(folder):
     spec = json.loads((LABS / f"{folder}.json").read_text(encoding="utf-8"))
     unit, slug = UNITS[folder]
-    nb = Notebook(COURSE / "assets" / "quizzes" / f"{unit}-lab", f"../../assets/quizzes/{unit}-lab")
+    nb = Notebook(COURSE / "Chapter01" / "assets" / "quizzes" / f"{unit}-lab", f"../assets/quizzes/{unit}-lab")
 
     nb.md(f"# [LAB] {spec['title']}\n\n{spec['intro']}")
     nb.meta(spec.get("intro__meta"))
@@ -355,7 +355,7 @@ def check_blanks(folder):
     """빈칸을 채우기 전 복사본이 파이썬 문법에 맞는지 확인한다(추정 범위 점검용)."""
     import tempfile
 
-    sys.path.insert(0, str(COURSE))
+    sys.path.insert(0, str(COURSE / "Chapter01"))
     from assets.widgets import make_blank
 
     spec = json.loads((LABS / f"{folder}.json").read_text(encoding="utf-8"))

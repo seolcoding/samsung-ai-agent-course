@@ -2,7 +2,7 @@
 
 실행(프로젝트 루트): uv run python dev/builders/build_lecture_1_1.py
 입력: dev/builders/1-1_cells.json(설명 셀·퀴즈·강사용 메모, C 수준)
-출력: course/Chapter01/notebooks/1-1_design_thinking_LEC.ipynb (출력 없음), course/assets/quizzes/1-1/*.json
+출력: course/Chapter01/notebooks/1-1_design_thinking_LEC.ipynb (출력 없음), course/Chapter01/assets/quizzes/1-1/*.json
 """
 
 import json
@@ -21,7 +21,7 @@ CURRICULUM_PAGES = [2, 3, 4, 5]  # 커리큘럼 제안서 PDF에서 표가 있�
 
 def build():
     text = json.loads((HERE / "1-1_cells.json").read_text(encoding="utf-8"))
-    nb = Notebook(COURSE / "assets" / "quizzes" / "1-1", "../../assets/quizzes/1-1")
+    nb = Notebook(COURSE / "Chapter01" / "assets" / "quizzes" / "1-1", "../assets/quizzes/1-1")
 
     def v(key):  # 설명 셀과 그 강사용 메모
         nb.md(text[key])
@@ -36,7 +36,7 @@ def build():
     nb.md(text["title"])
     nb.meta(text["title__meta"])
     nb.code(
-        "import sys\n\nsys.path.insert(0, '../..')  # course/assets 도구를 불러오기 위한 경로\n\n"
+        "import sys\n\nsys.path.insert(0, '..')  # 챕터 폴더의 assets 도구를 불러오기 위한 경로\n\n"
         "from assets.widgets import show_quiz, show_slides, slide_setup\n\n"
         "slide_setup()  # 슬라이드 뷰어(PDF.js)를 불러옵니다. 슬라이드가 비어 보이면 이 셀을 다시 실행합니다."
     )

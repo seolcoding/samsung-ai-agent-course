@@ -21,8 +21,8 @@
 ## 2. HTML·JavaScript 넣는 법
 
 - 마크다운 셀에서는 `<script>`가 실행되지 않는다. 동작이 필요한 HTML은 **코드 셀**에서 `display(HTML(...))`로 출력한다.
-- 짧은 것은 셀 안에 문자열로 직접 쓴다(인라인). 길거나 여러 번 쓰는 것은 `course/assets/`에 HTML 파일로 두고 `HTML(filename="assets/...")`으로 읽는다. 파일을 고치면 그 셀만 다시 실행한다.
-- 여러 노트북에서 쓰는 위젯(슬라이드, 메시지 흐름, 그래프 실행, 코드 지도, 체크리스트, 점수표)은 `course/assets/widgets.py`에 있다. `from assets.widgets import ...`로 쓴다. 새 위젯도 이 규칙을 지켜 여기에 더한다.
+- 짧은 것은 셀 안에 문자열로 직접 쓴다(인라인). 길거나 여러 번 쓰는 것은 `course/ChapterNN/assets/`에 HTML 파일로 두고 `HTML(filename="assets/...")`으로 읽는다. 파일을 고치면 그 셀만 다시 실행한다.
+- 여러 노트북에서 쓰는 위젯(슬라이드, 메시지 흐름, 그래프 실행, 코드 지도, 체크리스트, 점수표)은 `course/ChapterNN/assets/widgets.py`에 있다. `from assets.widgets import ...`로 쓴다. 새 위젯도 이 규칙을 지켜 여기에 더한다.
 - Python 값은 `json.dumps(..., ensure_ascii=False)`로 HTML 문자열 안에 끼워 JavaScript로 넘긴다.
 - VS Code는 한 노트북의 출력을 같은 화면에 그린다. 그래서 요소 `id`가 겹치면 서로 간섭한다.
   - 앱마다 고유한 바깥 `id`를 하나 두고, 안쪽 요소는 그 안에서 `querySelector`로 찾는다.
@@ -33,13 +33,13 @@
 
 - 원본이 PDF인 교안은 **PDF.js로 PDF를 그대로 그린다(2026-09-28 확정).** 벡터라 선명하고, 글자를 선택·복사할 수 있다.
   - `show_slides("1-2", [9, 10])`: `course/ChapterNN/slides/` 아래에서 `1-2-*.pdf`(또는 이름이 같은 PDF)를 찾아 필요한 쪽만 보여 준다.
-  - PDF.js는 `course/assets/vendor/pdfjs-3.11.174/`(legacy 빌드, Apache-2.0)를 HTML 안에 넣어 쓴다. 외부 주소를 부르지 않는다.
+  - PDF.js는 `course/ChapterNN/assets/vendor/pdfjs-3.11.174/`(legacy 빌드, Apache-2.0)를 HTML 안에 넣어 쓴다. 외부 주소를 부르지 않는다.
   - 노트북 맨 위 준비 셀에서 `slide_setup()`을 부른다. 슬라이드가 그려지기 전에는 출력에 "⛔ 슬라이드가 보이지 않으면 1. 바로 위 셀을 다시 실행 2. 그래도 안 되면 맨 위 셀부터 다시 실행" 안내가 보이고, 그려지면 사라진다.
   - Jupyter 화면의 require.js(AMD)와 부딪히지 않도록, 불러오는 동안 `define`을 잠시 숨긴다(`widgets.py`).
 - PDF가 없는 자료(예: 커리큘럼 PPTX)는 예전 방식대로 이미지 묶음을 쓴다. 쪽 이미지를 `assets/slides/<이름>.json`으로 만든다(도구는 `dev/demos/assets/`). 한글 글꼴이 빠질 수 있으니 가능하면 PowerPoint로 PDF를 내보내 PDF.js를 쓴다.
 
   ```
-  uv run python dev/demos/assets/build_slide_deck.py <입력.pdf|입력.pptx> course/assets/slides/<이름>.json
+  uv run python dev/demos/assets/build_slide_deck.py <입력.pdf|입력.pptx> course/ChapterNN/assets/slides/<이름>.json
   ```
 
   필요한 도구는 `pdftoppm`(poppler), PPTX라면 `soffice`(LibreOffice)다. 이 방식은 화질이 떨어지고 글자를 선택할 수 없다.
@@ -53,12 +53,12 @@
 ## 5. 사내망: 외부 CDN을 쓰지 않는다
 
 - 강의장은 사내망이다. HTML에 외부 주소(`https://`, `//`)를 넣지 않는다. 가능하면 기본 JavaScript·SVG로 만든다.
-- 라이브러리가 꼭 필요하면 사외에서 `.js` 파일을 받아 `course/assets/vendor/`에 두고, 파일 이름에 버전을 적는다(예: `chart-4.4.1.min.js`). 생성 스크립트가 그 내용을 `<script>` 본문으로 넣는다.
+- 라이브러리가 꼭 필요하면 사외에서 `.js` 파일을 받아 `course/ChapterNN/assets/vendor/`에 두고, 파일 이름에 버전을 적는다(예: `chart-4.4.1.min.js`). 생성 스크립트가 그 내용을 `<script>` 본문으로 넣는다.
 - 새 HTML을 만든 뒤 외부 주소가 없는지 `src=`, `href=`, `http`, `<link`, `import(`로 검색해 확인한다.
 
 ## 6. 경로·용량·커밋
 
-- 코드 셀 안의 경로는 노트북이 있는 폴더(`course/Chapter01/notebooks/` 등) 기준이다. 준비 셀에서 `sys.path.insert(0, '../..')`로 `course/assets`를 불러온다. 실습 자료는 `notebooks/data/`에 둔다. 마크다운에 적는 명령은 프로젝트 루트 기준이다.
+- 코드 셀 안의 경로는 노트북이 있는 폴더(`course/Chapter01/notebooks/` 등) 기준이다. 준비 셀에서 `sys.path.insert(0, '..')`로 챕터 폴더의 `assets`(`course/ChapterNN/assets/`)를 불러온다. assets는 챕터마다 따로 둔다. 실습 자료는 `notebooks/data/`에 둔다. 마크다운에 적는 명령은 프로젝트 루트 기준이다.
 - 원본(`course/ChapterNN/code/`)은 고치지 않는다. 노트북에서만 손볼 것은 spec의 `patch`로 한다. 작업 복사본은 `dev/work/`(Git 제외)에 둔다.
 - 출력을 저장하면 슬라이드 이미지가 노트북 파일에 들어가 수 MB가 된다. 커밋 전에 출력을 지운다.
 - 고객사 자료(커리큘럼 제안서 등)로 만든 뷰어는 내용이 이미지로 들어 있다. 커밋·공유 전에 확인한다.
