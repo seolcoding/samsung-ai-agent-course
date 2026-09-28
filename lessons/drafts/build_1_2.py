@@ -187,7 +187,7 @@ def build(version="C"):
         "answers": [
             {"answer": f"{words}개", "correct": False, "feedback": "띄어쓰기로 나눈 단어 수입니다. 토큰 수와는 다릅니다."},
             {"answer": f"{n - 2}개", "correct": False, "feedback": "한 단어가 둘로 나뉜 곳을 다시 세어 보세요."},
-            {"answer": f"{n}개", "correct": True, "feedback": "맞습니다. 예시 목록의 항목 수입니다. 토큰은 단어의 일부나 조사로도 나뉩니다."},
+            {"answer": f"{n}개", "correct": True, "feedback": "예시 목록의 항목 수입니다. 토큰은 단어의 일부나 조사로도 나뉩니다."},
             {"answer": f"{n + 3}개", "correct": False, "feedback": "슬라이드 예시 목록에 든 항목만 셉니다."},
         ],
     }])
