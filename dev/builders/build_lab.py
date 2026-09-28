@@ -1,15 +1,15 @@
-"""실습 노트북을 조립한다. 받은 실습 코드(src/raw)를 AI와 함께 채우고 솔루션(src/solution)과 비교한다.
+"""실습 노트북을 조립한다. 받은 실습 코드(course/Chapter01/code/raw)를 AI와 함께 채우고 솔루션(code/solution)과 비교한다.
 
 실행(프로젝트 루트):
-  uv run python lessons/drafts/build_lab.py 01-llm-api        # 실습 폴더 하나
-  uv run python lessons/drafts/build_lab.py                   # labs/*.json 전부
-  uv run python lessons/drafts/build_lab.py --scaffold        # 아직 없는 실습 폴더의 뼈대 JSON 만들기
+  uv run python dev/builders/build_lab.py 01-llm-api        # 실습 폴더 하나
+  uv run python dev/builders/build_lab.py                   # labs/*.json 전부
+  uv run python dev/builders/build_lab.py --scaffold        # 아직 없는 실습 폴더의 뼈대 JSON 만들기
 
-입력: lessons/drafts/labs/<실습 폴더>.json
-출력: lessons/Chapter01/<번호>_<이름>_LAB.ipynb (출력 없음)
+입력: dev/builders/labs/<실습 폴더>.json
+출력: course/Chapter01/notebooks/<번호>_<이름>_LAB.ipynb (출력 없음)
 
 수강생에게는 노트북만 보인다(.py 실습 파일은 주지 않는다). 그래서 원본 코드를 빌드할 때 셀로 옮겨 넣는다.
-정본은 계속 src/raw이고, 원본이 바뀌면 다시 빌드한다.
+정본은 계속 course/Chapter01/code/raw이고, 원본이 바뀌면 다시 빌드한다.
 
 모든 실습 노트북은 같은 구조다.
   제목 → 목차 → 1. 실습 방법 → 원본 파일마다 한 장:
@@ -34,10 +34,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 from nbkit import Notebook, fmt  # noqa: E402
 
 HERE = Path(__file__).parent
-LESSONS = HERE.parent
-ROOT = LESSONS.parent
+ROOT = HERE.parents[1]
+COURSE = ROOT / "course"
 LABS = HERE / "labs"
-REF = "../.."  # 노트북(lessons/Chapter01/)에서 프로젝트 루트까지
 COMMON = json.loads((HERE / "1-2_cells_common.json").read_text(encoding="utf-8"))
 
 # 실습 폴더 ↔ 교안 번호와 노트북 이름
@@ -190,7 +189,7 @@ def _mark(lines, edits):
 def build(folder):
     spec = json.loads((LABS / f"{folder}.json").read_text(encoding="utf-8"))
     unit, slug = UNITS[folder]
-    nb = Notebook(LESSONS / "assets" / "quizzes" / f"{unit}-lab", f"../assets/quizzes/{unit}-lab")
+    nb = Notebook(COURSE / "assets" / "quizzes" / f"{unit}-lab", f"../../assets/quizzes/{unit}-lab")
 
     nb.md(f"# [LAB] {spec['title']}\n\n{spec['intro']}")
     nb.meta(spec.get("intro__meta"))
@@ -202,7 +201,7 @@ def build(folder):
 
     for n, f in enumerate(spec["files"], start=2):
         # 원본을 먼저 정돈한다(읽기 쉽게). 원본·솔루션이 다르면 spec의 source로 깔끔한 쪽을 고른다
-        src_dir = ROOT / "src" / f.get("source", "raw") / "Chapter01" / folder
+        src_dir = COURSE / "Chapter01" / "code" / f.get("source", "raw") / folder
         raw = _patch(fmt((src_dir / f["name"]).read_text(encoding="utf-8")).splitlines(), f.get("patch", []))
         todos = [t for t in f.get("todos", []) if t.get("blank")]  # 빈칸 범위가 없는 TODO(뼈대 미완성)는 건너뛴다
         for t in f.get("todos", []):
@@ -285,7 +284,7 @@ def build(folder):
 
     nb.h(2, f"{len(spec['files']) + 2}. 정리")
     nb.md(spec["closing"])
-    nb.finish(LESSONS / "Chapter01" / f"{unit}_{slug}_LAB.ipynb")
+    nb.finish(COURSE / "Chapter01" / "notebooks" / f"{unit}_{slug}_LAB.ipynb")
 
 
 def _sections(lines):
@@ -328,7 +327,7 @@ def scaffold(folder):
     if out.exists():
         print(f"✔ 이미 있음: {out.name}")
         return
-    raw_dir = ROOT / "src" / "raw" / "Chapter01" / folder
+    raw_dir = COURSE / "Chapter01" / "code" / "raw" / folder
     files = []
     for py in sorted(raw_dir.glob("*.py")):
         lines = py.read_text(encoding="utf-8").splitlines()
@@ -356,14 +355,14 @@ def check_blanks(folder):
     """빈칸을 채우기 전 복사본이 파이썬 문법에 맞는지 확인한다(추정 범위 점검용)."""
     import tempfile
 
-    sys.path.insert(0, str(LESSONS))
+    sys.path.insert(0, str(COURSE))
     from assets.widgets import make_blank
 
     spec = json.loads((LABS / f"{folder}.json").read_text(encoding="utf-8"))
     for f in spec["files"]:
         if not f.get("todos"):
             continue
-        raw = ROOT / "src" / "raw" / "Chapter01" / folder / f["name"]
+        raw = COURSE / "Chapter01" / "code" / "raw" / folder / f["name"]
         with tempfile.TemporaryDirectory() as d:
             work = Path(d) / f["name"]
             try:

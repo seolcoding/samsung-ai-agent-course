@@ -1,8 +1,8 @@
 """Chapter01 2-1 강의 노트북을 조립한다. 슬라이드·설명·퀴즈만 담고 실습 코드는 넣지 않는다(실습은 2-1_langgraph_LAB).
 
-실행(프로젝트 루트): uv run python lessons/drafts/build_lecture_2_1.py
-입력: lessons/drafts/2-1_cells.json(설명 셀·퀴즈·강사용 메모, C 수준)
-출력: lessons/Chapter01/2-1_langgraph_LEC.ipynb (출력 없음)
+실행(프로젝트 루트): uv run python dev/builders/build_lecture_2_1.py
+입력: dev/builders/2-1_cells.json(설명 셀·퀴즈·강사용 메모, C 수준)
+출력: course/Chapter01/notebooks/2-1_langgraph_LEC.ipynb (출력 없음)
 """
 
 import json
@@ -13,13 +13,14 @@ sys.path.insert(0, str(Path(__file__).parent))
 from nbkit import Notebook  # noqa: E402
 
 HERE = Path(__file__).parent
-LESSONS = HERE.parent
-OUT = LESSONS / "Chapter01" / "2-1_langgraph_LEC.ipynb"
+ROOT = HERE.parents[1]
+COURSE = ROOT / "course"
+OUT = COURSE / "Chapter01" / "notebooks" / "2-1_langgraph_LEC.ipynb"
 
 
 def build():
     text = json.loads((HERE / "2-1_cells.json").read_text(encoding="utf-8"))
-    nb = Notebook(LESSONS / "assets" / "quizzes" / "2-1", "../assets/quizzes/2-1")
+    nb = Notebook(COURSE / "assets" / "quizzes" / "2-1", "../../assets/quizzes/2-1")
 
     def v(key):  # 설명 셀과 그 강사용 메모
         nb.md(text[key])
@@ -34,7 +35,7 @@ def build():
     nb.md(text["title"])
     nb.meta(text.get("title__meta"))
     nb.code(
-        "import sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\n"
+        "import sys\n\nsys.path.insert(0, '../..')  # course/assets 도구를 불러오기 위한 경로\n\n"
         "from assets.widgets import show_quiz, show_slides, slide_setup\n\n"
         "slide_setup()  # 슬라이드 뷰어(PDF.js)를 불러옵니다. 슬라이드가 비어 보이면 이 셀을 다시 실행합니다."
     )

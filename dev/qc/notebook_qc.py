@@ -6,9 +6,9 @@
 수강생은 노트북만 받는다. 그래서 수강생 글에 .py·경로·다른 노트북 이야기가 없어야 한다(노트북 하나로 완결).
 
 실행(프로젝트 루트):
-    uv run python lessons/qc/notebook_qc.py lessons/Chapter01/1-2_llm_api_LEC.ipynb
-    uv run python lessons/qc/notebook_qc.py                 # lessons/Chapter*/*.ipynb 전부
-    uv run --extra notebooks python lessons/qc/notebook_qc.py <노트북> --execute   # 새 커널 실행까지
+    uv run python dev/qc/notebook_qc.py course/Chapter01/notebooks/1-2_llm_api_LEC.ipynb
+    uv run python dev/qc/notebook_qc.py                 # course/Chapter*/notebooks/*.ipynb 전부
+    uv run --extra notebooks python dev/qc/notebook_qc.py <노트북> --execute   # 새 커널 실행까지
 
 결과는 검사마다 PASS/WARN/FAIL과 문제 셀 번호(0부터)·짧은 발췌를 출력한다. FAIL이 하나라도 있으면 종료 코드 1.
 판단이 필요한 검사(내용·설명 수준 등)는 /notebook-qc 명령(.claude/commands/notebook-qc.md)의 점검표로 본다.
@@ -186,7 +186,7 @@ DISCOURAGED = [
 ]
 
 
-FILE_REF = re.compile(r"\w+\.py\b|src/|lessons/|\.ipynb")
+FILE_REF = re.compile(r"\w+\.py\b|src/|lessons/|course/|dev/|\.ipynb")
 CROSS_REF = re.compile(r"강의 노트북|실습 노트북|강의에서 본|_LEC|_LAB")
 
 
@@ -312,7 +312,7 @@ def has_deck_pdf(deck):
 
     nfc = lambda t: unicodedata.normalize("NFC", t)  # noqa: E731
     return any(nfc(p.stem).startswith(nfc(deck) + "-") or nfc(p.stem) == nfc(deck)
-               for p in (ROOT / "docs" / "raw").rglob("*.pdf"))
+               for p in (ROOT / "course").glob("Chapter*/slides/**/*.pdf"))
 
 
 def check_slides(nb, kind, R):
@@ -330,7 +330,7 @@ def check_slides(nb, kind, R):
         for call in calls(s, {"show_slides"}):
             deck = literal(call.args[0]) if call.args else None
             if isinstance(deck, str) and not has_deck_pdf(deck):
-                probs.append((i, f"덱 {deck!r}의 PDF가 docs/raw에 없음 (이미지 방식으로 그려짐)"))
+                probs.append((i, f"덱 {deck!r}의 PDF가 course/ChapterNN/slides에 없음 (이미지 방식으로 그려짐)"))
         if "_show_slide_images" in s or "assets/slides/" in s or "<img" in s:
             probs.append((i, f"이미지 슬라이드 사용: {excerpt(s, 40)}"))
     R("구조", "준비 셀 slide_setup()·PDF.js 슬라이드(show_slides)", probs)
@@ -563,9 +563,9 @@ def qc(path, execute=False):
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     execute = "--execute" in sys.argv
-    paths = [Path(a).resolve() for a in args] or sorted((ROOT / "lessons").glob("Chapter*/*.ipynb"))
+    paths = [Path(a).resolve() for a in args] or sorted((ROOT / "course").glob("Chapter*/notebooks/*.ipynb"))
     if not paths:
-        print("✖ 검사할 노트북 | lessons/Chapter*/에 .ipynb가 없음 | 경로를 인자로 주세요")
+        print("✖ 검사할 노트북 | course/Chapter*/notebooks/에 .ipynb가 없음 | 경로를 인자로 주세요")
         return 1
     ok = True
     for n, p in enumerate(paths, 1):

@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 class FakeResponse:
@@ -76,7 +76,7 @@ class DirectApiExamplesTests(unittest.TestCase):
             runpy.run_path(str(ROOT / relative_path), run_name="__main__")
 
     def test_raw_request_selects_external_and_internal_endpoint(self):
-        for prefix in ("src/raw/Chapter01", "src/solution/Chapter01"):
+        for prefix in ("course/Chapter01/code/raw", "course/Chapter01/code/solution"):
             path = f"{prefix}/01-llm-api/01_requests.py"
             self.run_example(
                 path,
@@ -122,7 +122,7 @@ class DirectApiExamplesTests(unittest.TestCase):
             self.assertEqual(options["headers"]["x-dep-ticket"], "test-ticket")
 
     def test_openai_sdk_example_does_not_overwrite_key(self):
-        for prefix in ("src/raw/Chapter01", "src/solution/Chapter01"):
+        for prefix in ("course/Chapter01/code/raw", "course/Chapter01/code/solution"):
             path = f"{prefix}/01-llm-api/02_openai.py"
             values = {
                 "LLM_PROVIDER": "openai",

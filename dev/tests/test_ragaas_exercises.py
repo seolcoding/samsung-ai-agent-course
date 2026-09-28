@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 class FakeChain:
@@ -63,7 +63,7 @@ class RagExercisesTests(unittest.TestCase):
             "langchain_core.output_parsers": parsers,
             "langchain_core.prompts": prompts,
         }
-        for prefix in ("src/raw/Chapter01", "src/solution/Chapter01"):
+        for prefix in ("course/Chapter01/code/raw", "course/Chapter01/code/solution"):
             with self.subTest(prefix=prefix):
                 output = io.StringIO()
                 with patch.dict(sys.modules, modules), patch.dict(

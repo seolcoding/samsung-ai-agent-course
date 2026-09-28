@@ -1,8 +1,8 @@
 """Chapter01 1-1 강의 노트북을 조립한다. 슬라이드·설명·퀴즈만 담는다. 원본에 실습 코드가 없어 LAB은 만들지 않는다.
 
-실행(프로젝트 루트): uv run python lessons/drafts/build_lecture_1_1.py
-입력: lessons/drafts/1-1_cells.json(설명 셀·퀴즈·강사용 메모, C 수준)
-출력: lessons/Chapter01/1-1_design_thinking_LEC.ipynb (출력 없음), lessons/assets/quizzes/1-1/*.json
+실행(프로젝트 루트): uv run python dev/builders/build_lecture_1_1.py
+입력: dev/builders/1-1_cells.json(설명 셀·퀴즈·강사용 메모, C 수준)
+출력: course/Chapter01/notebooks/1-1_design_thinking_LEC.ipynb (출력 없음), course/assets/quizzes/1-1/*.json
 """
 
 import json
@@ -13,14 +13,15 @@ sys.path.insert(0, str(Path(__file__).parent))
 from nbkit import Notebook  # noqa: E402
 
 HERE = Path(__file__).parent
-LESSONS = HERE.parent
-OUT = LESSONS / "Chapter01" / "1-1_design_thinking_LEC.ipynb"
+ROOT = HERE.parents[1]
+COURSE = ROOT / "course"
+OUT = COURSE / "Chapter01" / "notebooks" / "1-1_design_thinking_LEC.ipynb"
 CURRICULUM_PAGES = [2, 3, 4, 5]  # 커리큘럼 제안서 PDF에서 표가 있는 쪽(1쪽은 표지)
 
 
 def build():
     text = json.loads((HERE / "1-1_cells.json").read_text(encoding="utf-8"))
-    nb = Notebook(LESSONS / "assets" / "quizzes" / "1-1", "../assets/quizzes/1-1")
+    nb = Notebook(COURSE / "assets" / "quizzes" / "1-1", "../../assets/quizzes/1-1")
 
     def v(key):  # 설명 셀과 그 강사용 메모
         nb.md(text[key])
@@ -35,7 +36,7 @@ def build():
     nb.md(text["title"])
     nb.meta(text["title__meta"])
     nb.code(
-        "import sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\n"
+        "import sys\n\nsys.path.insert(0, '../..')  # course/assets 도구를 불러오기 위한 경로\n\n"
         "from assets.widgets import show_quiz, show_slides, slide_setup\n\n"
         "slide_setup()  # 슬라이드 뷰어(PDF.js)를 불러옵니다. 슬라이드가 비어 보이면 이 셀을 다시 실행합니다."
     )

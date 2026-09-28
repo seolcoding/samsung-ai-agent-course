@@ -73,8 +73,8 @@ class RagProviderTests(unittest.TestCase):
 
     def test_capstone_search_marks_mock_and_rejects_missing_internal_index(self):
         source = (
-            Path(__file__).resolve().parents[1]
-            / "src/solution/Chapter02/06-capstone/solution.py"
+            Path(__file__).resolve().parents[2]
+            / "course/Chapter02/code/solution/06-capstone/solution.py"
         )
         tree = ast.parse(source.read_text())
         function = next(
@@ -110,8 +110,8 @@ class RagProviderTests(unittest.TestCase):
 
     def test_raw_lab_uses_the_original_prebuilt_index(self):
         source = (
-            Path(__file__).resolve().parents[1]
-            / "src/raw/Chapter01/03-rag/05_ragaas.py"
+            Path(__file__).resolve().parents[2]
+            / "course/Chapter01/code/raw/03-rag/05_ragaas.py"
         )
         self.assertIn("INDEX_NAME = 'rp-aicoa-meritz-pet'", source.read_text())
 

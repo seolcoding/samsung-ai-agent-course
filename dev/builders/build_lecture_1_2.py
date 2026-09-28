@@ -1,8 +1,8 @@
 """Chapter01 1-2 강의 노트북을 조립한다. 슬라이드·설명·퀴즈만 담고 실습 코드는 넣지 않는다(실습은 1-2_llm_api_LAB).
 
-실행(프로젝트 루트): uv run python lessons/drafts/build_lecture_1_2.py
-입력: lessons/drafts/1-2_cells_common.json(공통 셀·퀴즈), 1-2_cells_C.json(설명 셀, C 수준)
-출력: lessons/Chapter01/1-2_llm_api_LEC.ipynb (출력 없음)
+실행(프로젝트 루트): uv run python dev/builders/build_lecture_1_2.py
+입력: dev/builders/1-2_cells_common.json(공통 셀·퀴즈), 1-2_cells_C.json(설명 셀, C 수준)
+출력: course/Chapter01/notebooks/1-2_llm_api_LEC.ipynb (출력 없음)
 """
 
 import json
@@ -13,8 +13,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 from nbkit import Notebook  # noqa: E402
 
 HERE = Path(__file__).parent
-LESSONS = HERE.parent
-OUT = LESSONS / "Chapter01" / "1-2_llm_api_LEC.ipynb"
+ROOT = HERE.parents[1]
+COURSE = ROOT / "course"
+OUT = COURSE / "Chapter01" / "notebooks" / "1-2_llm_api_LEC.ipynb"
 # p9 예시의 토큰 목록. 2.1 퀴즈의 정답(목록 길이)을 여기서 계산한다.
 P9_TOKENS = ["Lang", "Chain", "으로", " AI", " Agent", "를", " 만든", "다", "."]
 P9_SENTENCE = "LangChain으로 AI Agent를 만든다."
@@ -23,7 +24,7 @@ P9_SENTENCE = "LangChain으로 AI Agent를 만든다."
 def build():
     common = json.loads((HERE / "1-2_cells_common.json").read_text(encoding="utf-8"))
     text = json.loads((HERE / "1-2_cells_C.json").read_text(encoding="utf-8"))
-    nb = Notebook(LESSONS / "assets" / "quizzes" / "1-2", "../assets/quizzes/1-2")
+    nb = Notebook(COURSE / "assets" / "quizzes" / "1-2", "../../assets/quizzes/1-2")
 
     def v(key):  # 설명 셀과 그 강사용 메모
         nb.md(text[key])
@@ -38,7 +39,7 @@ def build():
     nb.md(common["title"])
     nb.meta(common.get("title__meta", "").replace("{VERSION}", "C"))
     nb.code(
-        "import json\nimport sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\n"
+        "import json\nimport sys\n\nsys.path.insert(0, '../..')  # course/assets 도구를 불러오기 위한 경로\n\n"
         "from assets.widgets import show_order_quiz, show_quiz, show_slides, slide_setup\n\n"
         "slide_setup()  # 슬라이드 뷰어(PDF.js)를 불러옵니다. 슬라이드가 비어 보이면 이 셀을 다시 실행합니다."
     )
@@ -60,7 +61,7 @@ def build():
     nb.md("**먼저 예측해 봅니다.** 다음 쪽을 보기 전에, 요청을 보내고 응답을 받기까지의 순서를 맞혀 보세요.")
     (nb.quiz_dir / "order12.json").parent.mkdir(parents=True, exist_ok=True)
     (nb.quiz_dir / "order12.json").write_text(json.dumps(common["order12"], ensure_ascii=False, indent=1), encoding="utf-8")
-    nb.code('show_order_quiz(**json.load(open("../assets/quizzes/1-2/order12.json", encoding="utf-8")))')
+    nb.code('show_order_quiz(**json.load(open("../../assets/quizzes/1-2/order12.json", encoding="utf-8")))')
     slides(7)
     v("p7")
     v("sum12")

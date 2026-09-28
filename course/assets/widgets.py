@@ -1,7 +1,7 @@
 """교안 노트북에서 쓰는 HTML 위젯 모음.
 
 모든 함수는 IPython.display.HTML을 돌려준다. 코드 셀의 마지막 줄에 두면 출력 영역에 그려진다.
-규칙은 lessons/AGENTS.md를 따른다: 외부 CDN 없음, 이미지·스크립트는 HTML 안에 넣음, 위젯마다 고유 id.
+규칙은 dev/AGENTS.md(노트북 제작 규칙)를 따른다: 외부 CDN 없음, 이미지·스크립트는 HTML 안에 넣음, 위젯마다 고유 id.
 
     show_slides      원본 PDF에서 원하는 쪽만 뷰어로 보기 (PDF.js, 글자 선택 가능)
     slide_setup      PDF.js를 화면에 불러오기 (노트북 맨 위 준비 셀)
@@ -118,7 +118,7 @@ def _plain(value):
 # 슬라이드는 원본 PDF를 PDF.js로 그대로 그린다(벡터라 선명하고, 글자를 선택·복사할 수 있다).
 # PDF.js는 사내망 규칙대로 assets/vendor에 두고 HTML 안에 넣는다. 외부 주소는 쓰지 않는다.
 PDFJS = ASSETS / "vendor" / "pdfjs-3.11.174"
-DOCS_RAW = ASSETS.parent.parent / "docs" / "raw"
+COURSE = ASSETS.parent  # course/: 슬라이드는 course/ChapterNN/slides/ 아래
 _PDF_SENT = {"lib": False, "decks": set()}  # 이 커널에서 화면에 이미 보낸 것
 
 _TEXT_LAYER_CSS = """
@@ -131,12 +131,12 @@ _TEXT_LAYER_CSS = """
 
 
 def _deck_pdf(deck):
-    """"1-2"처럼 쓴 이름으로 docs/raw 아래의 원본 PDF(1-2-*.pdf)를 찾는다.
+    """"1-2"처럼 쓴 이름으로 course/ChapterNN/slides/ 아래의 원본 PDF(1-2-*.pdf)를 찾는다.
     이름이 파일 이름과 똑같은 PDF(예: "2026-09-03_커리큘럼_제안서" → 그 이름.pdf)도 찾는다. 없으면 None."""
     import unicodedata
 
     nfc = lambda t: unicodedata.normalize("NFC", t)  # noqa: E731  macOS는 한글 파일 이름을 NFD로 저장한다
-    pdfs = sorted(DOCS_RAW.rglob("*.pdf"))
+    pdfs = sorted(COURSE.glob("Chapter*/slides/**/*.pdf"))
     hits = [p for p in pdfs if nfc(p.stem).startswith(nfc(deck) + "-")] or [p for p in pdfs if nfc(p.stem) == nfc(deck)]
     return hits[0] if hits else None
 
