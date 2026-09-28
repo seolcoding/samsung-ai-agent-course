@@ -38,7 +38,7 @@ def tags_of(cell):
     if cell.cell_type == "code":
         if "show_slides(" in src:
             return {"슬라이드"}
-        if "display_quiz(" in src or "show_order_quiz(" in src:
+        if "show_quiz(" in src or "show_order_quiz(" in src:
             return {"퀴즈"}
         if not cell.metadata.get("jupyter", {}).get("source_hidden"):  # 수강생이 예측을 적는 셀
             return {"퀴즈"}
@@ -110,7 +110,7 @@ def build(version="C"):
             assert "(p" not in json.dumps(q, ensure_ascii=False), f"{name}: 퀴즈에 쪽 인용이 남아 있다"
         QUIZ_DIR.mkdir(parents=True, exist_ok=True)
         (QUIZ_DIR / f"{name}.json").write_text(json.dumps(questions, ensure_ascii=False, indent=1), encoding="utf-8")
-        code(f'display_quiz("../assets/quizzes/1-2/{name}.json", max_width=800)')
+        code(f'show_quiz("../assets/quizzes/1-2/{name}.json")')
 
     def quiz(key):
         quiz_file(key, [common[key]])
@@ -127,8 +127,8 @@ def build(version="C"):
     if common.get("title__meta"):
         meta(common["title__meta"].replace("{VERSION}", "C"))
     code(
-        "import json\nimport sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\nfrom jupyterquiz import display_quiz\n"
-        "from assets.widgets import run_step, show_checklist, show_code, show_code_map, show_order_quiz, show_slides, slide_setup\n\n"
+        "import json\nimport sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\n"
+        "from assets.widgets import run_step, show_checklist, show_code, show_code_map, show_order_quiz, show_quiz, show_slides, slide_setup\n\n"
         "slide_setup()  # 슬라이드 뷰어(PDF.js)를 불러옵니다. 슬라이드가 비어 보이면 이 셀을 다시 실행합니다."
     )
     slides(1, 2)

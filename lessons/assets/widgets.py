@@ -29,7 +29,28 @@ SLIDES = ASSETS / "slides"
 # 프로젝터 뒷자리에서도 보이도록 글자를 크게 하고, 에디터 테마와 무관하게 밝은 바탕을 쓴다.
 BOX = ("font-family:sans-serif;font-size:15px;line-height:1.5;color:#1f2328;background:#fff;"
        "border:1px solid #d0d7de;border-radius:8px;padding:12px;max-width:960px")
-BLUE, GREEN, GRAY = "#1f6feb", "#1a7f37", "#eaeef2"
+# 색은 교안 슬라이드(Marp PDF)에서 뽑았다: 제목 남색, 강조 파랑, 본문 먹색.
+NAVY, BLUE, INK = "#2a3f8c", "#446af3", "#172033"
+GRAY, LINE, PALE = "#eef1f8", "#d9deec", "#f5f7fc"
+GREEN, RED = "#1a7f37", "#c0392b"
+
+# jupyterquiz 색을 슬라이드 색에 맞춘다. show_quiz가 이 값을 쓴다.
+QUIZ_COLORS = {
+    "--jq-multiple-choice-bg": NAVY, "--jq-many-choice-bg": NAVY, "--jq-numeric-bg": NAVY, "--jq-string-bg": NAVY,
+    "--jq-mc-button-bg": PALE, "--jq-mc-button-border": LINE, "--jq-mc-button-inset-shadow": BLUE,
+    "--jq-numeric-input-bg": PALE, "--jq-numeric-input-label": INK, "--jq-numeric-input-shadow": LINE,
+    "--jq-correct-color": GREEN, "--jq-incorrect-color": RED, "--jq-text-color": "#ffffff", "--jq-link-color": "#c9d4ff",
+}
+# 퀴즈 제목 띠. jupyterquiz 문제 칸과 같은 모양으로 맞춘다.
+QUIZ_TITLE = f"background:{NAVY};color:#fff;border-radius:8px;padding:10px 14px;font-size:17px;font-weight:600"
+BTN = f"font-size:14px;padding:4px 12px;border:1px solid {LINE};border-radius:6px;background:{PALE};color:{INK};cursor:pointer"
+
+
+def show_quiz(path):
+    """jupyterquiz 문제 파일을 슬라이드 색으로 보여 준다."""
+    from jupyterquiz import display_quiz
+
+    return display_quiz(path, max_width=800, colors=QUIZ_COLORS)
 
 
 def _id():
@@ -76,7 +97,7 @@ _TEXT_LAYER_CSS = """
   -webkit-text-size-adjust:none;text-size-adjust:none;forced-color-adjust:none;transform-origin:0 0;z-index:2}
 .pdfslide .textLayer :is(span,br){color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0% 0%}
 .pdfslide .textLayer span.markedContent{top:0;height:0}
-.pdfslide .textLayer ::selection{background:#1f6feb}
+.pdfslide .textLayer ::selection{background:#446af3}
 """
 
 
@@ -541,11 +562,11 @@ def show_order_quiz(steps, title="순서 맞추기", explanation=""):
     wid = _id()
     return HTML(f"""
 <div id="{wid}" style="{BOX}">
-  <strong>{html.escape(title)}</strong>
-  <div style="color:#57606a;margin:4px 0">카드를 올바른 순서대로 클릭한다. 잘못 눌렀으면 '다시'를 누른다.</div>
+  <div style="{QUIZ_TITLE}">{html.escape(title)}</div>
+  <div style="color:#57606a;margin:8px 0 4px">카드를 올바른 순서대로 클릭합니다. 잘못 눌렀으면 '다시'를 누릅니다.</div>
   <div data-role="pool" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
   <ol data-role="answer" style="min-height:24px"></ol>
-  <button data-act="check">채점</button> <button data-act="reset">다시</button>
+  <button data-act="check" style="{BTN}">채점</button> <button data-act="reset" style="{BTN}">다시</button>
   <div data-role="result" style="margin-top:8px;white-space:pre-wrap"></div>
 </div>
 <script>
@@ -561,7 +582,7 @@ def show_order_quiz(steps, title="순서 맞추기", explanation=""):
       if (picked.includes(s)) return;
       const b = document.createElement("button");
       b.textContent = s;
-      b.style.cssText = "background:{GRAY};border:1px solid #d0d7de;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:15px";
+      b.style.cssText = "background:{PALE};border:1px solid {LINE};border-left:4px solid {BLUE};border-radius:6px;padding:6px 10px;cursor:pointer;font-size:15px;color:{INK}";
       b.onclick = () => {{ picked.push(s); draw(); }};
       pool.appendChild(b);
     }});
@@ -569,14 +590,14 @@ def show_order_quiz(steps, title="순서 맞추기", explanation=""):
   }};
   root.querySelector('[data-act="reset"]').onclick = () => {{ picked = []; result.textContent = ""; draw(); }};
   root.querySelector('[data-act="check"]').onclick = () => {{
-    if (picked.length < steps.length) {{ result.textContent = "카드를 모두 골라야 채점할 수 있다."; return; }}
+    if (picked.length < steps.length) {{ result.textContent = "카드를 모두 골라야 채점할 수 있습니다."; return; }}
     [...answer.children].forEach((li, k) => {{
       const ok = picked[k] === steps[k];
-      li.style.color = ok ? "{GREEN}" : "#cf222e";
+      li.style.color = ok ? "{GREEN}" : "{RED}";
       li.textContent = picked[k] + (ok ? "  ✔" : `  ✖ (정답: ${{steps[k]}})`);
     }});
     const allOk = picked.every((s, k) => s === steps[k]);
-    result.textContent = (allOk ? "정답이다. " : "틀린 칸이 있다. ") + explanation;
+    result.textContent = (allOk ? "정답입니다. " : "틀린 칸이 있습니다. ") + explanation;
   }};
   draw();
 }})();
@@ -589,8 +610,8 @@ def show_line_pick(code, answer_lines, title="틀린 줄 찾기", explanation=""
     wid = _id()
     return HTML(f"""
 <div id="{wid}" style="{BOX}">
-  <strong>{html.escape(title)}</strong>
-  <div style="color:#57606a;margin:4px 0">문제가 있다고 생각하는 줄을 클릭한다.</div>
+  <div style="{QUIZ_TITLE}">{html.escape(title)}</div>
+  <div style="color:#57606a;margin:8px 0 4px">문제가 있다고 생각하는 줄을 클릭합니다.</div>
   <pre data-role="code" style="margin:0;white-space:pre;overflow-x:auto;font-family:Menlo,Consolas,monospace;background:#f6f8fa;border-radius:6px;padding:8px;font-size:14px"></pre>
   <div data-role="result" style="margin-top:8px;white-space:pre-wrap"></div>
 </div>
@@ -606,7 +627,7 @@ def show_line_pick(code, answer_lines, title="틀린 줄 찾기", explanation=""
     row.onclick = () => {{
       const ok = answers.includes(k + 1);
       row.style.background = ok ? "#dafbe1" : "#ffebe9";
-      result.style.color = ok ? "{GREEN}" : "#cf222e";
+      result.style.color = ok ? "{GREEN}" : "{RED}";
       result.textContent = ok ? `${{k + 1}}번 줄, 정답이다. ${{explanation}}` : `${{k + 1}}번 줄은 문제가 아니다. 다시 찾아본다.`;
     }};
     code.appendChild(row);
