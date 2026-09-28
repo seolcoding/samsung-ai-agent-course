@@ -6,14 +6,14 @@
 
 | 폴더 | 들어 있는 것 |
 |---|---|
-| `Chapter01/notebooks/` | 수업 노트북. `1-1_…_LEC.ipynb`부터 번호 순서대로 엽니다. `data/`는 실습 자료입니다 |
-| `Chapter01/code/raw/` | 받은 원본 실습 코드 |
-| `Chapter01/code/solution/` | 원본 실습 코드의 정답 |
-| `Chapter01/slides/` | 강의 슬라이드 PDF |
-| `Chapter02/` | 2부 원본 코드와 슬라이드 |
-| `Chapter01/assets/` | 노트북 화면 도구(슬라이드 뷰어, 퀴즈) |
-| `config/` | 모델·임베딩 연결 설정. 노트북이 불러다 씁니다 |
-| `agent_docs/` | 설치·경로·오류 해결 안내. AI 도우미도 이 문서를 읽고 설정을 돕습니다 |
+| `course/Chapter01/notebooks/` | 수업 노트북. `1-1_…_LEC.ipynb`부터 번호 순서대로 엽니다. `data/`는 실습 자료입니다 |
+| `course/Chapter01/code/raw/` | 받은 원본 실습 코드 |
+| `course/Chapter01/code/solution/` | 원본 실습 코드의 정답 |
+| `course/Chapter01/slides/` | 강의 슬라이드 PDF |
+| `course/Chapter02/` | 2부 원본 코드와 슬라이드 |
+| `course/Chapter01/assets/` | 노트북 화면 도구(슬라이드 뷰어, 퀴즈) |
+| `course/config/` | 모델·임베딩 연결 설정. 노트북이 불러다 씁니다 |
+| `course/agent_docs/` | 설치·경로·오류 해결 안내. AI 도우미도 이 문서를 읽고 설정을 돕습니다 |
 
 ## 처음 한 번: 설치
 
@@ -28,7 +28,7 @@
 
 3. `.env.sample`을 복사해 저장소 맨 위에 `.env`를 만들고, 강사가 알려 준 값을 채웁니다. `.env`의 키는 다른 사람에게 보이거나 파일로 올리지 않습니다.
 
-설치나 실행이 안 되면 `agent_docs/troubleshooting.md`를 봅니다.
+설치나 실행이 안 되면 `course/agent_docs/troubleshooting.md`를 봅니다.
 
 ## 수업 때
 
