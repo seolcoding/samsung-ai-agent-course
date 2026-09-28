@@ -38,11 +38,11 @@
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| `AuthenticationError` / 401 | 키가 틀리거나 만료됨 | `.env`의 키를 강사에게 다시 받는다. 키를 화면에 출력해 확인하지 않는다 |
+| `AuthenticationError` / 401 | 키가 틀리거나 만료됨 | 사내는 교육 페이지의 값을, 사외는 받은 값을 `.env`에 다시 복사한다(앞뒤 공백·따옴표 확인). 키를 화면에 출력해 확인하지 않는다 |
 | `NotFoundError` / 404, "model … does not exist" | 모델 이름이 틀림 | `.env`의 `OPENAI_MODEL`(사내는 `model`) 값을 확인 |
 | `APIConnectionError`, 연결 시간 초과 | 네트워크. 사내 값은 사내망에서만, `openai`는 인터넷이 필요 | 네트워크 확인. 사외에서는 `openai` 설정을 쓴다 |
 | `RateLimitError` / 429 | 짧은 시간에 요청이 몰림 | 잠시 뒤 다시 실행 |
-| 사내 환경에서 SDK 셀(`client.responses…`), 도구 호출(`bind_tools`), 구조화 출력(`with_structured_output`)만 실패 | 사내 게이트웨이가 그 기능을 지원하는지 아직 확인되지 않음 | 오류 메시지를 강사에게 알린다. 코드를 바꿔 우회하지 않는다 |
+| 사내 환경에서 SDK 셀(`client.responses…`), 도구 호출(`bind_tools`), 구조화 출력(`with_structured_output`)만 실패 | 사내 게이트웨이가 그 기능을 지원하는지 아직 확인되지 않음 | ① `uv run python -m config.check --live`로 기본 호출이 되는지 본다. ② 기본 호출이 되면 그 기능만 막힌 것이다. 오류 마지막 줄로 원인을 설명해 주고, 그 셀은 건너뛰고 다음 절을 진행하게 한다. ③ 코드를 바꿔 우회하지 않는다. 강사에게는 셀 이름과 오류 마지막 줄을 정리해 전하게 한다 |
 | 사내 RAGaaS 인증 실패 | `rag_api_key`(api-key 헤더)와 `rag_credential_key`(x-dep-ticket) 둘 다 필요 | 두 값이 모두 있는지 확인. 사외에서는 `RAG_PROVIDER=mock` |
 
 ## 실습 중
@@ -73,8 +73,8 @@
 | 터미널: `No such file or directory` / `can't open file …_server.py` | 서버 파일을 쓰는 셀(`%%writefile`)을 아직 안 돌림, 또는 터미널이 저장소 맨 위가 아님 | 노트북의 쓰기 셀을 먼저 실행. 터미널에서 `pwd`가 저장소 맨 위인지 확인([paths.md](paths.md)) |
 | `address already in use` / `Errno 48`·`10048` | 같은 포트의 서버가 이미 떠 있음(A2A와 캡스톤 MCP는 둘 다 8001) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
 | 클라이언트 셀: `ConnectError`, `Connection refused`, 오래 기다리다 실패 | 서버가 꺼져 있거나 시작 중 오류로 끝남 | 서버 터미널에 `Uvicorn running on …`이 있는지 본다. 없으면 터미널의 마지막 오류 줄부터 고친다 |
-| 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일의 빈칸이 비었거나 틀림 | 서버 코드 셀의 빈칸을 다시 채우고 → Ctrl+C → 쓰기 셀 다시 실행 → 서버 다시 띄우기 |
-| 서버를 고쳤는데 결과가 그대로 | 예전 서버가 계속 떠 있음 | Ctrl+C로 끄고 다시 띄운다 |
+| 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일의 빈칸이 비었거나 틀림 | 서버 코드 셀의 빈칸을 다시 채우고 → Ctrl+C → 첫 쓰기 셀(`%%writefile <파일>`)부터 마지막 이어 쓰기 셀까지 차례로 다시 실행 → 서버 다시 띄우기 |
+| 서버를 고쳤는데 결과가 그대로 | 예전 서버가 계속 떠 있음, 또는 고친 이어 쓰기 셀(`%%writefile -a`)만 다시 실행해 코드가 파일 끝(서버 실행 줄 뒤)에 붙음 | Ctrl+C로 끄고 → 첫 쓰기 셀부터 차례로 모두 다시 실행 → 다시 띄운다 |
 | 서버 시작 때 `DeprecationWarning`, `Update available` 상자 | 라이브러리 안내 문구 | 무시해도 된다 |
 | stdio로 바꿨더니 추가한 할 일이 목록에 없음 | stdio는 도구를 부를 때마다 서버를 새로 띄워 기억이 사라진다 | 정상. SSE와 비교하는 실습이다 |
 
@@ -83,10 +83,16 @@
 | 증상 | 원인 | 해결 |
 |---|---|---|
 | 준비 셀: Langfuse 연결 ⛔ | `.env`의 `LANGFUSE_PUBLIC_KEY`·`LANGFUSE_SECRET_KEY`·`LANGFUSE_BASE_URL`이 없거나 틀림 | `uv run python -m config.check --langfuse`로 빠진 이름을 확인하고 강사에게 받은 값을 채운다 |
+| Langfuse 화면을 어디서 여는지 모름 | — | 브라우저에서 `.env`의 `LANGFUSE_BASE_URL` 주소를 열고 로그인한 뒤, 키를 받은 프로젝트를 연다. 왼쪽 메뉴 **Tracing**에 trace, **Scores**에 점수가 있다 |
 | 코드는 잘 도는데 대시보드에 trace가 없음 | 전송 전(몇 초 모았다 보냄), 또는 다른 프로젝트 화면을 봄 | 각 장 끝의 `flush()` 셀을 실행하고 새로고침. 키와 같은 프로젝트인지 확인 |
 | 남의 trace가 섞여 보임 | 여러 명이 한 프로젝트를 같이 씀 | 노트북 안내대로 이름·실행 시각·내가 보낸 질문으로 찾는다 |
 | `python-dotenv could not parse statement starting at line N` | `.env`의 N번째 줄 형식이 틀림(따옴표·공백·주석) | 그 줄을 `KEY=값` 모양으로 고친다 |
 
 ## 그래도 안 되면
 
-오류 메시지 전체(키 값이 없는지 확인한 뒤), 실행한 셀, `os.getcwd()` 결과, 고른 커널 이름을 강사에게 알린다.
+수강생이 스스로 먼저 확인하는 순서(노트북의 "막혔을 때"와 같다):
+
+1. 오류 마지막 줄로 이 문서의 표를 찾아 해결한다.
+2. `uv run python -m config.check`(필요하면 `--live`, `--langfuse`)로 설정을 다시 본다.
+3. 커널을 다시 시작하고 맨 위 셀부터 다시 실행한다. 경로 문제면 [paths.md](paths.md)를 본다.
+4. 풀리지 않으면 그 셀은 건너뛰고 다음 절을 진행하게 하고, 강사에게 보여 줄 내용을 정리해 준다: 오류 마지막 줄(키 값이 없는지 확인한 뒤), 실행한 셀, `os.getcwd()` 결과, 고른 커널 이름.

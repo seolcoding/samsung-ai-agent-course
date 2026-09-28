@@ -13,7 +13,7 @@
   터미널 B: uv run python course/Chapter02/capstone/starter.py
 
 starter.py는 구현할 부분(TODO)이 남아 있는 실습 뼈대다. AI와 함께 TODO를 채운다.
-사외에서는 RAG_PROVIDER=mock으로 RAGaaS 응답 형식을 모의 실행한다.
+사내망 밖(.env의 COURSE_ENV=out)에서는 RAGaaS가 네트워크 없이 모의 응답을 돌려준다.
 """
 
 import asyncio
@@ -54,7 +54,7 @@ def search_web(query: str) -> str:
 def rag_search(query: str) -> str:
     """내부 지식베이스에서 관련 문서를 검색한다. 삼성 사내망에서는 RAGaaS API를 사용한다."""
     # TODO: post_ragaas('retrieve-rrf', payload)를 Coding AI에게 구현하게 하고
-    # RAG_PROVIDER=mock일 때 결과에 [MOCK RAGaaS]가 표시되는지 검토하세요.
+    # 사내망 밖(.env의 COURSE_ENV=out)에서 결과에 [MOCK RAGaaS]가 표시되는지 검토하세요.
 
 
 # ── State ─────────────────────────────────────────────────────────────────────

@@ -11,7 +11,7 @@
    {
     "answer": "HTTP/SSE 모드와 stdio 모드",
     "correct": true,
-    "feedback": "FastMCP는 HTTP/SSE 모드와 stdio 모드로 실행할 수 있습니다. Claude Code 같은 Host와는 stdio로 연결합니다."
+    "feedback": "FastMCP는 HTTP/SSE 모드와 stdio 모드로 실행할 수 있습니다. Claude Code 같은 Host와도 stdio로 연결할 수 있습니다."
    },
    {
     "answer": "동기 모드와 비동기 모드",

@@ -58,7 +58,7 @@
    {
     "answer": "HTTP/SSE",
     "correct": false,
-    "feedback": "HTTP/SSE도 FastMCP의 실행 방식이지만, 슬라이드는 Claude Code 같은 Host와는 stdio로 연결한다고 합니다."
+    "feedback": "HTTP/SSE도 FastMCP의 실행 방식입니다. 이 문제는 슬라이드가 Claude Code 같은 Host와 연결하는 방식으로 따로 든 것을 묻습니다."
    },
    {
     "answer": "WebSocket",
@@ -68,7 +68,7 @@
    {
     "answer": "stdio",
     "correct": true,
-    "feedback": "Claude Code 같은 MCP Host와는 stdio 방식으로 연결할 수 있습니다."
+    "feedback": "Claude Code 같은 MCP Host와도 stdio 방식으로 연결할 수 있습니다."
    },
    {
     "answer": "gRPC",
