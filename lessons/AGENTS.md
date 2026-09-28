@@ -1,7 +1,7 @@
 # AGENTS.md — 수업용 교안 노트북 (lessons/, v1.0, 2026-09-26)
 
 이 폴더는 수업에서 여는 교안 노트북을 둔다. 루트 `AGENTS.md`의 규칙을 그대로 따르고, 이 문서는 노트북 제작 방식만 정한다.
-작동하는 예시는 `html_embed_demo.ipynb`다. 새 방식을 쓰기 전에 이 예시로 먼저 확인한다.
+작동하는 예시는 `demos/html_embed_demo.ipynb`다. 새 방식을 쓰기 전에 이 예시로 먼저 확인한다.
 
 ## 1. 교안은 노트북으로 만든다
 
@@ -65,8 +65,8 @@
 
 ## 7. 검증
 
-- 기존 교수법 도구(Jupytext, nbstripout, ipytest, Graphviz, diagrams, archify, plotly, jupyterquiz)의 사용 예와 사내망 점검표는 `demo_d_tool_tryout.ipynb`에 있다. 필요한 패키지는 `uv sync --extra notebooks --extra teaching`으로 설치한다.
-- 퀴즈 형식 11가지(jupyterquiz, jupytercards, 순서 맞추기·틀린 줄 찾기 위젯, 예측 후 실행, ipytest 빈칸, LLM 채점 서술형)는 `demo_e_quiz_types.ipynb`에 있다. 숫자형 문제의 정답은 코드로 계산해 넣어 교안이 바뀌어도 어긋나지 않게 한다.
+- 기존 교수법 도구(Jupytext, nbstripout, ipytest, Graphviz, diagrams, archify, plotly, jupyterquiz)의 사용 예와 사내망 점검표는 `demos/demo_d_tool_tryout.ipynb`에 있다. 필요한 패키지는 `uv sync --extra notebooks --extra teaching`으로 설치한다.
+- 퀴즈 형식 11가지(jupyterquiz, jupytercards, 순서 맞추기·틀린 줄 찾기 위젯, 예측 후 실행, ipytest 빈칸, LLM 채점 서술형)는 `demos/demo_e_quiz_types.ipynb`에 있다. 숫자형 문제의 정답은 코드로 계산해 넣어 교안이 바뀌어도 어긋나지 않게 한다.
 
 - QC: `uv run python lessons/qc/notebook_qc.py <노트북>`(규칙 검사, `--execute`면 새 커널 실행까지)와 Claude Code 명령 `/notebook-qc`(판단 점검표)로 확인한다.
   - 종류는 파일 이름 끝(`_LEC`/`_LAB`)으로 정한다. 강의 노트북에 `run_step`·`show_code`·`show_code_map`·`make_blank`·`show_diff`가 있으면 FAIL, 실습 노트북에 `make_blank`·`run_step`·`show_diff`·`show_code_map`·`show_slides`가 있으면 FAIL이다.
