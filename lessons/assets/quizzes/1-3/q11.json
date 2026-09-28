@@ -1,0 +1,28 @@
+[
+ {
+  "question": "`chain = prompt | model | parser`에서 `|`가 하는 일은 무엇인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "세 단계를 동시에 따로 실행한다",
+    "correct": false,
+    "feedback": "여러 결과를 동시에 만드는 것은 RunnableParallel의 일입니다. `|`는 단계를 차례로 잇습니다."
+   },
+   {
+    "answer": "앞 단계의 출력을 다음 단계의 입력으로 넘긴다",
+    "correct": true,
+    "feedback": "프롬프트가 만든 메시지가 모델로, 모델의 답이 파서로 차례로 넘어갑니다."
+   },
+   {
+    "answer": "세 단계 중 하나를 골라 실행한다",
+    "correct": false,
+    "feedback": "`|`는 고르지 않습니다. 연결된 모든 단계를 순서대로 거칩니다."
+   },
+   {
+    "answer": "두 값을 비트 연산으로 합친다",
+    "correct": false,
+    "feedback": "모양은 파이썬의 비트 OR와 같지만, LangChain 구성 요소 사이에서는 체인을 잇는 연산자로 동작합니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Tool Calling에서 도구 함수를 실제로 실행하는 주체는 누구인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "LLM이 서버 안에서 직접 실행한다",
+    "correct": false,
+    "feedback": "모델은 호출할 도구 이름과 인자 값만 만듭니다."
+   },
+   {
+    "answer": "모델의 호출 의도를 받은 애플리케이션 코드",
+    "correct": true,
+    "feedback": "애플리케이션이 모델의 출력을 파싱해 함수를 실행하고, 결과를 다시 모델에 넣습니다."
+   },
+   {
+    "answer": "사용자가 직접 실행해 결과를 붙여 넣는다",
+    "correct": false,
+    "feedback": "사람이 나서지 않아도 애플리케이션이 도구 호출을 읽어 실행합니다."
+   },
+   {
+    "answer": "도구 명세(Tool Schema)가 스스로 실행된다",
+    "correct": false,
+    "feedback": "Tool Schema는 모델에게 도구를 알려 주는 명세일 뿐, 실행되는 코드가 아닙니다."
+   }
+  ]
+ }
+]

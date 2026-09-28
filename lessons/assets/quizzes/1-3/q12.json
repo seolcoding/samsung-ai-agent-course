@@ -1,0 +1,28 @@
+[
+ {
+  "question": "일반 파이썬 함수를 체인 안의 실행 단위로 감싸는 것은 무엇인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "RunnablePassthrough",
+    "correct": false,
+    "feedback": "RunnablePassthrough는 받은 입력을 다음 단계로 넘기는 일을 합니다."
+   },
+   {
+    "answer": "RunnableParallel",
+    "correct": false,
+    "feedback": "RunnableParallel은 여러 실행 결과를 만들어 하나의 묶음으로 합칩니다."
+   },
+   {
+    "answer": "RunnableLambda",
+    "correct": true,
+    "feedback": "RunnableLambda로 감싼 함수는 다른 Runnable처럼 `|`로 이어 쓸 수 있습니다."
+   },
+   {
+    "answer": "StrOutputParser",
+    "correct": false,
+    "feedback": "StrOutputParser는 모델의 출력을 문자열로 바꾸는 파서입니다."
+   }
+  ]
+ }
+]
