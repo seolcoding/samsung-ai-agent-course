@@ -533,35 +533,6 @@ def show_checklist(items, title="리뷰 체크리스트"):
 </script>""")
 
 
-def show_criteria(checks, title="성공 기준 확인"):
-    """성공 기준을 검사해 통과는 🟢, 아직이면 ⛔로 출력한다.
-
-    checks: [(기준, 검사 함수, 고칠 곳)]. 검사 함수는 인자 없이 참·거짓을 돌려준다.
-    아직 실행하지 않은 셀이 있으면(NameError) 그 사실을 알려 준다.
-    """
-    print(f"── {title} ──")
-    passed = 0
-    for label, test, fix in checks:
-        try:
-            ok = bool(test())
-        except NameError as e:
-            ok, fix = False, f"아직 실행하지 않은 셀이 있습니다({e.name}). 위 셀부터 차례로 실행합니다."
-        except Exception as e:  # noqa: BLE001 — 검사 중 오류도 ⛔로 보여 준다
-            ok, fix = False, f"{fix} (검사 중 {type(e).__name__})"
-        passed += ok
-        print(f"🟢 {label}" if ok else f"⛔ {label}\n     → {fix}")
-    left = len(checks) - passed
-    print(f"\n{'🟢 모두 통과했습니다.' if not left else f'⛔ {left}개가 남았습니다.'} ({passed}/{len(checks)})")
-
-
-def last_cell(keyword):
-    """keyword가 든 셀 중 가장 최근에 실행한 셀의 코드를 돌려준다(성공 기준 검사용)."""
-    from IPython import get_ipython
-
-    history = get_ipython().user_ns.get("In", [])
-    return next((src for src in reversed(history) if keyword in src and "show_criteria" not in src), "")
-
-
 def show_scorecard(rounds):
     """검증 결과를 회차별로 나란히 보여 준다.
 

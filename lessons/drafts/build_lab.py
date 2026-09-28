@@ -15,10 +15,11 @@
   제목 → 목차 → 1. 실습 방법 → 원본 파일마다 한 장:
     준비 코드(접힘) → 구획마다 한 절 → CodeMate에게 물어보기(TODO가 없는 파일) → 정리
 구획은 두 종류다.
-  예제: 완성된 코드를 함께 실행한다. `# ✍️ TODO:` 주석이 붙은 줄(값)만 바꿔 다시 실행해 본다.
-  과제: `# ✍️ TODO:` 아래 정답 줄을 빈칸(`...  # ✍️ …`)으로 바꿔 넣는다. 수강생이 CodeMate와 채운다.
-    [TODO 설명 → CodeMate에게 줄 힌트 → 성공 기준(🟢/⛔)] → 빈칸 셀 → 성공 기준 검사 셀 → 정답 보기(접힘)
+  예제: 완성된 코드를 함께 실행한다. 줄 끝에 `# ✍️ CHANGE_HERE:` 주석이 붙은 값만 바꿔 다시 실행해 본다.
+  과제: 원본 TODO 주석을 `# ✍️ WRITE_THIS:`로 바꾸고, 그 아래 정답 줄을 빈칸(`...  # ✍️ …`)으로 바꿔 넣는다. 수강생이 CodeMate와 채운다.
+    [설명 → CodeMate에게 줄 힌트 → 성공 기준(🟢/⛔)] → 빈칸 셀 → 정답 보기(접힘)
 CodeMate 지시문 완성본은 주지 않는다. 힌트와 성공 기준만 주고, 지시문은 수강생이 쓴다.
+성공 기준은 자동으로 검사하지 않는다. 수강생이 실행 결과를 보고 스스로 판단한다.
 """
 
 import ast
@@ -50,15 +51,17 @@ KIND_EXAMPLE, KIND_TASK = "예제", "과제"  # 절 제목 앞에 붙는 실습 
 
 PROMPT_GUIDE = f"""이 노트북의 실습은 두 종류입니다.
 
-- **{KIND_EXAMPLE}**: 완성된 코드를 함께 실행합니다. `# ✍️ TODO:` 주석이 붙은 줄이 있으면 그 값만 바꿔 다시 실행해 봅니다.
-- **{KIND_TASK}**: 코드 셀의 `...  # ✍️ 여기를 채웁니다` 줄이 빈칸입니다. CodeMate와 함께 채웁니다.
+- **{KIND_EXAMPLE}**: 완성된 코드를 함께 실행합니다. `# ✍️ CHANGE_HERE:` 주석이 붙은 줄이 있으면 그 값만 바꿔 다시 실행해 봅니다.
+- **{KIND_TASK}**: `# ✍️ WRITE_THIS:` 주석 아래 `...  # ✍️ 여기를 채웁니다` 줄이 빈칸입니다. CodeMate와 함께 채웁니다.
+
+두 종류 모두 **성공 기준**이 있습니다. 실행 결과를 보고 스스로 판단합니다. 🟢는 되어야 하는 것, ⛔는 이렇게 나오면 다시 해야 하는 신호입니다.
 
 {KIND_TASK}는 이렇게 진행합니다.
-1. `# ✍️ TODO:` 주석과 설명을 읽고, 무엇을 채워야 하는지 한 문장으로 말해 봅니다.
+1. `# ✍️ WRITE_THIS:` 주석과 설명을 읽고, 무엇을 채워야 하는지 한 문장으로 말해 봅니다.
 2. **CodeMate에게 줄 힌트**를 보고 지시문을 직접 씁니다. 아래 다섯 칸 틀을 써도 좋습니다.
 3. CodeMate가 준 코드를 읽고, 모르는 줄은 "이 줄이 하는 일"을 다시 묻습니다.
 4. 빈칸에 넣고 실행합니다. 오류가 나면 오류 메시지를 그대로 CodeMate에 붙여 넣고 원인부터 묻습니다.
-5. 아래 **성공 기준 확인** 셀을 실행합니다. 모두 🟢이면 통과입니다. ⛔가 있으면 옆의 안내를 보고 다시 지시합니다.
+5. 실행 결과를 **성공 기준**과 비교합니다. 🟢를 모두 만족하고 ⛔ 신호가 없으면 통과입니다. 아니면 무엇이 다른지 CodeMate에게 알려 주고 다시 지시합니다.
 6. 접힌 "정답 보기"를 펼쳐 비교합니다. 다르다고 틀린 것은 아닙니다. 왜 다른지 말할 수 있으면 됩니다.
 
 ```text
@@ -71,7 +74,7 @@ PROMPT_GUIDE = f"""이 노트북의 실습은 두 종류입니다.
 
 
 BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
-MARK = "# ✍️ TODO:"
+MARK_TASK, MARK_EDIT = "# ✍️ WRITE_THIS:", "# ✍️ CHANGE_HERE:"
 
 
 def _find(lines, marker, begin):
@@ -124,24 +127,18 @@ def _bullets(head, items, mark=""):
 
 def _criteria_md(checks, fail=(), success=()):
     """성공 기준 글: 통과 조건은 🟢, 다시 해야 하는 신호는 ⛔."""
-    return "**성공 기준**\n\n" + "\n".join([f"- 🟢 {c[0]}" for c in checks] + [f"- 🟢 {x}" for x in success]
+    return "**성공 기준**\n\n" + "\n".join([f"- 🟢 {x}" for x in [*checks, *success]]
                                           + [f"- ⛔ {x}" for x in fail])
 
 
-def _check_cell(checks):
-    """성공 기준 검사 셀. checks: [[기준, 파이썬 식, 고칠 곳]]"""
-    rows = "\n".join(f"    ({label!r}, lambda: {expr}, {fix!r})," for label, expr, fix in checks)
-    return f"show_criteria([\n{rows}\n])"
-
-
 def _mark(lines, edits):
-    """과제의 TODO 주석에 ✍️를 붙이고, 예제에서 바꿔 볼 줄 끝에 `# ✍️ TODO:` 주석을 단다. 바꿔 볼 줄 위치를 돌려준다."""
-    out = [ln.replace("# TODO:", MARK) if "# TODO:" in ln and "✍" not in ln else ln for ln in lines]
+    """과제의 TODO 주석을 `# ✍️ WRITE_THIS:`로 바꾸고, 예제에서 바꿔 볼 줄 끝에 `# ✍️ CHANGE_HERE:` 주석을 단다. 바꿔 볼 줄 위치를 돌려준다."""
+    out = [ln.replace("# TODO:", MARK_TASK) if "# TODO:" in ln and "✍" not in ln else ln for ln in lines]
     at = []
     for e in edits:
         k = _find(out, e["line"], 0)
         assert k is not None, f"바꿔 볼 줄을 찾지 못함: {e['line']!r}"
-        out[k] = out[k].rstrip() + f"  {MARK} {e['todo']}"
+        out[k] = out[k].rstrip() + f"  {MARK_EDIT} {e['todo']}"
         at.append(k)
     return out, at
 
@@ -153,7 +150,6 @@ def build(folder):
 
     nb.md(f"# [LAB] {spec['title']}\n\n{spec['intro']}")
     nb.meta(spec.get("intro__meta"))
-    nb.code("import sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\nfrom assets.widgets import last_cell, show_criteria")
     nb.code(COMMON["env_check_code"])
     nb.md(COMMON["env_check_look"])
 
@@ -169,8 +165,8 @@ def build(folder):
         lines, answers = _blank(raw, [t["blank"] for t in todos]) if todos else (raw, [])
         edits = f.get("edits", [])
         lines, edit_at = _mark(lines, edits)
-        # TODO 주석 줄 위치로 어느 구획에 속하는지 정한다(찾지 못하면 순서대로 TODO 줄을 쓴다)
-        todo_lines = [k for k, ln in enumerate(lines) if "TODO" in ln and k not in edit_at]
+        # WRITE_THIS 주석 줄 위치로 어느 구획에 속하는지 정한다(찾지 못하면 순서대로 WRITE_THIS 줄을 쓴다)
+        todo_lines = [k for k, ln in enumerate(lines) if MARK_TASK in ln]
         todo_at = [next((k for k in todo_lines if t["todo"][:12] in lines[k]), todo_lines[min(i, len(todo_lines) - 1)] if todo_lines else 0)
                    for i, t in enumerate(todos)]
         split = f.get("split") or [ln.strip() for ln in lines if ln.startswith("# ──")]
@@ -206,19 +202,17 @@ def build(folder):
             visible += 1
             nb.h(3, f"{n}.{sub} {KIND_TASK if mine else KIND_EXAMPLE}: {shown}")
             for e in my_edits:
-                nb.md(f"**✍️ 바꿔 보기: {e['todo']}**\n\n{e['explain']}")
-            checks = []
+                nb.md(f"**✍️ CHANGE_HERE: {e['todo']}**\n\n{e['explain']}")
             for i in mine:
                 t = todos[i]
-                nb.md(f"**✍️ TODO: {t['todo']}**\n\n{t['explain']}")
+                nb.md(f"**✍️ WRITE_THIS: {t['todo']}**\n\n{t['explain']}")
                 nb.md(_bullets("CodeMate에게 줄 힌트", t["hint"]))
                 nb.md(_criteria_md(t.get("checks", []), t.get("fail", [])))
                 nb.meta(t.get("look__meta"))
-                checks += t.get("checks", [])
             nb.code(text, visible=True)  # 수강생이 채우거나 바꿔서 실행하는 셀
-            checks += (f.get("chunk_checks") or {}).get(shown, [])
-            if checks:
-                nb.code(_check_cell(checks))
+            done = (f.get("chunk_success") or {}).get(shown)
+            if done:  # 예제: 바꿔 실행한 뒤 스스로 확인할 성공 기준
+                nb.md(_criteria_md(done))
             if mine:
                 # 정답은 원본에서 지운 줄이 기본이고, 솔루션과 다른 곳은 spec의 answer로 바꿔 보여 준다
                 ans = "\n\n".join("```python\n" + _dedent_common("\n".join(todos[i].get("answer") or answers[i])) + "\n```" for i in mine)

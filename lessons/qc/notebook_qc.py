@@ -2,7 +2,7 @@
 
 노트북 종류는 파일 이름 끝으로 정한다.
     *_LEC.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
-    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → 예제(✍️ 값 바꿔 보기)·과제(힌트·성공 기준 → 빈칸 셀 → 성공 기준 검사 → 정답 보기).
+    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → 예제(`# ✍️ CHANGE_HERE:` 값 바꿔 보기 + 성공 기준)·과제(힌트·성공 기준 → `# ✍️ WRITE_THIS:` 빈칸 셀 → 정답 보기).
 수강생은 노트북만 받는다. 그래서 수강생 글에 .py·경로·다른 노트북 이야기가 없어야 한다(노트북 하나로 완결).
 
 실행(프로젝트 루트):
@@ -371,25 +371,27 @@ def check_lab(nb, R):
     R("실습", "CodeMate 지시문 완성본을 주지 않음 — 힌트와 성공 기준만",
       [(i, excerpt(c.source, 50)) for i, c in enumerate(cells)
        if c.cell_type == "markdown" and not is_box(c) and "**CodeMate 지시문**" in c.source])
-    R("실습", "보이는 코드 셀의 TODO 주석에 ✍️ 표시",
+    R("실습", "보이는 코드 셀에 TODO 대신 `# ✍️ WRITE_THIS:`(과제)·`# ✍️ CHANGE_HERE:`(예제) 표시",
       [(i, ln.strip()[:50]) for i, c in enumerate(cells) if c.cell_type == "code" and not hidden(c)
-       for ln in c.source.splitlines() if "TODO" in ln and "✍️" not in ln])
+       for ln in c.source.splitlines()
+       if "TODO" in ln or (("WRITE_THIS" in ln or "CHANGE_HERE" in ln) and "# ✍️ " not in ln)])
+    R("실습", "성공 기준 자동 검사 셀 없음 — 수강생이 스스로 판단한다",
+      [(i, excerpt(c.source, 40)) for i, c in enumerate(cells) if c.cell_type == "code" and "show_criteria(" in c.source])
 
-    syntax, guide_bad, draft, check_bad, answer_bad, edit_bad = [], [], [], [], [], []
+    syntax, guide_bad, draft, answer_bad, edit_bad = [], [], [], [], []
     for i, c in enumerate(cells):
         if c.cell_type != "code" or BLANK not in c.source or "show_criteria(" in c.source:
             continue
         before, after = section(cells, i)
-        has_check = any(cells[k].cell_type == "code" and "show_criteria(" in cells[k].source for k in after)
         n_blank = sum(bool(BLANK_LINE.match(ln)) for ln in c.source.splitlines())
         if hidden(c):
             syntax.append((i, "✍️ 셀이 숨겨져 있음 — 수강생이 채우거나 바꿀 셀은 보여야 한다"))
             continue
-        if not n_blank:  # 예제: 값만 바꿔 보는 셀. 같은 장 안에 성공 기준 검사가 있어야 한다
-            later = range(i + 1, len(cells))
-            end = next((k for k in later if is_head(cells[k]) and cells[k].source.lstrip().startswith("## ")), len(cells))
-            if not any(cells[k].cell_type == "code" and "show_criteria(" in cells[k].source for k in range(i + 1, end)):
-                edit_bad.append((i, "✍️ 바꿔 보기 줄이 있는데 같은 장에 성공 기준 검사(show_criteria) 셀이 없음"))
+        if not n_blank:  # 예제: 값만 바꿔 보는 셀. 같은 장 안에 🟢 성공 기준 글이 있어야 한다
+            end = next((k for k in range(i + 1, len(cells)) if is_head(cells[k]) and cells[k].source.lstrip().startswith("## ")), len(cells))
+            if not any(cells[k].cell_type == "markdown" and CRITERIA_HEAD in cells[k].source and "🟢" in cells[k].source
+                       for k in range(i + 1, end)):
+                edit_bad.append((i, "CHANGE_HERE 줄이 있는데 같은 장 뒤쪽에 🟢 **성공 기준** 글이 없음"))
             continue
         try:
             ast.parse(c.source)
@@ -405,9 +407,6 @@ def check_lab(nb, R):
                 guide_bad.append((i, f"같은 절 앞쪽에 없음: {' '.join(missing)}"))
             elif "🟢" not in text:
                 guide_bad.append((i, "성공 기준에 🟢 항목이 없음"))
-        # (c) 뒤쪽의 성공 기준 검사 셀
-        if not has_check:
-            (draft if TODO_PLACEHOLDER in text else check_bad).append((i, "셀 뒤(다음 제목 전)에 성공 기준 검사(show_criteria) 셀이 없음"))
         # (d) 다음 제목 전까지의 정답 보기 상자
         box = next((k for k in after if cells[k].cell_type == "markdown" and cells[k].source.lstrip().startswith(ANSWER_HEAD)), None)
         if box is None:
@@ -423,9 +422,8 @@ def check_lab(nb, R):
             answer_bad.append((box, f"정답을 끼운 셀 {i}가 문법 오류: {e.msg} ({e.lineno}행)"))
     R("실습", "✍️ 셀이 보이고, 빈칸 상태 그대로 파이썬 문법에 맞음", syntax)
     R("실습", "과제 셀마다 앞에 **CodeMate에게 줄 힌트**와 🟢 **성공 기준**", guide_bad)
-    R("실습", "과제 셀마다 뒤에 성공 기준 검사(show_criteria) 셀", check_bad)
     R("실습", "과제 셀마다 뒤에 정답 보기 상자, 정답을 끼우면 문법에 맞음", answer_bad)
-    R("실습", "예제의 ✍️ 바꿔 보기마다 같은 장에 성공 기준 검사 셀", edit_bad)
+    R("실습", "예제의 CHANGE_HERE마다 같은 장에 🟢 성공 기준 글", edit_bad)
     R("실습", "힌트·성공 기준이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)
     R("실습", "(작성 예정) 자리표시 없음", [(i, excerpt(c.source, 50)) for i, c in enumerate(cells)
                                      if not is_box(c) and TODO_PLACEHOLDER in c.source], warn=True)
