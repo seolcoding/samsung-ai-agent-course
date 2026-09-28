@@ -194,3 +194,7 @@ node_modules/
 
 study_materials/
 infra/langfuse/docker-compose.override.yml
+
+# 교안 노트북 실습이 실행 중 만드는 파일
+lessons/Chapter01/app.py
+lessons/Chapter01/test.py

@@ -73,6 +73,21 @@ def _find(lines, marker, begin):
     return next((k for k in range(begin, len(lines)) if m in _norm(lines[k])), None)
 
 
+def _patch(lines, patches):
+    """노트북에서만 원본을 손본다(가독성 우선 결정). 원본 파일은 그대로 둔다.
+
+    patches: [{"find": 표시, "until": 끝 표시(포함, 없으면 한 줄), "lines": [바꿔 넣을 줄]}]
+    lines가 []이면 그 구간을 지운다. 표시를 못 찾으면 멈춘다(조용히 틀리지 않게).
+    """
+    for p in patches:
+        a = _find(lines, p["find"], 0)
+        assert a is not None, f"patch 표시를 찾지 못함: {p['find']!r}"
+        e = a if "until" not in p else _find(lines, p["until"], a)
+        assert e is not None, f"patch 끝 표시를 찾지 못함: {p['until']!r}"
+        lines = lines[:a] + list(p["lines"]) + lines[e + 1:]
+    return fmt("\n".join(lines)).splitlines() if patches else lines
+
+
 def _blank(lines, blanks):
     """blanks 구간을 빈칸 한 줄로 바꾼 줄 목록과, 구간마다 지운 정답 줄(주석 제외)을 돌려준다."""
     out, answers, k, cursor = [], [], 0, 0
@@ -152,7 +167,7 @@ def build(folder):
     for n, f in enumerate(spec["files"], start=2):
         # 원본을 먼저 정돈한다(읽기 쉽게). 원본·솔루션이 다르면 spec의 source로 깔끔한 쪽을 고른다
         src_dir = ROOT / "src" / f.get("source", "raw") / "Chapter01" / folder
-        raw = fmt((src_dir / f["name"]).read_text(encoding="utf-8")).splitlines()
+        raw = _patch(fmt((src_dir / f["name"]).read_text(encoding="utf-8")).splitlines(), f.get("patch", []))
         todos = [t for t in f.get("todos", []) if t.get("blank")]  # 빈칸 범위가 없는 TODO(뼈대 미완성)는 건너뛴다
         for t in f.get("todos", []):
             if not t.get("blank"):
@@ -209,6 +224,8 @@ def build(folder):
                 nb.md(_criteria_md(t.get("checks", []), t.get("fail", [])))
                 nb.meta(t.get("look__meta"))
             nb.code(text, visible=True, kind=KIND_TASK if mine else KIND_EXAMPLE)  # 수강생이 채우거나 바꿔서 실행하는 셀
+            if shown in f.get("no_auto_run", []):  # input()처럼 사람이 답해야 하는 셀: 자동 실행 검사에서 건너뛴다
+                nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")
             done = (f.get("chunk_success") or {}).get(shown)
             if done:  # 예제: 바꿔 실행한 뒤 스스로 확인할 성공 기준
                 nb.md(_criteria_md(done))

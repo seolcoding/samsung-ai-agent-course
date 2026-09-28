@@ -485,6 +485,9 @@ def check_execute(path, R):
     out = TEMP / path.name
     shutil.copy(path, out)
     nb = nbformat.read(out, as_version=4)
+    for c in nb.cells:  # 사람이 입력해야 하는 셀(input 등)은 건너뛴다
+        if "skip-auto-run" in c.metadata.get("tags", []):
+            c.source = "pass  # 자동 실행 검사에서 건너뜀(skip-auto-run)"
     print(f"✔ 새 커널로 실행 중: {path.name} (최대 셀당 300초)")
     crash = []
     try:
