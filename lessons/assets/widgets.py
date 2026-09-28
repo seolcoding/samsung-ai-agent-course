@@ -140,7 +140,7 @@ def slide_setup():
     """PDF.js를 화면에 한 번 불러온다. 노트북 맨 위 준비 셀에서 부른다.
 
     show_slides도 처음 한 번은 스스로 불러오므로 꼭 필요하지는 않다.
-    노트북을 다시 열어 슬라이드가 비어 보이면 이 셀을 다시 실행한다.
+    노트북을 다시 열어 슬라이드가 비어 보이면 슬라이드 셀 아래 안내(SLIDE_HELP)대로 다시 실행한다.
     """
     _PDF_SENT["lib"] = False
     _PDF_SENT["decks"].clear()
@@ -161,6 +161,12 @@ def _pdfjs_loader():
             "window.pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([code], {type: 'text/javascript'}));"
             "window.__pdfDecks = window.__pdfDecks || {}; window.__pdfDocs = window.__pdfDocs || {};"
             "})();</script>")
+
+
+# 슬라이드가 그려지면 JavaScript가 숨긴다. 스크립트가 돌지 않거나 그리기에 실패하면 이 안내가 남는다.
+SLIDE_HELP = ("⛔ 슬라이드가 보이지 않으면<br>"
+              "1. 바로 위 셀(이 슬라이드 셀)을 다시 실행합니다.<br>"
+              "2. 그래도 안 되면 맨 위 셀부터 차례로 다시 실행합니다.")
 
 
 def show_slides(deck, pages=None):
@@ -199,7 +205,7 @@ def show_slides(deck, pages=None):
     <canvas data-role="canvas" style="display:block"></canvas>
     <div data-role="text" class="textLayer"></div>
   </div>
-  <div data-role="msg" style="color:#cf222e"></div>
+  <div data-role="msg" style="color:#cf222e;margin-top:6px">{SLIDE_HELP}</div>
 </div>
 <script>(() => {{
   const root = document.getElementById({_js(wid)});
@@ -224,10 +230,11 @@ def show_slides(deck, pages=None):
   }}
   function start() {{
     if (!window.pdfjsLib || !(window.__pdfDecks || {{}})[deck]) {{
-      if (++tries > 50) {{ q("msg").textContent = "슬라이드 도구가 아직 불러와지지 않았습니다. 맨 위 준비 셀을 다시 실행해 주세요."; return; }}
+      if (++tries > 50) return;  // 안내 문구를 그대로 둔다
       return setTimeout(start, 100);
     }}
-    draw().catch(e => q("msg").textContent = "슬라이드를 그리지 못했습니다: " + e);
+    draw().then(() => q("msg").style.display = "none")
+      .catch(e => q("msg").innerHTML = {_js(SLIDE_HELP)} + "<br><small>(" + e + ")</small>");
   }}
   const ready = () => window.pdfjsLib && (window.__pdfDecks || {{}})[deck];
   q("prev").onclick = () => {{ if (ready() && i > 0) {{ i--; draw(); }} }};
