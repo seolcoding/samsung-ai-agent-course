@@ -536,6 +536,8 @@ def qc(path, execute=False):
     kind = kind_of(path)
     if kind is None:
         R("종류", "파일 이름이 _LEC 또는 _LAB으로 끝남", [(0, path.name)], warn=True)
+    if "course" in path.parts:  # 수강생본에는 강사용 메모가 없어야 한다(강사본은 dev/instructor/)
+        R("구조", "수강생본에 강사용 메모 없음", [(i, "강사용 메모 상자") for i, c in enumerate(nb.cells) if c.cell_type == "markdown" and c.source.lstrip().startswith(BOX_HEAD)])
     quizzes = check_quiz(nb, path.parent, R)
     check_student_text(nb, quizzes, R)
     check_structure(nb, kind, R)

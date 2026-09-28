@@ -3,7 +3,7 @@
 - 제목은 노트북 안에서 1부터 번호를 매긴다. 제목 옆에 (슬라이드) (퀴즈) (코드) (예제) (과제) 표시를 작게 붙이고,
   맨 위에 같은 표시를 단 목차를 만든다(finish에서 셀 종류를 보고 자동으로 계산).
 - 교안 도구를 부르는 코드 셀은 입력 칸을 접는다(source_hidden). 수강생이 직접 쓰는 셀만 보인다.
-- 강사용 메모는 절마다 한 상자로 모아 접어 둔다.
+- 강사용 메모는 절마다 한 상자로 모아 접어 둔다. 수강생본에서는 빼고 강사본(dev/instructor/)에만 둔다.
 - 코드 셀은 ruff format(한 줄 88자, 큰따옴표)으로 정돈해 읽기 쉽게 한다. 문법 오류인 셀은 그대로 둔다.
 - 수강생 글에는 "(p6)" 같은 쪽 인용을 넣지 않는다. 퀴즈는 4지선다·정답 1개이고 문제는 파일로 둔다.
 """
@@ -135,9 +135,19 @@ class Notebook:
             if level <= 3:
                 toc.append("  " * (level - 2) + f"- {title}" + (f" {label}" if label else ""))
         cells.insert(1, nbf.v4.new_markdown_cell("**목차**\n\n" + "\n".join(toc)))
-        nb = nbf.v4.new_notebook(cells=cells)
-        nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
         out = Path(out)
-        out.parent.mkdir(parents=True, exist_ok=True)
-        nbf.write(nb, out)
-        print(f"✔ {out} ({len(cells)}셀)")
+        # 두 벌로 쓴다. 수강생본(course/…/notebooks/)은 강사용 메모를 빼고,
+        # 강사본(dev/instructor/<챕터>/)은 메모를 두고 맨 위에서 수강생본 폴더로 옮겨 가 같은 경로로 실행한다.
+        student = [c for c in cells if "강사용" not in c.metadata.get("tags", [])]
+        chapter = out.parent.parent.name  # course/Chapter01/notebooks/x.ipynb → Chapter01
+        root = out.parents[3]
+        teacher_out = root / "dev" / "instructor" / chapter / out.name
+        cd = nbf.v4.new_code_cell(f"%cd ../../../course/{chapter}/notebooks")
+        cd.metadata["jupyter"] = {"source_hidden": True}
+        cd.metadata["tags"] = ["교안도구", "강사본"]
+        for path, body in ((out, student), (teacher_out, [cells[0], cd, *cells[1:]])):
+            nb = nbf.v4.new_notebook(cells=body)
+            nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
+            path.parent.mkdir(parents=True, exist_ok=True)
+            nbf.write(nb, path)
+        print(f"✔ {out} ({len(student)}셀) + 강사본 {teacher_out.relative_to(root)} ({len(cells) + 1}셀)")
