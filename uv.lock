@@ -70,6 +70,7 @@ dev = [
 ]
 notebooks = [
     { name = "ipykernel" },
+    { name = "jupyterquiz" },
     { name = "nbclient" },
     { name = "nbconvert" },
     { name = "nbformat" },
@@ -99,6 +100,7 @@ requires-dist = [
     { name = "ipytest", marker = "extra == 'teaching'", specifier = ">=0.14.2" },
     { name = "ipywidgets", marker = "extra == 'teaching'", specifier = ">=8.1.9" },
     { name = "jupytercards", marker = "extra == 'teaching'", specifier = ">=3.2.1" },
+    { name = "jupyterquiz", marker = "extra == 'notebooks'", specifier = ">=2.9.6.4" },
     { name = "jupyterquiz", marker = "extra == 'teaching'", specifier = ">=2.9.6.4" },
     { name = "jupytext", marker = "extra == 'teaching'", specifier = ">=1.19.5" },
     { name = "langchain", specifier = ">=1.3.4" },
