@@ -14,11 +14,10 @@
 """
 
 import sys
-import textwrap
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from nbkit import SELF_HELP, Notebook  # noqa: E402
+from nbkit import Notebook  # noqa: E402
 
 HERE = Path(__file__).parent
 ROOT = HERE.parents[1]
@@ -46,13 +45,14 @@ def solution_source():
 
 
 def between(lines, start, end):
-    """start가 든 줄부터 end가 든 줄 앞까지. 끝의 빈 줄을 빼고 공통 들여쓰기를 없앤다."""
+    """start가 든 줄부터 end가 든 줄 앞까지. 끝의 빈 줄만 뺀다.
+    들여쓰기는 원본 그대로 둔다(main()·evaluate_report 안의 코드는 4칸). starter.py에서 그 코드가 들어갈 자리와 같다."""
     a = next(k for k, ln in enumerate(lines) if start in ln)
     e = next(k for k in range(a + 1, len(lines)) if end in lines[k])
     body = lines[a:e]
     while body and not body[-1].strip():
         body.pop()
-    return textwrap.dedent("\n".join(body))
+    return "\n".join(body)
 
 
 def answer(*blocks):
@@ -136,7 +136,7 @@ TITLE_META = """| 항목 | 내용 |
 | 빌더 | `dev/builders/build_capstone_guide.py`. 정답 보기는 빌드할 때 원본 정답 파일에서 잘라 넣는다(두 곳 바꿈: 실행 명령, Writer skill 경로) |
 | 실행 확인 | 2026-09-28 사외(OpenAI)로 capstone 구성(mcp_server + 바꾼 정답) 실행: y → 보고서·점수(종합 0.93), n → `취소됐습니다.` 한 번 실행 약 40~50초 |"""
 
-HOW = f"""1. 아래 **환경 점검** 두 셀을 실행해 설정을 확인합니다.
+HOW = f"""1. 맨 위 **환경 점검** 두 셀(접힌 코드 셀)을 실행해 설정을 확인합니다.
 2. 1~4장에서 무엇을 만드는지, 폴더에 무엇이 있는지 봅니다.
 3. 5장대로 터미널 A에서 MCP 서버를 켭니다.
 4. 6장의 단계를 차례로 진행합니다. 단계마다 **할 일** → **프롬프트 힌트**를 보고 AI에게 지시를 직접 씀 → AI가 고친 코드를 읽고 받아들일지 판단 → 접힌 "정답 보기"와 비교합니다.
@@ -178,11 +178,11 @@ FOLDER = """`capstone/` 폴더의 파일과 흐름에서의 위치입니다.
 
 | 파일 | 하는 일 | 흐름에서 위치 |
 |---|---|---|
-| `capstone/starter.py` | 전체 프로그램 뼈대. `TODO` 자리를 채웁니다 | 1~6단계 전부 |
-| `capstone/mcp_server.py` | `data/`의 문서를 도구 3개로 내주는 MCP 서버. 그대로 씁니다 | 3단계(자료 수집) |
-| `capstone/skills/researcher/research/SKILL.md` | Researcher 규칙: 도구 쓰는 순서, 리서치 결과 형식(`## 리서치 결과:`) | 3단계 |
-| `capstone/skills/writer/sds-report-writer/SKILL.md` | Writer 규칙: `[SDS-AI-RPT v2.1]` 보고서 양식, TL;DR 3줄, 현황 분석 표 | 5단계 |
-| `capstone/data/ai_trends.md`, `capstone/data/llm_market.md` | MCP 서버가 보여 주는 문서 | 3단계 |
+| `capstone/starter.py` | 전체 프로그램 뼈대. `TODO` 자리를 채웁니다 | 흐름 1~6 전부 |
+| `capstone/mcp_server.py` | `data/`의 문서를 도구 3개로 내주는 MCP 서버. 그대로 씁니다 | 흐름 3(자료 수집) |
+| `capstone/skills/researcher/research/SKILL.md` | Researcher 규칙: 도구 쓰는 순서, 리서치 결과 형식(`## 리서치 결과:`) | 흐름 3 |
+| `capstone/skills/writer/sds-report-writer/SKILL.md` | Writer 규칙: `[SDS-AI-RPT v2.1]` 보고서 양식, TL;DR 3줄, 현황 분석 표 | 흐름 5 |
+| `capstone/data/ai_trends.md`, `capstone/data/llm_market.md` | MCP 서버가 보여 주는 문서 | 흐름 3 |
 | `capstone/README.md` | 이 노트북 없이 폴더만 열어도 볼 수 있는 요약 | — |
 
 `capstone/starter.py`에서 Agent, 노드, 그래프는 모두 `main()` 함수 안에 있습니다. MCP 도구를 서버에서 비동기로 받아 와야 Agent를 만들 수 있기 때문입니다."""
@@ -196,13 +196,26 @@ SERVER = f"""VS Code 메뉴 **터미널 → 새 터미널**로 터미널을 엽�
 이 터미널은 끝날 때까지 닫지 않습니다. 서버 파일은 고치지 않으니 한 번 켜 두면 됩니다. 다 쓴 뒤에는 **Ctrl+C**로 끕니다."""
 
 SERVER_OK = criteria(
-    ["터미널 A에 `Application startup complete.`가 나오고, 명령이 끝나지 않고 기다립니다."],
+    ["터미널 A에 `Uvicorn running on`으로 시작하는 줄이 나오고, 명령이 끝나지 않고 기다립니다."],
     ["`address already in use` 오류가 납니다 → 8001 포트를 다른 서버(3일차 A2A 서버 등)가 쓰고 있습니다. 그 서버를 띄운 터미널에서 **Ctrl+C**로 끄고 다시 실행합니다.",
      "환경 점검 셀에서 Langfuse가 ⛔입니다 → `.env`의 Langfuse 값 세 개를 확인합니다. 그대로 진행해도 보고서와 점수는 나오지만 Langfuse에 기록되지 않습니다."])
 
-STEPS_NOTE = """`capstone/starter.py`의 `TODO` 11개를 일곱 단계로 묶었습니다. 단계 1~5는 코드만 고치고, 실행 확인은 6단계를 마친 뒤 7장에서 한 번에 합니다. 각 단계의 🟢/⛔는 그때 볼 화면입니다.
+STEPS_NOTE = """`capstone/starter.py`의 `TODO` 12개를 일곱 단계(6.1~6.7)로 묶었습니다. 6.1~6.5는 코드만 고치고, 실행 확인은 6.6까지 마친 뒤 7장에서 한 번에 합니다. 각 단계의 🟢/⛔는 그때 볼 화면입니다.
+
+- 중간에 실행하면 6.5를 채우기 전에는 `Graph must have an entrypoint` 오류로 멈추고, 6.5까지 채웠으면 `MCP 도구 로드: [...]` 한 줄만 나오고 끝납니다. 아직 채우지 않은 단계 때문이니 정상입니다.
+- 🟢에 적힌 `🔍 Researcher 실행 중...` 같은 출력 문구는 정답 코드가 출력하는 문구입니다. 내 코드의 문구가 달라도 같은 뜻의 줄이 나오면 통과입니다.
+- "정답 보기"의 코드는 `capstone/starter.py`에서 그 코드가 들어갈 자리와 같은 들여쓰기로 보여 줍니다. 옮겨 붙일 때는 바꿀 줄 전체(줄 앞 공백까지)를 지우고 그 자리에 붙여 넣습니다.
 
 단계를 마칠 때마다 AI가 고친 부분을 직접 읽어 봅니다. 모르는 줄이 있으면 그 줄이 무엇을 하는지 AI에게 물어봅니다."""
+
+# 막혔을 때: 공통 안내(nbkit.SELF_HELP)는 노트북 셀용이라, 터미널에서 한 프로그램을 돌리는 캡스톤에 맞게 따로 둔다
+SELF_HELP_CAPSTONE = """**막혔을 때: 스스로 먼저 확인합니다**
+
+1. 터미널 B에 나온 오류의 마지막 줄과 방금 고친 단계(6.1~6.7 중 어디인지)를 AI에게 붙여 넣고, 원인과 고칠 곳을 물어봅니다. 처음 한 번은 "저장소 맨 위 AGENTS.md를 읽고 도와줘"라고 먼저 말합니다. AI가 설치·경로·연결 문제의 해결 순서를 알게 됩니다.
+2. 연결 오류(`ConnectError` 등)면 터미널 A의 MCP 서버가 켜져 있는지 봅니다. 설정 문제로 보이면 맨 위 환경 점검 셀을 다시 실행하고, ⛔ 줄의 → 안내대로 고칩니다.
+3. 같은 줄이 끝없이 되풀이되면 터미널 B에서 **Ctrl+C**로 멈춥니다.
+4. 옆 사람 화면과 비교해 봅니다.
+5. 그래도 안 되면 오류 화면을 그대로 두고 강사에게 보여 줍니다. 그동안 그 단계의 "정답 보기"와 내 코드를 비교해 봅니다."""
 
 
 def build():
@@ -220,7 +233,7 @@ def build():
             kind="")
     nb.md("**볼 지점**\n- \"준비 완료\"와 \"🟢 Langfuse 연결 확인\"이 나오면 다음으로 넘어갑니다.\n"
           "- ⛔가 나오면 ⛔ 줄의 → 안내대로 `.env`를 고친 뒤 다시 실행합니다. 모르겠으면 출력을 AI에게 붙여 넣고 물어봅니다.\n- 키 값은 화면에 나오지 않습니다. 혹시 나오면 셀 출력을 지우고, 다른 곳에 붙여 넣지 않습니다.")
-    nb.md(SELF_HELP)
+    nb.md(SELF_HELP_CAPSTONE)
     nb.meta("- 사용자 결정 3: Langfuse 키는 `get_client().auth_check()`로 실제 인증까지 확인합니다. 맥 `.env`의 `LANGFUSE_BASE_URL` 줄이 깨져 있어 제작 때는 환경변수로 `https://jp.cloud.langfuse.com`을 주어 확인했습니다.\n"
             "- 캡스톤은 임베딩을 쓰지 않지만 공통 지침대로 `EMBED_PROVIDER`도 점검합니다.")
 
@@ -258,16 +271,19 @@ def build():
     # 6.1 도구
     nb.h(3, "6.1 도구 만들기")
     nb.md("**할 일** `capstone/starter.py`의 `# TODO: 사용할 도구를 정의` 아래 `search_web`과, `rag_search` 안의 TODO를 채웁니다. "
-          "`search_web`은 실제 검색 대신 정해 둔 검색 결과 몇 줄을 돌려주는 흉내 도구면 충분합니다. `rag_search`는 RAGaaS의 `retrieve-rrf`로 문서를 찾아 본문을 돌려줍니다.")
+          "`search_web`은 실제 검색 대신 정해 둔 검색 결과 몇 줄을 돌려주는 흉내 도구면 충분합니다. `rag_search`는 RAGaaS의 `retrieve-rrf`로 문서를 찾아 본문을 돌려줍니다.\n\n"
+          "RAGaaS 요청 값(AI에게 그대로 알려 줍니다): `index_name`(인덱스 이름, `.env`의 `index_name` 값), `permission_groups`(`[\"rag-public\"]`), "
+          "`query_text`(검색어), `num_result_doc`(결과 개수, 예: 3), `fields_exclude`(`[\"v_merge_title_content\"]`). "
+          "요청은 `config.ragaas`의 `post_ragaas(\"retrieve-rrf\", payload)`로 보내고, 본문은 응답 JSON의 `hits` → `hits` 목록 → `_source` → `merge_title_content`에 있습니다.")
     nb.md("**프롬프트 힌트** 두 도구가 검색어를 받아 글(문자열)을 돌려줘야 한다고 먼저 말합니다. "
           "`rag_search`는 RAGaaS 요청에 넣을 값(인덱스 이름, 검색어, 결과 개수)과 응답에서 꺼낼 본문 필드를 AI에게 알려 줍니다. "
           "`search_web`은 실제 검색 없이 정해 둔 결과를 돌려주면 된다고 덧붙입니다.")
     nb.md(criteria(
-        ["7장 실행 뒤 Langfuse의 Researcher trace에서 `rag_search` 도구 결과가 보입니다. 사내망 밖에서는 `[MOCK RAGaaS] 질문: …`으로 시작하는 문장, 사내망에서는 실제 문서 본문입니다.",
-         "리서치 결과 맨 아래 `### 출처`에 `rag_search`와 `search_web`이 보입니다."],
+        ["7장 실행 뒤 Langfuse에서 먼저 생긴 `LangGraph` trace(Researcher 실행, 7.1 표)를 열면 `rag_search` 도구 결과가 보입니다. 사내망 밖에서는 `[MOCK RAGaaS] 질문: …`으로 시작하는 문장, 사내망에서는 실제 문서 본문입니다.",
+         "같은 trace의 마지막 출력(리서치 결과) 맨 아래 `### 출처`에 `rag_search`와 `search_web`이 보입니다. 정답 코드는 터미널에 리서치 결과의 앞 500자만 보여 줍니다."],
         ["도구 결과가 `None`입니다 → 함수 끝에 `return`이 있는지 봅니다.",
          "`KeyError: 'hits'`가 납니다 → 응답에서 본문을 꺼내는 순서를 AI와 다시 확인합니다.",
-         "사내망에서 인증 오류(401)가 납니다 → RAGaaS 키와 `api-key` 요청 헤더를 확인합니다."]))
+         "사내망에서 인증 오류(401)가 납니다 → 저장소 맨 위에서 `uv run python -m config.check`로 RAGaaS 키 이름을 확인합니다."]))
     nb.md(answer(between(L, "@tool", "# ── State")))
     nb.meta("- 정답의 `search_web`은 실제 검색이 아니라 정해 둔 네 줄(시장 성장률 등)을 돌려줍니다. 이 숫자가 보고서에 들어갈 수 있습니다.\n"
             "- 사외 `COURSE_ENV=out`이면 `config`가 `RAG_PROVIDER=mock`을 채우고, `post_ragaas`가 네트워크 없이 모의 응답을 돌려줍니다. 정답은 mock일 때 `index_name`이 없어도 `mock-capstone`을 씁니다.\n"
@@ -306,9 +322,10 @@ def build():
     nb.md("**할 일** `# TODO: Supervisor 노드 정의`, `# TODO: Researcher 노드 정의`, `# TODO: Writer 노드 정의` 아래 세 함수의 `pass`를 채웁니다.")
     nb.md("**프롬프트 힌트** Supervisor에게 지금 상황(주제, 리서치 완료 여부, 초안 완료 여부)을 알려 주고, 세 선택지(researcher, writer, END)를 언제 고르는지 먼저 정리해 AI에게 줍니다. "
           "Researcher·Writer 노드는 Agent 실행 결과의 마지막 메시지를 State의 어느 값에 넣는지 말합니다. "
-          "두 노드는 비동기(`async`)이고 Langfuse 추적 설정을 함께 넘긴다고 덧붙입니다.")
+          "두 노드는 비동기(`async`)이고 Langfuse 추적 설정을 함께 넘기며, 시작할 때 `🔍 Researcher 실행 중...`·`✍️  Writer 실행 중...`을 출력한다고 덧붙입니다.")
     nb.md(criteria(["7장 실행에서 `🔍 Researcher 실행 중...`과 `✍️  Writer 실행 중...`이 한 번씩만 나옵니다."],
-                   ["같은 Agent가 되풀이해 실행됩니다 → Supervisor가 받는 상황 글에 리서치·초안 완료 여부가 들어 있는지 봅니다.",
+                   ["같은 Agent가 되풀이해 실행됩니다 → 터미널 B에서 **Ctrl+C**로 멈춥니다. Supervisor가 받는 상황 글에 리서치·초안 완료 여부가 들어 있는지, "
+                    "두 노드가 결과를 State 값으로 돌려주는지(정답은 `return {'research_result': …}`·`return {'draft': …}`) 봅니다.",
                     "Writer가 리서치 결과 없이 글을 씁니다 → Writer 노드가 State의 리서치 결과를 지시에 넣는지 봅니다."]))
     nb.md(answer(between(L, "supervisor_llm = get_llm()", "def route(")))
 
@@ -325,12 +342,12 @@ def build():
     # 6.6 run + resume
     nb.h(3, "6.6 실행과 재개")
     nb.md("**할 일** `main()` 맨 아래 `# TODO: app.ainvoke로 실행하고 단계별 진행 상황 출력`을 채웁니다. 리서치까지 실행 → 결과 보여 주기 → 터미널에서 승인 입력 → Writer부터 이어서 실행 → 보고서 출력 순서입니다.")
-    nb.md("**프롬프트 힌트** 1단계 실행 → 리서치 결과 보여 주기 → `y/n` 입력 받기 → 재개의 순서를 AI에게 알려 줍니다. "
+    nb.md("**프롬프트 힌트** 리서치까지 실행 → 결과 보여 주기 → `y/n` 입력 받기 → 재개의 순서를 AI에게 알려 줍니다. "
           "재개할 때는 같은 `thread_id`로, 새 입력 없이 이어서 실행한다고 말합니다. "
           "`n`이면 안내 문구를 출력하고 끝낸다고 덧붙입니다.")
     nb.md(criteria(["`y`를 입력하면 `--- 2단계: 보고서 작성 ---` 뒤에 `[SDS-AI-RPT v2.1]`로 시작하는 보고서가 나옵니다. TL;DR이 세 줄(①②③)이고 현황 분석에 표가 있습니다.",
                     "`n`을 입력하면 `취소됐습니다.`가 나오고 끝납니다."],
-                   ["승인한 뒤 아무것도 나오지 않습니다 → 재개할 때 같은 `thread_id`와 빈 입력(`None`)으로 실행하는지 봅니다.",
+                   ["승인한 뒤 아무것도 나오지 않습니다 → 재개할 때 같은 `thread_id`와 빈 입력(`None`)으로 실행하는지 봅니다. Writer 노드가 `draft`를 돌려주는지도 봅니다.",
                     "`No synchronous function provided` 오류가 납니다 → 노드가 비동기라 `invoke` 대신 `ainvoke`로 실행합니다.",
                     "보고서가 `[SDS-AI-RPT v2.1]` 양식이 아닙니다 → 6.3의 Writer skill 경로를 봅니다."]))
     nb.md(answer(between(L, "# ── 1단계", "# ── 3단계")))
@@ -340,16 +357,17 @@ def build():
     nb.md("**할 일** `evaluate_report` 함수의 `# TODO: 평가를 진행하고 Langfuse에 점수를 기록`을 채우고, `main()`에서 보고서를 출력한 뒤 이 함수로 채점해 점수를 보여 줍니다.")
     nb.md("**프롬프트 힌트** 네 평가 항목(Relevance, Faithfulness, Completeness, Clarity)의 뜻과 0.0~1.0 점수 범위를 AI에게 그대로 알려 주고, 근거 없이 높은 점수를 주지 않게 하라고 말합니다. "
           "점수는 채점한 호출의 trace에 항목 이름으로 하나씩 남긴다고 말합니다. "
-          "화면에는 항목별 막대와 점수·근거, 평균 점수를 출력한다고 덧붙입니다.")
+          "화면에는 항목별 막대와 점수·근거를 출력하고, 그 아래에 평균을 `종합 점수`로 출력한다고 덧붙입니다.")
     nb.md(criteria(["관련성·근거충실도·완성도·명확성 네 줄에 막대(`█░`), 점수, 근거가 나오고 마지막에 `종합 점수`가 나옵니다.",
                     "Langfuse에 채점 trace가 생기고 relevance·faithfulness·completeness·clarity 점수 네 개가 붙습니다(찾는 법은 7장)."],
-                   ["점수는 나오는데 Langfuse에 없습니다 → 환경 점검 셀의 Langfuse 결과와, 프로그램 끝에서 기록을 내보내는지(`flush`) 봅니다.",
+                   ["`'NoneType' object has no attribute 'relevance'` 오류가 납니다 → `evaluate_report` 끝에 평가 결과를 돌려주는 `return`이 있는지 봅니다.",
+                    "점수는 나오는데 Langfuse에 없습니다 → 환경 점검 셀의 Langfuse 결과와, 프로그램 끝에서 기록을 내보내는지(`flush`) 봅니다.",
                     "네 점수가 모두 1.0입니다 → Judge 지시에 엄격하게 채점하라는 조건이 있는지 봅니다."]))
     nb.md(answer(between(L, "evaluation: ReportEvaluation =", "# ── 메인 함수"),
                  between(L, "# ── 3단계", "if __name__")))
 
     nb.h(2, "7. 전체 실행")
-    nb.md(f"""터미널을 하나 더 엽니다(**터미널 B**). 터미널 A의 MCP 서버는 켜 둔 채로, 터미널 B에서 실행합니다.
+    nb.md(f"""VS Code 메뉴 **터미널 → 새 터미널**로 터미널을 하나 더 엽니다(**터미널 B**). 터미널이 둘이 되면 터미널 창 오른쪽에 목록이 생기고, 눌러서 A와 B를 오갑니다. 터미널 A의 MCP 서버는 켜 둔 채로, 터미널 B에서 실행합니다.
 
 ```
 {RUN_STARTER}
@@ -398,7 +416,7 @@ def build():
     nb.md(criteria(["정답 실행에서도 `[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수가 나옵니다. 내 점수의 근거와 정답 점수의 근거를 비교해 차이 한 가지를 말할 수 있습니다."],
                    ["`address already in use` 또는 연결 오류가 납니다 → 5장의 서버 안내를 다시 봅니다."]))
     nb.meta("- 정답 코드 셀은 원본 정답에 두 곳만 바꿨습니다(실행 명령 설명, Writer skill 경로). 사외 실행 종합 점수 0.90(원본 skill 경로), 0.93(바꾼 경로).\n"
-            "- `capstone/solution.py`는 `.gitignore` 대상이 아닙니다. 수강생 PC에 남는 것은 괜찮고, 제작 저장소에는 남기지 않습니다(공용 변경 요청으로 올림).")
+            "- `capstone/solution.py`는 `.gitignore` 대상이라 제작 저장소에 남지 않습니다.")
 
     nb.h(2, "9. 평가 기준")
     nb.md("""1. **체크리스트 통과:** 6장의 일곱 단계를 모두 통과합니다(7장 실행에서 각 단계의 🟢를 확인).

@@ -15,6 +15,7 @@
 """
 
 import ast
+import textwrap
 import json
 import re
 import shutil
@@ -375,7 +376,7 @@ def fill_blanks(src, answers):
     for line in src.splitlines():
         if BLANK_LINE.match(line) and k < len(answers):
             indent = line[: len(line) - len(line.lstrip())]
-            out += [indent + a if a.strip() else a for a in answers[k].splitlines()]
+            out += [indent + a if a.strip() else a for a in textwrap.dedent(answers[k]).splitlines()]
             k += 1
         else:
             out.append(line)

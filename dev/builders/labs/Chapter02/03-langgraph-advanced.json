@@ -250,7 +250,7 @@
     ],
     "체크포인트 목록 보기": {
      "success": [
-      "`저장된 체크포인트 수:`와 함께 `[0]`부터 번호가 붙은 목록이 나오고, 처음 실행하면 번호가 커질수록 메시지 수가 줄어든다",
+      "`저장된 체크포인트 수:`와 함께 `[0]`부터 번호가 붙은 목록이 나오고, 처음 실행하면 번호가 커질수록 메시지 수가 같거나 줄어든다",
       "여러 번 실행해도 맨 아래 번호의 메시지 수는 0이다"
      ],
      "fail": []
@@ -272,7 +272,7 @@
    "name": "03_memory_store.py",
    "title": "Memory Store로 대화를 넘어 기억하기",
    "intro": "체크포인터는 thread 하나 안에서만 대화를 이어 줍니다. 이번에는 thread를 넘어 남는 장기 기억 저장소(`InMemoryStore`)를 씁니다. 사용자가 이름이나 취미를 말하면 모델이 답 앞에 `[기억 저장: …]`을 붙이고, 코드는 그 내용을 사용자별 namespace(`(\"memories\", user_id)`)에 저장합니다. 다음 대화에서는 저장된 기억을 시스템 메시지에 넣어 줍니다.\n\n코드는 완성되어 있습니다. 먼저 차례로 끝까지 실행하고, `# ✍️ CHANGE_HERE:` 줄 두 곳을 바꿔 다시 실행합니다. 끝으로 AI에게 코드를 물어봅니다.",
-   "intro__meta": "- 알려진 결함(루트 AGENTS.md 7절): raw의 compile 줄은 `app = builder.compile()`로 checkpointer·store가 없습니다. 슬라이드 p7과 같은 `builder.compile(checkpointer=MemorySaver(), store=store)`로 patch했습니다(원본 파일은 그대로, 사용자 결정 8).\n- 그런데 `chatbot`이 전역 변수 `store`를 직접 쓰므로, compile에 `store=`를 넘기든 안 넘기든 화면이 같습니다. LangGraph는 노드 함수가 `store` 인자를 선언할 때(`def chatbot(state, *, store: BaseStore)`)만 compile에 넘긴 store를 넣어 줍니다. 설치된 LangGraph 1.2.12에서 확인했습니다(store 인자를 선언한 노드는 compile(store=...)이면 InMemoryStore, 없으면 None을 받음). 이 점을 CHANGE_HERE 2와 AI에게 물어보기의 소재로 씁니다. 노드 코드를 고치지는 않았습니다.\n- 저장은 모델이 `[기억 저장: …]` 형식(콜론 뒤 공백 하나)을 지켜야만 됩니다. 사내 모델의 형식 준수율은 미확인입니다.\n- `key = f\"fact_{len(memories) + i}\"`는 기억이 10개(search 기본 limit)를 넘으면 덮어쓸 수 있습니다. 수업 흐름에서는 생기지 않습니다.",
+   "intro__meta": "- 알려진 결함(루트 AGENTS.md 7절): raw의 compile 줄은 `app = builder.compile()`로 checkpointer·store가 없습니다. 슬라이드 p7과 같은 `builder.compile(checkpointer=MemorySaver(), store=store)`로 patch했습니다(원본 파일은 그대로, 사용자 결정 8).\n- 그런데 `chatbot`이 전역 변수 `store`를 직접 쓰므로, compile에 `store=`를 넘기든 안 넘기든 화면이 같습니다. LangGraph는 노드 함수가 `store` 인자를 선언할 때(`def chatbot(state, *, store: BaseStore)`)만 compile에 넘긴 store를 넣어 줍니다. 설치된 LangGraph 1.2.12에서 확인했습니다(store 인자를 선언한 노드는 compile(store=...)이면 InMemoryStore, 없으면 None을 받음). 이 점을 CHANGE_HERE 2와 AI에게 물어보기의 소재로 씁니다. 노드 코드를 고치지는 않았습니다.\n- store 실험 순서(2026-09-29 리뷰 반영): `user_002`로 바꾼 상태에서는 세션 2가 원래 기억이 없어 store를 빼도 차이가 드러나지 않으므로, 사용자를 `user_001`로 되돌린 뒤 store를 빼게 했습니다. LLM 없는 가짜 모델로 네 조합(user_001/002 × store 있음/없음)을 돌려, 세션 2가 기억하는지는 사용자에만 달려 있고 store 유무와 관계없음을 확인했습니다.\n- 저장은 모델이 `[기억 저장: …]` 형식(콜론 뒤 공백 하나)을 지켜야만 됩니다. 사내 모델의 형식 준수율은 미확인입니다.\n- `key = f\"fact_{len(memories) + i}\"`는 기억이 10개(search 기본 limit)를 넘으면 덮어쓸 수 있습니다. 수업 흐름에서는 생기지 않습니다.",
    "setup_note": "도구와 모델을 준비하는 코드입니다. 실행만 하면 됩니다.",
    "patch": [
     {
@@ -320,7 +320,7 @@
     {
      "line": "app = builder.compile(checkpointer=MemorySaver(), store=store)",
      "todo": "compile에 넘기는 store를 빼 봅니다",
-     "explain": "이 줄은 아래 \"두 세션으로 대화하기\"의 CHANGE_HERE를 해 본 **다음에** 바꿉니다. `# ✍️ CHANGE_HERE:` 바로 아래 줄에서 `, store=store`를 지워 `builder.compile(checkpointer=MemorySaver())`로 만들고, 이 장의 \"장기 기억 Store 만들기\" 셀부터 차례로 다시 실행합니다. 결과가 달라지는지 봅니다."
+     "explain": "이 줄은 아래 \"두 세션으로 대화하기\"의 CHANGE_HERE를 해 본 **다음에** 바꿉니다. 먼저 그 셀에서 바꾼 `\"user_002\"`를 `\"user_001\"`로 되돌립니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄에서 `, store=store`를 지워 `builder.compile(checkpointer=MemorySaver())`로 만들고, 이 장의 \"장기 기억 Store 만들기\" 셀부터 차례로 다시 실행합니다. 세션 2가 여전히 이름(이지수)과 취미(피아노)를 아는지 봅니다."
     },
     {
      "line": "print(chat(\"user_001\", \"session_2\", \"내 이름이랑 취미 알아?\"))",
@@ -334,14 +334,14 @@
       "세션 1의 답 앞에 `[기억 저장: …]`이 보이고, 세션 2(새 thread)의 답에 \"이지수\"와 \"피아노\"가 나온다",
       "`Store에 저장된 장기 기억` 아래에 `[fact_0] …`처럼 기억이 한 줄 이상 나온다",
       "(사용자를 바꾼 뒤) `user_002`의 세션 2 답은 이름과 취미를 모르고, 맨 아래 기억 목록에는 여전히 `user_001`의 기억이 나온다",
-      "(compile에서 store를 뺀 뒤) 결과가 앞과 똑같이 나온다"
+      "(사용자를 `user_001`로 되돌리고 compile에서 store를 뺀 뒤) 세션 2의 답에 여전히 \"이지수\"와 \"피아노\"가 나오고, 맨 아래 기억 목록에도 기억이 나온다"
      ],
      "fail": [
       "기억 목록이 비어 있고 세션 2가 이름을 모른다 → 모델이 `[기억 저장: …]` 형식을 지키지 않았습니다. \"장기 기억 Store 만들기\" 셀부터 다시 실행합니다"
      ]
     }
    },
-   "look": "**볼 지점**\n- 세션 2는 새 thread(`session_2`)라 체크포인터에는 세션 1의 대화가 없습니다. 그런데도 이름과 취미를 압니다. 시스템 메시지에 Store의 기억이 들어갔기 때문입니다.\n- 기억은 `(\"memories\", user_id)` namespace에 저장됩니다. 사용자를 `user_002`로 바꾸면 다른 namespace를 찾으므로 `user_001`의 기억을 보지 못합니다.\n- `[기억 저장: …]` 표시는 사용자에게 보이는 답에도 그대로 남습니다. 저장이 모델의 형식 준수에 달려 있다는 점도 이 코드의 약점입니다.\n- compile에서 `store=store`를 빼도 결과가 같습니다. 왜 그런지는 아래에서 AI에게 물어봅니다.",
+   "look": "**볼 지점**\n- 세션 2는 새 thread(`session_2`)라 체크포인터에는 세션 1의 대화가 없습니다. 그런데도 이름과 취미를 압니다. 시스템 메시지에 Store의 기억이 들어갔기 때문입니다.\n- 기억은 `(\"memories\", user_id)` namespace에 저장됩니다. 사용자를 `user_002`로 바꾸면 다른 namespace를 찾으므로 `user_001`의 기억을 보지 못합니다.\n- `[기억 저장: …]` 표시는 사용자에게 보이는 답에도 그대로 남습니다. 저장이 모델의 형식 준수에 달려 있다는 점도 이 코드의 약점입니다.\n- compile에서 `store=store`를 빼도 세션 2는 여전히 이름과 취미를 압니다. 왜 그런지는 아래에서 AI에게 물어봅니다.",
    "ask": {
     "hint": "\"기억을 읽고 쓰는 chatbot 노드\" 셀과 \"그래프 연결과 컴파일\" 셀을 붙여 넣고, compile에 `store=store`를 넘기든 빼든 결과가 같은 이유를 코드에서 찾아 달라고 합니다. 코드는 고치지 말고, chatbot이 Store를 어디서 가져오는지 근거가 되는 줄을 짚어 달라고 적습니다.",
     "success": [
@@ -358,7 +358,7 @@
    "name": "04_parallel_execution.py",
    "title": "장점과 단점을 동시에 정리하기",
    "intro": "한 주제(Remote Work)의 장점과 단점을 두 노드가 동시에 정리하고, 세 번째 노드가 둘을 모아 한 문장 결론을 냅니다. START에서 두 노드로 갈라지는 것이 fan-out, 두 노드가 한 노드로 모이는 것이 fan-in입니다.\n\n빈칸은 한 곳입니다. 결과는 맨 아래 \"실행하기\" 셀에서 나옵니다.",
-   "intro__meta": "- raw 기준. raw의 디버그 출력 `print(state['cons'], state['pros'])`(장단점 전문을 한 번 더 출력)는 뺐고, fan-in 설명 강사 메모 주석(raw 54–59행)은 솔루션의 짧은 주석으로 바꿨습니다. 메모 요지: summary로 들어오는 엣지가 하나면 그 노드가 끝나자마자 summary가 시작되지만, 두 개면 두 노드가 모두 끝나야 summary가 실행된다.\n- 이 장은 파일의 앞부분(패턴 1)만 씁니다. 패턴 2(Send)는 patch로 지우고 다음 장에서 다룹니다.\n- 직렬(pros → cons → summary)로 이어도 출력이 거의 같아 **화면만으로는 병렬 여부를 가를 수 없습니다.** 성공 기준에 \"정답 보기와 엣지 비교\"를 넣었습니다.\n- LLM 호출 3회.",
+   "intro__meta": "- raw 기준. raw의 디버그 출력 `print(state['cons'], state['pros'])`(장단점 전문을 한 번 더 출력)는 뺐고, fan-in 설명 강사 메모 주석(raw 54–59행)은 솔루션의 짧은 주석으로 바꿨습니다. 메모 요지: summary로 들어오는 엣지가 하나면 그 노드가 끝나자마자 summary가 시작되지만, 두 개면 두 노드가 모두 끝나야 summary가 실행된다. 다만 설치된 LangGraph 1.2.12에서는 pros·cons가 같은 단계에서 함께 끝나므로 summary로 가는 엣지가 하나여도 summary는 두 결과를 모두 받습니다(LLM 없는 가짜 모델로 확인, 2026-09-29). 결론이 한쪽만 말하는 것은 START에서 가는 엣지가 빠졌을 때라서 ⛔를 그렇게 적었습니다.\n- 19행 주석의 \"append\"는 두 노드가 서로 다른 필드에 쓰는 동작과 맞지 않아 \"자기 필드(pros, cons)에 결과를 쓰고\"로 바꿨습니다(2026-09-29 리뷰 반영).\n- 이 장은 파일의 앞부분(패턴 1)만 씁니다. 패턴 2(Send)는 patch로 지우고 다음 장에서 다룹니다.\n- 직렬(pros → cons → summary)로 이어도 출력이 거의 같아 **화면만으로는 병렬 여부를 가를 수 없습니다.** 성공 기준에 \"정답 보기와 엣지 비교\"를 넣었습니다.\n- LLM 호출 3회.",
    "setup_note": "이 장의 준비 코드입니다. 앞 장들과 같이 도구와 모델을 준비합니다. 펼치지 않고 실행만 합니다.",
    "patch": [
     {
@@ -369,6 +369,12 @@
     {
      "find": "print(state[\"cons\"], state[\"pros\"])",
      "lines": []
+    },
+    {
+     "find": "# 각 분기가 State에 결과를 append하고",
+     "lines": [
+      "# 각 분기가 자기 필드(pros, cons)에 결과를 쓰고, 이후 하나의 노드가 합쳐서 처리한다."
+     ]
     },
     {
      "find": "static_builder.add_edge(START, \"cons\")",
@@ -410,7 +416,7 @@
      ],
      "fail": [
       "`pros` → `cons` → `summary`처럼 차례로 이었다 → 결과는 비슷하게 나와도 병렬이 아닙니다. 정답 보기와 엣지를 비교합니다",
-      "결론이 장점이나 단점 한쪽만 말한다 → `summary`로 들어오는 엣지가 하나뿐인지 봅니다"
+      "`장점:`이나 `단점:` 뒤에 `...`만 나오고 결론이 한쪽만 말한다 → START에서 `pros`와 `cons`로 가는 엣지가 둘 다 있는지 봅니다"
      ],
      "answer": [
       "static_builder.add_edge(START, \"pros\")",
@@ -480,7 +486,7 @@
       "마지막 셀에서 질문 수만큼 `[질문] 답` 줄이 나온다"
      ],
      "fail": [
-      "마지막 셀에서 `KeyError: 'query'`가 난다 → `Send`에 담은 딕셔너리 키가 `WorkerState`와 다릅니다",
+      "마지막 셀에서 `KeyError: 'query'`가 난다 → `Send`에 담은 딕셔너리 키가 `WorkerState`와 다르거나, 7.3에서 START를 `worker`에 바로 이었습니다(`add_edge`)",
       "줄이 하나만 나오거나 하나도 없다 → 질문 하나마다 `Send`를 만들었는지 봅니다"
      ]
     },
@@ -498,7 +504,7 @@
      ],
      "fail": [
       "이 셀의 컴파일 줄에서 오류가 난다 → START에서 나가는 엣지가 빠졌습니다",
-      "`add_edge(START, \"worker\")`로 이었다 → worker가 한 번만, 질문 목록 없이 실행됩니다. 정답 보기와 비교합니다"
+      "`add_edge(START, \"worker\")`로 이었다 → worker가 질문 없이 한 번 실행되어 마지막 셀에서 `KeyError: 'query'`가 납니다. 정답 보기와 비교합니다"
      ]
     }
    ],
@@ -525,11 +531,12 @@
     "hint": "\"State와 worker 노드\" 셀을 붙여 넣고, `results`에 붙은 `Annotated[..., lambda a, b: a + b]`가 하는 일과, 이것이 없으면 여러 worker의 결과가 어떻게 되는지 설명해 달라고 합니다. 코드는 고치지 말라고 적습니다.",
     "success": [
      "여러 worker가 같은 `results`에 쓰므로, 앞 값과 새 값을 이어 붙이는 규칙이 필요하다는 점을 짚었다",
-     "규칙이 없으면 한 단계에서 여러 값이 한 필드에 들어오므로 결과가 하나만 남거나 오류가 날 수 있다는 점을 짚었다"
+     "규칙이 없으면 여러 worker가 같은 단계에 `results`에 쓰므로 LangGraph가 오류(`InvalidUpdateError`)를 낸다는 점을 짚었다"
     ],
     "fail": [
      "코드를 고치거나 새로 써 왔다 → 고치지 말라고 다시 적습니다",
-     "\"lambda는 익명 함수다\"처럼 문법만 설명했다 → 여러 worker가 같은 필드에 쓸 때 무슨 일이 생기는지 다시 묻습니다"
+     "\"lambda는 익명 함수다\"처럼 문법만 설명했다 → 여러 worker가 같은 필드에 쓸 때 무슨 일이 생기는지 다시 묻습니다",
+     "\"마지막 값만 남는다\"고만 답했다 → LangGraph에서 실제로 어떻게 되는지 다시 묻습니다"
     ]
    }
   }

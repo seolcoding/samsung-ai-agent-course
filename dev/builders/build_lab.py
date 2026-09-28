@@ -73,10 +73,12 @@ PROMPT_GUIDE = f"""실습은 두 종류입니다. 제목 옆 표시와 코드 �
 - **{KIND_EXAMPLE}** `# ✍️ CHANGE_HERE:` 바로 아래 줄의 값을 바꿔 다시 실행해 봅니다.
 - **{KIND_TASK}** `# ✍️ WRITE_HERE:` 아래 빈칸(`...`)을 AI와 함께 채웁니다. **프롬프트 힌트**를 보고 지시를 직접 씁니다.
 
-실행한 뒤에는 **성공 기준**과 비교해 스스로 판단합니다. 🟢는 되어야 하는 것, ⛔는 다시 해야 하는 신호입니다. 과제는 그다음 접힌 "정답 보기"와 비교합니다."""
+실행한 뒤에는 **성공 기준**과 비교해 스스로 판단합니다. 🟢는 되어야 하는 것, ⛔는 다시 해야 하는 신호입니다. 과제는 그다음 접힌 "정답 보기"와 비교합니다.
+
+"정답 보기"의 코드는 빈칸 줄과 같은 들여쓰기로 보여 줍니다. 붙여 넣을 때는 빈칸 줄 전체(줄 앞 공백까지)를 지우고 그 자리에 붙여 넣습니다."""
 
 
-TERMINAL_NOTE = """위 셀을 실행하면 이 폴더에 서버 파일이 만들어집니다(빈칸을 먼저 채웁니다). 서버는 터미널에서 띄웁니다.
+TERMINAL_NOTE = """{write}하면 이 폴더에 서버 파일이 만들어집니다(빈칸을 먼저 채웁니다). 서버는 터미널에서 띄웁니다.
 
 1. VS Code 메뉴 **터미널 → 새 터미널**을 엽니다(저장소 맨 위 폴더에서 열립니다).
 2. 아래 명령을 붙여 넣고 실행합니다.
@@ -86,7 +88,7 @@ uv run python {path}
 ```
 
 3. 서버 시작 문구가 나오고 명령이 끝나지 않고 기다리면 켜진 것입니다. 이 터미널은 닫지 말고 노트북으로 돌아옵니다.
-4. 서버 파일을 고쳤다면 터미널에서 **Ctrl+C**로 끄고, 위 셀을 다시 실행한 뒤 같은 명령으로 다시 띄웁니다."""
+4. 서버 파일을 고쳤다면 터미널에서 **Ctrl+C**로 끄고, {rewrite} 같은 명령으로 다시 띄웁니다.{warn}"""
 
 BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
 MARK_TASK, MARK_EDIT = "# ✍️ WRITE_HERE:", "# ✍️ CHANGE_HERE:"
@@ -163,6 +165,12 @@ def _dedent_common(text):
     return textwrap.dedent(text)
 
 
+def _answer_code(text, indent):
+    """정답 보기 코드: 빈칸 줄과 같은 들여쓰기로 맞춘다(빈칸 줄 전체를 지우고 붙여 넣으면 그대로 맞는다)."""
+    import textwrap
+    return textwrap.indent(_dedent_common(text), indent)
+
+
 def _env_check(extra):
     """환경 점검 셀. 점검 로직은 course/config/check.py에 있다(수강생 AI도 같은 점검을 명령으로 돌린다)."""
     groups = f"{list(extra)!r}" if extra else ""
@@ -215,6 +223,7 @@ def build(folder):
                 print(f"✖ {folder}/{f['name']} TODO 빈칸 범위 없음 | 뼈대 추정 실패 | labs/{folder}.json의 blank를 채운다")
         lines, answers = _blank(raw, [t["blank"] for t in todos]) if todos else (raw, [])
         todos, answers = [t for t, x in zip(todos, answers) if x is not None], [x for x in answers if x is not None]
+        blank_indents = [ln[: len(ln) - len(ln.lstrip())] for ln in lines if ln.endswith(BLANK_LINE)]
         edits = f.get("edits", [])
         lines, edit_at = _mark(lines, edits)
         # WRITE_HERE 주석 줄 위치로 어느 구획에 속하는지 정한다(찾지 못하면 순서대로 WRITE_HERE 줄을 쓴다)
@@ -228,7 +237,7 @@ def build(folder):
         nb.h(2, f"{n}. {f['title']}")
         nb.md(f["intro"])
         nb.meta(f.get("intro__meta"))
-        pos, sub, visible = 0, 0, 0
+        pos, sub, visible, first_wf = 0, 0, 0, None
         for c, (title, body) in enumerate(_chunks(lines, split)):
             start, pos = pos, pos + len(body)
             while pos < len(lines) and not lines[pos].strip():
@@ -248,7 +257,12 @@ def build(folder):
                 if c == 0 and "/" in wf:  # %%writefile은 폴더를 만들지 않는다
                     folder_of = wf.rsplit("/", 1)[0]
                     nb.code(f"from pathlib import Path\n\nPath({folder_of!r}).mkdir(parents=True, exist_ok=True)", kind="")
-                text = f"%%writefile {'-a ' if c else ''}{wf}\n" + text  # IPython이 끝에 줄바꿈을 붙여 이어 쓴다
+                if c == 0:
+                    first_wf = f"{n}.{sub + 1}"
+                    text = f"%%writefile {wf}\n" + text
+                else:  # 이어 쓰기 셀만 다시 실행하면 파일 끝(서버 실행 줄 뒤)에 붙어 반영되지 않는다
+                    text = (f"%%writefile -a {wf}\n# 이어 쓰기 셀: 고쳤다면 {first_wf} 셀부터 차례로 다시 실행합니다"
+                            f"(이 셀만 다시 실행하면 반영되지 않습니다)\n" + text)  # IPython이 끝에 줄바꿈을 붙여 이어 쓴다
             elif c == 0 and f.get("hide_first", True):  # 준비 코드: 불러오기·환경 설정. 접어 둔다
                 nb.md(f.get("setup_note", "준비 코드입니다. 필요한 도구를 불러오고 모델을 준비합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다."))
                 nb.code(text, kind="")
@@ -277,10 +291,16 @@ def build(folder):
                 nb.md(_criteria_md([], done.get("fail", []), done.get("success", [])) if isinstance(done, dict) else _criteria_md(done))
             if mine:
                 # 정답은 원본에서 지운 줄이 기본이고, 솔루션과 다른 곳은 spec의 answer로 바꿔 보여 준다
-                ans = "\n\n".join("```python\n" + _dedent_common("\n".join(todos[i].get("answer") or answers[i])) + "\n```" for i in mine)
+                ans = "\n\n".join("```python\n" + _answer_code("\n".join(todos[i].get("answer") or answers[i]), blank_indents[i]) + "\n```"
+                                    for i in mine)
                 nb.md(f"<details><summary>정답 보기</summary>\n\n{ans}\n\n</details>")
         if wf and f.get("run") == "terminal":  # 서버: 노트북 커널을 붙잡지 않도록 터미널에서 띄운다
-            nb.md(f.get("run_note") or TERMINAL_NOTE.format(path=f"course/{chapter}/notebooks/{wf}"))
+            many = split and first_wf  # 여러 셀로 나눠 쓴 파일
+            nb.md(f.get("run_note") or TERMINAL_NOTE.format(
+                path=f"course/{chapter}/notebooks/{wf}",
+                write=f"{first_wf} 셀부터 이 안내 바로 위 셀까지 차례로 실행" if many else "위 셀을 실행",
+                rewrite=f"{first_wf} 셀부터 이 안내 바로 위 셀까지 차례로 모두 다시 실행한 뒤" if many else "위 셀을 다시 실행한 뒤",
+                warn=" 고친 셀 하나만 다시 실행하면 파일 끝에 덧붙기만 해서 반영되지 않습니다." if many else ""))
         elif wf:
             nb.md(f.get("run_note", "위 셀을 실행하면 이 폴더에 앱 파일이 만들어집니다. 아래 셀을 실행하면 브라우저에 앱이 열립니다. 앱을 멈출 때는 이 셀의 실행을 중지(■)합니다."))
             # 셸 PATH에 가상환경이 없어도 되도록, 노트북 커널의 파이썬으로 streamlit을 실행한다

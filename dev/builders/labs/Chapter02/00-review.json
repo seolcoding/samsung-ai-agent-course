@@ -183,7 +183,7 @@
    "title": "RAG 체인",
    "intro": "약관 PDF를 청크로 나눠 벡터 저장소에 넣고, 질문과 가까운 청크 3개를 찾아 답변에 더하는 RAG 체인을 실행합니다. 검색 → 프롬프트 → 모델 → 출력 파서를 `|`로 잇고, 답변은 조각씩 받습니다.\n\nPDF를 읽고 청크로 나누는 일은 접힌 준비 코드에서 합니다. 임베딩 요청이 여러 번 가므로 벡터 저장소를 만드는 셀은 조금 걸립니다.",
    "intro__meta": "- 원본 `03_langchain_rag.py`(raw). raw와 솔루션이 같습니다. 노트북에서만 손봤습니다(M1 1-4와 같은 처리): ① `PDF_PATH`를 `data/…` 상대 경로로 ② `langchain-community` 종료 예고 경고 숨김 ③ `Chroma().delete_collection()` 추가(한 커널에서 다시 실행하면 청크가 쌓여 검색 결과가 중복됨) ④ `while True` + `input()` 반복을 질문 변수 하나로 한 번만 실행.\n- 사내 임베딩(`EMBED_PROVIDER=samsung`)으로는 실행하지 않았습니다(M1 1-4와 같은 조건).",
-   "setup_note": "준비 코드입니다. 필요한 도구를 불러오고, 약관 PDF를 읽어 청크(`chunks`)로 나눕니다. 이 셀은 모델을 호출하지 않습니다.",
+   "setup_note": "준비 코드입니다. 필요한 도구를 불러오고, 약관 PDF를 읽어 청크(`chunks`)로 나눕니다. 이 셀은 모델을 호출하지 않습니다. 이 셀에서 `is not a valid file or url` 오류가 나면 이 노트북 옆 `data` 폴더에 약관 PDF가 있는지 확인합니다.",
    "patch": [
     {
      "find": "from langchain_community.document_loaders import PDFMinerLoader",
@@ -247,7 +247,7 @@
      ],
      "fail": [
       "약관과 상관없는 일반론만 나온다 → 질문이 약관에 있을 법한 내용인지 확인합니다",
-      "`FileNotFoundError`가 난다 → 준비 코드를 실행했는지, 이 노트북 옆 `data` 폴더에 약관 PDF가 있는지 확인합니다"
+      "`NameError`(예: `name 'rag_chain' is not defined`)가 난다 → 5장 준비 코드와 5.1·5.2 셀을 먼저 실행합니다"
      ]
     }
    },

@@ -117,7 +117,7 @@
   ]
  },
  "sum14": "**정리:** CallbackHandler를 `config`의 `callbacks`로 넘기거나 `with_config`로 붙이면 LangChain·LangGraph 실행이 Trace로 기록됩니다.",
- "p8": "`@observe()`는 일반 Python 함수를 Langfuse Trace 또는 Span으로 기록하는 데코레이터입니다.\nLangChain 밖에서 실행되는 사용자 정의 함수, 예를 들어 검색, 후처리, 평가, 파일 생성 같은 로직을 Trace에 넣을 수 있습니다.\n그러면 요청 하나 안에서 LLM 호출과 일반 Python 처리를 함께 볼 수 있습니다.\n\n**왜 배우나:** CallbackHandler는 LangChain·LangGraph의 실행만 모읍니다. RAG의 검색처럼 체인 밖에 있는 단계는 @observe를 붙여야 같은 기록 안에 나타납니다.",
+ "p8": "`@observe()`는 일반 Python 함수를 Langfuse Trace 또는 Span(Trace 안의 한 단계 기록)으로 기록하는 데코레이터입니다.\nLangChain 밖에서 실행되는 사용자 정의 함수, 예를 들어 검색, 후처리, 평가, 파일 생성 같은 로직을 Trace에 넣을 수 있습니다.\n그러면 요청 하나 안에서 LLM 호출과 일반 Python 처리를 함께 볼 수 있습니다.\n\n**왜 배우나:** CallbackHandler는 LangChain·LangGraph의 실행만 모읍니다. RAG의 검색처럼 체인 밖에 있는 단계는 @observe를 붙여야 같은 기록 안에 나타납니다.",
  "q15": {
   "question": "CallbackHandler만으로는 부족하고 @observe가 필요한 경우는?",
   "type": "multiple_choice",

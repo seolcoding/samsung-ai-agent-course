@@ -73,8 +73,8 @@
 | 터미널: `No such file or directory` / `can't open file …_server.py` | 서버 파일을 쓰는 셀(`%%writefile`)을 아직 안 돌림, 또는 터미널이 저장소 맨 위가 아님 | 노트북의 쓰기 셀을 먼저 실행. 터미널에서 `pwd`가 저장소 맨 위인지 확인([paths.md](paths.md)) |
 | `address already in use` / `Errno 48`·`10048` | 같은 포트의 서버가 이미 떠 있음(A2A와 캡스톤 MCP는 둘 다 8001) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
 | 클라이언트 셀: `ConnectError`, `Connection refused`, 오래 기다리다 실패 | 서버가 꺼져 있거나 시작 중 오류로 끝남 | 서버 터미널에 `Uvicorn running on …`이 있는지 본다. 없으면 터미널의 마지막 오류 줄부터 고친다 |
-| 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일의 빈칸이 비었거나 틀림 | 서버 코드 셀의 빈칸을 다시 채우고 → Ctrl+C → 쓰기 셀 다시 실행 → 서버 다시 띄우기 |
-| 서버를 고쳤는데 결과가 그대로 | 예전 서버가 계속 떠 있음 | Ctrl+C로 끄고 다시 띄운다 |
+| 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일의 빈칸이 비었거나 틀림 | 서버 코드 셀의 빈칸을 다시 채우고 → Ctrl+C → 첫 쓰기 셀(`%%writefile <파일>`)부터 마지막 이어 쓰기 셀까지 차례로 다시 실행 → 서버 다시 띄우기 |
+| 서버를 고쳤는데 결과가 그대로 | 예전 서버가 계속 떠 있음, 또는 고친 이어 쓰기 셀(`%%writefile -a`)만 다시 실행해 코드가 파일 끝(서버 실행 줄 뒤)에 붙음 | Ctrl+C로 끄고 → 첫 쓰기 셀부터 차례로 모두 다시 실행 → 다시 띄운다 |
 | 서버 시작 때 `DeprecationWarning`, `Update available` 상자 | 라이브러리 안내 문구 | 무시해도 된다 |
 | stdio로 바꿨더니 추가한 할 일이 목록에 없음 | stdio는 도구를 부를 때마다 서버를 새로 띄워 기억이 사라진다 | 정상. SSE와 비교하는 실습이다 |
 
@@ -83,6 +83,7 @@
 | 증상 | 원인 | 해결 |
 |---|---|---|
 | 준비 셀: Langfuse 연결 ⛔ | `.env`의 `LANGFUSE_PUBLIC_KEY`·`LANGFUSE_SECRET_KEY`·`LANGFUSE_BASE_URL`이 없거나 틀림 | `uv run python -m config.check --langfuse`로 빠진 이름을 확인하고 강사에게 받은 값을 채운다 |
+| Langfuse 화면을 어디서 여는지 모름 | — | 브라우저에서 `.env`의 `LANGFUSE_BASE_URL` 주소를 열고 로그인한 뒤, 키를 받은 프로젝트를 연다. 왼쪽 메뉴 **Tracing**에 trace, **Scores**에 점수가 있다 |
 | 코드는 잘 도는데 대시보드에 trace가 없음 | 전송 전(몇 초 모았다 보냄), 또는 다른 프로젝트 화면을 봄 | 각 장 끝의 `flush()` 셀을 실행하고 새로고침. 키와 같은 프로젝트인지 확인 |
 | 남의 trace가 섞여 보임 | 여러 명이 한 프로젝트를 같이 씀 | 노트북 안내대로 이름·실행 시각·내가 보낸 질문으로 찾는다 |
 | `python-dotenv could not parse statement starting at line N` | `.env`의 N번째 줄 형식이 틀림(따옴표·공백·주석) | 그 줄을 `KEY=값` 모양으로 고친다 |
