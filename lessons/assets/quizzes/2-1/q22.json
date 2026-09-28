@@ -1,0 +1,28 @@
+[
+ {
+  "question": "기본값과 값 검증이 필요한 State를 정의할 때 더 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Pydantic `BaseModel`",
+    "correct": true,
+    "feedback": "`Field`로 설명과 기본값을 주고, 들어온 값의 형식도 검사할 수 있습니다."
+   },
+   {
+    "answer": "TypedDict",
+    "correct": false,
+    "feedback": "TypedDict는 가볍고 직관적이지만, 기본값과 검증이 필요하면 Pydantic이 유리합니다."
+   },
+   {
+    "answer": "타입 없이 쓰는 일반 dict",
+    "correct": false,
+    "feedback": "스키마가 없으면 노드 사이에 어떤 데이터가 오가는지 약속이 흐려집니다."
+   },
+   {
+    "answer": "문자열 하나",
+    "correct": false,
+    "feedback": "문자열 하나로는 질문, 문서, 답변처럼 여러 필드를 나눠 담을 수 없습니다."
+   }
+  ]
+ }
+]

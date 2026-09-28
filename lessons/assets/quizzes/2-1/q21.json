@@ -1,0 +1,28 @@
+[
+ {
+  "question": "한 노드가 끝난 뒤 어디로 갈지 정하는 요소는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Node",
+    "correct": false,
+    "feedback": "Node는 실제 작업을 하는 실행 단위입니다. 다음 행선지는 다른 요소가 정합니다."
+   },
+   {
+    "answer": "Edge",
+    "correct": true,
+    "feedback": "Edge가 노드가 끝난 뒤 이동할 노드를 정합니다. 조건부 Edge는 State를 보고 행선지를 고릅니다."
+   },
+   {
+    "answer": "State",
+    "correct": false,
+    "feedback": "State는 실행 중 노드들이 함께 읽고 고치는 데이터입니다."
+   },
+   {
+    "answer": "Reducer",
+    "correct": false,
+    "feedback": "Reducer는 같은 필드에 들어온 값을 합치는 규칙이라 이동과는 관계가 없습니다."
+   }
+  ]
+ }
+]
