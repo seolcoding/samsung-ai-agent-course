@@ -20,15 +20,16 @@
 
 VS Code는 노트북을 그 노트북이 있는 폴더(`course/ChapterNN/notebooks/`)에서 실행한다. 그래서:
 
-| 쓰는 곳 | 코드 | 가리키는 곳 |
-|---|---|---|
-| 준비 셀 | `sys.path.insert(0, '..')` 후 `from assets.widgets import …` | `course/ChapterNN/assets/` |
-| 퀴즈 | `show_quiz("../assets/quizzes/<권>/<문제>.json")` | `course/ChapterNN/assets/quizzes/` |
-| 실습 자료 | `"data/meritz_pet_insurance.pdf"` | `course/ChapterNN/notebooks/data/` |
-| 슬라이드 | `show_slides("1-2", [쪽])` | `course/ChapterNN/slides/` 아래 `1-2-*.pdf`를 자동으로 찾음 |
-| 설정 | `import config.llm` | 설치된 패키지(`course/config/`). 경로와 상관없음 |
-| `.env` | 자동(`find_dotenv`) | 노트북 폴더에서 위로 올라가며 처음 만나는 `.env` |
-| 앱 파일(2-3) | `%%writefile app.py` | 노트북 폴더에 생긴다 |
+
+| 쓰는 곳      | 코드                                                          | 가리키는 곳                                                 |
+| -------------- | --------------------------------------------------------------- | ------------------------------------------------------------- |
+| 준비 셀      | `sys.path.insert(0, '..')` 후 `from assets.widgets import …` | `course/ChapterNN/assets/`                                  |
+| 퀴즈         | `show_quiz("../assets/quizzes/<권>/<문제>.json")`             | `course/ChapterNN/assets/quizzes/`                          |
+| 실습 자료    | `"data/meritz_pet_insurance.pdf"`                             | `course/ChapterNN/notebooks/data/`                          |
+| 슬라이드     | `show_slides("1-2", [쪽])`                                    | `course/ChapterNN/slides/` 아래 `1-2-*.pdf`를 자동으로 찾음 |
+| 설정         | `import config.llm`                                           | 설치된 패키지(`course/config/`). 경로와 상관없음            |
+| `.env`       | 자동(`find_dotenv`)                                           | 노트북 폴더에서 위로 올라가며 처음 만나는`.env`             |
+| 앱 파일(2-3) | `%%writefile app.py`                                          | 노트북 폴더에 생긴다                                        |
 
 - 지금 폴더 확인: 셀에서 `import os; print(os.getcwd())`. `…/course/ChapterNN/notebooks`가 나와야 한다.
 - 다른 폴더가 나오면(VS Code 설정 `jupyter.notebookFileRoot`를 바꾼 경우 등) 노트북 맨 위에 `%cd <저장소>/course/ChapterNN/notebooks`를 한 번 실행하거나, 설정을 `${fileDirname}`(기본값)으로 되돌린다.

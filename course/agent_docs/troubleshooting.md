@@ -30,6 +30,8 @@
 | `RuntimeError: 사내 API 설정이 부족합니다: [...]` | `LLM_PROVIDER`(또는 EMBED·RAG)가 `samsung`인데 사내 값이 없음 | 사외 PC면 `LLM_PROVIDER=openai`, `EMBED_PROVIDER=openai`, `RAG_PROVIDER=mock`. 사내 PC면 강사가 준 사내 값 |
 | `ValueError: 지원하지 않는 LLM_PROVIDER` | 값 오타 | `openai` 또는 `samsung` |
 | `.env`를 고쳤는데 그대로임 | 커널이 예전 값을 기억함 | 커널 다시 시작 후 맨 위부터 실행 |
+| 값이 `# …`로 시작하는 글자로 들어감(주소·모델 이름이 이상함) | `KEY=   # 설명`처럼 빈 값 뒤에 주석을 붙임 | 설명은 윗줄로 옮기고 `KEY=값`만 남긴다 |
+| 사내 PC인데 OpenAI로 연결하려 함 / 사외 PC인데 사내 주소로 연결하려 함 | `.env`의 ① 실행 환경을 잘못 고름 | 사내는 `samsung` 세 줄, 사외는 `openai`·`openai`·`mock` 세 줄만 남긴다 |
 | `.env`를 못 찾음 | 이름이 `.env`가 아님(예: `.env.txt`, `.env.external`) 또는 위치가 다름 | 저장소 맨 위에 정확히 `.env`로 둔다. 윈도우 탐색기는 확장자를 숨기니 주의 |
 
 ## LLM·API 호출
