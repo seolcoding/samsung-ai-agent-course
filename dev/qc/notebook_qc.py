@@ -190,11 +190,27 @@ FILE_REF = re.compile(r"\w+\.py\b|src/|lessons/|course/|dev/|\.ipynb")
 CROSS_REF = re.compile(r"강의 노트북|실습 노트북|강의에서 본|_LEC|_LAB")
 
 
+def written_files(nb):
+    """노트북이 %%writefile로 직접 만드는 파일 이름(서버·앱·SKILL.md). 수강생 글에서 가리켜도 된다."""
+    return {ln.split()[-1] for c in nb.cells if c.cell_type == "code"
+            for ln in c.source.splitlines()[:1] if ln.startswith("%%writefile")}
+
+
+# 수강생이 직접 여는 곳이라 글에서 가리켜도 되는 경로: 캡스톤 프로젝트 폴더
+ALLOWED_REF = re.compile(r"capstone/")
+
+
 def check_student_text(nb, quizzes, R):
     seen_text = learner_text(nb, quizzes)
     around = lambda src, m: f"…{excerpt(src[max(0, m.start() - 20):m.end() + 15], 50)}…"  # noqa: E731
-    R("수강생 글", "보이지 않는 파일·경로(.py, src/, lessons/, .ipynb) 언급 없음 — 수강생은 노트북만 받는다",
-      [(i, around(src, m)) for i, src in seen_text for m in FILE_REF.finditer(src)])
+    own = written_files(nb)
+
+    def allowed(src, m):  # 이 노트북이 쓰는 파일을 터미널에서 실행하라는 안내, 캡스톤 폴더 안내는 괜찮다
+        line = src[src.rfind("\n", 0, m.start()) + 1:src.find("\n", m.end()) % (len(src) + 1)]
+        return any(f in line for f in own) or ALLOWED_REF.search(line)
+
+    R("수강생 글", "보이지 않는 파일·경로(.py, src/, lessons/, .ipynb) 언급 없음 — 수강생은 노트북만 받는다(이 노트북이 쓰는 파일·캡스톤 폴더는 예외)",
+      [(i, around(src, m)) for i, src in seen_text for m in FILE_REF.finditer(src) if not allowed(src, m)])
     R("수강생 글", "다른 노트북 언급 없음 — 노트북 하나로 완결",
       [(i, around(src, m)) for i, src in seen_text for m in CROSS_REF.finditer(src)], warn=True)
     R("수강생 글", "도구 이름(CodeMate) 대신 \"AI\"라고 씀",
