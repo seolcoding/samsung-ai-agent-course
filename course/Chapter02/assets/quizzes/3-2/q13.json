@@ -1,0 +1,28 @@
+[
+ {
+  "question": "\"Host 안에서 MCP Server와 통신하는 연결 계층\"은 무엇인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Server",
+    "correct": false,
+    "feedback": "Server는 도구, 데이터, 프롬프트를 MCP 형태로 제공하는 쪽입니다."
+   },
+   {
+    "answer": "Host",
+    "correct": false,
+    "feedback": "Host는 사용자가 실제로 쓰는 LLM 애플리케이션입니다. 연결 계층은 그 안에 있습니다."
+   },
+   {
+    "answer": "Prompt",
+    "correct": false,
+    "feedback": "Prompt는 Server가 제공하는 기능(Primitive) 중 하나입니다."
+   },
+   {
+    "answer": "Client",
+    "correct": true,
+    "feedback": "Client는 Host 안에 있으면서 Server와 통신합니다."
+   }
+  ]
+ }
+]

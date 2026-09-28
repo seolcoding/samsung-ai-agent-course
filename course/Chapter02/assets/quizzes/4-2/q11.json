@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Langfuse가 Trace 단위로 기록하는 것이 **아닌** 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "프롬프트와 모델 호출",
+    "correct": false,
+    "feedback": "프롬프트와 모델 호출은 Langfuse가 기록하는 대표 항목입니다."
+   },
+   {
+    "answer": "도구 호출과 오류",
+    "correct": false,
+    "feedback": "도구 호출과 오류도 Trace에 기록됩니다."
+   },
+   {
+    "answer": "지연시간과 비용",
+    "correct": false,
+    "feedback": "지연시간과 비용도 기록합니다. 어느 단계에서 시간과 돈이 들었는지 볼 수 있습니다."
+   },
+   {
+    "answer": "실행한 PC의 CPU·메모리 사양",
+    "correct": true,
+    "feedback": "Langfuse는 LLM 애플리케이션의 실행 흐름을 기록합니다. PC 사양은 기록 대상이 아닙니다."
+   }
+  ]
+ }
+]

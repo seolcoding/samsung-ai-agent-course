@@ -1,0 +1,28 @@
+[
+ {
+  "question": "SKILL.md에서 \"품질 기준과 확인 방법\"을 적는 항목은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Verification",
+    "correct": true,
+    "feedback": "수행 정보의 Verification에 품질 기준과 확인 방법을 적습니다."
+   },
+   {
+    "answer": "Description",
+    "correct": false,
+    "feedback": "Description은 해결하는 문제와 범위를 적습니다."
+   },
+   {
+    "answer": "Constraints",
+    "correct": false,
+    "feedback": "Constraints는 금지 행동과 안전 규칙을 적습니다."
+   },
+   {
+    "answer": "Examples",
+    "correct": false,
+    "feedback": "Examples는 입력과 기대 결과를 적습니다."
+   }
+  ]
+ }
+]

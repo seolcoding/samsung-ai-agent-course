@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Researcher가 자료를 모으는 경로가 **아닌** 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "웹 검색",
+    "correct": false,
+    "feedback": "웹 검색은 Researcher의 자료 수집 경로입니다."
+   },
+   {
+    "answer": "RAGaaS 사내 지식베이스 검색",
+    "correct": false,
+    "feedback": "RAGaaS는 Researcher가 내부 문서를 찾는 경로입니다."
+   },
+   {
+    "answer": "MCP 서버가 제공하는 문서 도구",
+    "correct": false,
+    "feedback": "MCP 서버는 `data` 경로의 파일을 Researcher에게 도구로 제공합니다."
+   },
+   {
+    "answer": "Writer가 쓴 보고서 초안",
+    "correct": true,
+    "feedback": "초안은 Researcher가 일을 마친 뒤 Writer가 만드는 결과물입니다. Researcher의 자료 수집 경로가 아닙니다."
+   }
+  ]
+ }
+]

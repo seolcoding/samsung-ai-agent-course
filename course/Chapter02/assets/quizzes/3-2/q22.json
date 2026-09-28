@@ -1,0 +1,28 @@
+[
+ {
+  "question": "반복해서 쓸 수 있는 프롬프트 템플릿에 해당하는 Primitive는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Tools",
+    "correct": false,
+    "feedback": "Tools는 LLM이 실제 행동을 하려고 호출하는 함수입니다."
+   },
+   {
+    "answer": "Resources",
+    "correct": false,
+    "feedback": "Resources는 LLM이나 Host가 읽는 데이터나 맥락 자료입니다."
+   },
+   {
+    "answer": "Prompts",
+    "correct": true,
+    "feedback": "Prompts는 다시 쓰는 프롬프트 템플릿이고, 단축 명령어로 제공하기도 합니다."
+   },
+   {
+    "answer": "Messages",
+    "correct": false,
+    "feedback": "Messages는 MCP의 3대 Primitive가 아닙니다. 3대 Primitive는 Tools, Resources, Prompts입니다."
+   }
+  ]
+ }
+]

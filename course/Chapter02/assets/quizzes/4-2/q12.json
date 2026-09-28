@@ -1,0 +1,28 @@
+[
+ {
+  "question": "실패한 응답의 원인을 Trace로 가를 때, 슬라이드가 든 구분이 **아닌** 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "모델 문제",
+    "correct": false,
+    "feedback": "모델이 잘못 답한 경우입니다. 슬라이드가 든 세 구분 중 하나입니다."
+   },
+   {
+    "answer": "컨텍스트 문제",
+    "correct": false,
+    "feedback": "모델에 어떤 내용이 전달되었는지 Trace로 확인해 가려냅니다."
+   },
+   {
+    "answer": "도구 문제",
+    "correct": false,
+    "feedback": "어떤 도구가 어떤 입력으로 호출되었는지 Trace로 확인해 가려냅니다."
+   },
+   {
+    "answer": "사용자의 인터넷 속도 문제",
+    "correct": true,
+    "feedback": "슬라이드는 실패 원인을 모델·컨텍스트·도구로 나눕니다. 인터넷 속도는 들지 않았습니다."
+   }
+  ]
+ }
+]

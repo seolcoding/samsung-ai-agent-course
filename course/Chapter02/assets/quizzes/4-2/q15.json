@@ -1,0 +1,28 @@
+[
+ {
+  "question": "CallbackHandler만으로는 부족하고 @observe가 필요한 경우는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "LangChain 체인 안의 LLM 호출을 기록할 때",
+    "correct": false,
+    "feedback": "체인 안의 LLM 호출은 CallbackHandler가 자동으로 모읍니다."
+   },
+   {
+    "answer": "LangGraph 노드 실행을 기록할 때",
+    "correct": false,
+    "feedback": "LangGraph 실행도 CallbackHandler가 모읍니다."
+   },
+   {
+    "answer": "체인 밖에서 직접 만든 검색 함수를 같은 Trace에 넣고 싶을 때",
+    "correct": true,
+    "feedback": "LangChain 밖의 일반 Python 함수는 @observe를 붙여야 Trace에 들어갑니다."
+   },
+   {
+    "answer": "모델의 답변 속도를 높이고 싶을 때",
+    "correct": false,
+    "feedback": "@observe는 기록 도구입니다. 실행 속도를 바꾸지 않습니다."
+   }
+  ]
+ }
+]

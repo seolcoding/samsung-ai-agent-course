@@ -1,0 +1,80 @@
+[
+ {
+  "question": "사내 문서 검색 기능을 MCP 형태로 만들어 여러 Agent가 연결해 쓰게 하려고 합니다. 이 검색 기능을 담은 프로그램은 무엇인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "MCP Host",
+    "correct": false,
+    "feedback": "Host는 사용자가 쓰는 LLM 애플리케이션입니다. 기능을 가져와 쓰는 쪽입니다."
+   },
+   {
+    "answer": "MCP Server",
+    "correct": true,
+    "feedback": "도구와 데이터를 MCP 형태로 제공하는 쪽이 Server입니다. 여러 Host가 같은 Server에 연결해 씁니다."
+   },
+   {
+    "answer": "MCP Client",
+    "correct": false,
+    "feedback": "Client는 Host 안에서 Server와 통신하는 연결 계층입니다."
+   },
+   {
+    "answer": "Function Calling",
+    "correct": false,
+    "feedback": "Function Calling은 LLM이 함수를 쓰게 하는 방식입니다. 기능을 앱 코드 안에 두면 다른 Agent가 다시 쓰기 어렵습니다."
+   }
+  ]
+ },
+ {
+  "question": "LLM이나 Host가 등록된 서버에 대한 정보를 얻으려고 읽는 데이터나 맥락 자료는 어떤 Primitive인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Resources",
+    "correct": true,
+    "feedback": "Resources는 읽을 수 있는 데이터나 맥락 자료입니다. 실습 서버의 `config://app-info`가 이것입니다."
+   },
+   {
+    "answer": "Tools",
+    "correct": false,
+    "feedback": "Tools는 행동을 하려고 호출하는 함수입니다."
+   },
+   {
+    "answer": "Prompts",
+    "correct": false,
+    "feedback": "Prompts는 다시 쓰는 프롬프트 템플릿입니다."
+   },
+   {
+    "answer": "Transport",
+    "correct": false,
+    "feedback": "Transport는 연결 방식(SSE, stdio)입니다. Primitive가 아닙니다."
+   }
+  ]
+ },
+ {
+  "question": "Claude Code 같은 MCP Host와 FastMCP 서버를 연결할 때 슬라이드가 든 방식은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "HTTP/SSE",
+    "correct": false,
+    "feedback": "HTTP/SSE도 FastMCP의 실행 방식이지만, 슬라이드는 Claude Code 같은 Host와는 stdio로 연결한다고 합니다."
+   },
+   {
+    "answer": "WebSocket",
+    "correct": false,
+    "feedback": "슬라이드가 든 방식이 아닙니다."
+   },
+   {
+    "answer": "stdio",
+    "correct": true,
+    "feedback": "Claude Code 같은 MCP Host와는 stdio 방식으로 연결할 수 있습니다."
+   },
+   {
+    "answer": "gRPC",
+    "correct": false,
+    "feedback": "슬라이드가 든 방식이 아닙니다."
+   }
+  ]
+ }
+]

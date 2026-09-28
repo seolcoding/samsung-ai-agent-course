@@ -6,12 +6,13 @@
 
 | 폴더 | 들어 있는 것 |
 |---|---|
-| `course/Chapter01/notebooks/` | 수업 노트북. `1-1_…_LEC.ipynb`부터 번호 순서대로 엽니다. `data/`는 실습 자료입니다 |
-| `course/Chapter01/code/raw/` | 받은 원본 실습 코드 |
-| `course/Chapter01/code/solution/` | 원본 실습 코드의 정답 |
-| `course/Chapter01/slides/` | 강의 슬라이드 PDF |
-| `course/Chapter02/` | 2부 원본 코드와 슬라이드 |
-| `course/Chapter01/assets/` | 노트북 화면 도구(슬라이드 뷰어, 퀴즈) |
+| `course/Chapter01/notebooks/` | 1부(1·2일차) 수업 노트북. `1-1_…_LEC.ipynb`부터 번호 순서대로 엽니다. `data/`는 실습 자료입니다 |
+| `course/Chapter02/notebooks/` | 2부(3·4일차) 수업 노트북. `3-1_…`부터 번호 순서대로 엽니다. MCP·A2A 실습은 서버를 VS Code 새 터미널에서 띄웁니다(노트북 안내를 따릅니다) |
+| `course/Chapter02/capstone/` | 4일차 캡스톤 프로젝트 폴더. AI와 함께 직접 고칩니다. 안내는 `4-3_capstone_LAB` 노트북과 이 폴더의 README.md |
+| `course/ChapterNN/code/raw/` | 받은 원본 실습 코드 |
+| `course/ChapterNN/code/solution/` | 원본 실습 코드의 정답 |
+| `course/ChapterNN/slides/` | 강의 슬라이드 PDF |
+| `course/ChapterNN/assets/` | 노트북 화면 도구(슬라이드 뷰어, 퀴즈) |
 | `course/config/` | 모델·임베딩 연결 설정. 노트북이 불러다 씁니다 |
 | `course/agent_docs/` | 설치·경로·오류 해결 안내. AI 도우미도 이 문서를 읽고 설정을 돕습니다 |
 
@@ -40,7 +41,7 @@
 ## 수업 때
 
 1. VS Code에서 저장소 폴더를 엽니다.
-2. `course/Chapter01/notebooks/`에서 노트북을 엽니다. 커널은 저장소의 `.venv`를 고릅니다.
+2. `course/Chapter01/notebooks/`(2부는 `course/Chapter02/notebooks/`)에서 노트북을 엽니다. 커널은 저장소의 `.venv`를 고릅니다.
 3. 셀은 위에서부터 차례로 실행합니다.
 4. 슬라이드가 보이지 않으면 바로 위 셀을 다시 실행합니다. 그래도 안 되면 맨 위 셀부터 다시 실행합니다.
 

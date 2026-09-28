@@ -1,0 +1,28 @@
+[
+ {
+  "question": "`get_tools`로 가져온 도구를 LLM에 넘겨 Tool Calling 대상으로 쓸 때 쓰는 메서드는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "`invoke`",
+    "correct": false,
+    "feedback": "`invoke`는 LLM이나 그래프를 실행하는 메서드입니다. 도구를 넘기는 메서드가 아닙니다."
+   },
+   {
+    "answer": "`with_structured_output`",
+    "correct": false,
+    "feedback": "구조화 출력 형식을 정하는 메서드입니다. 도구 목록을 넘길 때는 쓰지 않습니다."
+   },
+   {
+    "answer": "`add_node`",
+    "correct": false,
+    "feedback": "`add_node`는 LangGraph 그래프에 노드를 더합니다. LLM에 도구를 알려 주지는 않습니다."
+   },
+   {
+    "answer": "`bind_tools`",
+    "correct": true,
+    "feedback": "`get_llm().bind_tools(tools)`로 넘기면 LLM이 서버의 도구를 호출 대상으로 씁니다."
+   }
+  ]
+ }
+]

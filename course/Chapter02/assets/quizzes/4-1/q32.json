@@ -1,0 +1,28 @@
+[
+ {
+  "question": "\"표준 템플릿 기반 산출물 작성\"과 \"원인을 알 수 없는 오류 디버깅\"에 각각 알맞은 구조는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "템플릿 산출물은 Workflow, 오류 디버깅은 Agent",
+    "correct": true,
+    "feedback": "템플릿 작성은 순서가 분명하고 재현성이 중요합니다. 원인을 모르는 디버깅은 다음 행동을 미리 알기 어렵습니다."
+   },
+   {
+    "answer": "템플릿 산출물은 Agent, 오류 디버깅은 Workflow",
+    "correct": false,
+    "feedback": "반대입니다. 원인을 모르는 오류는 단계를 미리 정할 수 없어 Agent에 맞습니다."
+   },
+   {
+    "answer": "둘 다 Workflow",
+    "correct": false,
+    "feedback": "디버깅은 관찰 결과를 보고 다음 행동을 골라야 해서 미리 정한 경로로는 어렵습니다."
+   },
+   {
+    "answer": "둘 다 Agent",
+    "correct": false,
+    "feedback": "템플릿 산출물은 순서가 분명해 Workflow로 예측 가능하고 테스트하기 쉽게 만드는 편이 낫습니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "LangGraph 심화에서 장기 기억을 관리하는 기능은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Subgraph",
+    "correct": false,
+    "feedback": "Subgraph는 그래프를 모듈로 나누는 기능입니다."
+   },
+   {
+    "answer": "Persistence",
+    "correct": false,
+    "feedback": "Persistence는 상태를 저장해 이어서 실행하게 합니다. 장기 기억은 따로 관리합니다."
+   },
+   {
+    "answer": "Parallel Execution",
+    "correct": false,
+    "feedback": "Parallel Execution은 병렬 처리입니다."
+   },
+   {
+    "answer": "Memory Store",
+    "correct": true,
+    "feedback": "Memory Store가 장기 기억을 관리합니다."
+   }
+  ]
+ }
+]
