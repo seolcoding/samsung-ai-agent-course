@@ -1,0 +1,28 @@
+[
+ {
+  "question": "다음 중 단일 Agent를 먼저 고려할 상황은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "작업 단계가 적고 쓰는 도구가 제한적인 짧은 작업",
+    "correct": true,
+    "feedback": "짧고 단순한 작업은 단일 Agent가 더 빠르고 저렴합니다."
+   },
+   {
+    "answer": "조사와 작성처럼 결과물이 다른 단계가 있는 작업",
+    "correct": false,
+    "feedback": "결과물이 다른 단계가 있으면 역할 분리를 고려합니다."
+   },
+   {
+    "answer": "위험한 결정이라 품질 검증이 꼭 필요한 작업",
+    "correct": false,
+    "feedback": "검증이 필요하면 Reviewer Agent를 추가하는 쪽을 고려합니다."
+   },
+   {
+    "answer": "역할이 뚜렷하게 나뉘고 서로 검토가 필요한 작업",
+    "correct": false,
+    "feedback": "역할이 뚜렷하고 검토가 필요하면 Multi-Agent가 유리합니다."
+   }
+  ]
+ }
+]

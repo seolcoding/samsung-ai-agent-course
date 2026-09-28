@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Supervisor 패턴에서 최종 응답은 누가 작성하나요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Supervisor가 하위 Agent의 결과를 종합해 작성한다",
+    "correct": true,
+    "feedback": "Supervisor는 전체 목표와 진행 상태를 관리하고, 하위 결과를 모아 최종 응답을 만듭니다."
+   },
+   {
+    "answer": "마지막에 일한 하위 Agent의 결과를 그대로 쓴다",
+    "correct": false,
+    "feedback": "하위 Agent는 자기 역할의 결과만 냅니다. 종합은 전체 진행을 아는 Supervisor가 맡습니다."
+   },
+   {
+    "answer": "하위 Agent끼리 직접 토론해 합의한 쪽이 작성한다",
+    "correct": false,
+    "feedback": "중앙 관리자 없이 서로 직접 주고받는 방식은 Network 패턴입니다."
+   },
+   {
+    "answer": "사용자가 하위 Agent의 결과를 모아 작성한다",
+    "correct": false,
+    "feedback": "결과를 모으는 일은 사용자가 아니라 중앙 조정 Agent인 Supervisor가 합니다."
+   }
+  ]
+ }
+]

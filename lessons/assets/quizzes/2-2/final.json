@@ -1,0 +1,80 @@
+[
+ {
+  "question": "상위 Agent는 목표와 정책을, 중간 Agent는 일을 다시 나눠 담당자를 정하고, 하위 Agent는 실행을 맡습니다. 어떤 패턴인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Supervisor",
+    "correct": false,
+    "feedback": "Supervisor는 중앙 조정자 하나가 하위 Agent에 직접 일을 나눕니다. 중간 층이 없습니다."
+   },
+   {
+    "answer": "Hierarchical",
+    "correct": true,
+    "feedback": "층을 나눠 중간 Agent가 조정 부담을 나눠 가지는 구조입니다."
+   },
+   {
+    "answer": "Network",
+    "correct": false,
+    "feedback": "Network는 중앙 관리자나 층 없이 Agent끼리 직접 주고받습니다."
+   },
+   {
+    "answer": "단일 Agent",
+    "correct": false,
+    "feedback": "단일 Agent는 모델 하나가 모든 단계를 맡습니다."
+   }
+  ]
+ },
+ {
+  "question": "좋은 역할 분리의 조건으로 맞는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Agent 수를 가능한 한 많이 늘린다",
+    "correct": false,
+    "feedback": "핵심은 Agent 수가 아니라 책임을 잘 나누는 것입니다."
+   },
+   {
+    "answer": "모든 Agent가 모든 도구를 똑같이 가진다",
+    "correct": false,
+    "feedback": "필요한 도구를 기준으로 나눠야 각 Agent의 선택 범위가 줄어듭니다."
+   },
+   {
+    "answer": "각 Agent가 처리할 입력과 돌려줄 출력 형식을 정해 둔다",
+    "correct": true,
+    "feedback": "입력과 출력 형식이 정해지면 책임 경계가 분명해지고 평가 기준도 단순해집니다."
+   },
+   {
+    "answer": "책임 경계를 느슨하게 두어 서로 일을 대신하게 한다",
+    "correct": false,
+    "feedback": "책임 경계가 모호하면 Multi-Agent도 단일 Agent보다 나아지지 않습니다."
+   }
+  ]
+ },
+ {
+  "question": "Reviewer Agent를 추가하는 것이 알맞은 경우는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "단순 질의응답을 가장 싸게 처리해야 할 때",
+    "correct": false,
+    "feedback": "단순 질의응답은 단일 Agent가 더 빠르고 저렴합니다."
+   },
+   {
+    "answer": "위험한 결정이나 품질 검증이 필요할 때",
+    "correct": true,
+    "feedback": "Reviewer는 누락·오류·근거 일치를 확인합니다. 검증이 필요한 곳에 더합니다."
+   },
+   {
+    "answer": "응답을 가장 빨리 돌려줘야 할 때",
+    "correct": false,
+    "feedback": "Agent가 늘면 지연 시간도 늘어납니다. 속도가 가장 중요하면 불리합니다."
+   },
+   {
+    "answer": "쓰는 도구가 하나뿐일 때",
+    "correct": false,
+    "feedback": "도구 수는 Reviewer를 더할 기준이 아닙니다. 기준은 위험과 품질 검증의 필요입니다."
+   }
+  ]
+ }
+]

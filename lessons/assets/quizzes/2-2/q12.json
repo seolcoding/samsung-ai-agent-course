@@ -1,0 +1,28 @@
+[
+ {
+  "question": "단일 Agent의 컨텍스트가 빠르게 커지는 원인이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "여러 도구의 설명",
+    "correct": false,
+    "feedback": "도구 설명도 프롬프트에 들어가 컨텍스트를 키웁니다."
+   },
+   {
+    "answer": "한 번의 프롬프트에 함께 넣은 작업 자료",
+    "correct": false,
+    "feedback": "작업 자료를 한 번에 넣으면 컨텍스트가 커집니다."
+   },
+   {
+    "answer": "이전 단계에서 쌓인 중간 결과",
+    "correct": false,
+    "feedback": "단계가 지날수록 중간 결과가 쌓여 컨텍스트가 커집니다."
+   },
+   {
+    "answer": "temperature 값을 낮게 정한 것",
+    "correct": true,
+    "feedback": "temperature는 답의 다양성을 정하는 값입니다. 컨텍스트에 들어가는 내용의 양과는 관계가 없습니다."
+   }
+  ]
+ }
+]
