@@ -23,7 +23,7 @@ from pathlib import Path
 
 from IPython.display import HTML
 
-ASSETS = Path(__file__).parent
+ASSETS = Path(__file__).resolve().parent
 SLIDES = ASSETS / "slides"
 
 # 프로젝터 뒷자리에서도 보이도록 글자를 크게 하고, 에디터 테마와 무관하게 밝은 바탕을 쓴다.
@@ -383,7 +383,8 @@ def show_code_map(path, sections, deck=None):
     구획을 클릭하면 설명과 대응 슬라이드 쪽(deck의 page)이 오른쪽에 나온다.
     """
     lines = Path(path).read_text(encoding="utf-8").splitlines()
-    data = _load_deck(deck) if deck else None
+    # 쪽 이미지는 이미지 묶음이 있을 때만 옆에 보여 준다. PDF 교안은 show_slides로 따로 본다.
+    data = _load_deck(deck) if deck and (SLIDES / f"{deck}.json").exists() else None
     starts, cursor = [], 0
     for sec in sections:
         hit = next((k for k in range(cursor, len(lines)) if sec["marker"] in lines[k]), None)
