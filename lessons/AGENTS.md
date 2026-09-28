@@ -6,7 +6,7 @@
 ## 1. 교안은 노트북으로 만든다
 
 - 수업 교안은 이 폴더 아래 챕터 폴더(`Chapter01/`, `Chapter02/`)에 `.ipynb`로 만든다. 다른 위치에 교안 노트북을 만들지 않는다.
-- 한 권은 강의 노트북 `<번호>_<이름>_LEC.ipynb`(슬라이드·설명·퀴즈, 실습 코드 없음)와 실습 노트북 `<번호>_<이름>_LAB.ipynb`(`lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`으로 조립)로 나눈다. 번호는 원본 PDF 번호를 따른다(예: `Chapter01/1-2_llm_api_LEC.ipynb`, `Chapter01/1-2_llm_api_LAB.ipynb`. 제목도 `# [LEC] …`, `# [LAB] …`으로 시작한다). 설명 수준은 C(슬라이드 요약 + 내용 있는 곳만 "왜 배우나")로 확정했다(2026-09-28). 강의 본문에 "실습 노트북에서 확인" 같은 안내를 되풀이하지 않는다.
+- 한 권은 강의 노트북 `<번호>_<이름>_LEC.ipynb`(슬라이드·설명·퀴즈, 실습 코드 없음)와 실습 노트북 `<번호>_<이름>_LAB.ipynb`(`lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`과 원본 코드로 조립. 원본 코드를 셀로 넣는다: 첫 구획은 접힌 준비 셀, 나머지는 보이는 코드 셀, 정답 줄은 `...  # ✍ 여기를 CodeMate와 함께 채웁니다` 빈칸, 바로 뒤에 볼 지점과 접힌 "정답 보기". 수강생은 노트북만 받으므로 `.py`·경로·다른 노트북을 언급하지 않는다)로 나눈다. 번호는 원본 PDF 번호를 따른다(예: `Chapter01/1-2_llm_api_LEC.ipynb`, `Chapter01/1-2_llm_api_LAB.ipynb`. 제목도 `# [LEC] …`, `# [LAB] …`으로 시작한다). 설명 수준은 C(슬라이드 요약 + 내용 있는 곳만 "왜 배우나")로 확정했다(2026-09-28). 강의 본문에 "실습 노트북에서 확인" 같은 안내를 되풀이하지 않는다.
 - 노트북 안의 제목은 1부터 번호를 매긴다(`1.`, `1.1`, `1.1.1`). 챕터와 권은 폴더와 파일 이름으로 구분한다.
 - 제목 바로 옆에 그 아래 내용의 종류를 `(슬라이드) (퀴즈) (코드) (실습)`처럼 작게 표시하고, 맨 위에 이 표시를 단 목차를 둔다. 빌더가 쓰는 `lessons/drafts/nbkit.py`가 셀 종류를 보고 자동으로 붙인다.
 - 설명, 슬라이드, 그림, 실행 코드, 실습을 **노트북 한 권 안에 인라인**으로 넣는다. 수업 중 PDF 뷰어나 PPT로 화면을 바꾸지 않게 한다.
@@ -63,7 +63,8 @@
 - 퀴즈 형식 11가지(jupyterquiz, jupytercards, 순서 맞추기·틀린 줄 찾기 위젯, 예측 후 실행, ipytest 빈칸, LLM 채점 서술형)는 `demo_e_quiz_types.ipynb`에 있다. 숫자형 문제의 정답은 코드로 계산해 넣어 교안이 바뀌어도 어긋나지 않게 한다.
 
 - QC: `uv run python lessons/qc/notebook_qc.py <노트북>`(규칙 검사, `--execute`면 새 커널 실행까지)와 Claude Code 명령 `/notebook-qc`(판단 점검표)로 확인한다.
-  - 종류는 파일 이름 끝(`_LEC`/`_LAB`)으로 정한다. 강의 노트북에 `run_step`·`show_code`·`show_code_map`·`make_blank`·`show_diff`가 있으면 FAIL, 실습 노트북에 `show_slides`가 있으면 FAIL이다.
-  - 실습 노트북은 TODO 절마다 다섯 칸 지시문, 빈칸 범위, 경로(복사본 `../work/`, 솔루션 `../../src/solution/`, 원본 `../../src/raw/`)를 검사한다. `(작성 예정)`은 뼈대 상태라 WARN이다.
+  - 종류는 파일 이름 끝(`_LEC`/`_LAB`)으로 정한다. 강의 노트북에 `run_step`·`show_code`·`show_code_map`·`make_blank`·`show_diff`가 있으면 FAIL, 실습 노트북에 `make_blank`·`run_step`·`show_diff`·`show_code_map`·`show_slides`가 있으면 FAIL이다.
+  - 두 종류 모두 수강생 글(강사용 상자 밖 마크다운·퀴즈)에 `.py` 파일 이름·`src/`·`lessons/`·`.ipynb`가 있으면 FAIL, 다른 노트북 언급("강의 노트북", "실습 노트북", "강의에서 본", `_LEC`, `_LAB`)은 WARN이다.
+  - 실습 노트북은 빈칸(✍) 셀마다 빈칸 상태 문법, 앞쪽의 다섯 칸 지시문, 뒤쪽 "정답 보기"를 끼웠을 때의 문법을 검사한다. `(작성 예정)`은 뼈대 상태라 WARN이다.
 - 새 커널 실행: `uv run --extra notebooks jupyter nbconvert --to notebook --execute lessons/<이름>.ipynb --output-dir <임시 폴더>`. 모든 셀이 오류·경고 없이 출력을 내는지 본다.
 - JavaScript 동작은 `--to html`로 내보낸 파일을 브라우저에서 눌러 보고, VS Code에서도 직접 눌러 본다. 내보낸 HTML은 require.js·MathJax를 CDN에서 부르지만 검증용일 뿐이며 수업 노트북과는 관계없다.

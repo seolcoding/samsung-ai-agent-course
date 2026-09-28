@@ -24,8 +24,10 @@ def tags_of(cell):
             return {"슬라이드"}
         if "show_quiz(" in src or "show_order_quiz(" in src:
             return {"퀴즈"}
-        if not cell.metadata.get("jupyter", {}).get("source_hidden"):  # 수강생이 직접 쓰는 셀
-            return {"퀴즈"} if "예측" in src else {"실습"}
+        if not cell.metadata.get("jupyter", {}).get("source_hidden"):  # 수강생에게 보이는 셀
+            if "✍" in src:
+                return {"실습"}  # 빈칸을 채우는 셀
+            return {"퀴즈"} if "예측" in src else {"코드"}
         if "show_checklist(" in src or "slide_setup(" in src or "make_blank(" in src:
             return set()
         return {"코드"}

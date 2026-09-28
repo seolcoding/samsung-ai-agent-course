@@ -2,7 +2,8 @@
 
 노트북 종류는 파일 이름 끝으로 정한다.
     *_LEC.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
-    *_LAB.ipynb      실습 노트북: 코드 지도 → 빈칸 복사본 → TODO마다 CodeMate 지시문 → 실행 → 솔루션 비교.
+    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → CodeMate 지시문 → 빈칸(✍) 셀 → 정답 보기(접힘).
+수강생은 노트북만 받는다. 그래서 수강생 글에 .py·경로·다른 노트북 이야기가 없어야 한다(노트북 하나로 완결).
 
 실행(프로젝트 루트):
     uv run python lessons/qc/notebook_qc.py lessons/Chapter01/1-2_llm_api_LEC.ipynb
@@ -28,10 +29,13 @@ TAGS = {"슬라이드", "퀴즈", "코드", "실습"}
 BOX_HEAD = "<details><summary>강사용 메모</summary>"
 CITE = re.compile(r"\(p\d+")  # "(p6)", "(p13, p14)" 같은 쪽 인용
 STOCK = ("맞습니다.", "정답입니다.")
-LAB_TOOLS = ("run_step", "show_code", "show_code_map", "make_blank", "show_diff")
+LAB_TOOLS = ("run_step", "show_code", "show_code_map", "make_blank", "show_diff")  # 강의 노트북에 있으면 FAIL
+LAB_FILE_TOOLS = ("make_blank", "run_step", "show_diff", "show_code_map", "show_slides")  # 실습 노트북에 있으면 FAIL
+BLANK = "✍"
+ANSWER_HEAD = "<details><summary>정답 보기</summary>"
+TOOL_CELL = re.compile(r"\b(show_\w+|slide_setup)\(|sys\.path\.insert|find_dotenv\(usecwd=True\)")  # 숨겨야 할 도구 셀
 PROMPT_LABELS = ("[역할·목표]", "[배경·제약]", "[출력 형식]", "[모호함 줄이기]", "[하지 말 것]")
 TODO_PLACEHOLDER = "작성 예정"
-RAW, SOL, CONF, WORK = "../../src/raw/", "../../src/solution/", "../../src/config/", "../work/"
 
 
 def kind_of(path):
@@ -48,9 +52,22 @@ def is_box(cell):
     return cell.cell_type == "markdown" and cell.source.lstrip().startswith("<details>")
 
 
+def hidden(cell):
+    return bool(cell.metadata.get("jupyter", {}).get("source_hidden"))
+
+
 def student_md(nb):
     """수강생에게 보이는 마크다운 셀 (강사용 상자 제외)."""
     return [(i, c.source) for i, c in enumerate(nb.cells) if c.cell_type == "markdown" and not is_box(c)]
+
+
+def learner_text(nb, quizzes):
+    """수강생이 읽는 글: <details> 밖의 마크다운 + 퀴즈 문제·선택지·피드백."""
+    out = [(i, re.sub(r"<details>.*?</details>", "", c.source, flags=re.S)) for i, c in enumerate(nb.cells)
+           if c.cell_type == "markdown"]
+    for i, _path, questions in quizzes:
+        out.append((i, json.dumps(questions, ensure_ascii=False)))
+    return out
 
 
 def prose(src):
@@ -146,6 +163,7 @@ def check_quiz(nb, folder, R):
     R("퀴즈", "정답 피드백이 '맞습니다.' 같은 상투어로 시작하지 않음", stock)
     R("퀴즈", "같은 피드백 문장 3회 이상 반복 없음",
       [(v[0], f"{len(v)}회: {excerpt(s)}") for s, v in fb_seen.items() if len(v) >= 3])
+    return loaded
 
 
 # ── 수강생 글 ───────────────────────────────────────────
@@ -165,7 +183,17 @@ DISCOURAGED = [
 ]
 
 
-def check_student_text(nb, R):
+FILE_REF = re.compile(r"\w+\.py\b|src/|lessons/|\.ipynb")
+CROSS_REF = re.compile(r"강의 노트북|실습 노트북|강의에서 본|_LEC|_LAB")
+
+
+def check_student_text(nb, quizzes, R):
+    seen_text = learner_text(nb, quizzes)
+    around = lambda src, m: f"…{excerpt(src[max(0, m.start() - 20):m.end() + 15], 50)}…"  # noqa: E731
+    R("수강생 글", "보이지 않는 파일·경로(.py, src/, lessons/, .ipynb) 언급 없음 — 수강생은 노트북만 받는다",
+      [(i, around(src, m)) for i, src in seen_text for m in FILE_REF.finditer(src)])
+    R("수강생 글", "다른 노트북 언급 없음 — 노트북 하나로 완결",
+      [(i, around(src, m)) for i, src in seen_text for m in CROSS_REF.finditer(src)], warn=True)
     md = student_md(nb)
     R("수강생 글", "쪽 인용 (pN) 없음", [(i, f"…{excerpt(src[max(0, m.start() - 20):m.end() + 10], 40)}…")
                                     for i, src in md for m in CITE.finditer(src)])
@@ -194,7 +222,7 @@ def check_student_text(nb, R):
 HEAD = re.compile(r"^(#{2,4}) (\d+(?:\.\d+)*)\.? (.*)$")
 
 
-def check_structure(nb, R):
+def check_structure(nb, kind, R):
     heads, bad_num, bad_tag = [], [], []
     counter = [0, 0, 0]
     for i, c in enumerate(nb.cells):
@@ -248,17 +276,27 @@ def check_structure(nb, R):
                     bad_box.append((i, f"제목(셀 {last_head}) 아래 강사용 상자가 {boxes_here}개"))
     R("구조", "강사용 메모는 접힌 상자, 제목 사이에 한 개까지", bad_box)
 
-    hidden = []
+    bad_hidden = []
     for i, c in enumerate(nb.cells):
         if c.cell_type != "code":
             continue
-        is_hidden = bool(c.metadata.get("jupyter", {}).get("source_hidden"))
         predict = re.search(r"^예측_\w+\s*=", c.source, re.M)
-        if predict and is_hidden:
-            hidden.append((i, "예측 입력 셀이 숨겨져 있음"))
-        elif not predict and not is_hidden:
-            hidden.append((i, f"숨겨지지 않은 도구 셀: {excerpt(c.source, 40)}"))
-    R("구조", "도구 셀은 source_hidden, 예측 셀만 보임", hidden)
+        if predict and hidden(c):
+            bad_hidden.append((i, "예측 입력 셀이 숨겨져 있음"))
+        elif not predict and not hidden(c) and (kind != "lab" or TOOL_CELL.search(c.source)):
+            bad_hidden.append((i, f"숨겨지지 않은 도구 셀: {excerpt(c.source, 40)}"))
+    R("구조", "도구 셀은 source_hidden (강의: 예측 셀만 보임, 실습: 실습 코드 셀은 보임)", bad_hidden)
+
+    if kind == "lab":  # 원본 파일마다 첫 구획(준비 코드)은 접는다
+        first_open, section_code = [], None
+        for i, c in enumerate(nb.cells):
+            if is_head(c) and c.source.lstrip().startswith("## "):
+                section_code = False
+            elif c.cell_type == "code" and section_code is False:
+                section_code = True
+                if not hidden(c) and BLANK not in c.source:
+                    first_open.append((i, f"절의 첫 코드 셀이 보임: {excerpt(c.source, 40)}"))
+        R("구조", "원본 파일 절의 첫 코드(준비 코드)는 접힘", first_open, warn=True)
 
 
 
@@ -268,8 +306,7 @@ def check_slides(nb, kind, R):
     setup = next((i for i, s in codes if "slide_setup()" in s), None)
     first_slide = next((i for i, s in codes if "show_slides(" in s), None)
     probs = []
-    if kind == "lab":
-        R("실습", "슬라이드(show_slides) 없음 — 슬라이드는 강의 노트북에", [(i, excerpt(s, 40)) for i, s in codes if "show_slides(" in s])
+    if kind == "lab":  # 실습 노트북의 show_slides는 check_lab의 파일 도구 검사에서 FAIL
         return
     if kind == "lecture" and first_slide is None:
         probs.append((0, "show_slides 셀이 하나도 없음"))
@@ -293,117 +330,87 @@ def check_lecture(nb, R):
 
 
 # ── 실습 노트북 ─────────────────────────────────────────
-def check_lab(nb, folder, R):
-    # TODO 절마다 ```text 지시문과 다섯 칸 이름표
-    sections, cur = {}, None
-    for i, c in enumerate(nb.cells):
-        if c.cell_type != "markdown" or is_box(c):
+def is_head(c):
+    return c.cell_type == "markdown" and not is_box(c) and re.match(r"#{1,4} ", c.source.lstrip()) is not None
+
+
+def fill_blanks(src, answers):
+    """✍ 빈칸 줄을 정답 코드로 차례대로 바꾼다(빈칸 줄의 들여쓰기를 유지)."""
+    out, k = [], 0
+    for line in src.splitlines():
+        if BLANK in line and k < len(answers):
+            indent = line[: len(line) - len(line.lstrip())]
+            out += [indent + a if a.strip() else a for a in answers[k].splitlines()]
+            k += 1
+        else:
+            out.append(line)
+    return "\n".join(out)
+
+
+def check_lab(nb, R):
+    cells = nb.cells
+    pat = re.compile(r"\b(" + "|".join(LAB_FILE_TOOLS) + r")\(")
+    R("실습", "파일 도구(make_blank·run_step·show_diff·show_code_map·show_slides) 없음 — 코드는 셀에 넣는다",
+      [(i, f"{m.group(1)}: {excerpt(c.source, 40)}") for i, c in enumerate(cells)
+       if c.cell_type == "code" for m in pat.finditer(c.source)])
+    R("실습", "src/ 파일에 쓰는 코드 없음",
+      [(i, excerpt(c.source, 50)) for i, c in enumerate(cells) if c.cell_type == "code"
+       and "src/" in c.source and re.search(r"write_text|open\([^)]*['\"][wa]['\"]", c.source)])
+
+    syntax, prompt_bad, draft, answer_bad = [], [], [], []
+    for i, c in enumerate(cells):
+        if c.cell_type != "code" or BLANK not in c.source:
             continue
-        head = next((ln for ln in c.source.splitlines() if re.match(r"#{2,4} ", ln)), None)
-        if head:
-            cur = i if re.match(r"#{2,4} [\d.]+ TODO", head) else None
-            if cur is not None:
-                sections[cur] = []
-        elif cur is not None:
-            sections[cur] += re.findall(r"```text\n(.*?)```", c.source, flags=re.S)
-    bad, draft = [], []
-    for i, blocks in sections.items():
+        if hidden(c):
+            syntax.append((i, "빈칸(✍) 셀이 숨겨져 있음 — 수강생이 채울 셀은 보여야 한다"))
+            continue
+        try:
+            ast.parse(c.source)
+        except SyntaxError as e:
+            syntax.append((i, f"빈칸 상태로 문법 오류: {e.msg} ({e.lineno}행)"))
+        # (b) 같은 절 안, 앞쪽의 CodeMate 지시문
+        blocks, k = [], i - 1
+        while k >= 0 and not is_head(cells[k]):
+            if cells[k].cell_type == "markdown" and "**CodeMate 지시문**" in cells[k].source:
+                blocks += re.findall(r"```text\n(.*?)```", cells[k].source, flags=re.S)
+            k -= 1
         if not blocks:
-            bad.append((i, "TODO 절에 ```text CodeMate 지시문이 없음"))
+            prompt_bad.append((i, "같은 절 앞쪽에 **CodeMate 지시문** ```text 블록이 없음"))
         elif any(TODO_PLACEHOLDER in b for b in blocks):
             draft.append((i, "지시문이 아직 (작성 예정)"))
         else:
             missing = [lab for lab in PROMPT_LABELS if not any(lab in b for b in blocks)]
             if missing:
-                bad.append((i, f"지시문에 없는 칸: {' '.join(missing)}"))
-    R("실습", "TODO 절마다 ```text 지시문 + 다섯 칸 [역할·목표]…[하지 말 것]", bad)
-    R("실습", "지시문이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)
-    R("실습", "(작성 예정) 자리표시 없음", [(i, excerpt(c.source, 50)) for i, c in enumerate(nb.cells)
-                                     if not is_box(c) and TODO_PLACEHOLDER in c.source], warn=True)
-
-    # 도구 호출 경로와 빈칸 복사본
-    import tempfile
-
-    sys.path.insert(0, str(ROOT / "lessons"))
-    from assets.widgets import _slice, make_blank  # 노트북과 같은 방식으로 표시를 찾고 빈칸을 만든다
-
-    rules = {"run_step": (WORK, RAW), "show_code": (RAW, CONF), "show_code_map": (WORK, RAW, CONF)}
-    bad, blanks_bad, works, diffed, blank_texts = [], [], {}, set(), {}
-    for i, c in enumerate(nb.cells):
-        if c.cell_type != "code":
+                prompt_bad.append((i, f"지시문에 없는 칸: {' '.join(missing)}"))
+        # (c) 다음 제목 전까지의 정답 보기 상자
+        box, k = None, i + 1
+        while k < len(cells) and not is_head(cells[k]):
+            if cells[k].cell_type == "markdown" and cells[k].source.lstrip().startswith(ANSWER_HEAD):
+                box = cells[k]
+                break
+            k += 1
+        if box is None:
+            answer_bad.append((i, "셀 뒤(다음 제목 전)에 <details><summary>정답 보기</summary> 상자가 없음"))
             continue
-        if "src/" in c.source and re.search(r"write_text|open\([^)]*['\"][wa]['\"]", c.source):
-            bad.append((i, "src/ 파일에 쓰는 코드"))
-        for call in calls(c.source, set(LAB_TOOLS)):
-            name, args = call.func.id, [literal(a) for a in call.args]
-            kw = {k.arg: literal(k.value) for k in call.keywords}
-            if name == "make_blank":
-                raw, work, blanks = (args + [None] * 3)[:3]
-                if not (isinstance(raw, str) and raw.startswith(RAW) and isinstance(work, str) and work.startswith(WORK)):
-                    bad.append((i, f"make_blank는 {RAW} → {WORK}: {raw!r} → {work!r}"))
-                    continue
-                works[work] = i
-                empty = [n for n, b in enumerate(blanks or [None], 1) if not isinstance(b, dict)]
-                if empty:
-                    blanks_bad.append((i, f"{Path(raw).name}: {empty}번째 빈칸 범위가 비어 있음 — labs JSON의 blank를 채운다"))
-                    continue
-                try:
-                    with tempfile.TemporaryDirectory() as d:
-                        out = Path(d) / Path(work).name
-                        make_blank(folder / raw, out, blanks, reset=True)
-                        blank_texts[work] = out.read_text(encoding="utf-8")
-                        ast.parse(blank_texts[work])
-                except Exception as e:  # noqa: BLE001 — 표시 못 찾음·문법 오류·범위 없음(None) 모두 보고
-                    blanks_bad.append((i, f"{Path(raw).name}: {type(e).__name__}: {excerpt(e, 70)}"))
-                continue
-            if name == "show_diff":
-                mine, sol = (args + [None] * 2)[:2]
-                if not (isinstance(mine, str) and mine.startswith(WORK) and isinstance(sol, str) and sol.startswith(SOL)):
-                    bad.append((i, f"show_diff는 ({WORK}…, {SOL}…): {mine!r}, {sol!r}"))
-                    continue
-                if not (folder / sol).resolve().exists():
-                    bad.append((i, f"솔루션 파일 없음: {sol}"))
-                diffed.add(mine)
-            else:
-                path = args[0] if args else None
-                if not (isinstance(path, str) and path.startswith(rules[name])):
-                    bad.append((i, f"{name} 경로가 {' 또는 '.join(rules[name])} 밖: {path!r}"))
-                    continue
-            path = args[0] if args else None
-            if path.startswith(WORK):
-                if works.get(path, i) >= i:
-                    bad.append((i, f"{name}: 앞에서 make_blank로 만들지 않은 복사본 {path}"))
-                elif name == "show_code_map" and path in blank_texts:  # 코드 지도 표시는 빈칸 복사본에 있어야 한다
-                    for sec in (args[1] if len(args) > 1 and isinstance(args[1], list) else []):
-                        if sec.get("marker") and sec["marker"] not in blank_texts[path]:
-                            bad.append((i, f"빈칸 복사본 {Path(path).name}에 표시 없음: {sec['marker']!r}"))
-                continue
-            f = (folder / path).resolve()
-            if not f.exists():
-                bad.append((i, f"파일 없음: {path}"))
-                continue
-            try:
-                if name == "show_code_map":
-                    text = f.read_text(encoding="utf-8")
-                    for sec in (args[1] if len(args) > 1 and isinstance(args[1], list) else []):
-                        if sec.get("marker") and sec["marker"] not in text:
-                            bad.append((i, f"{f.name}에 표시 없음: {sec['marker']!r}"))
-                    continue
-                pos = args[1:3] + [None] * (3 - len(args))
-                start, end = kw.get("start", pos[0]), kw.get("end", pos[1])
-                lines, first, last, _ = _slice(f, start, end)
-                for fs, _fe, _label in kw.get("fold") or []:
-                    if not any(fs in lines[k] for k in range(first, last)):
-                        bad.append((i, f"{f.name} 구간 안에 접기 표시 없음: {fs!r}"))
-            except ValueError as e:
-                bad.append((i, excerpt(e, 80)))
-    bad += [(i, f"복사본 {w}를 솔루션과 비교하는 show_diff 없음") for w, i in works.items() if w not in diffed]
-    R("실습", f"경로: 복사본 {WORK}, 솔루션 {SOL}, 원본 {RAW}(읽기만)·코드 지도 표시가 보여 줄 파일에 있음", bad)
-    R("실습", "make_blank 빈칸이 원본에 맞고, 빈칸 복사본이 파이썬 문법에 맞음", blanks_bad)
+        answers = re.findall(r"```python\n(.*?)```", box.source, flags=re.S)
+        n_blank = sum(BLANK in ln for ln in c.source.splitlines())
+        if len(answers) != n_blank:
+            answer_bad.append((k, f"빈칸 {n_blank}곳인데 정답 코드 블록 {len(answers)}개"))
+            continue
+        try:
+            ast.parse(fill_blanks(c.source, answers))
+        except SyntaxError as e:
+            answer_bad.append((k, f"정답을 끼운 셀 {i}가 문법 오류: {e.msg} ({e.lineno}행)"))
+    R("실습", "빈칸(✍) 셀이 보이고, 빈칸 상태 그대로 파이썬 문법에 맞음", syntax)
+    R("실습", "빈칸 셀마다 앞에 ```text 지시문 + 다섯 칸 [역할·목표]…[하지 말 것]", prompt_bad)
+    R("실습", "빈칸 셀마다 뒤에 정답 보기 상자, 정답을 끼우면 문법에 맞음", answer_bad)
+    R("실습", "지시문이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)
+    R("실습", "(작성 예정) 자리표시 없음", [(i, excerpt(c.source, 50)) for i, c in enumerate(cells)
+                                     if not is_box(c) and TODO_PLACEHOLDER in c.source], warn=True)
 
 
 # ── 안전·실행 ───────────────────────────────────────────
-def check_safety(nb, folder, R):
+def check_safety(nb, kind, R):
     R("안전·실행", "저장된 출력·실행 번호 없음 (커밋용)",
       [(i, f"출력 {len(c.outputs)}개, 실행 번호 {c.execution_count}") for i, c in enumerate(nb.cells)
        if c.cell_type == "code" and (c.outputs or c.execution_count)])
@@ -412,9 +419,13 @@ def check_safety(nb, folder, R):
     for i, c in enumerate(nb.cells):
         if is_box(c):
             continue
+        if kind == "lab" and c.cell_type == "code" and not TOOL_CELL.search(c.source):
+            continue  # 실습 노트북에 옮겨 넣은 원본 코드의 API 주소 문자열은 불러오기가 아니다
         src = outside_text_blocks(c.source) if c.cell_type == "markdown" else c.source
+        if kind == "lab" and c.cell_type == "markdown":
+            src = re.sub(r"```python.*?```", "", src, flags=re.S)  # 참고 코드 블록도 원본 코드
         urls += [(i, excerpt(m.group(0))) for m in re.finditer(r"(https?:)?//[\w.-]+\.\w+\S*|\bcdn\.\S+", src)]
-    R("안전·실행", "외부 주소(http/https/cdn) 없음", urls)
+    R("안전·실행", "외부 주소(http/https/cdn) 없음 (실습의 원본 코드는 제외)", urls)
 
 
 def secret_values():
@@ -477,15 +488,15 @@ def qc(path, execute=False):
     kind = kind_of(path)
     if kind is None:
         R("종류", "파일 이름이 _LEC 또는 _LAB으로 끝남", [(0, path.name)], warn=True)
-    check_quiz(nb, path.parent, R)
-    check_student_text(nb, R)
-    check_structure(nb, R)
+    quizzes = check_quiz(nb, path.parent, R)
+    check_student_text(nb, quizzes, R)
+    check_structure(nb, kind, R)
     check_slides(nb, kind, R)
     if kind == "lecture":
         check_lecture(nb, R)
     else:
-        check_lab(nb, path.parent, R)
-    check_safety(nb, path.parent, R)
+        check_lab(nb, R)
+    check_safety(nb, kind, R)
     if execute:
         check_execute(path, R)
 
