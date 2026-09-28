@@ -47,7 +47,24 @@ UNITS = {
     "04-langgraph": ("2-1", "langgraph"),
     "05-multi-agent": ("2-2", "multi_agent"),
     "06-rag-streamlit": ("2-3", "rag_streamlit"),
+    # Chapter02(M2). spec 파일은 labs/Chapter02/<실습 폴더>.json
+    "00-review": ("3-1", "review"),
+    "01-mcp": ("3-2", "mcp"),
+    "02-a2a": ("3-3", "a2a"),
+    "03-langgraph-advanced": ("3-4", "langgraph_advanced"),
+    "04-harness": ("4-1", "harness"),
+    "05-observability": ("4-2", "observability"),
 }
+
+
+def chapter_of(folder):
+    """교안 번호 첫 자리로 챕터를 정한다: 1·2일차 → Chapter01, 3·4일차 → Chapter02."""
+    return "Chapter01" if UNITS[folder][0][0] in "12" else "Chapter02"
+
+
+def spec_path(folder):
+    ch = chapter_of(folder)
+    return LABS / f"{folder}.json" if ch == "Chapter01" else LABS / ch / f"{folder}.json"
 
 KIND_EXAMPLE, KIND_TASK = "예제", "과제"  # 제목 옆 표시 (예제) (과제)
 
@@ -58,6 +75,18 @@ PROMPT_GUIDE = f"""실습은 두 종류입니다. 제목 옆 표시와 코드 �
 
 실행한 뒤에는 **성공 기준**과 비교해 스스로 판단합니다. 🟢는 되어야 하는 것, ⛔는 다시 해야 하는 신호입니다. 과제는 그다음 접힌 "정답 보기"와 비교합니다."""
 
+
+TERMINAL_NOTE = """위 셀을 실행하면 이 폴더에 서버 파일이 만들어집니다(빈칸을 먼저 채웁니다). 서버는 터미널에서 띄웁니다.
+
+1. VS Code 메뉴 **터미널 → 새 터미널**을 엽니다(저장소 맨 위 폴더에서 열립니다).
+2. 아래 명령을 붙여 넣고 실행합니다.
+
+```
+uv run python {path}
+```
+
+3. 서버 시작 문구가 나오고 명령이 끝나지 않고 기다리면 켜진 것입니다. 이 터미널은 닫지 말고 노트북으로 돌아옵니다.
+4. 서버 파일을 고쳤다면 터미널에서 **Ctrl+C**로 끄고, 위 셀을 다시 실행한 뒤 같은 명령으로 다시 띄웁니다."""
 
 BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
 MARK_TASK, MARK_EDIT = "# ✍️ WRITE_HERE:", "# ✍️ CHANGE_HERE:"
@@ -162,9 +191,10 @@ def _mark(lines, edits):
 
 
 def build(folder):
-    spec = json.loads((LABS / f"{folder}.json").read_text(encoding="utf-8"))
+    spec = json.loads(spec_path(folder).read_text(encoding="utf-8"))
     unit, slug = UNITS[folder]
-    nb = Notebook(COURSE / "Chapter01" / "assets" / "quizzes" / f"{unit}-lab", f"../assets/quizzes/{unit}-lab")
+    chapter = chapter_of(folder)
+    nb = Notebook(COURSE / chapter / "assets" / "quizzes" / f"{unit}-lab", f"../assets/quizzes/{unit}-lab")
 
     nb.md(f"# [LAB] {spec['title']}\n\n{spec['intro']}")
     nb.meta(spec.get("intro__meta"))
@@ -176,7 +206,7 @@ def build(folder):
 
     for n, f in enumerate(spec["files"], start=2):
         # 원본을 먼저 정돈한다(읽기 쉽게). 원본·솔루션이 다르면 spec의 source로 깔끔한 쪽을 고른다
-        src_dir = COURSE / "Chapter01" / "code" / f.get("source", "raw") / folder
+        src_dir = COURSE / chapter / "code" / f.get("source", "raw") / folder
         raw = _patch(fmt((src_dir / f["name"]).read_text(encoding="utf-8")).splitlines(), f.get("patch", []))
         todos = [t for t in f.get("todos", []) if t.get("blank")]  # 빈칸 범위가 없는 TODO(뼈대 미완성)는 건너뛴다
         for t in f.get("todos", []):
@@ -190,8 +220,10 @@ def build(folder):
         todo_lines = [k for k, ln in enumerate(lines) if MARK_TASK in ln]
         todo_at = [next((k for k in todo_lines if t["todo"][:12] in lines[k]), todo_lines[min(i, len(todo_lines) - 1)] if todo_lines else 0)
                    for i, t in enumerate(todos)]
-        wf = f.get("writefile")  # Streamlit 앱처럼 파일로 띄워야 하는 코드: 한 셀로 묶어 파일로 쓰고 따로 실행한다
-        split = [] if wf else f.get("split") or [ln.strip() for ln in lines if ln.startswith("# ──")]
+        # Streamlit 앱·서버처럼 파일로 띄워야 하는 코드: 셀에서 파일로 쓰고 따로 실행한다.
+        # split을 주면 구획마다 나눠 쓴다(첫 구획은 새로 쓰고, 다음부터는 이어 쓰기 -a)
+        wf = f.get("writefile")
+        split = f.get("split", []) if wf else f.get("split") or [ln.strip() for ln in lines if ln.startswith("# ──")]
         nb.h(2, f"{n}. {f['title']}")
         nb.md(f["intro"])
         nb.meta(f.get("intro__meta"))
@@ -212,7 +244,7 @@ def build(folder):
                 nb.md("문자열로 감싸 두어 실행되지 않는 참고 코드입니다. 읽어만 봅니다.\n\n```python\n" + (notes + "\n" if notes else "") + ref + "\n```")
                 continue
             if wf:
-                text = f"%%writefile {wf}\n" + text
+                text = f"%%writefile {'-a ' if c else ''}{wf}\n" + text + ("\n\n" if split else "")
             elif c == 0 and f.get("hide_first", True):  # 준비 코드: 불러오기·환경 설정. 접어 둔다
                 nb.md(f.get("setup_note", "준비 코드입니다. 필요한 도구를 불러오고 모델을 준비합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다."))
                 nb.code(text, kind="")
@@ -243,7 +275,9 @@ def build(folder):
                 # 정답은 원본에서 지운 줄이 기본이고, 솔루션과 다른 곳은 spec의 answer로 바꿔 보여 준다
                 ans = "\n\n".join("```python\n" + _dedent_common("\n".join(todos[i].get("answer") or answers[i])) + "\n```" for i in mine)
                 nb.md(f"<details><summary>정답 보기</summary>\n\n{ans}\n\n</details>")
-        if wf:
+        if wf and f.get("run") == "terminal":  # 서버: 노트북 커널을 붙잡지 않도록 터미널에서 띄운다
+            nb.md(f.get("run_note") or TERMINAL_NOTE.format(path=f"course/{chapter}/notebooks/{wf}"))
+        elif wf:
             nb.md(f.get("run_note", "위 셀을 실행하면 이 폴더에 앱 파일이 만들어집니다. 아래 셀을 실행하면 브라우저에 앱이 열립니다. 앱을 멈출 때는 이 셀의 실행을 중지(■)합니다."))
             # 셸 PATH에 가상환경이 없어도 되도록, 노트북 커널의 파이썬으로 streamlit을 실행한다
             nb.code(f"import sys\n\n!{{sys.executable}} -m streamlit run {wf}", visible=True, kind=KIND_EXAMPLE)
@@ -259,7 +293,7 @@ def build(folder):
 
     nb.h(2, f"{len(spec['files']) + 2}. 정리")
     nb.md(spec["closing"])
-    nb.finish(COURSE / "Chapter01" / "notebooks" / f"{unit}_{slug}_LAB.ipynb")
+    nb.finish(COURSE / chapter / "notebooks" / f"{unit}_{slug}_LAB.ipynb")
 
 
 def _sections(lines):
@@ -298,11 +332,11 @@ def _guess_blank(lines, t):
 
 def scaffold(folder):
     """실습 폴더의 뼈대 JSON을 만든다. 설명·지시문은 '작성 예정'으로 두고, 빈칸 범위는 추정값이다."""
-    out = LABS / f"{folder}.json"
+    out = spec_path(folder)
     if out.exists():
         print(f"✔ 이미 있음: {out.name}")
         return
-    raw_dir = COURSE / "Chapter01" / "code" / "raw" / folder
+    raw_dir = COURSE / chapter_of(folder) / "code" / "raw" / folder
     files = []
     for py in sorted(raw_dir.glob("*.py")):
         lines = py.read_text(encoding="utf-8").splitlines()
@@ -321,7 +355,7 @@ def scaffold(folder):
         files.append(entry)
     unit = UNITS[folder][0]
     spec = {"draft": True, "title": f"{unit} 실습", "intro": "(작성 예정)", "files": files, "closing": "(작성 예정)"}
-    LABS.mkdir(parents=True, exist_ok=True)
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(spec, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"✔ 뼈대 생성: {out.name} (파일 {len(files)}개, TODO {sum(len(f.get('todos', [])) for f in files)}개)")
 
@@ -333,11 +367,11 @@ def check_blanks(folder):
     sys.path.insert(0, str(COURSE / "Chapter01"))
     from assets.widgets import make_blank
 
-    spec = json.loads((LABS / f"{folder}.json").read_text(encoding="utf-8"))
+    spec = json.loads(spec_path(folder).read_text(encoding="utf-8"))
     for f in spec["files"]:
         if not f.get("todos"):
             continue
-        raw = COURSE / "Chapter01" / "code" / "raw" / folder / f["name"]
+        raw = COURSE / chapter_of(folder) / "code" / "raw" / folder / f["name"]
         with tempfile.TemporaryDirectory() as d:
             work = Path(d) / f["name"]
             try:
@@ -351,12 +385,12 @@ def check_blanks(folder):
 if __name__ == "__main__":
     args = sys.argv[1:]
     if args[:1] == ["--scaffold"]:
-        for folder in UNITS:
+        for folder in args[1:] or UNITS:
             scaffold(folder)
             check_blanks(folder)
     elif args[:1] == ["--check"]:
         for folder in args[1:] or UNITS:
             check_blanks(folder)
     else:
-        for folder in args or sorted(p.stem for p in LABS.glob("*.json")):
+        for folder in args or sorted(p.stem for p in LABS.glob("**/*.json") if p.stem in UNITS):
             build(folder)

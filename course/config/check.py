@@ -4,10 +4,12 @@
     uv run python -m config.check            설정 점검
     uv run python -m config.check --live     실제로 모델·임베딩을 한 번씩 호출해 본다(요청 1~2회)
     uv run python -m config.check --json     AI 도우미가 읽기 좋은 JSON으로 출력
+    uv run python -m config.check --langfuse Langfuse 키(2부 관측 실습·캡스톤)도 본다
 노트북:
     from config.check import check_env
     check_env()                              # LLM만 본다
     check_env(["EMBED_PROVIDER", "RAG_PROVIDER"])   # 임베딩·RAGaaS도 본다
+    check_env(["LANGFUSE"])                         # Langfuse(2부 관측 실습)도 본다
 
 결과 표시: 🟢 문제없음, ⛔ 고쳐야 함, ⚠️ 확인 필요(동작은 할 수 있음)
 """
@@ -35,7 +37,12 @@ REQUIRED = {
         "samsung": ["search_url", "rag_credential_key", "rag_api_key"],
         "mock": [],
     },
+    # 연결 방식이 하나뿐인 설정(2부 관측 실습·캡스톤)
+    "LANGFUSE": {
+        "on": ["LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGFUSE_BASE_URL"],
+    },
 }
+ALIAS = {"LANGFUSE_BASE_URL": "LANGFUSE_HOST"}  # 예전 이름도 받는다
 ROOT = Path(__file__).resolve().parents[2]  # course/config/check.py → 저장소 맨 위
 _SECRET = re.compile(r"(sk-[A-Za-z0-9_-]{4})[A-Za-z0-9_-]+|([A-Za-z0-9_-]{6})[A-Za-z0-9_-]{20,}")
 
@@ -78,12 +85,12 @@ def report(groups=("LLM_PROVIDER",), live=False):
 
     # 4. 연결 방식별 필요한 이름
     for group in groups:
-        kind = os.getenv(group, "samsung").strip().lower()
+        kind = "on" if group == "LANGFUSE" else os.getenv(group, "samsung").strip().lower()
         need = REQUIRED[group].get(kind)
         if need is None:
             items.append(_item("⛔", group, f"알 수 없는 값: {kind}", f"{' 또는 '.join(REQUIRED[group])} 중 하나"))
             continue
-        missing = [n for n in need if not os.getenv(n, "").strip()]
+        missing = [n for n in need if not os.getenv(n, "").strip() and not os.getenv(ALIAS.get(n, ""), "").strip()]
         odd = [n for n in need if os.getenv(n, "").lstrip().startswith("#")]  # 빈 값 뒤 주석이 값으로 읽힌 경우
         if missing or odd:
             detail = f"{kind} — 빠진 이름: {', '.join(missing)}" if missing else f"{kind}"
@@ -94,7 +101,8 @@ def report(groups=("LLM_PROVIDER",), live=False):
             items.append(_item("🟢", group, f"{kind} — 필요한 이름 {len(need)}개 있음"))
 
     # 5. 패키지
-    for mod in ("dotenv", "langchain_openai", "openai", "requests"):
+    mods = ["dotenv", "langchain_openai", "openai", "requests"] + (["langfuse"] if "LANGFUSE" in groups else [])
+    for mod in mods:
         found = importlib.util.find_spec(mod) is not None
         items.append(_item("🟢" if found else "⛔", f"패키지 {mod}", "설치됨" if found else "없음",
                            "" if found else "저장소 맨 위에서 uv sync --extra notebooks"))
@@ -143,6 +151,8 @@ def check_env(groups=(), live=False):
 if __name__ == "__main__":
     args = sys.argv[1:]
     groups = ["LLM_PROVIDER", "EMBED_PROVIDER", "RAG_PROVIDER"]  # 명령으로 실행하면 전부 본다
+    if "--langfuse" in args:  # 2부 관측 실습·캡스톤
+        groups.append("LANGFUSE")
     if "--json" in args:
         items = report(groups, live="--live" in args)
         print(json.dumps({"ok": not any(i["status"] == "⛔" for i in items), "items": items}, ensure_ascii=False, indent=1))
