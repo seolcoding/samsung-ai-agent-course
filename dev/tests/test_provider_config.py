@@ -16,7 +16,8 @@ class CaptureClient:
 class ProviderConfigTests(unittest.TestCase):
     def setUp(self):
         dotenv = types.ModuleType("dotenv")
-        dotenv.load_dotenv = lambda: None
+        dotenv.load_dotenv = lambda *args, **kwargs: None
+        dotenv.find_dotenv = lambda *args, **kwargs: ""
 
         langchain_openai = types.ModuleType("langchain_openai")
         langchain_openai.ChatOpenAI = CaptureClient

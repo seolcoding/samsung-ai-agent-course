@@ -134,37 +134,12 @@ def _dedent_common(text):
     return textwrap.dedent(text)
 
 
-# 환경 점검 셀이 보는 설정: 설정 이름 → 종류별로 있어야 할 이름. LLM은 늘 보고, 임베딩·RAG는 spec "env"로 더한다
-ENV_GROUPS = {
-    "LLM_PROVIDER": {"openai": ["OPENAI_API_KEY", "OPENAI_MODEL"],
-                     "samsung": ["api_base_url", "model", "credential_key", "send_system_name", "user_id"]},
-    "EMBED_PROVIDER": {"openai": ["OPENAI_API_KEY", "OPENAI_EMBEDDING_MODEL"],
-                       "samsung": ["embedding_api_url", "embedding_x_dep_ticket"]},
-    "RAG_PROVIDER": {"mock": [], "samsung": ["search_url", "rag_credential_key", "rag_api_key"]},
-}
-
-
 def _env_check(extra):
-    groups = {k: ENV_GROUPS[k] for k in ["LLM_PROVIDER", *extra]}
-    return f"""import os
-from dotenv import load_dotenv, find_dotenv
-
-load_dotenv(find_dotenv(usecwd=True))  # 프로젝트의 .env 파일을 읽습니다
-
-# 값은 출력하지 않습니다. 빠진 설정이 있는지만 봅니다.
-필요한_설정 = {pformat(groups, width=100, sort_dicts=False)}
-빠진_이름 = []
-for 설정, 종류별 in 필요한_설정.items():
-    종류 = os.getenv(설정, "samsung").strip().lower()
-    빠진_이름 += [n for n in 종류별.get(종류, [설정]) if not os.getenv(n)]
-
-import config.llm  # 실습 코드가 쓰는 설정 모듈을 불러옵니다
-
-if 빠진_이름:
-    print(f"준비가 덜 되었습니다. 빠진 설정 {{len(빠진_이름)}}개가 있습니다. 강사에게 알려 주세요.")
-    print("(강사 확인용:", ", ".join(빠진_이름), ")")
-else:
-    print("준비 완료: 실습에 필요한 설정이 모두 있습니다.")"""
+    """환경 점검 셀. 점검 로직은 course/config/check.py에 있다(수강생 AI도 같은 점검을 명령으로 돌린다)."""
+    groups = f"{list(extra)!r}" if extra else ""
+    return ("from config.check import check_env\n\n"
+            "# 값은 출력하지 않고, 필요한 설정 이름이 있는지만 봅니다\n"
+            f"check_env({groups})")
 
 
 def _criteria_md(checks, fail=(), success=()):

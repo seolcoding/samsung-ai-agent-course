@@ -24,6 +24,7 @@ from typing import Annotated, Literal
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 from dotenv import load_dotenv
+import config  # noqa: F401  .env의 COURSE_ENV(사내/사외)에 맞춰 연결 방식을 채운다
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 from langchain_mcp_adapters.client import MultiServerMCPClient

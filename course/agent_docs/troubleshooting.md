@@ -1,6 +1,6 @@
 # 문제 해결
 
-오류 메시지의 **마지막 줄**(오류 이름과 설명)을 먼저 읽고 아래 표에서 찾는다. 해결한 뒤에는 **맨 위 셀부터 다시 실행**한다.
+먼저 저장소 맨 위에서 `uv run python -m config.check`를 실행해 ⛔ 줄을 고친다(설정 문제는 대부분 여기서 잡힌다). 그다음 오류 메시지의 **마지막 줄**(오류 이름과 설명)을 읽고 아래 표에서 찾는다. 해결한 뒤에는 **맨 위 셀부터 다시 실행**한다.
 설치·`.env`는 [setup.md](setup.md), 경로는 [paths.md](paths.md)를 함께 본다.
 키·토큰 값은 절대 출력하지 않는다. 있는지만 확인한다: `import os; print(bool(os.getenv("OPENAI_API_KEY")))`
 
@@ -31,7 +31,7 @@
 | `ValueError: 지원하지 않는 LLM_PROVIDER` | 값 오타 | `openai` 또는 `samsung` |
 | `.env`를 고쳤는데 그대로임 | 커널이 예전 값을 기억함 | 커널 다시 시작 후 맨 위부터 실행 |
 | 값이 `# …`로 시작하는 글자로 들어감(주소·모델 이름이 이상함) | `KEY=   # 설명`처럼 빈 값 뒤에 주석을 붙임 | 설명은 윗줄로 옮기고 `KEY=값`만 남긴다 |
-| 사내 PC인데 OpenAI로 연결하려 함 / 사외 PC인데 사내 주소로 연결하려 함 | `.env`의 ① 실행 환경을 잘못 고름 | 사내는 `samsung` 세 줄, 사외는 `openai`·`openai`·`mock` 세 줄만 남긴다 |
+| 사내 PC인데 OpenAI로 연결하려 함 / 사외 PC인데 사내 주소로 연결하려 함 | `.env`의 `COURSE_ENV`가 틀렸거나, 따로 적은 `*_PROVIDER`가 덮어씀 | 사내 `COURSE_ENV=samsung`, 사외 `COURSE_ENV=out`. 따로 적은 `LLM_PROVIDER` 등은 지운다 |
 | `.env`를 못 찾음 | 이름이 `.env`가 아님(예: `.env.txt`, `.env.external`) 또는 위치가 다름 | 저장소 맨 위에 정확히 `.env`로 둔다. 윈도우 탐색기는 확장자를 숨기니 주의 |
 
 ## LLM·API 호출

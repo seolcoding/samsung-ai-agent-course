@@ -34,7 +34,7 @@ LAB_FILE_TOOLS = ("make_blank", "run_step", "show_diff", "show_code_map", "show_
 BLANK = "✍"
 BLANK_LINE = re.compile(r"^\s*\.\.\.\s*# ✍")  # 빈칸 줄: `...  # ✍️ 여기를 채웁니다`
 ANSWER_HEAD = "<details><summary>정답 보기</summary>"
-TOOL_CELL = re.compile(r"\b(show_\w+|slide_setup)\(|sys\.path\.insert|find_dotenv\(usecwd=True\)")  # 숨겨야 할 도구 셀
+TOOL_CELL = re.compile(r"\b(show_\w+|slide_setup|check_env)\(|sys\.path\.insert|find_dotenv\(usecwd=True\)")  # 숨겨야 할 도구 셀
 HINT_HEAD, CRITERIA_HEAD = "**프롬프트 힌트**", "**성공 기준**"
 HINT_MAX_SENTENCES = 3
 MARKER = re.compile(r"# ✍️ (CHANGE_HERE|WRITE_HERE):")

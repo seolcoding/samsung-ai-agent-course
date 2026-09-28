@@ -62,7 +62,8 @@ class DirectApiExamplesTests(unittest.TestCase):
         self.openai.OpenAI = openai_client
 
         dotenv = types.ModuleType("dotenv")
-        dotenv.load_dotenv = lambda: None
+        dotenv.load_dotenv = lambda *args, **kwargs: None
+        dotenv.find_dotenv = lambda *args, **kwargs: ""
 
         modules = patch.dict(
             sys.modules,

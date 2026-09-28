@@ -13,7 +13,8 @@ from unittest.mock import patch
 class RagProviderTests(unittest.TestCase):
     def setUp(self):
         dotenv = types.ModuleType("dotenv")
-        dotenv.load_dotenv = lambda: None
+        dotenv.load_dotenv = lambda *args, **kwargs: None
+        dotenv.find_dotenv = lambda *args, **kwargs: ""
         requests = types.ModuleType("requests")
         self.calls = []
 

@@ -29,19 +29,20 @@
 ## 3. `.env` (연결 설정)
 
 1. 저장소 맨 위의 `.env.sample`을 같은 자리에 **`.env`** 라는 이름으로 복사한다. 노트북은 이 이름만 읽는다(노트북 폴더에서 위로 올라가며 `.env`를 찾는다).
-2. `.env`의 **① 실행 환경**에서 하나만 남긴다.
-   - 강의장(삼성 인트라넷) PC: `[사내]` 세 줄 — `LLM_PROVIDER=samsung`, `EMBED_PROVIDER=samsung`, `RAG_PROVIDER=samsung`. 견본의 기본값이다.
-   - 사내망 밖: `[사외]` 세 줄 — `openai`, `openai`, `mock`. 사내 세 줄 앞에는 `#`을 붙인다.
+2. `.env` 맨 위 **① `COURSE_ENV`** 한 줄만 고른다. 나머지 연결 방식은 `config`가 자동으로 맞춘다.
+   - `COURSE_ENV=samsung` 강의장(삼성 인트라넷) PC. LLM·임베딩·RAGaaS 모두 사내 API. 견본의 기본값이다.
+   - `COURSE_ENV=out` 사내망 밖. LLM·임베딩은 OpenAI, RAGaaS는 모의 응답(mock).
+   - 하나씩 따로 정해야 할 때만 `LLM_PROVIDER`·`EMBED_PROVIDER`·`RAG_PROVIDER`를 적는다. 적은 값이 `COURSE_ENV`보다 우선한다.
 3. 고른 환경의 칸만 채운다. **② 사내 값**은 사내 교육 페이지의 환경·API 키 안내에 있고, **③ 사외 값**은 강사가 알려 준다.
-4. 노트북 맨 위 "환경 점검" 셀을 실행한다. "준비 완료"가 나오면 끝이다. 빠진 이름이 나오면 그 이름을 채우고 다시 실행한다.
+4. 설정을 점검한다(아래 "설정 점검"). "준비 완료"가 나오면 끝이다.
 
 - 값 뒤에 `# 설명`을 붙이지 않는다. 빈 값 뒤의 주석은 값으로 읽힌다. 설명은 윗줄에 쓴다.
 - 키·토큰 값은 화면에 출력하거나 다른 파일·채팅에 붙여 넣지 않는다. 있는지만 확인한다.
-- 환경별로 있어야 하는 이름:
+- `COURSE_ENV`에 따라 정해지는 연결 방식과, 그때 있어야 하는 이름:
 
 | 설정 | 값 | 함께 있어야 하는 이름 |
 |---|---|---|
-| `LLM_PROVIDER` | `samsung`(사내, 비워 두어도 이 값) | `api_base_url`, `model`, `credential_key`, `send_system_name`, `user_id` |
+| `LLM_PROVIDER` | `samsung`(사내) | `api_base_url`, `model`, `credential_key`, `send_system_name`, `user_id` |
 | | `openai`(사외) | `OPENAI_API_KEY`, `OPENAI_MODEL` |
 | `EMBED_PROVIDER` | `samsung` | `embedding_api_url`, `embedding_x_dep_ticket` |
 | | `openai` | `OPENAI_API_KEY`, `OPENAI_EMBEDDING_MODEL` |
@@ -50,13 +51,27 @@
 
 - 사내 주소는 끝부분을 붙이지 않고 적는다. 코드가 `api_base_url` 뒤에 `/chat/completions`, `embedding_api_url` 뒤에 `/v1/embeddings`를 붙인다.
 
-## 4. 모델·임베딩 부르는 법
+## 4. 설정 점검 (config.check)
+
+`config` 패키지가 `.env`를 읽고 `COURSE_ENV`에 맞춰 연결 방식을 정한다. 제대로 되었는지는 점검 명령으로 확인한다. 키·토큰 값은 출력하지 않고 이름이 있는지만 본다.
+
+```
+uv run python -m config.check           # 파이썬·커널·.env 위치·COURSE_ENV·필요한 이름·패키지
+uv run python -m config.check --live    # 위에 더해 실제로 모델·임베딩을 한 번씩 호출(요청 1~2회)
+uv run python -m config.check --json    # AI 도우미용 JSON
+```
+
+- 노트북에서는 실습 노트북 맨 위 "환경 점검" 셀이 같은 점검을 한다(`from config.check import check_env; check_env()`).
+- 결과: 🟢 문제없음, ⛔ 고쳐야 함(→ 뒤의 안내를 따른다), ⚠️ 확인 필요. 끝줄이 "준비 완료"면 된다.
+- `--live`는 실제 요청을 보내므로, 이름 점검이 모두 🟢인데도 실습 셀에서 연결 오류가 날 때 쓴다.
+
+## 5. 모델·임베딩 부르는 법
 
 - 모델: `from config.llm import get_llm` → `llm = get_llm()`
 - 임베딩: `from config.embeddings import get_embeddings` → `get_embeddings()`
 - 주소·모델 이름·키를 코드에 직접 쓰지 않는다. 환경을 바꿀 때는 `.env`만 바꾼다.
 
-## 5. 원본 코드(.py)를 직접 실행할 때
+## 6. 원본 코드(.py)를 직접 실행할 때
 
 노트북이 아니라 `code/raw/…`의 파일을 실행해야 하면 저장소 맨 위에서 실행한다.
 

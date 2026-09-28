@@ -33,7 +33,8 @@ class FakeLoader:
 class RagExercisesTests(unittest.TestCase):
     def test_student_and_solution_use_mock_without_network(self):
         dotenv = types.ModuleType("dotenv")
-        dotenv.load_dotenv = lambda: None
+        dotenv.load_dotenv = lambda *args, **kwargs: None
+        dotenv.find_dotenv = lambda *args, **kwargs: ""
         llm = types.ModuleType("config.llm")
         llm.get_llm = FakeChain
         requests = types.ModuleType("requests")
