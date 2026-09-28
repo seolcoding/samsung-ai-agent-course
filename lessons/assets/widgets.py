@@ -11,7 +11,8 @@
     show_scorecard   검증 규칙 통과 여부를 회차별로 비교
     show_order_quiz  순서 맞추기 퀴즈
     show_line_pick   코드에서 틀린 줄 찾기 퀴즈
-    run_step         원본 파일의 한 구간을 보여 주고 그대로 실행
+    run_step         원본 파일의 한 구간을 보여 주고 그대로 실행 (일부를 접어 둘 수 있음)
+    show_code        원본 파일의 한 구간을 실행하지 않고 보여 주기
 """
 
 import html
@@ -494,43 +495,83 @@ def show_line_pick(code, answer_lines, title="틀린 줄 찾기", explanation=""
 _STEP_SPACES = {}
 
 
-def run_step(path, start=None, end=None):
+def _slice(path, start, end):
+    """원본에서 start 표시 줄부터 end 표시 줄 직전까지의 범위(0부터 센 줄 번호)를 찾는다."""
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+
+    def find(marker, begin):
+        hit = next((k for k in range(begin, len(lines)) if marker in lines[k]), None)
+        if hit is None:
+            raise ValueError(f"{Path(path).name}에서 표시를 찾지 못했다: {marker!r}. 원본이 바뀌었는지 확인한다.")
+        return hit
+
+    first = 0 if start is None else find(start, 0)
+    last = len(lines) if end is None else find(end, first + 1)
+    return lines, first, last, find
+
+
+def _code_box(path, lines, first, last, fold=(), collapsed=None, note="원본 그대로 실행"):
+    """코드 구간을 줄 번호와 함께 그린다.
+
+    fold: [(시작 표시, 끝 표시, 이름)] — 이 구간 안의 줄 묶음을 접어서 한 줄로 보여 준다. 끝 표시가 None이면 구간 끝까지.
+    collapsed: 문자열이면 코드 전체를 그 이름으로 접는다. 수강생에게는 접힌 제목만 보이고, 누르면 펼쳐진다.
+    접기는 화면 표시만 바꾼다. 실행되는 코드는 같다.
+    """
+    folds = []
+    for fs, fe, label in fold:
+        a = next(k for k in range(first, last) if fs in lines[k])
+        b = last if fe is None else next((k for k in range(a + 1, last) if fe in lines[k]), last)
+        folds.append((a, b, label))
+
+    def row(k):
+        return (f'<div><span style="color:#8c959f;user-select:none;display:inline-block;width:3em">{k + 1}</span>'
+                f"{html.escape(lines[k]) or ' '}</div>")
+
+    summary_style = "cursor:pointer;color:#57606a;font-size:13px"
+    parts, k = [], first
+    while k < last:
+        f = next((x for x in folds if x[0] == k), None)
+        if f:
+            a, b, label = f
+            inner = "".join(row(j) for j in range(a, b))
+            parts.append(f'<details><summary style="{summary_style}">{a + 1}–{b}줄 · {html.escape(label)} (접힘, 눌러서 보기)</summary>{inner}</details>')
+            k = b
+        else:
+            parts.append(row(k))
+            k += 1
+    pre = ('<pre style="margin:0;white-space:pre;overflow:auto;font-family:Menlo,Consolas,monospace;font-size:14px;'
+           f'background:#f6f8fa;border-radius:6px;padding:8px">{"".join(parts)}</pre>')
+    head = f"{html.escape(Path(path).name)} {first + 1}–{last}줄 ({note})"
+    if collapsed:
+        body = f'<details><summary style="{summary_style}">{head} · {html.escape(collapsed)} (접힘, 눌러서 보기)</summary>{pre}</details>'
+    else:
+        body = f'<div style="color:#57606a;font-size:13px;margin-bottom:4px">{head}</div>{pre}'
+    return HTML(f'<div style="{BOX};max-width:1200px;padding:8px">{body}</div>')
+
+
+def show_code(path, start=None, end=None, fold=(), collapsed=None):
+    """원본 구간을 실행하지 않고 보여 주기만 한다. 인자는 run_step과 같다."""
+    lines, first, last, _ = _slice(Path(path).resolve(), start, end)
+    return _code_box(Path(path).resolve(), lines, first, last, fold, collapsed, note="읽기만 함")
+
+
+def run_step(path, start=None, end=None, fold=(), collapsed=None):
     """원본 파일에서 start 표시가 든 줄부터 end 표시가 든 줄 직전까지를 보여 주고 실행한다.
 
     start가 None이면 파일 처음부터, end가 None이면 파일 끝까지다. end는 start 뒤에서 찾는다.
     원본은 고치지 않는다. 같은 파일의 단계를 순서대로 모두 실행하면 원본 전체를 한 번 실행한 것과 같다.
     파일 처음(start=None)부터 다시 실행하면 그 파일의 변수를 새로 시작한다.
+    fold·collapsed는 화면에서 접어 둘 부분이다(_code_box 참고). 실행에는 영향이 없다.
     """
     from IPython.display import display
 
     path = Path(path).resolve()
-    lines = path.read_text(encoding="utf-8").splitlines()
-
-    def find(marker, begin):
-        hit = next((k for k in range(begin, len(lines)) if marker in lines[k]), None)
-        if hit is None:
-            raise ValueError(f"{path.name}에서 표시를 찾지 못했다: {marker!r}. 원본이 바뀌었는지 확인한다.")
-        return hit
-
-    first = 0 if start is None else find(start, 0)
-    last = len(lines) if end is None else find(end, first + 1)
+    lines, first, last, _ = _slice(path, start, end)
     if start is None or path not in _STEP_SPACES:
         _STEP_SPACES[path] = {"__name__": "__main__", "__file__": str(path)}
     space = _STEP_SPACES[path]
-
-    rows = "".join(
-        f'<div><span style="color:#8c959f;user-select:none;display:inline-block;width:3em">{k + 1}</span>'
-        f"{html.escape(lines[k]) or ' '}</div>"
-        for k in range(first, last)
-    )
-    display(HTML(
-        f'<div style="{BOX};max-width:1200px;padding:8px">'
-        f'<div style="color:#57606a;font-size:13px;margin-bottom:4px">{html.escape(path.name)} {first + 1}–{last}줄 (원본 그대로 실행)</div>'
-        f'<pre style="margin:0;white-space:pre;overflow:auto;font-family:Menlo,Consolas,monospace;font-size:14px;'
-        f'background:#f6f8fa;border-radius:6px;padding:8px">{rows}</pre></div>'
-    ))
+    display(_code_box(path, lines, first, last, fold, collapsed))
     # 줄 번호가 원본과 같도록 앞을 빈 줄로 채워 컴파일한다. 오류 위치가 원본 줄 번호로 나온다.
     source = "\n" * first + "\n".join(lines[first:last]) + "\n"
     exec(compile(source, str(path), "exec"), space)
     return space
-

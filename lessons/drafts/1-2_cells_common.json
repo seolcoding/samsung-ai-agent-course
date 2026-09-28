@@ -1,7 +1,7 @@
 {
- "title": "# 1-2 LLM을 사용하며 알아야 할 것들 (버전 {VERSION})\n\n| 항목 | 내용 |\n|---|---|\n| 원본 PDF | `docs/raw/Chapter01/day01/1-2-development-environment-and-llm-api-mechanism.pdf` (19쪽) |\n| 원본 코드 | `src/raw/Chapter01/01-llm-api/`의 `01_requests.py`, `02_openai.py`, `03_langchain.py` |\n| 실행 조건 | 실제 API를 호출합니다. 사외는 `LLM_PROVIDER=openai`, 사내는 `LLM_PROVIDER=samsung`입니다. |\n| 버전 뜻 | A = 슬라이드 문구만, B = 슬라이드 요약 + 코드 연결, C = B + 왜 배우는지 |",
- "env_check_code": "import os\nfrom dotenv import load_dotenv, find_dotenv\n\nload_dotenv(find_dotenv(usecwd=True))  # 프로젝트의 .env 파일을 찾아 읽습니다\n\nprovider = os.getenv(\"LLM_PROVIDER\", \"samsung\").strip().lower()\nprint(\"LLM_PROVIDER:\", provider)\n\n# 값은 출력하지 않습니다. 설정되어 있는지(True/False)만 봅니다.\n필요한_이름 = {\n    \"openai\": [\"OPENAI_API_KEY\", \"OPENAI_MODEL\"],\n    \"samsung\": [\"api_base_url\", \"model\", \"credential_key\", \"send_system_name\", \"user_id\"],\n}\nfor name in 필요한_이름.get(provider, []):\n    print(f\"{name} 설정됨:\", bool(os.getenv(name)))\n\nimport config.llm\nprint(\"config 불러오기 성공\")",
- "env_check_look": "**볼 지점**\n- `LLM_PROVIDER`가 `openai` 또는 `samsung`으로 나오는지 확인합니다.\n- 이름 옆이 모두 `True`인지 확인합니다. `False`가 있으면 `.env`에 그 값이 비어 있다는 뜻이니 강사에게 알립니다.\n- 마지막 줄에 \"config 불러오기 성공\"이 나오면 준비가 끝났습니다.\n- 키 값은 화면에 나오지 않습니다. 혹시 나오면 강사에게 알립니다.",
+ "title": "# 1-2 LLM을 사용하며 알아야 할 것들\n\n이 노트북은 실제 API를 호출합니다.",
+ "env_check_code": "import os\nfrom dotenv import load_dotenv, find_dotenv\n\nload_dotenv(find_dotenv(usecwd=True))  # 프로젝트의 .env 파일을 읽습니다\n\n# 값은 출력하지 않습니다. 빠진 설정이 있는지만 봅니다.\nprovider = os.getenv(\"LLM_PROVIDER\", \"samsung\").strip().lower()\n필요한_이름 = {\n    \"openai\": [\"OPENAI_API_KEY\", \"OPENAI_MODEL\"],\n    \"samsung\": [\"api_base_url\", \"model\", \"credential_key\", \"send_system_name\", \"user_id\"],\n}.get(provider, [\"LLM_PROVIDER\"])\n빠진_이름 = [name for name in 필요한_이름 if not os.getenv(name)]\n\nimport config.llm  # 실습 코드가 쓰는 설정 모듈을 불러옵니다\n\nif 빠진_이름:\n    print(f\"준비가 덜 되었습니다. 빠진 설정 {len(빠진_이름)}개가 있습니다. 강사에게 알려 주세요.\")\n    print(\"(강사 확인용:\", \", \".join(빠진_이름), \")\")\nelse:\n    print(\"준비 완료: LLM에 연결할 설정이 모두 있습니다.\")",
+ "env_check_look": "**볼 지점**\n- \"준비 완료\"가 나오면 다음으로 넘어갑니다.\n- \"준비가 덜 되었습니다\"가 나오면 강사에게 알립니다.\n- 키 값은 화면에 나오지 않습니다. 혹시 나오면 강사에게 알립니다.",
  "q11_lead": "슬라이드를 보기 전에 먼저 예측해 봅니다. 답은 바로 뒤의 p4에 있습니다.",
  "q11": {
   "question": "사전 학습만 거친 모델에 \"To be or not to be\"를 넣으면 무엇이 나올 가능성이 클까요?",
@@ -40,9 +40,9 @@
  },
  "map01": [
   {
-   "title": "준비와 환경 분기",
+   "title": "준비",
    "marker": "import os",
-   "note": "필요한 도구를 불러오고 .env를 읽습니다.\nLLM_PROVIDER 값에 따라 요청 주소, 모델, 인증 헤더를 정합니다.\n키는 헤더에만 넣고 화면에 출력하지 않습니다."
+   "note": "필요한 도구를 불러옵니다.\n요청에 필요한 주소·모델·인증 정보를 준비합니다.\n키는 화면에 출력하지 않습니다."
   },
   {
    "title": "요청 본문",
@@ -51,10 +51,9 @@
    "note": "p7의 1단계, 메시지와 설정값을 담는 곳입니다.\nmessages 안의 user 한 줄이 보낼 질문입니다.\ntemperature 0.5가 설정값입니다."
   },
   {
-   "title": "환경·모델별 조정",
+   "title": "설정 조정",
    "marker": "if provider == 'samsung':",
-   "page": 19,
-   "note": "사내(samsung)이면 include_reasoning False를 추가합니다.\n그렇지 않고 모델이 gpt-6-luna이면 temperature를 빼고 reasoning_effort를 추가합니다.\n사내 경로에서는 temperature 0.5가 그대로 전송됩니다."
+   "note": "요청에 필요한 설정을 조정하는 부분입니다. 건너뛰어도 됩니다."
   },
   {
    "title": "전송",
@@ -87,7 +86,7 @@
    {
     "answer": "답을 만드는 데 쓴 토큰 수 정보가 함께 온다",
     "correct": true,
-    "feedback": "응답 JSON의 usage에 입력 토큰 수와 출력 토큰 수가 들어 있습니다. 토큰 수는 비용의 기준입니다 (p10). 사내 환경에서 usage가 오는지는 아직 확인하지 않았습니다. 출력에서 직접 살펴봅니다."
+    "feedback": "응답 JSON의 usage에 입력 토큰 수와 출력 토큰 수가 들어 있습니다. 토큰 수는 비용의 기준입니다 (p10). 출력에서 직접 살펴봅니다."
    },
    {
     "answer": "모델이 학습한 웹 문서 목록이 온다",
@@ -101,13 +100,13 @@
    }
   ]
  },
- "look_r1s1": "**볼 지점**\n- 이 단계는 화면에 아무것도 출력하지 않습니다. 오류 없이 끝나면 준비가 된 것입니다.\n- 9줄에서 `LLM_PROVIDER` 값을 읽고, 10~28줄에서 그 값에 따라 주소·모델·헤더를 정합니다.\n- 오류가 나면 메시지를 읽습니다. \"OPENAI_MODEL과 OPENAI_API_KEY가 필요합니다\"(15줄)나 \"사내 API 설정이 부족합니다\"가 나오면 `.env`에서 메시지에 적힌 이름을 확인합니다.\n- 키는 헤더에만 넣습니다(16~19줄, 26줄). 화면에는 나오지 않습니다.",
- "look_r1s2": "**볼 지점**\n- 이 단계도 출력이 없습니다. 위 코드 화면에서 확인합니다.\n- `\"messages\"` 안의 `\"role\": \"user\"` 한 줄(33줄)이 우리가 보낼 메시지입니다.\n- `\"temperature\": 0.5`(35줄)가 설정값입니다.\n- 그 아래 `if`·`elif`(38~43줄)는 환경(`samsung`)과 모델(`gpt-6-luna`)에 따라 설정값을 조금 바꿉니다. 사외 실행에서 모델이 `gpt-6-luna`이면 42줄에서 temperature가 빠진 채 전송되고, 사내 경로에서는 0.5가 그대로 전송됩니다(38~43줄).",
- "look_r1s3": "**볼 지점**\n- \"### 결과 메시지\" 아래 줄이 모델의 답입니다. 코드는 `choices[0].message.content`를 꺼내 출력했습니다(53~54줄).\n- \"### 응답 Json\" 아래에서 `choices` → `message` → `content`를 따라가면 같은 텍스트가 있습니다.\n- \"### 응답 Json\" 아래에서 `usage`를 찾습니다. 입력 토큰 수와 출력 토큰 수가 들어 있습니다 (p10).\n- 이름의 뜻: `prompt_tokens` = 입력 토큰, `completion_tokens` = 출력 토큰, `total_tokens` = 둘의 합입니다.\n- 숫자는 실행할 때마다, 환경마다 다릅니다. 출력에 적힌 값을 그대로 읽습니다.\n- `usage`가 없으면 \"이 환경에서는 제공되지 않음\"으로 적습니다.",
+ "look_r1s1": "**볼 지점**\n- 이 단계는 화면에 아무것도 출력하지 않습니다. 오류 없이 끝나면 준비가 된 것입니다.\n- 오류가 나면 메시지를 읽습니다.\n- 키는 화면에 나오지 않습니다.",
+ "look_r1s2": "**볼 지점**\n- 이 단계도 출력이 없습니다. 위 코드 화면에서 확인합니다.\n- `\"messages\"` 안의 `\"role\": \"user\"` 한 줄(33줄)이 우리가 보낼 메시지입니다.\n- `\"temperature\": 0.5`(35줄)가 설정값입니다.\n- 그 아래 접힌 38~43줄은 설정값을 조정하는 코드입니다. 펼치지 않아도 됩니다.",
+ "look_r1s3": "**볼 지점**\n- \"### 결과 메시지\" 아래 줄이 모델의 답입니다. 코드는 `choices[0].message.content`를 꺼내 출력했습니다(53~54줄).\n- \"### 응답 Json\" 아래에서 `choices` → `message` → `content`를 따라가면 같은 텍스트가 있습니다.\n- \"### 응답 Json\" 아래에서 `usage`를 찾습니다. 입력 토큰 수와 출력 토큰 수가 들어 있습니다 (p10).\n- 이름의 뜻: `prompt_tokens` = 입력 토큰, `completion_tokens` = 출력 토큰, `total_tokens` = 둘의 합입니다.\n- 숫자는 실행할 때마다 다릅니다. 출력에 적힌 값을 그대로 읽습니다.\n- `usage`가 없으면 \"이 환경에서는 제공되지 않음\"으로 적습니다.",
  "q21_code": "토큰_예시 = [\"Lang\", \"Chain\", \"으로\", \" AI\", \" Agent\", \"를\", \" 만든\", \"다\", \".\"]  # p9 예시 그대로\nn = len(토큰_예시)\n단어_수 = len(\"LangChain으로 AI Agent를 만든다.\".split())  # 띄어쓰기로 나눈 단어 수\n\ndisplay_quiz([{\n    \"question\": 'p9 예시에서 \"LangChain으로 AI Agent를 만든다.\"는 몇 개의 토큰으로 나뉘었나요?',\n    \"type\": \"multiple_choice\",\n    \"answers\": [\n        {\"answer\": f\"{단어_수}개\", \"correct\": False,\n         \"feedback\": \"띄어쓰기로 나눈 단어 수입니다. 토큰 수와는 다릅니다 (p9).\"},\n        {\"answer\": f\"{n - 2}개\", \"correct\": False,\n         \"feedback\": \"\\\"Lang\\\"과 \\\"Chain\\\", \\\"만든\\\"과 \\\"다\\\"처럼 한 단어가 둘로 나뉜 곳을 다시 세어 보세요 (p9).\"},\n        {\"answer\": f\"{n}개\", \"correct\": True,\n         \"feedback\": \"맞습니다. 예시 리스트의 항목 수입니다. 토큰은 단어의 일부나 조사로도 나뉩니다 (p9).\"},\n        {\"answer\": f\"{n + 3}개\", \"correct\": False,\n         \"feedback\": \"예시 리스트에 든 항목만 셉니다 (p9).\"},\n    ],\n}], max_width=800)",
  "back22": "**되돌아보기: 실행 ①의 usage**\n\n실행 ①의 결과로 돌아갑니다. API를 다시 호출하지 않습니다.\n아래 셀은 실행 ①에서 받아 둔 응답(`recv_json`)에서 `usage` 부분만 다시 꺼내 보여 줍니다.",
  "back22_code": "from pprint import pprint\n\nusage = ns01[\"recv_json\"].get(\"usage\")\nif usage:\n    pprint(usage)\nelse:\n    print(\"이 환경에서는 usage가 제공되지 않습니다\")",
- "back22_look": "**볼 지점**\n- 입력 토큰 수와 출력 토큰 수를 직접 읽어 적습니다 (p10).\n- `prompt_tokens`가 입력 토큰, `completion_tokens`가 출력 토큰, `total_tokens`가 둘의 합입니다.\n- 숫자는 실행할 때마다, 환경마다 다릅니다.\n- \"이 환경에서는 usage가 제공되지 않습니다\"가 나오면 그대로 적습니다.",
+ "back22_look": "**볼 지점**\n- 입력 토큰 수와 출력 토큰 수를 직접 읽어 적습니다 (p10).\n- `prompt_tokens`가 입력 토큰, `completion_tokens`가 출력 토큰, `total_tokens`가 둘의 합입니다.\n- 숫자는 실행할 때마다 다릅니다.\n- \"이 환경에서는 usage가 제공되지 않습니다\"가 나오면 그대로 적습니다.",
  "q22": {
   "question": "다음 중 입력 토큰 수에 들어가지 않는 것은?",
   "type": "multiple_choice",
@@ -138,9 +137,9 @@
  "q31_code": "예측_3_1 = None  # 1 또는 2 로 바꾸세요",
  "map02": [
   {
-   "title": "준비와 환경 분기",
+   "title": "준비",
    "marker": "import os",
-   "note": "필요한 도구를 불러오고 .env를 읽습니다.\nLLM_PROVIDER 값에 따라 OpenAI 클라이언트(API에 요청을 보내는 도구)를 만듭니다.\n사내이면 사내 게이트웨이 주소와 헤더를 씁니다."
+   "note": "필요한 도구를 불러옵니다.\n요청에 필요한 주소·모델·인증 정보를 준비합니다.\n클라이언트(API에 요청을 보내는 도구)를 만듭니다."
   },
   {
    "title": "Single Turn",
@@ -173,7 +172,7 @@
    "note": "temperature와 top_p 예시입니다.\n\"\"\" 안에 있어 실행되지 않습니다."
   }
  ],
- "look_r2s1": "**볼 지점**\n- 이 단계는 출력이 없습니다. 오류 없이 끝나면 다음 단계로 갑니다.\n- 오류 메시지가 나오면 실행 ① 단계 1과 같은 문구인지 확인합니다(15줄, 28줄).\n- 이 파일은 Responses API(OpenAI의 새 요청 방식, 01의 `messages` 대신 `input`을 씀)를 사용합니다. 사내 게이트웨이가 이 방식을 지원하는지는 아직 확인하지 않았습니다. 오류가 나면 코드 지도만 보고 넘어갑니다.",
+ "look_r2s1": "**볼 지점**\n- 이 단계는 출력이 없습니다. 오류 없이 끝나면 다음 단계로 갑니다.\n- 이 파일은 Responses API(새 요청 방식, 01의 `messages` 대신 `input`을 씀)를 사용합니다.",
  "look_r2s2": "**볼 지점**\n- \"LLM이 무엇인지 3문장으로 설명해줘.\"에 대한 답이 한 덩어리로 나오는지 봅니다(36~40줄).\n- 실행 ①과 같은 질문입니다. 답 문장이 똑같은지 비교해 봅니다.",
  "look_r2s3": "**볼 지점**\n- \"대한민국의 수도는 어디지?\"에 대한 답이 짧은 존댓말로 나오는지 확인합니다(48~52줄).\n- 짧은 존댓말로 답하라는 규칙은 `developer` 메시지(48줄)에 들어 있습니다. 코드 주석(46줄)은 이것을 \"시스템 지시\"라고 부릅니다.",
  "look_r2s4": "**볼 지점**\n- \"그곳의 인구는 어느정도야?\"에 대한 답이 서울의 인구를 말하는지 살펴봅니다(56~58줄).\n- 앞 질문과 답을 `context +=`로 다시 넣었기 때문에 \"그곳\"을 알아들을 수 있습니다(55~56줄) (p14).\n- 붙인 첫 답(`response_1.output`)은 텍스트가 아니라 여러 정보가 든 묶음입니다. 그래서 코드 화면에 assistant 텍스트가 보이지 않습니다(55줄).\n- 아래 셀에서 3-1의 예측과 비교합니다.",
@@ -248,7 +247,7 @@
   {
    "title": "불러오기",
    "marker": "from dotenv import load_dotenv",
-   "note": "필요한 도구를 불러오고 .env를 읽습니다.\n모델 준비에 쓸 get_llm()도 불러옵니다."
+   "note": "필요한 도구를 불러옵니다.\n모델 준비에 쓸 get_llm()도 불러옵니다."
   },
   {
    "title": "모델 준비",
@@ -272,8 +271,8 @@
  "look_r3s1": "**볼 지점**\n- 이 단계는 출력이 없습니다. 오류 없이 끝나면 모델 준비가 된 것입니다.\n- 코드 화면의 8~11줄 메모를 읽습니다. \"사용자가 질문하고 싶은 것, 시스템적으로 지시하고 싶은 것\"을 나눠야 한다고 적혀 있습니다.\n- 이것은 p18의 User 메시지와 System 메시지 구분과 같은 말입니다 (p18).",
  "look_r3s2": "**볼 지점**\n- `SystemMessage`(19줄)에는 \"너는 초보자를 위한 AI 튜터야\"가, `HumanMessage`(20줄)에는 질문이 들어 있습니다.\n- `SystemMessage`가 p18의 System, `HumanMessage`가 User 메시지입니다 (p18).\n- 출력된 답이 초보자에게 설명하듯 쓰였는지 확인합니다. 실행 ①·②의 답과 말투를 비교해 봅니다.",
  "warn_r3s3": "**실행 전에 읽습니다.** 다음 셀은 출력이 깁니다. 각 줄의 `content=` 뒤 텍스트만 봅니다.",
- "look_r3s3": "**볼 지점**\n- 마지막 부분 줄에 `usage_metadata`가 있으면 그 안의 `input_tokens`(입력 토큰)와 `output_tokens`(출력 토큰)를 직접 읽습니다. 실행 ①의 `prompt_tokens`·`completion_tokens`와 같은 뜻입니다 (p10).\n- 사내 환경에서 `usage_metadata`가 나오는지는 아직 확인하지 않았습니다. 없으면 \"이 환경에서는 제공되지 않음\"으로 적습니다.\n- 조각이 한 줄에 하나씩 출력됩니다(31~32줄).\n- 각 줄의 `content=` 뒤 텍스트를 위에서 아래로 이어 읽으면 답 문장이 됩니다 (p6).\n- 조각 줄 수와 출력 토큰 수가 같다고 단정할 수는 없습니다.",
- "note42": "**코드에서 찾아보기** (실행하지 않습니다)\n- `01_requests.py`의 요청 본문에 `\"temperature\": 0.5`가 들어 있습니다(35줄).\n- 사외 실행에서 모델이 `gpt-6-luna`이면 42줄에서 temperature가 빠진 채 전송되고, 사내 경로에서는 0.5가 그대로 전송됩니다(`01_requests.py` 38~43줄).\n- `02_openai.py` 끝의 temperature·top_p 예시(81~89줄)는 `\"\"\"` 안에 있어 실행되지 않습니다.",
+ "look_r3s3": "**볼 지점**\n- 마지막 부분 줄에 `usage_metadata`가 있으면 그 안의 `input_tokens`(입력 토큰)와 `output_tokens`(출력 토큰)를 직접 읽습니다. 실행 ①의 `prompt_tokens`·`completion_tokens`와 같은 뜻입니다 (p10).\n- `usage_metadata`가 없으면 \"이 환경에서는 제공되지 않음\"으로 적습니다.\n- 조각이 한 줄에 하나씩 출력됩니다(31~32줄).\n- 각 줄의 `content=` 뒤 텍스트를 위에서 아래로 이어 읽으면 답 문장이 됩니다 (p6).\n- 조각 줄 수와 출력 토큰 수가 같다고 단정할 수는 없습니다.",
+ "note42": "**코드에서 찾아보기** (실행하지 않습니다)\n- `01_requests.py`의 요청 본문에 `\"temperature\": 0.5`가 들어 있습니다(35줄).\n- `02_openai.py` 끝의 temperature·top_p 예시(81~89줄)는 `\"\"\"` 안에 있어 실행되지 않습니다.",
  "q42": {
   "question": "코드 생성에 알맞은 조합은?",
   "type": "multiple_choice",
@@ -318,7 +317,7 @@
   "src/ 아래 파일이 바뀌지 않았다",
   "마지막에 '왜 이렇게 판단했는지' 3줄이 있다"
  ],
- "cmC": "**실습 C (선택, 먼저 끝난 사람): 지시로 다시 만들고 원본과 비교**\n\n원본 `01_requests.py`의 동작을 말로 적은 지시문입니다. CodeMate가 이 지시만 보고 같은 파일을 만들게 합니다. 목표 코드는 원본입니다.\nCodeMate가 `lessons/work/`에 파일을 만들 수 있는지는 사내 환경에서는 아직 확인하지 않았습니다.\n\n```text\n[역할·목표]\n당신은 제 지시대로 파이썬 파일을 만드는 페어 프로그래머입니다.\n목표는 아래 동작을 그대로 하는 파일 lessons/work/01_requests_mine.py 를 만드는 것입니다.\n\n[배경·제약]\n- 라이브러리는 os, pprint, requests, python-dotenv만 씁니다.\n- python-dotenv의 load_dotenv()로 .env를 읽은 뒤 LLM_PROVIDER 값을 읽습니다. 없으면 'samsung'입니다. 앞뒤 공백을 지우고 소문자로 바꿉니다.\n- 'openai'이면:\n  - 주소는 https://api.openai.com/v1/chat/completions 입니다.\n  - OPENAI_MODEL, OPENAI_API_KEY를 읽습니다. 둘 중 하나라도 없으면 RuntimeError를 냅니다.\n  - 헤더는 Authorization(Bearer 키)과 Content-Type(application/json)입니다.\n- 'samsung'이면:\n  - config.samsung 의 llm_config()를 호출해 base_url, model, headers를 받습니다.\n  - 주소는 base_url 끝의 / 를 지우고 /chat/completions 를 붙입니다.\n  - 헤더는 받은 headers에 Content-Type(application/json)을 더합니다.\n- 그 밖의 값이면 ValueError를 냅니다.\n- 요청 본문: model, messages(user 역할 1개, 내용 \"LLM이 무엇인지 3문장으로 설명해줘.\"), temperature 0.5, stream False.\n- samsung이면 본문에 include_reasoning False를 추가합니다.\n  아니고 모델이 gpt-6-luna이면 temperature를 빼고 reasoning_effort 'none'을 추가합니다.\n- POST로 보냅니다. timeout은 30초입니다. 서버가 오류로 답하면 예외를 냅니다.\n\n[출력 형식]\n1. 파일 하나만 만듭니다. 위 순서대로 씁니다.\n2. 실행하면 \"### 응답 Json\" 다음 줄에 응답 JSON 전체를 pprint로, \"### 결과 메시지\" 다음 줄에 choices[0].message.content 를 출력합니다.\n3. 파일을 만든 뒤, 각 제약이 몇 번째 줄에 있는지 표로 써 주세요.\n\n[모호함 줄이기]\n- 위에 없는 동작은 넣지 마세요. 헷갈리면 만들기 전에 저에게 물어 주세요.\n\n[하지 말 것]\n- src/ 아래 파일을 열어 베끼거나 고치지 마세요.\n- 키 값을 코드에 쓰거나 화면에 출력하지 마세요.\n- 재시도, 로그, 함수 나누기 같은 기능을 더하지 마세요.\n\n마지막에 왜 이렇게 만들었는지 3줄로 써 주세요.\n```\n\n**검토 방법**\n1. VS Code 탐색기에서 원본 `src/raw/Chapter01/01-llm-api/01_requests.py`와 만든 파일을 함께 선택하고 \"Compare Selected(선택 항목 비교)\"로 나란히 봅니다.\n2. 다른 줄을 적습니다.\n3. 빠진 조건이 있으면 지시문에 보강해 다시 시킵니다.",
+ "cmC": "**실습 C (선택, 먼저 끝난 사람): 지시로 다시 만들고 원본과 비교**\n\n원본 `01_requests.py`의 동작을 말로 적은 지시문입니다. CodeMate가 이 지시만 보고 같은 파일을 만들게 합니다. 목표 코드는 원본입니다.\n\n```text\n[역할·목표]\n당신은 제 지시대로 파이썬 파일을 만드는 페어 프로그래머입니다.\n목표는 아래 동작을 그대로 하는 파일 lessons/work/01_requests_mine.py 를 만드는 것입니다.\n\n[배경·제약]\n- 라이브러리는 os, pprint, requests, python-dotenv만 씁니다.\n- python-dotenv의 load_dotenv()로 .env를 읽습니다.\n- config.samsung 의 llm_config()를 호출해 base_url, model, headers를 받습니다.\n  - 주소는 base_url 끝의 / 를 지우고 /chat/completions 를 붙입니다.\n  - 헤더는 받은 headers에 Content-Type(application/json)을 더합니다.\n- 요청 본문: model, messages(user 역할 1개, 내용 \"LLM이 무엇인지 3문장으로 설명해줘.\"), temperature 0.5, stream False.\n- 본문에 include_reasoning False를 추가합니다.\n- POST로 보냅니다. timeout은 30초입니다. 서버가 오류로 답하면 예외를 냅니다.\n\n[출력 형식]\n1. 파일 하나만 만듭니다. 위 순서대로 씁니다.\n2. 실행하면 \"### 응답 Json\" 다음 줄에 응답 JSON 전체를 pprint로, \"### 결과 메시지\" 다음 줄에 choices[0].message.content 를 출력합니다.\n3. 파일을 만든 뒤, 각 제약이 몇 번째 줄에 있는지 표로 써 주세요.\n\n[모호함 줄이기]\n- 위에 없는 동작은 넣지 마세요. 헷갈리면 만들기 전에 저에게 물어 주세요.\n\n[하지 말 것]\n- src/ 아래 파일을 열어 베끼거나 고치지 마세요.\n- 키 값을 코드에 쓰거나 화면에 출력하지 마세요.\n- 재시도, 로그, 함수 나누기 같은 기능을 더하지 마세요.\n\n마지막에 왜 이렇게 만들었는지 3줄로 써 주세요.\n```\n\n**검토 방법**\n1. VS Code 탐색기에서 원본 `src/raw/Chapter01/01-llm-api/01_requests.py`와 만든 파일을 함께 선택하고 \"Compare Selected(선택 항목 비교)\"로 나란히 봅니다.\n2. 다른 줄을 적습니다.\n3. 빠진 조건이 있으면 지시문에 보강해 다시 시킵니다.",
  "final": [
   {
    "question": "LLM이 답을 만드는 방식으로 맞는 것은?",
@@ -425,5 +424,16 @@
    ]
   }
  ],
- "closing": "**이 노트북에서 본 것**\n- 사전 학습만 한 모델은 그럴듯하게 이어 쓰고 API로 쓰는 모델은 대체로 지시 수행을 강화한 모델입니다 (p4, p5).\n- 모델은 토큰을 하나씩 예측해 붙이고, API는 요청 → 후보 계산 → 누적 → 반환 순서로 답을 돌려줍니다 (p6, p7).\n- 비용은 입력 토큰과 출력 토큰으로 정해지고, 입력에는 시스템 프롬프트와 이전 대화까지 들어갑니다 (p10).\n- 모델은 요청에 담긴 컨텍스트만 읽습니다. 이전 대화도 요청에 다시 넣어야 합니다 (p14).\n- 좋은 입력은 역할·목표, 배경·제약, 출력 형식을 주고 모호함을 줄입니다 (p16).\n- 역할 구분(System, User, Assistant)은 모델이 지시의 우선순위와 대화 흐름을 해석하는 기준입니다 (p18).\n- Temperature와 Top-p가 낮으면 일관된 답, 높으면 다양한 답에 유리합니다 (p19)."
+ "closing": "**이 노트북에서 본 것**\n- 사전 학습만 한 모델은 그럴듯하게 이어 쓰고 API로 쓰는 모델은 대체로 지시 수행을 강화한 모델입니다 (p4, p5).\n- 모델은 토큰을 하나씩 예측해 붙이고, API는 요청 → 후보 계산 → 누적 → 반환 순서로 답을 돌려줍니다 (p6, p7).\n- 비용은 입력 토큰과 출력 토큰으로 정해지고, 입력에는 시스템 프롬프트와 이전 대화까지 들어갑니다 (p10).\n- 모델은 요청에 담긴 컨텍스트만 읽습니다. 이전 대화도 요청에 다시 넣어야 합니다 (p14).\n- 좋은 입력은 역할·목표, 배경·제약, 출력 형식을 주고 모호함을 줄입니다 (p16).\n- 역할 구분(System, User, Assistant)은 모델이 지시의 우선순위와 대화 흐름을 해석하는 기준입니다 (p18).\n- Temperature와 Top-p가 낮으면 일관된 답, 높으면 다양한 답에 유리합니다 (p19).",
+ "title__meta": "| 항목 | 내용 |\n|---|---|\n| 버전 | {VERSION} |\n| 원본 PDF | `docs/raw/Chapter01/day01/1-2-development-environment-and-llm-api-mechanism.pdf` (19쪽) |\n| 원본 코드 | `src/raw/Chapter01/01-llm-api/`의 `01_requests.py`, `02_openai.py`, `03_langchain.py` |\n| 실행 조건 | 사외는 `LLM_PROVIDER=openai`, 사내는 `LLM_PROVIDER=samsung`입니다. |\n| 버전 뜻 | A = 슬라이드 문구만, B = 슬라이드 요약 + 코드 연결, C = B + 왜 배우는지 |",
+ "env_check_look__meta": "- `LLM_PROVIDER`가 `openai` 또는 `samsung`으로 나오는지 확인합니다.\n- `False`가 있으면 `.env`에 그 값이 비어 있다는 뜻입니다.",
+ "q_run1_lead__meta": "- 퀴즈 정답 해설에서 뺀 주의: 사내 환경에서 usage가 오는지는 아직 확인하지 않았습니다.",
+ "look_r1s1__meta": "원래 '볼 지점' 설명:\n- 이 단계는 화면에 아무것도 출력하지 않습니다. 오류 없이 끝나면 준비가 된 것입니다.\n- 9줄에서 `LLM_PROVIDER` 값을 읽고, 10~28줄에서 그 값에 따라 주소·모델·헤더를 정합니다.\n- 오류가 나면 메시지를 읽습니다. \"OPENAI_MODEL과 OPENAI_API_KEY가 필요합니다\"(15줄)나 \"사내 API 설정이 부족합니다\"가 나오면 `.env`에서 메시지에 적힌 이름을 확인합니다.\n- 키는 헤더에만 넣습니다(16~19줄, 26줄). 화면에는 나오지 않습니다.",
+ "look_r1s2__meta": "- 그 아래 `if`·`elif`(38~43줄)는 환경(`samsung`)과 모델(`gpt-6-luna`)에 따라 설정값을 조금 바꿉니다. 사외 실행에서 모델이 `gpt-6-luna`이면 42줄에서 temperature가 빠진 채 전송되고, 사내 경로에서는 0.5가 그대로 전송됩니다(38~43줄).",
+ "look_r1s3__meta": "- 토큰 수는 환경(사내·사외)마다도 다릅니다.",
+ "back22_look__meta": "- 토큰 수는 환경(사내·사외)마다도 다릅니다.",
+ "look_r2s1__meta": "- 오류 메시지가 나오면 실행 ① 단계 1과 같은 문구인지 확인합니다(15줄, 28줄).\n- Responses API는 OpenAI의 새 요청 방식입니다. 사내 게이트웨이가 이 방식을 지원하는지는 아직 확인하지 않았습니다. 오류가 나면 코드 지도만 보고 넘어갑니다.",
+ "look_r3s3__meta": "- 사내 환경에서 `usage_metadata`가 나오는지는 아직 확인하지 않았습니다.",
+ "note42__meta": "- 사외 실행에서 모델이 `gpt-6-luna`이면 42줄에서 temperature가 빠진 채 전송되고, 사내 경로에서는 0.5가 그대로 전송됩니다(`01_requests.py` 38~43줄).",
+ "cmC__meta": "- CodeMate가 `lessons/work/`에 파일을 만들 수 있는지는 사내 환경에서는 아직 확인하지 않았습니다.\n- 수강생 지시문은 사내 경로만 적었습니다. 원본 `01_requests.py`에는 `LLM_PROVIDER` 분기(9~28줄의 openai·samsung·그 밖, 38~43줄의 gpt-6-luna 조정)가 있어, 비교하면 그 부분이 다르게 보입니다.\n- 원래 지시문의 분기 부분:\n\n```text\n- python-dotenv의 load_dotenv()로 .env를 읽은 뒤 LLM_PROVIDER 값을 읽습니다. 없으면 'samsung'입니다. 앞뒤 공백을 지우고 소문자로 바꿉니다.\n- 'openai'이면:\n  - 주소는 https://api.openai.com/v1/chat/completions 입니다.\n  - OPENAI_MODEL, OPENAI_API_KEY를 읽습니다. 둘 중 하나라도 없으면 RuntimeError를 냅니다.\n  - 헤더는 Authorization(Bearer 키)과 Content-Type(application/json)입니다.\n- 'samsung'이면:\n  - config.samsung 의 llm_config()를 호출해 base_url, model, headers를 받습니다.\n  - 주소는 base_url 끝의 / 를 지우고 /chat/completions 를 붙입니다.\n  - 헤더는 받은 headers에 Content-Type(application/json)을 더합니다.\n- 그 밖의 값이면 ValueError를 냅니다.\n- samsung이면 본문에 include_reasoning False를 추가합니다.\n  아니고 모델이 gpt-6-luna이면 temperature를 빼고 reasoning_effort 'none'을 추가합니다.\n```"
 }

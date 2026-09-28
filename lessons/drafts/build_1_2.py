@@ -34,14 +34,31 @@ def build(version):
     def md(src):
         cells.append(nbf.v4.new_markdown_cell(src.strip()))
 
-    def code(src):
-        cells.append(nbf.v4.new_code_cell(src.strip()))
+    def code(src, visible=False):
+        # 교안 도구를 부르는 코드는 수강생 화면에서 접어 두고 출력만 보이게 한다.
+        # VS Code·Jupyter는 metadata.jupyter.source_hidden을 보고 입력 칸을 접는다.
+        cell = nbf.v4.new_code_cell(src.strip())
+        if not visible:
+            cell.metadata["jupyter"] = {"source_hidden": True}
+            cell.metadata["tags"] = ["교안도구"]
+        cells.append(cell)
+
+    def meta(src):
+        # 설정·환경·강사용 내용은 접힌 상자에 넣는다. 수강생은 건너뛰어도 된다.
+        cells.append(nbf.v4.new_markdown_cell(
+            "<details><summary>강사용 메모 (수강생은 건너뛰어도 됩니다)</summary>\n\n" + src.strip() + "\n\n</details>"))
+        cells[-1].metadata["tags"] = ["강사용"]
+
+    def with_meta(table, key):
+        md(table[key])
+        if table.get(key + "__meta"):
+            meta(table[key + "__meta"])
 
     def v(key):  # 버전별 글
-        md(text[key])
+        with_meta(text, key)
 
     def c(key):  # 공통 글
-        md(common[key])
+        with_meta(common, key)
 
     def slides(*pages):
         code(f'show_slides("1-2", {list(pages)})')
@@ -58,17 +75,20 @@ def build(version):
     def quiz(key):
         quiz_file(key, [common[key]])
 
-    def step(path, start, end, var, look):
+    def step(path, start, end, var, look, **opts):
         s = "None" if start is None else repr(start)
         e = "None" if end is None else repr(end)
-        code(f"{var} = run_step({path!r}, {s}, {e})")
+        extra = "".join(f", {k}={v!r}" for k, v in opts.items())
+        code(f"{var} = run_step({path!r}, {s}, {e}{extra})")
         c(look)
 
     # 0 도입
     md(common["title"].replace("{VERSION}", version))
+    if common.get("title__meta"):
+        meta(common["title__meta"].replace("{VERSION}", version))
     code(
         "import json\n\nfrom jupyterquiz import display_quiz\n"
-        "from assets.widgets import run_step, show_checklist, show_code_map, show_order_quiz, show_slides"
+        "from assets.widgets import run_step, show_checklist, show_code, show_code_map, show_order_quiz, show_slides"
     )
     slides(1, 2)
     v("intro")
@@ -104,10 +124,10 @@ def build(version):
     quiz("q_run1")
     md("#### 실행 ① · 단계 1")
     v("r1s1")
-    step(F01, None, "payload = {", "ns01", "look_r1s1")
+    step(F01, None, "payload = {", "ns01", "look_r1s1", collapsed="준비 코드: 환경 설정(강사용)")
     md("#### 실행 ① · 단계 2")
     v("r1s2")
-    step(F01, "payload = {", "new_response = requests.post", "ns01", "look_r1s2")
+    step(F01, "payload = {", "new_response = requests.post", "ns01", "look_r1s2", fold=[("if provider", None, "환경별 설정 조정(강사용)")])
     md("#### 실행 ① · 단계 3")
     v("r1s3")
     step(F01, "new_response = requests.post", '"""', "ns01", "look_r1s3")
@@ -143,7 +163,7 @@ def build(version):
     # 3 Context Window
     md("## 3. Context Window\n### 3-1 Context Window")
     c("q31")
-    code(common["q31_code"])
+    code(common["q31_code"], visible=True)
     slides(12, 13, 14)
     v("p14")
     v("sum31")
@@ -154,7 +174,7 @@ def build(version):
     code(f"show_code_map({F02!r}, {pformat(common['map02'], width=100, sort_dicts=False)}, deck=\"1-2\")")
     md("#### 실행 ② · 단계 1")
     v("r2s1")
-    step(F02, None, "# ── Single Turn", "ns02", "look_r2s1")
+    step(F02, None, "# ── Single Turn", "ns02", "look_r2s1", collapsed="준비 코드: 환경 설정(강사용)")
     md("#### 실행 ② · 단계 2")
     v("r2s2")
     step(F02, "# ── Single Turn", "# ── Multi Turn", "ns02", "look_r2s2")
@@ -188,7 +208,7 @@ def build(version):
     # 실행 ③
     md("### ▶ 실행 ③ `03_langchain.py` — LangChain과 `get_llm()`")
     v("run3_intro")
-    code(f"show_code_map({LLM!r}, {pformat(common['map_llm'], width=100, sort_dicts=False)})")
+    code(f"show_code({LLM!r}, collapsed='get_llm() 안쪽: 환경에 맞는 모델 설정을 고르는 코드')")
     code(f"show_code_map({F03!r}, {pformat(common['map03'], width=100, sort_dicts=False)}, deck=\"1-2\")")
     md("#### 실행 ③ · 단계 1")
     v("r3s1")
