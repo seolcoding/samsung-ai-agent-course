@@ -35,7 +35,9 @@ BLANK = "✍"
 BLANK_LINE = re.compile(r"^\s*\.\.\.\s*# ✍")  # 빈칸 줄: `...  # ✍️ 여기를 채웁니다`
 ANSWER_HEAD = "<details><summary>정답 보기</summary>"
 TOOL_CELL = re.compile(r"\b(show_\w+|slide_setup)\(|sys\.path\.insert|find_dotenv\(usecwd=True\)")  # 숨겨야 할 도구 셀
-HINT_HEAD, CRITERIA_HEAD = "**CodeMate에게 줄 힌트**", "**성공 기준**"
+HINT_HEAD, CRITERIA_HEAD = "**프롬프트 힌트**", "**성공 기준**"
+HINT_MAX_SENTENCES = 3
+MARKER = re.compile(r"# ✍️ (CHANGE_HERE|WRITE_HERE):")
 TODO_PLACEHOLDER = "작성 예정"
 
 
@@ -195,6 +197,8 @@ def check_student_text(nb, quizzes, R):
       [(i, around(src, m)) for i, src in seen_text for m in FILE_REF.finditer(src)])
     R("수강생 글", "다른 노트북 언급 없음 — 노트북 하나로 완결",
       [(i, around(src, m)) for i, src in seen_text for m in CROSS_REF.finditer(src)], warn=True)
+    R("수강생 글", "도구 이름(CodeMate) 대신 \"AI\"라고 씀",
+      [(i, around(src, m)) for i, src in seen_text for m in re.finditer("CodeMate", src)])
     md = student_md(nb)
     R("수강생 글", "쪽 인용 (pN) 없음", [(i, f"…{excerpt(src[max(0, m.start() - 20):m.end() + 10], 40)}…")
                                     for i, src in md for m in CITE.finditer(src)])
@@ -375,6 +379,13 @@ def check_lab(nb, R):
       [(i, ln.strip()[:50]) for i, c in enumerate(cells) if c.cell_type == "code" and not hidden(c)
        for ln in c.source.splitlines()
        if "TODO" in ln or (("WRITE_HERE" in ln or "CHANGE_HERE" in ln) and "# ✍️ " not in ln)])
+    R("실습", "✍️ CHANGE_HERE·WRITE_HERE 표시는 주석만 있는 한 줄 (코드 줄 끝에 붙이지 않음)",
+      [(i, ln.strip()[:50]) for i, c in enumerate(cells) if c.cell_type == "code" and not hidden(c)
+       for ln in c.source.splitlines() if MARKER.search(ln) and not ln.lstrip().startswith("#")])
+    R("실습", f"프롬프트 힌트는 {HINT_MAX_SENTENCES}문장 이내",
+      [(i, f"{n}문장: {excerpt(c.source, 40)}") for i, c in enumerate(cells)
+       if c.cell_type == "markdown" and c.source.lstrip().startswith(HINT_HEAD)
+       and (n := len(re.findall(r"[.?!](?=\s|$)", prose(c.source[len(HINT_HEAD) + 1:])))) > HINT_MAX_SENTENCES])
     R("실습", "성공 기준 자동 검사 셀 없음 — 수강생이 스스로 판단한다",
       [(i, excerpt(c.source, 40)) for i, c in enumerate(cells) if c.cell_type == "code" and "show_criteria(" in c.source])
 
@@ -421,7 +432,7 @@ def check_lab(nb, R):
         except SyntaxError as e:
             answer_bad.append((box, f"정답을 끼운 셀 {i}가 문법 오류: {e.msg} ({e.lineno}행)"))
     R("실습", "✍️ 셀이 보이고, 빈칸 상태 그대로 파이썬 문법에 맞음", syntax)
-    R("실습", "과제 셀마다 앞에 **CodeMate에게 줄 힌트**와 🟢 **성공 기준**", guide_bad)
+    R("실습", "과제 셀마다 앞에 **프롬프트 힌트**와 🟢 **성공 기준**", guide_bad)
     R("실습", "과제 셀마다 뒤에 정답 보기 상자, 정답을 끼우면 문법에 맞음", answer_bad)
     R("실습", "예제의 CHANGE_HERE마다 같은 장에 🟢 성공 기준 글", edit_bad)
     R("실습", "힌트·성공 기준이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)

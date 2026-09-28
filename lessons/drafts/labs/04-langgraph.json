@@ -28,9 +28,7 @@
       "end": "# 3. Edge: 노드 간 흐름을 정의한다."
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -41,9 +39,7 @@
       "end": "# TODO: 그래프를 컴파일해 실행 가능한 app을 만들어 주세요."
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -54,9 +50,7 @@
       "end": "# 그래프 구조 출력 (Mermaid 다이어그램)"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     }
@@ -102,9 +96,7 @@
       "end": "def korean_response(state: State) -> dict:"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -115,9 +107,7 @@
       "end": "# 병렬처리"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     }
@@ -148,9 +138,7 @@
       "end": "# TODO: bind_tools()로 LLM에 도구를 연결해 주세요."
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -161,9 +149,7 @@
       "end": "class State(TypedDict):"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -174,9 +160,7 @@
       "end": "# ToolNode: AI 메시지에 포함된 tool_calls를 파싱하고 해당 도구를 실행한 뒤"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -187,9 +171,7 @@
       "end": "# tools_condition: 마지막 메시지에 tool_calls가 있으면 'tools'로,"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -200,9 +182,7 @@
       "end": "app = builder.compile()"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     }
@@ -243,9 +223,7 @@
       "end": "# interrupt_before: 지정한 노드 실행 직전에 그래프를 일시 중단한다."
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     },
@@ -256,9 +234,7 @@
       "end": "config = {'configurable': {'thread_id': 'hitl_demo'}}"
      },
      "explain": "(작성 예정)",
-     "hint": [
-      "(작성 예정)"
-     ],
+     "hint": "(작성 예정)",
      "checks": [],
      "fail": []
     }
@@ -277,9 +253,7 @@
    ],
    "look": "(작성 예정)",
    "ask": {
-    "hint": [
-     "(작성 예정)"
-    ],
+    "hint": "(작성 예정)",
     "success": [
      "(작성 예정)"
     ],

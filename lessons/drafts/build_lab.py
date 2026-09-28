@@ -1,4 +1,4 @@
-"""실습 노트북을 조립한다. 받은 실습 코드(src/raw)를 CodeMate와 함께 채우고 솔루션(src/solution)과 비교한다.
+"""실습 노트북을 조립한다. 받은 실습 코드(src/raw)를 AI와 함께 채우고 솔루션(src/solution)과 비교한다.
 
 실행(프로젝트 루트):
   uv run python lessons/drafts/build_lab.py 01-llm-api        # 실습 폴더 하나
@@ -13,12 +13,13 @@
 
 모든 실습 노트북은 같은 구조다.
   제목 → 목차 → 1. 실습 방법 → 원본 파일마다 한 장:
-    준비 코드(접힘) → 구획마다 한 절 → CodeMate에게 물어보기(TODO가 없는 파일) → 정리
+    준비 코드(접힘) → 구획마다 한 절 → AI에게 물어보기(TODO가 없는 파일) → 정리
 구획은 두 종류다.
   예제: 완성된 코드를 함께 실행한다. `# ✍️ CHANGE_HERE:` 주석 바로 아래 줄의 값만 바꿔 다시 실행해 본다.
-  과제: 원본 TODO 주석을 `# ✍️ WRITE_HERE:`로 바꾸고, 그 아래 정답 줄을 빈칸(`...  # ✍️ …`)으로 바꿔 넣는다. 수강생이 CodeMate와 채운다.
-    [설명 → CodeMate에게 줄 힌트 → 성공 기준(🟢/⛔)] → 빈칸 셀 → 정답 보기(접힘)
-CodeMate 지시문 완성본은 주지 않는다. 힌트와 성공 기준만 주고, 지시문은 수강생이 쓴다.
+  과제: 원본 TODO 주석을 `# ✍️ WRITE_HERE:`로 바꾸고, 그 아래 정답 줄을 빈칸(`...  # ✍️ …`)으로 바꿔 넣는다. 수강생이 AI와 채운다.
+    [설명 → 프롬프트 힌트(3문장 이내) → 성공 기준(🟢/⛔)] → 빈칸 셀 → 정답 보기(접힘)
+지시문 완성본은 주지 않는다. 짧은 프롬프트 힌트와 성공 기준만 주고, 지시는 수강생이 쓴다.
+수강생 글에서는 도구 이름(CodeMate) 대신 "AI"라고 쓴다.
 성공 기준은 자동으로 검사하지 않는다. 수강생이 실행 결과를 보고 스스로 판단한다.
 """
 
@@ -49,28 +50,12 @@ UNITS = {
 
 KIND_EXAMPLE, KIND_TASK = "예제", "과제"  # 제목 옆 표시 (예제) (과제)
 
-PROMPT_GUIDE = f"""이 노트북의 실습은 두 종류입니다.
+PROMPT_GUIDE = f"""실습은 두 종류입니다. 제목 옆 표시와 코드 주석으로 구분합니다.
 
-- **{KIND_EXAMPLE}**: 완성된 코드를 함께 실행합니다. `# ✍️ CHANGE_HERE:` 주석이 있으면 바로 아래 줄의 값만 바꿔 다시 실행해 봅니다.
-- **{KIND_TASK}**: `# ✍️ WRITE_HERE:` 주석 아래 `...  # ✍️ 여기를 채웁니다` 줄이 빈칸입니다. CodeMate와 함께 채웁니다.
+- **{KIND_EXAMPLE}** `# ✍️ CHANGE_HERE:` 바로 아래 줄의 값을 바꿔 다시 실행해 봅니다.
+- **{KIND_TASK}** `# ✍️ WRITE_HERE:` 아래 빈칸(`...`)을 AI와 함께 채웁니다. **프롬프트 힌트**를 보고 지시를 직접 씁니다.
 
-두 종류 모두 **성공 기준**이 있습니다. 실행 결과를 보고 스스로 판단합니다. 🟢는 되어야 하는 것, ⛔는 이렇게 나오면 다시 해야 하는 신호입니다.
-
-{KIND_TASK}는 이렇게 진행합니다.
-1. `# ✍️ WRITE_HERE:` 주석과 설명을 읽고, 무엇을 채워야 하는지 한 문장으로 말해 봅니다.
-2. **CodeMate에게 줄 힌트**를 보고 지시문을 직접 씁니다. 아래 다섯 칸 틀을 써도 좋습니다.
-3. CodeMate가 준 코드를 읽고, 모르는 줄은 "이 줄이 하는 일"을 다시 묻습니다.
-4. 빈칸에 넣고 실행합니다. 오류가 나면 오류 메시지를 그대로 CodeMate에 붙여 넣고 원인부터 묻습니다.
-5. 실행 결과를 **성공 기준**과 비교합니다. 🟢를 모두 만족하고 ⛔ 신호가 없으면 통과입니다. 아니면 무엇이 다른지 CodeMate에게 알려 주고 다시 지시합니다.
-6. 접힌 "정답 보기"를 펼쳐 비교합니다. 다르다고 틀린 것은 아닙니다. 왜 다른지 말할 수 있으면 됩니다.
-
-```text
-[역할·목표] 무엇을 하는 사람으로서, 무엇을 만들어 달라는지
-[배경·제약] 어느 셀의 어느 빈칸인지, 쓸 수 있는 것과 없는 것
-[출력 형식] 코드만? 코드 + 설명 3줄?
-[모호함 줄이기] 헷갈릴 만한 부분을 미리 정해 주기
-[하지 말 것] 빈칸 밖은 고치지 않기, 새 기능 추가하지 않기
-```"""
+실행한 뒤에는 **성공 기준**과 비교해 스스로 판단합니다. 🟢는 되어야 하는 것, ⛔는 다시 해야 하는 신호입니다. 과제는 그다음 접힌 "정답 보기"와 비교합니다."""
 
 
 BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
@@ -119,10 +104,6 @@ def _chunks(lines, split):
 def _dedent_common(text):
     import textwrap
     return textwrap.dedent(text)
-
-
-def _bullets(head, items, mark=""):
-    return f"**{head}**\n\n" + "\n".join(f"- {mark}{x}" for x in items)
 
 
 def _criteria_md(checks, fail=(), success=()):
@@ -207,7 +188,7 @@ def build(folder):
             for i in mine:
                 t = todos[i]
                 nb.md(f"**✍️ WRITE_HERE: {t['todo']}**\n\n{t['explain']}")
-                nb.md(_bullets("CodeMate에게 줄 힌트", t["hint"]))
+                nb.md(f"**프롬프트 힌트** {t['hint']}")
                 nb.md(_criteria_md(t.get("checks", []), t.get("fail", [])))
                 nb.meta(t.get("look__meta"))
             nb.code(text, visible=True, kind=KIND_TASK if mine else KIND_EXAMPLE)  # 수강생이 채우거나 바꿔서 실행하는 셀
@@ -223,9 +204,8 @@ def build(folder):
         ask = f.get("ask")
         if not todos and ask:
             sub += 1
-            nb.h(3, f"{n}.{sub} CodeMate에게 물어보기")
-            nb.md(ask.get("intro", "코드를 고치지 않고, CodeMate에게 설명을 받아 실행 결과와 맞춰 봅니다. 지시문은 직접 씁니다."))
-            nb.md(_bullets("CodeMate에게 줄 힌트", ask["hint"]))
+            nb.h(3, f"{n}.{sub} AI에게 물어보기")
+            nb.md(f"**프롬프트 힌트** {ask['hint']}")
             nb.md(_criteria_md([], ask.get("fail", []), ask.get("success", [])))
 
     nb.h(2, f"{len(spec['files']) + 2}. 정리")
@@ -282,13 +262,13 @@ def scaffold(folder):
             if "TODO" in line:
                 blank = _guess_blank(lines, t)
                 todos.append({"todo": line.split("TODO:", 1)[-1].strip(), "blank": blank,
-                              "explain": "(작성 예정)", "hint": ["(작성 예정)"], "checks": [], "fail": []})
+                              "explain": "(작성 예정)", "hint": "(작성 예정)", "checks": [], "fail": []})
         entry = {"name": py.name, "title": py.stem, "intro": "(작성 예정)", "map": _sections(lines),
                  "look": "(작성 예정)"}
         if todos:
             entry["todos"] = todos
         else:
-            entry["ask"] = {"hint": ["(작성 예정)"], "success": ["(작성 예정)"], "fail": []}
+            entry["ask"] = {"hint": "(작성 예정)", "success": ["(작성 예정)"], "fail": []}
         files.append(entry)
     unit = UNITS[folder][0]
     spec = {"draft": True, "title": f"{unit} 실습", "intro": "(작성 예정)", "files": files, "closing": "(작성 예정)"}
