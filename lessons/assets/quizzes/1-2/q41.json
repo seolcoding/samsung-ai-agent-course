@@ -6,7 +6,7 @@
    {
     "answer": "System",
     "correct": true,
-    "feedback": "맞습니다. System 메시지는 모델의 전체 역할, 규칙, 제약 조건을 정합니다."
+    "feedback": "System 메시지는 모델의 전체 역할, 규칙, 제약 조건을 정합니다."
    },
    {
     "answer": "User",

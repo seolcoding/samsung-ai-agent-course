@@ -6,7 +6,7 @@
    {
     "answer": "낮은 temperature / 낮은 top-p",
     "correct": true,
-    "feedback": "맞습니다. 보수적이고 반복 가능성이 높아 사실 기반 답변, 코드 생성, 요약에 맞습니다."
+    "feedback": "보수적이고 반복 가능성이 높아 사실 기반 답변, 코드 생성, 요약에 맞습니다."
    },
    {
     "answer": "낮은 temperature / 높은 top-p",

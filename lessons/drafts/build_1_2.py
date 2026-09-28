@@ -32,9 +32,21 @@ def build(version):
     text = json.loads((HERE / f"1-2_cells_{version}.json").read_text(encoding="utf-8"))
     cells = []
 
+    pending = []  # 이 절에서 모은 강사용 메모. 다음 절 제목 앞에서 한 상자로 내보낸다.
+
+    def flush():
+        if pending:
+            body = "\n\n---\n\n".join(pending)
+            cell = nbf.v4.new_markdown_cell("<details><summary>강사용 메모</summary>\n\n" + body + "\n\n</details>")
+            cell.metadata["tags"] = ["강사용"]
+            cells.append(cell)
+            pending.clear()
+
     def md(src):
         # 수강생 글에는 "(p6)" 같은 쪽 인용을 넣지 않는다(어색함). 쪽은 슬라이드 뷰어가 보여 준다.
         assert not re.search(r"\(p\d+", src), f"수강생 글에 쪽 인용이 남아 있다: {src[:60]!r}"
+        if re.match(r"#{1,3} ", src.lstrip()):  # 새 절이 시작되면 앞 절의 강사용 메모를 먼저 내보낸다
+            flush()
         cells.append(nbf.v4.new_markdown_cell(src.strip()))
 
     def code(src, visible=False):
@@ -47,10 +59,8 @@ def build(version):
         cells.append(cell)
 
     def meta(src):
-        # 설정·환경·강사용 내용은 접힌 상자에 넣는다. 수강생은 건너뛰어도 된다.
-        cells.append(nbf.v4.new_markdown_cell(
-            "<details><summary>강사용 메모 (수강생은 건너뛰어도 됩니다)</summary>\n\n" + src.strip() + "\n\n</details>"))
-        cells[-1].metadata["tags"] = ["강사용"]
+        # 설정·환경·강사용 내용은 절마다 한 상자로 모아 절 끝에 접어 둔다.
+        pending.append(src.strip())
 
     def with_meta(table, key):
         md(table[key])
@@ -248,6 +258,7 @@ def build(version):
     quiz_file("final", common["final"])
     c("closing")
 
+    flush()
     nb = nbf.v4.new_notebook(cells=cells)
     nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
     out = LESSONS / f"1-2_llm_api_{version}.ipynb"

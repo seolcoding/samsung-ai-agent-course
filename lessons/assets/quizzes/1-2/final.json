@@ -11,7 +11,7 @@
    {
     "answer": "다음 토큰을 하나씩 예측해 문맥 뒤에 붙이기를 반복한다",
     "correct": true,
-    "feedback": "맞습니다. 후보 중 하나를 골라 문맥 뒤에 붙이고, 이를 되풀이해 답을 만듭니다."
+    "feedback": "후보 중 하나를 골라 문맥 뒤에 붙이고, 이를 되풀이해 답을 만듭니다."
    },
    {
     "answer": "학습한 문서 중 가장 비슷한 문서를 그대로 돌려준다",
@@ -32,7 +32,7 @@
    {
     "answer": "토큰은 단어 하나와 항상 같다",
     "correct": true,
-    "feedback": "정답입니다. 이 설명이 틀린 설명입니다. 토큰은 단어 하나와 항상 같지 않습니다."
+    "feedback": "이 설명이 틀린 설명입니다. 토큰은 단어 하나와 항상 같지 않습니다."
    },
    {
     "answer": "단어의 일부, 공백, 기호, 숫자 조각이 토큰이 될 수 있다",
@@ -63,7 +63,7 @@
    {
     "answer": "이전 대화를 다음 요청의 메시지 목록에 다시 넣는다",
     "correct": true,
-    "feedback": "맞습니다. 실행 ②의 context += 줄이 이 일을 했습니다."
+    "feedback": "실행 ②의 context += 줄이 이 일을 했습니다."
    },
    {
     "answer": "temperature를 낮춘다",
@@ -84,7 +84,7 @@
    {
     "answer": "System",
     "correct": true,
-    "feedback": "맞습니다. 모델의 역할을 정하는 지시라서 System입니다. 03에서는 SystemMessage로 보냈습니다."
+    "feedback": "모델의 역할을 정하는 지시라서 System입니다. 03에서는 SystemMessage로 보냈습니다."
    },
    {
     "answer": "User",
