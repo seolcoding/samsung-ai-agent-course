@@ -236,6 +236,7 @@ def build(folder):
         if wf:
             nb.md(f.get("run_note", "위 셀을 실행하면 이 폴더에 앱 파일이 만들어집니다. 아래 셀을 실행하면 브라우저에 앱이 열립니다. 앱을 멈출 때는 이 셀의 실행을 중지(■)합니다."))
             nb.code(f"!streamlit run {wf}", visible=True, kind=KIND_EXAMPLE)
+            nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")  # 앱은 멈출 때까지 돈다
         nb.md(f["look"])
         nb.meta(f.get("look__meta"))
         ask = f.get("ask")
