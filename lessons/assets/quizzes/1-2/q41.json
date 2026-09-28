@@ -17,6 +17,11 @@
     "answer": "Assistant",
     "correct": false,
     "feedback": "Assistant 메시지는 LLM이 만든 답입니다. 이후 대화에 더해져 맥락을 전합니다 (p18)."
+   },
+   {
+    "answer": "어느 역할에 넣어도 똑같다",
+    "correct": false,
+    "feedback": "역할 구분은 지시의 우선순위와 대화 흐름을 해석하는 기준입니다 (p18). 넣는 역할에 따라 해석이 달라집니다."
    }
   ]
  }

@@ -21,6 +21,11 @@
     "answer": "\"무엇을 도와드릴까요?\"라고 되묻는다",
     "correct": false,
     "feedback": "되묻는 대화형 반응도 Instruction Tuning 뒤에 강해지는 행동입니다 (p5). 사전 학습만 한 모델은 이어 쓰는 성향이 강합니다 (p4)."
+   },
+   {
+    "answer": "질문으로 알아듣고 짧게 답한다",
+    "correct": false,
+    "feedback": "요청을 알아듣고 답하는 방식은 Instruction Tuning으로 강화된 행동입니다 (p5). 사전 학습만 한 모델은 이어 쓰는 성향이 강합니다 (p4)."
    }
   ]
  },
@@ -88,6 +93,11 @@
     "answer": "모델이 학습한 웹 문서 목록이 온다",
     "correct": false,
     "feedback": "웹 문서는 사전 학습 단계에서 언어 패턴을 학습하는 재료입니다 (p4). 이번 요청의 응답과는 다른 이야기입니다."
+   },
+   {
+    "answer": "다음 질문에 쓸 이전 대화 기록이 온다",
+    "correct": false,
+    "feedback": "모델은 요청에 담긴 컨텍스트만 봅니다 (p14). 이전 대화는 응답에 저절로 오지 않고, 다음 요청에 우리가 다시 넣어야 합니다."
    }
   ]
  },
@@ -194,6 +204,11 @@
     "answer": "Assistant",
     "correct": false,
     "feedback": "Assistant 메시지는 LLM이 만든 답입니다. 이후 대화에 더해져 맥락을 전합니다 (p18)."
+   },
+   {
+    "answer": "어느 역할에 넣어도 똑같다",
+    "correct": false,
+    "feedback": "역할 구분은 지시의 우선순위와 대화 흐름을 해석하는 기준입니다 (p18). 넣는 역할에 따라 해석이 달라집니다."
    }
   ]
  },
@@ -323,6 +338,11 @@
      "answer": "학습한 문서 중 가장 비슷한 문서를 그대로 돌려준다",
      "correct": false,
      "feedback": "모델은 문맥을 보고 다음 토큰의 확률을 계산해 답을 만듭니다 (p6)."
+    },
+    {
+     "answer": "질문을 받으면 답을 검색해 가져온다",
+     "correct": false,
+     "feedback": "모델은 검색하지 않고, 문맥을 보고 다음 토큰의 확률을 계산해 답을 만듭니다 (p6)."
     }
    ]
   },
@@ -370,6 +390,11 @@
      "answer": "temperature를 낮춘다",
      "correct": false,
      "feedback": "temperature는 답의 다양성을 조정하는 값입니다 (p19)."
+    },
+    {
+     "answer": "질문을 더 길게 쓴다",
+     "correct": false,
+     "feedback": "질문 길이와 상관없이, 이전 대화가 요청에 들어 있지 않으면 모델은 참고하지 못합니다 (p14)."
     }
    ]
   },
@@ -391,6 +416,11 @@
      "answer": "Assistant",
      "correct": false,
      "feedback": "Assistant는 LLM이 만든 답입니다 (p18)."
+    },
+    {
+     "answer": "어느 역할에 넣어도 똑같다",
+     "correct": false,
+     "feedback": "역할 구분은 지시의 우선순위를 해석하는 기준이라, 넣는 역할에 따라 해석이 달라집니다 (p18)."
     }
    ]
   }

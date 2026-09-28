@@ -17,6 +17,11 @@
     "answer": "학습한 문서 중 가장 비슷한 문서를 그대로 돌려준다",
     "correct": false,
     "feedback": "모델은 문맥을 보고 다음 토큰의 확률을 계산해 답을 만듭니다 (p6)."
+   },
+   {
+    "answer": "질문을 받으면 답을 검색해 가져온다",
+    "correct": false,
+    "feedback": "모델은 검색하지 않고, 문맥을 보고 다음 토큰의 확률을 계산해 답을 만듭니다 (p6)."
    }
   ]
  },
@@ -64,6 +69,11 @@
     "answer": "temperature를 낮춘다",
     "correct": false,
     "feedback": "temperature는 답의 다양성을 조정하는 값입니다 (p19)."
+   },
+   {
+    "answer": "질문을 더 길게 쓴다",
+    "correct": false,
+    "feedback": "질문 길이와 상관없이, 이전 대화가 요청에 들어 있지 않으면 모델은 참고하지 못합니다 (p14)."
    }
   ]
  },
@@ -85,6 +95,11 @@
     "answer": "Assistant",
     "correct": false,
     "feedback": "Assistant는 LLM이 만든 답입니다 (p18)."
+   },
+   {
+    "answer": "어느 역할에 넣어도 똑같다",
+    "correct": false,
+    "feedback": "역할 구분은 지시의 우선순위를 해석하는 기준이라, 넣는 역할에 따라 해석이 달라집니다 (p18)."
    }
   ]
  }

@@ -48,6 +48,9 @@ def build(version):
 
     def quiz_file(name, questions):
         # 정답이 코드 셀에 보이지 않도록 문제는 파일로 두고 셀에서는 경로만 부른다.
+        for q in questions:  # 퀴즈 선택지는 항상 4개, 정답은 1개
+            assert len(q["answers"]) == 4, f"{name}: 선택지가 {len(q['answers'])}개"
+            assert sum(a["correct"] for a in q["answers"]) == 1, f"{name}: 정답이 1개가 아님"
         QUIZ_DIR.mkdir(parents=True, exist_ok=True)
         (QUIZ_DIR / f"{name}.json").write_text(json.dumps(questions, ensure_ascii=False, indent=1), encoding="utf-8")
         code(f'display_quiz("assets/quizzes/1-2/{name}.json", max_width=800)')
