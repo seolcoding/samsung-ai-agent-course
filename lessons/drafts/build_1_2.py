@@ -102,7 +102,8 @@ def build(version):
         meta(common["title__meta"].replace("{VERSION}", version))
     code(
         "import json\n\nfrom jupyterquiz import display_quiz\n"
-        "from assets.widgets import run_step, show_checklist, show_code, show_code_map, show_order_quiz, show_slides"
+        "from assets.widgets import run_step, show_checklist, show_code, show_code_map, show_order_quiz, show_slides, slide_setup\n\n"
+        "slide_setup()  # 슬라이드 뷰어(PDF.js)를 불러옵니다. 슬라이드가 비어 보이면 이 셀을 다시 실행합니다."
     )
     slides(1, 2)
     v("intro")

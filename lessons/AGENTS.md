@@ -22,15 +22,18 @@
 
 ## 3. 슬라이드 넣는 법
 
-- PDF와 PPTX는 페이지를 이미지로 바꿔 슬라이드 묶음(JSON) 한 파일로 만든다. 만든 파일은 `assets/slides/`에 두고, 이름은 PDF 번호(예: `1-3`)로 짓는다.
+- 원본이 PDF인 교안은 **PDF.js로 PDF를 그대로 그린다.** 벡터라 선명하고, 글자를 선택·복사할 수 있다.
+  - `show_slides("1-2", [9, 10])`: `docs/raw/` 아래에서 `1-2-*.pdf`를 찾아 필요한 쪽만 보여 준다.
+  - PDF.js는 `assets/vendor/pdfjs-3.11.174/`(legacy 빌드, Apache-2.0)를 HTML 안에 넣어 쓴다. 외부 주소를 부르지 않는다.
+  - 노트북 맨 위 준비 셀에서 `slide_setup()`을 부른다. 노트북을 다시 열어 슬라이드가 비어 보이면 이 셀을 다시 실행한다.
+  - Jupyter 화면의 require.js(AMD)와 부딪히지 않도록, 불러오는 동안 `define`을 잠시 숨긴다(`widgets.py`).
+- PDF가 없는 자료(예: 커리큘럼 PPTX)는 예전 방식대로 이미지 묶음을 쓴다. 쪽 이미지를 `assets/slides/<이름>.json`으로 만든다.
 
   ```
   uv run python lessons/assets/build_slide_deck.py <입력.pdf|입력.pptx> lessons/assets/slides/<이름>.json
   ```
 
-- 노트북에서는 `show_slides("1-3", [9, 10])`처럼 설명하는 대목에 필요한 쪽만 꺼내 보여 준다.
-- 필요한 도구: `pdftoppm`(poppler), PPTX라면 `soffice`(LibreOffice). 강의장 PC에는 없을 수 있으니 뷰어는 미리 만들어 가져간다.
-- PPTX는 PDF를 거치므로 애니메이션·전환 효과가 사라지고, 글자를 선택·검색할 수 없다.
+  필요한 도구는 `pdftoppm`(poppler), PPTX라면 `soffice`(LibreOffice)다. 이 방식은 화질이 떨어지고 글자를 선택할 수 없다.
 - PDF를 `iframe`에 바로 넣지 않는다. VS Code 출력 화면에는 PDF 뷰어가 없다.
 
 ## 4. 모든 것을 HTML 안에 넣는다

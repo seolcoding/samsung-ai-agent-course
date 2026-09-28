@@ -3,7 +3,8 @@
 모든 함수는 IPython.display.HTML을 돌려준다. 코드 셀의 마지막 줄에 두면 출력 영역에 그려진다.
 규칙은 lessons/AGENTS.md를 따른다: 외부 CDN 없음, 이미지·스크립트는 HTML 안에 넣음, 위젯마다 고유 id.
 
-    show_slides      슬라이드 묶음에서 원하는 쪽만 뷰어로 보기
+    show_slides      원본 PDF에서 원하는 쪽만 뷰어로 보기 (PDF.js, 글자 선택 가능)
+    slide_setup      PDF.js를 화면에 불러오기 (노트북 맨 위 준비 셀)
     show_trace       도구 호출 루프의 메시지 흐름을 한 단계씩 보기
     show_graph_run   LangGraph 그래프 구조와 실제 실행 순서를 한 단계씩 보기
     show_code_map    원본 코드를 구획별로 나눠 설명·슬라이드와 함께 보기
@@ -64,8 +65,130 @@ def _plain(value):
 
 # ── 슬라이드 ─────────────────────────────────────────────────────────────────
 
+# 슬라이드는 원본 PDF를 PDF.js로 그대로 그린다(벡터라 선명하고, 글자를 선택·복사할 수 있다).
+# PDF.js는 사내망 규칙대로 assets/vendor에 두고 HTML 안에 넣는다. 외부 주소는 쓰지 않는다.
+PDFJS = ASSETS / "vendor" / "pdfjs-3.11.174"
+DOCS_RAW = ASSETS.parent.parent / "docs" / "raw"
+_PDF_SENT = {"lib": False, "decks": set()}  # 이 커널에서 화면에 이미 보낸 것
+
+_TEXT_LAYER_CSS = """
+.pdfslide .textLayer{position:absolute;inset:0;overflow:hidden;opacity:.25;line-height:1;text-align:initial;
+  -webkit-text-size-adjust:none;text-size-adjust:none;forced-color-adjust:none;transform-origin:0 0;z-index:2}
+.pdfslide .textLayer :is(span,br){color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0% 0%}
+.pdfslide .textLayer span.markedContent{top:0;height:0}
+.pdfslide .textLayer ::selection{background:#1f6feb}
+"""
+
+
+def _deck_pdf(deck):
+    """"1-2"처럼 쓴 이름으로 docs/raw 아래의 원본 PDF(1-2-*.pdf)를 찾는다. 없으면 None."""
+    hits = sorted(DOCS_RAW.rglob(f"{deck}-*.pdf"))
+    return hits[0] if hits else None
+
+
+def slide_setup():
+    """PDF.js를 화면에 한 번 불러온다. 노트북 맨 위 준비 셀에서 부른다.
+
+    show_slides도 처음 한 번은 스스로 불러오므로 꼭 필요하지는 않다.
+    노트북을 다시 열어 슬라이드가 비어 보이면 이 셀을 다시 실행한다.
+    """
+    _PDF_SENT["lib"] = False
+    _PDF_SENT["decks"].clear()
+    return HTML(_pdfjs_loader())
+
+
+def _pdfjs_loader():
+    _PDF_SENT["lib"] = True
+    lib = (PDFJS / "pdf.min.js").read_text(encoding="utf-8")
+    worker = (PDFJS / "pdf.worker.min.js").read_text(encoding="utf-8")
+    return (f"<style>{_TEXT_LAYER_CSS}</style>"
+            # Jupyter 화면에 require.js(AMD)가 있으면 PDF.js가 전역 pdfjsLib 대신 AMD 모듈로 등록된다. 잠시 숨긴다.
+            "<script>window.__amdDefine = window.define; window.define = undefined;</script>"
+            f"<script>{lib}</script>"
+            "<script>window.define = window.__amdDefine;</script>"
+            "<script>(() => {"
+            f"const code = {_js(worker)};"
+            "window.pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([code], {type: 'text/javascript'}));"
+            "window.__pdfDecks = window.__pdfDecks || {}; window.__pdfDocs = window.__pdfDocs || {};"
+            "})();</script>")
+
+
 def show_slides(deck, pages=None):
-    """슬라이드 묶음(assets/slides/<deck>.json)에서 pages 쪽만 뷰어로 보여 준다. 쪽 번호는 1부터."""
+    """원본 PDF에서 pages 쪽만 뷰어로 보여 준다. 쪽 번호는 1부터.
+
+    PDF가 없는 묶음(예: 커리큘럼 PPTX)은 예전처럼 이미지 묶음(assets/slides/<deck>.json)으로 보여 준다.
+    """
+    pdf = _deck_pdf(deck)
+    if pdf is None:
+        return _show_slide_images(deck, pages)
+    import subprocess
+    total = int(next(l.split()[-1] for l in subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout.splitlines() if l.startswith("Pages:")))
+    pages = list(pages or range(1, total + 1))
+    bad = [p for p in pages if not 1 <= p <= total]
+    if bad:
+        raise ValueError(f"{deck}에 없는 쪽: {bad} (전체 {total}쪽)")
+
+    head = "" if _PDF_SENT["lib"] else _pdfjs_loader()
+    if deck not in _PDF_SENT["decks"]:
+        import base64
+        data = base64.b64encode(pdf.read_bytes()).decode("ascii")
+        head += f"<script>(window.__pdfDecks = window.__pdfDecks || {{}})[{_js(deck)}] = {_js(data)};</script>"
+        _PDF_SENT["decks"].add(deck)
+
+    wid = _id()
+    btn = "font-size:14px;padding:2px 10px;border:1px solid #d0d7de;border-radius:6px;background:#f6f8fa;cursor:pointer"
+    return HTML(head + f"""
+<div id="{wid}" class="pdfslide" style="{BOX};max-width:980px" tabindex="0">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+    <b style="flex:1">{html.escape(pdf.name)}</b>
+    <button data-role="prev" style="{btn}">◀ 이전</button>
+    <span data-role="label" style="min-width:90px;text-align:center"></span>
+    <button data-role="next" style="{btn}">다음 ▶</button>
+  </div>
+  <div data-role="page" style="position:relative;margin:0 auto;box-shadow:0 1px 4px rgba(0,0,0,.2)">
+    <canvas data-role="canvas" style="display:block"></canvas>
+    <div data-role="text" class="textLayer"></div>
+  </div>
+  <div data-role="msg" style="color:#cf222e"></div>
+</div>
+<script>(() => {{
+  const root = document.getElementById({_js(wid)});
+  const q = r => root.querySelector(`[data-role="${{r}}"]`);
+  const pages = {_js(pages)}, deck = {_js(deck)};
+  let i = 0, tries = 0;
+  const b64 = s => {{ const b = atob(s); const u = new Uint8Array(b.length); for (let k = 0; k < b.length; k++) u[k] = b.charCodeAt(k); return u; }};
+  async function draw() {{
+    q("label").textContent = `p${{pages[i]}} (${{i + 1}} / ${{pages.length}})`;
+    const doc = await (window.__pdfDocs[deck] = window.__pdfDocs[deck] ||
+      window.pdfjsLib.getDocument({{data: b64(window.__pdfDecks[deck])}}).promise);
+    const page = await doc.getPage(pages[i]);
+    const width = Math.min(root.clientWidth - 26, 960);
+    const vp = page.getViewport({{scale: width / page.getViewport({{scale: 1}}).width}});
+    const ratio = window.devicePixelRatio || 1, canvas = q("canvas");
+    canvas.width = Math.floor(vp.width * ratio); canvas.height = Math.floor(vp.height * ratio);
+    canvas.style.width = vp.width + "px"; canvas.style.height = vp.height + "px";
+    q("page").style.width = vp.width + "px"; q("page").style.height = vp.height + "px";
+    await page.render({{canvasContext: canvas.getContext("2d"), viewport: vp, transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : null}}).promise;
+    const text = q("text"); text.innerHTML = ""; text.style.setProperty("--scale-factor", vp.scale);
+    await window.pdfjsLib.renderTextLayer({{textContentSource: page.streamTextContent(), container: text, viewport: vp}}).promise;
+  }}
+  function start() {{
+    if (!window.pdfjsLib || !(window.__pdfDecks || {{}})[deck]) {{
+      if (++tries > 50) {{ q("msg").textContent = "슬라이드 도구가 아직 불러와지지 않았습니다. 맨 위 준비 셀을 다시 실행해 주세요."; return; }}
+      return setTimeout(start, 100);
+    }}
+    draw().catch(e => q("msg").textContent = "슬라이드를 그리지 못했습니다: " + e);
+  }}
+  const ready = () => window.pdfjsLib && (window.__pdfDecks || {{}})[deck];
+  q("prev").onclick = () => {{ if (ready() && i > 0) {{ i--; draw(); }} }};
+  q("next").onclick = () => {{ if (ready() && i < pages.length - 1) {{ i++; draw(); }} }};
+  root.addEventListener("keydown", e => {{ if (e.key === "ArrowLeft") q("prev").click(); if (e.key === "ArrowRight") q("next").click(); }});
+  start();
+}})();</script>""")
+
+
+def _show_slide_images(deck, pages=None):
+    """이미지 묶음(assets/slides/<deck>.json)에서 pages 쪽만 뷰어로 보여 준다. PDF가 없는 자료용."""
     data = _load_deck(deck)
     total = len(data["images"])
     pages = list(pages or range(1, total + 1))
