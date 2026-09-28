@@ -46,10 +46,37 @@ QUIZ_TITLE = f"background:{NAVY};color:#fff;border-radius:8px;padding:10px 14px;
 BTN = f"font-size:14px;padding:4px 12px;border:1px solid {LINE};border-radius:6px;background:{PALE};color:{INK};cursor:pointer"
 
 
+# 선택지 칸은 모두 같은 크기로 두고, 글이 넘치면 글자만 줄인다(최소 12px).
+_QUIZ_FIT = """
+<style>
+.Quiz .Answer{grid-auto-rows:76px}
+.Quiz .MCButton{height:76px;box-sizing:border-box;overflow:hidden;line-height:1.3;font-size:17px;color:#172033}
+</style>
+<script>
+(() => {
+  if (window.__jqFit) return;
+  window.__jqFit = true;
+  const fit = () => document.querySelectorAll(".Quiz .MCButton:not([data-fit])").forEach(b => {
+    if (!b.clientHeight) return;
+    let size = 17;
+    b.style.fontSize = size + "px";
+    while ((b.scrollHeight > b.clientHeight || b.scrollWidth > b.clientWidth) && size > 12) {
+      size -= 1; b.style.fontSize = size + "px";
+    }
+    b.dataset.fit = "1";
+  });
+  setInterval(fit, 300);
+})();
+</script>
+"""
+
+
 def show_quiz(path):
-    """jupyterquiz 문제 파일을 슬라이드 색으로 보여 준다."""
+    """jupyterquiz 문제 파일을 슬라이드 색으로 보여 준다. 선택지 칸은 모두 같은 크기다."""
+    from IPython.display import display
     from jupyterquiz import display_quiz
 
+    display(HTML(_QUIZ_FIT))
     return display_quiz(path, max_width=800, colors=QUIZ_COLORS)
 
 

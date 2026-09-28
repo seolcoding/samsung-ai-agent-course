@@ -303,9 +303,10 @@ def build(version="C"):
         found = set().union(*(tags_of(cells[j]) for j in range(k + 1, end) if "강사용" not in cells[j].metadata.get("tags", [])))
         if cells[k].metadata["heading"]["title"].startswith("5."):
             found.add("실습")
-        label = " ".join(f"`[{t}]`" for t in TAG_ORDER if t in found)
+        label = " ".join(f"({t})" for t in TAG_ORDER if t in found)
         title = cells[k].metadata["heading"]["title"]
-        cells[k].source = "#" * level + " " + title + ("\n\n" + label if label else "")
+        # 표시는 제목 바로 옆에 작게 붙인다: "1.1 제목 (슬라이드) (퀴즈)"
+        cells[k].source = "#" * level + " " + title + (f" <small>{label}</small>" if label else "")
         if level <= 3:
             toc.append("  " * (level - 2) + f"- {title}" + (f" {label}" if label else ""))
     toc_cell = nbf.v4.new_markdown_cell("**목차**\n\n" + "\n".join(toc))
