@@ -306,6 +306,15 @@ def check_structure(nb, kind, R):
 
 
 # ── 강의 노트북 ─────────────────────────────────────────
+def has_deck_pdf(deck):
+    """widgets._deck_pdf와 같은 규칙: "<덱>-*.pdf" 또는 "<덱>.pdf"(한글 이름은 NFC로 비교)."""
+    import unicodedata
+
+    nfc = lambda t: unicodedata.normalize("NFC", t)  # noqa: E731
+    return any(nfc(p.stem).startswith(nfc(deck) + "-") or nfc(p.stem) == nfc(deck)
+               for p in (ROOT / "docs" / "raw").rglob("*.pdf"))
+
+
 def check_slides(nb, kind, R):
     codes = [(i, c.source) for i, c in enumerate(nb.cells) if c.cell_type == "code"]
     setup = next((i for i, s in codes if "slide_setup()" in s), None)
@@ -320,7 +329,7 @@ def check_slides(nb, kind, R):
     for i, s in codes:
         for call in calls(s, {"show_slides"}):
             deck = literal(call.args[0]) if call.args else None
-            if isinstance(deck, str) and not list((ROOT / "docs" / "raw").rglob(f"{deck}-*.pdf")):
+            if isinstance(deck, str) and not has_deck_pdf(deck):
                 probs.append((i, f"덱 {deck!r}의 PDF가 docs/raw에 없음 (이미지 방식으로 그려짐)"))
         if "_show_slide_images" in s or "assets/slides/" in s or "<img" in s:
             probs.append((i, f"이미지 슬라이드 사용: {excerpt(s, 40)}"))

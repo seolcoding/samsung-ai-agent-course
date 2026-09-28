@@ -1,0 +1,28 @@
+[
+ {
+  "question": "\"The quick ___ fox jumps over the lazy dog.\"의 빈칸에 LLM이 넣을 말은 무엇을 기준으로 정해질까요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "학습한 글에서 quick과 fox 사이에 자주 나온 말",
+    "correct": true,
+    "feedback": "LLM은 말뭉치에서 어떤 말이 그 자리에 많이 등장했는지를 배워 빈칸을 채웁니다."
+   },
+   {
+    "answer": "사람이 미리 코드로 적어 둔 문법 규칙",
+    "correct": false,
+    "feedback": "머신러닝은 규칙을 하나하나 프로그래밍하지 않고 데이터에서 배웁니다."
+   },
+   {
+    "answer": "사전에 실린 형용사 중 알파벳순으로 첫 단어",
+    "correct": false,
+    "feedback": "순서 규칙이 아니라, 학습한 글에서 그 자리에 얼마나 자주 나왔는지가 기준입니다."
+   },
+   {
+    "answer": "여우 사진을 보고 알아낸 실제 털 색깔",
+    "correct": false,
+    "feedback": "LLM은 사진이 아니라 글을 배웁니다. 사실 확인이 아니라 자주 나온 말을 고릅니다."
+   }
+  ]
+ }
+]

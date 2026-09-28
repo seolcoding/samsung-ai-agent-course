@@ -131,8 +131,13 @@ _TEXT_LAYER_CSS = """
 
 
 def _deck_pdf(deck):
-    """"1-2"처럼 쓴 이름으로 docs/raw 아래의 원본 PDF(1-2-*.pdf)를 찾는다. 없으면 None."""
-    hits = sorted(DOCS_RAW.rglob(f"{deck}-*.pdf"))
+    """"1-2"처럼 쓴 이름으로 docs/raw 아래의 원본 PDF(1-2-*.pdf)를 찾는다.
+    이름이 파일 이름과 똑같은 PDF(예: "2026-09-03_커리큘럼_제안서" → 그 이름.pdf)도 찾는다. 없으면 None."""
+    import unicodedata
+
+    nfc = lambda t: unicodedata.normalize("NFC", t)  # noqa: E731  macOS는 한글 파일 이름을 NFD로 저장한다
+    pdfs = sorted(DOCS_RAW.rglob("*.pdf"))
+    hits = [p for p in pdfs if nfc(p.stem).startswith(nfc(deck) + "-")] or [p for p in pdfs if nfc(p.stem) == nfc(deck)]
     return hits[0] if hits else None
 
 
