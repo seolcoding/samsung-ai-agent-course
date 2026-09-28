@@ -2,7 +2,7 @@
 
 노트북 종류는 파일 이름 끝으로 정한다.
     *_LEC.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
-    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → 예제(`# ✍️ CHANGE_HERE:` 값 바꿔 보기 + 성공 기준)·과제(힌트·성공 기준 → `# ✍️ WRITE_THIS:` 빈칸 셀 → 정답 보기).
+    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → 예제(`# ✍️ CHANGE_HERE:` 값 바꿔 보기 + 성공 기준)·과제(힌트·성공 기준 → `# ✍️ WRITE_HERE:` 빈칸 셀 → 정답 보기).
 수강생은 노트북만 받는다. 그래서 수강생 글에 .py·경로·다른 노트북 이야기가 없어야 한다(노트북 하나로 완결).
 
 실행(프로젝트 루트):
@@ -25,7 +25,7 @@ import nbformat
 
 ROOT = Path(__file__).resolve().parents[2]
 TEMP = Path.home() / "000_Inbox" / "080_Temporary" / "notebook_qc"
-TAGS = {"슬라이드", "퀴즈", "코드", "실습"}
+TAGS = {"슬라이드", "퀴즈", "코드", "예제", "과제"}
 BOX_HEAD = "<details><summary>강사용 메모</summary>"
 CITE = re.compile(r"\(p\d+")  # "(p6)", "(p13, p14)" 같은 쪽 인용
 STOCK = ("맞습니다.", "정답입니다.")
@@ -252,7 +252,7 @@ def check_structure(nb, kind, R):
                 bad_tag.append((i, f"표시가 <small> 밖에 있음: {excerpt(line)}"))
             heads.append((i, level, m.group(2), title.strip(), small.group(1).strip() if small else ""))
     R("구조", "제목 번호가 1부터 차례로 (## N. / ### N.M / #### N.M.K)", bad_num)
-    R("구조", "제목 옆 표시는 <small>(슬라이드)(퀴즈)(코드)(실습)</small>", bad_tag)
+    R("구조", "제목 옆 표시는 <small>(슬라이드)(퀴즈)(코드)(예제)(과제)</small>", bad_tag)
 
     toc = next(((i, c.source) for i, c in enumerate(nb.cells[:4]) if c.cell_type == "markdown" and "**목차**" in c.source), None)
     if toc is None:
@@ -371,10 +371,10 @@ def check_lab(nb, R):
     R("실습", "CodeMate 지시문 완성본을 주지 않음 — 힌트와 성공 기준만",
       [(i, excerpt(c.source, 50)) for i, c in enumerate(cells)
        if c.cell_type == "markdown" and not is_box(c) and "**CodeMate 지시문**" in c.source])
-    R("실습", "보이는 코드 셀에 TODO 대신 `# ✍️ WRITE_THIS:`(과제)·`# ✍️ CHANGE_HERE:`(예제) 표시",
+    R("실습", "보이는 코드 셀에 TODO 대신 `# ✍️ WRITE_HERE:`(과제)·`# ✍️ CHANGE_HERE:`(예제) 표시",
       [(i, ln.strip()[:50]) for i, c in enumerate(cells) if c.cell_type == "code" and not hidden(c)
        for ln in c.source.splitlines()
-       if "TODO" in ln or (("WRITE_THIS" in ln or "CHANGE_HERE" in ln) and "# ✍️ " not in ln)])
+       if "TODO" in ln or (("WRITE_HERE" in ln or "CHANGE_HERE" in ln) and "# ✍️ " not in ln)])
     R("실습", "성공 기준 자동 검사 셀 없음 — 수강생이 스스로 판단한다",
       [(i, excerpt(c.source, 40)) for i, c in enumerate(cells) if c.cell_type == "code" and "show_criteria(" in c.source])
 

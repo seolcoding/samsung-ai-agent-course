@@ -1,6 +1,6 @@
 """강의·실습 노트북 빌더가 함께 쓰는 셀 조립 도구.
 
-- 제목은 노트북 안에서 1부터 번호를 매긴다. 제목 옆에 (슬라이드) (퀴즈) (코드) (실습) 표시를 작게 붙이고,
+- 제목은 노트북 안에서 1부터 번호를 매긴다. 제목 옆에 (슬라이드) (퀴즈) (코드) (예제) (과제) 표시를 작게 붙이고,
   맨 위에 같은 표시를 단 목차를 만든다(finish에서 셀 종류를 보고 자동으로 계산).
 - 교안 도구를 부르는 코드 셀은 입력 칸을 접는다(source_hidden). 수강생이 직접 쓰는 셀만 보인다.
 - 강사용 메모는 절마다 한 상자로 모아 접어 둔다.
@@ -13,12 +13,15 @@ from pathlib import Path
 
 import nbformat as nbf
 
-TAG_ORDER = ["슬라이드", "퀴즈", "코드", "실습"]
+TAG_ORDER = ["슬라이드", "퀴즈", "코드", "예제", "과제"]
 
 
 def tags_of(cell):
     """셀 하나가 어떤 종류인지 돌려준다(목차·제목 옆 표시용)."""
     src = cell.source
+    if "lab_kind" in cell.metadata:  # 실습 노트북: 빌더가 정한 종류(예제·과제, 준비 코드는 빈 값)
+        kind = cell.metadata["lab_kind"]
+        return {kind} if kind else set()
     if cell.cell_type == "code":
         if "show_slides(" in src:
             return {"슬라이드"}
@@ -26,12 +29,12 @@ def tags_of(cell):
             return {"퀴즈"}
         if not cell.metadata.get("jupyter", {}).get("source_hidden"):  # 수강생에게 보이는 셀
             if "✍" in src:
-                return {"실습"}  # 빈칸을 채우는 셀
+                return {"과제"}  # 빈칸을 채우는 셀
             return {"퀴즈"} if "예측" in src else {"코드"}
         if any(k in src for k in ("show_checklist(", "show_criteria(", "slide_setup(", "make_blank(")):
             return set()
         return {"코드"}
-    return {"실습"} if "**CodeMate에게 줄 힌트**" in src or "**성공 기준**" in src else set()
+    return set()
 
 
 class Notebook:
@@ -53,8 +56,10 @@ class Notebook:
             self.flush()
         self.cells.append(nbf.v4.new_markdown_cell(src.strip()))
 
-    def code(self, src, visible=False):
+    def code(self, src, visible=False, kind=None):
         cell = nbf.v4.new_code_cell(src.strip())
+        if kind is not None:  # 실습 노트북의 셀 종류(예제·과제, 준비 코드는 "")
+            cell.metadata["lab_kind"] = kind
         if not visible:
             cell.metadata["jupyter"] = {"source_hidden": True}
             cell.metadata["tags"] = ["교안도구"]

@@ -9,7 +9,7 @@ argument-hint: "[노트북 경로] [실행]"
 
 노트북은 두 종류이고, 파일 이름 끝으로 구분한다.
 - **강의** `*_LEC.ipynb`: 슬라이드(`show_slides`) + 설명 + 퀴즈. 실습 코드 도구는 없다.
-- **실습** `*_LAB.ipynb`: `lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`과 원본 코드로 조립한다. 원본 파일마다 준비 코드(접힘) → 구획마다 예제(완성 코드 실행, `# ✍️ CHANGE_HERE:` 줄의 값만 바꿔 보기 → 🟢/⛔ 성공 기준) 또는 과제(설명 → CodeMate에게 줄 힌트 → 🟢/⛔ 성공 기준 → `# ✍️ WRITE_THIS:` 아래 빈칸(`...  # ✍️ …`) 셀 → 정답 보기(접힘)). 성공 기준은 자동 검사하지 않고 수강생이 스스로 판단한다. TODO가 없는 파일은 끝에 "CodeMate에게 물어보기"(힌트 + 성공 기준). 지시문 완성본은 주지 않는다. 실행되지 않는 참고 코드는 "참고:" 절의 ```` ```python ```` 블록.
+- **실습** `*_LAB.ipynb`: `lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`과 원본 코드로 조립한다. 원본 파일마다 준비 코드(접힘) → 구획마다 예제(완성 코드 실행, `# ✍️ CHANGE_HERE:` 줄의 값만 바꿔 보기 → 🟢/⛔ 성공 기준) 또는 과제(설명 → CodeMate에게 줄 힌트 → 🟢/⛔ 성공 기준 → `# ✍️ WRITE_HERE:` 아래 빈칸(`...  # ✍️ …`) 셀 → 정답 보기(접힘)). 성공 기준은 자동 검사하지 않고 수강생이 스스로 판단한다. TODO가 없는 파일은 끝에 "CodeMate에게 물어보기"(힌트 + 성공 기준). 지시문 완성본은 주지 않는다. 실행되지 않는 참고 코드는 "참고:" 절의 ```` ```python ```` 블록.
 
 수강생은 노트북만 받는다(.py 파일은 보이지 않는다). 노트북 하나로 완결되어야 한다.
 
@@ -27,7 +27,7 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
   - 공통: 번호 제목·`<small>` 표시·목차, 강사용 상자, 숨긴 도구 셀(`show_*`·`slide_setup`·환경 점검·`sys.path` 셀), 출력 없음, 외부 주소 없음(실습의 원본 코드는 제외), (pN) 없음, provider 단어, 합니다체(WARN), 반복(WARN), 퀴즈 규칙.
   - 공통(수강생 글 = `<details>` 밖 마크다운 + 퀴즈 글): `○○.py`·`src/`·`lessons/`·`.ipynb` 언급은 FAIL, "강의 노트북"·"실습 노트북"·"강의에서 본"·`_LEC`·`_LAB`은 WARN. 강사용 상자는 제외.
   - 강의: `run_step`·`show_code`·`show_code_map`·`make_blank`·`show_diff`가 있으면 FAIL. `slide_setup()` 뒤 `show_slides` 필수. 예측 셀 말고는 코드 셀을 숨김.
-  - 실습: `make_blank`·`run_step`·`show_diff`·`show_code_map`·`show_slides`가 있으면 FAIL. `**CodeMate 지시문**`이 있으면 FAIL, 보이는 코드에 `TODO`가 남았거나 `WRITE_THIS`·`CHANGE_HERE` 앞에 `# ✍️`가 없으면 FAIL, `show_criteria` 자동 검사 셀이 있으면 FAIL. 예제의 CHANGE_HERE는 같은 장에 🟢 성공 기준 글. 과제 빈칸 셀마다 ① 보이고 빈칸 상태 그대로 문법에 맞음 ② 같은 절 앞쪽에 `**CodeMate에게 줄 힌트**`와 🟢 항목이 있는 `**성공 기준**` ③ 다음 제목 전에 `정답 보기` 상자가 있고, 그 ```` ```python ```` 블록을 빈칸에 차례로 끼우면 문법에 맞음. 원본 파일 절의 첫 코드(준비 코드)가 보이면 WARN. `(작성 예정)`은 뼈대 상태라 WARN.
+  - 실습: `make_blank`·`run_step`·`show_diff`·`show_code_map`·`show_slides`가 있으면 FAIL. `**CodeMate 지시문**`이 있으면 FAIL, 보이는 코드에 `TODO`가 남았거나 `WRITE_HERE`·`CHANGE_HERE` 앞에 `# ✍️`가 없으면 FAIL, `show_criteria` 자동 검사 셀이 있으면 FAIL. 예제의 CHANGE_HERE는 같은 장에 🟢 성공 기준 글. 과제 빈칸 셀마다 ① 보이고 빈칸 상태 그대로 문법에 맞음 ② 같은 절 앞쪽에 `**CodeMate에게 줄 힌트**`와 🟢 항목이 있는 `**성공 기준**` ③ 다음 제목 전에 `정답 보기` 상자가 있고, 그 ```` ```python ```` 블록을 빈칸에 차례로 끼우면 문법에 맞음. 원본 파일 절의 첫 코드(준비 코드)가 보이면 WARN. `(작성 예정)`은 뼈대 상태라 WARN.
 - 결과의 FAIL/WARN과 셀 번호(0부터)를 그대로 가져온다. 실행본은 `~/000_Inbox/080_Temporary/notebook_qc/`에 생긴다.
 - 키 값이 출력에 나왔다는 결과가 있어도 값을 옮겨 적지 않는다. 셀 번호만 적는다.
 
@@ -47,7 +47,7 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
 8. **기계적 반복 금지:** 같은 문장, 같은 피드백 서두, 중복 머리글이 되풀이되지 않는다.
 9. **강의 용어:** 출력하다(찍다 X), 답변 텍스트(답 글자 X), 호출하다(부르다 X), 이 노트북(이 권 X).
 10. **문체:** 수강생 글은 합니다체다.
-11. **구조:** 번호 목차가 맨 위에 있고, 제목 옆에 (슬라이드)(퀴즈)(코드)(실습) 표시가 내용과 맞다.
+11. **구조:** 번호 목차가 맨 위에 있고, 제목 옆에 (슬라이드)(퀴즈)(코드)(예제)(과제) 표시가 내용과 맞다.
 12. **슬라이드:** PDF.js로 그린다. 외부 CDN·외부 주소가 없다.
 13. **원본 보호:** `src/`가 바뀌지 않았다 (`git status src/`로 확인).
 14. **실행:** 새 커널에서 오류 0, 키 값이 출력되지 않는다.
