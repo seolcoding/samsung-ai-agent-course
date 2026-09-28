@@ -182,8 +182,9 @@ def show_slides(deck, pages=None):
     pdf = _deck_pdf(deck)
     if pdf is None:
         return _show_slide_images(deck, pages)
-    import subprocess
-    total = int(next(l.split()[-1] for l in subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout.splitlines() if l.startswith("Pages:")))
+    from pypdf import PdfReader  # 쪽 수만 센다(수강생 PC에 poppler가 없어도 되도록 파이썬 패키지를 쓴다)
+
+    total = len(PdfReader(pdf).pages)
     pages = list(pages or range(1, total + 1))
     bad = [p for p in pages if not 1 <= p <= total]
     if bad:
