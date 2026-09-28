@@ -1,0 +1,358 @@
+{
+ "draft": true,
+ "title": "1-3 실습",
+ "intro": "(작성 예정)",
+ "files": [
+  {
+   "name": "01_lcel_runnable.py",
+   "title": "01_lcel_runnable",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "기본 LCEL 체인",
+     "marker": "# ── 기본 LCEL 체인 ────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "RunnableParallel",
+     "marker": "# ── RunnableParallel ──────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "RunnablePassthrough",
+     "marker": "# ── RunnablePassthrough ───────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "RunnableLambda",
+     "marker": "# ── RunnableLambda ────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "system, human 메시지 튜플을 작성해 주세요.",
+     "blank": {
+      "start": "('system', '너는 초보자를 위한 AI 튜터야'),",
+      "end": "# 사용자마다 서로 다른 내용의 주제를 질문하게 될 것이다."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "위에 정의한 프롬프트, 모델, 출력 파서를 파이프라인 연산자로 연결해 주세요.",
+     "blank": {
+      "start": "chain = prompt | model | parser # runnable",
+      "end": "# Runnable 실행 방식:"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "02_tool_calling.py",
+   "title": "02_tool_calling",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "도구 정의 (@tool 데코레이터)",
+     "marker": "# ── 도구 정의 (@tool 데코레이터) ────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "LLM에 도구 바인딩",
+     "marker": "# ── LLM에 도구 바인딩 ─────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "수동 도구 호출 루프",
+     "marker": "# ── 수동 도구 호출 루프 ───────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "실행 예시",
+     "marker": "# ── 실행 예시 ─────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "LLM에 연결할 도구 목록을 작성해 주세요.",
+     "blank": {
+      "start": "tools = [get_weather, calculate]",
+      "end": "# ── LLM에 도구 바인딩 ─────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "bind_tools()를 사용해 LLM에 도구 스키마를 연결해 주세요.",
+     "blank": {
+      "start": "llm_with_tools = llm.bind_tools(tools)",
+      "end": "# 도구 이름 → 실행 함수 매핑"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "도구 이름으로 실제 도구를 찾을 수 있도록 매핑을 만들어 주세요.",
+     "blank": {
+      "start": "'''",
+      "end": "# ── 수동 도구 호출 루프 ───────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "tool_calls의 이름과 인자를 사용해 해당 도구를 실행해 주세요.",
+     "blank": {
+      "start": "tool_fn = tool_map[call['name']]",
+      "end": "# ── 실행 예시 ─────────────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "03_output_parser.py",
+   "title": "03_output_parser",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "출력 스키마 정의",
+     "marker": "# ── 출력 스키마 정의 ───────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "방법 1: PydanticOutputParser",
+     "marker": "# ── 방법 1: PydanticOutputParser ──────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "방법 2: .with_structured_output()",
+     "marker": "# ── 방법 2: .with_structured_output() ────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "MovieReview 스키마를 사용하는 PydanticOutputParser를 생성해 주세요.",
+     "blank": {
+      "start": "parser = PydanticOutputParser(pydantic_object=MovieReview)",
+      "end": "# TODO: format_instructions가 포함된 프롬프트를 구성해 주세요."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "format_instructions가 포함된 프롬프트를 구성해 주세요.",
+     "blank": {
+      "start": "prompt = ChatPromptTemplate.from_messages([",
+      "end": "# TODO: 프롬프트, LLM, 파서를 LCEL 체인으로 연결해 주세요."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "프롬프트, LLM, 파서를 LCEL 체인으로 연결해 주세요.",
+     "blank": {
+      "start": "chain1 = prompt | llm | parser",
+      "end": "# review1은 MovieReview의 인스턴스가 되길 희망한다."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "with_structured_output()으로 구조화 출력을 지원하는 LLM을 만들어 주세요.",
+     "blank": {
+      "start": "",
+      "end": "# prompt2 = ChatPromptTemplate.from_messages(["
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "프롬프트와 구조화 LLM을 연결해 주세요.",
+     "blank": {
+      "start": "",
+      "end": "# print(f'제목   : {review2.title}')"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "04_memory_runnable.py",
+   "title": "04_memory_runnable",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "세션 저장소",
+     "marker": "# ── 세션 저장소 ───────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "체인 구성",
+     "marker": "# ── 체인 구성 ─────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "세션 A",
+     "marker": "# ── 세션 A ────────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "세션 B",
+     "marker": "# ── 세션 B ────────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "저장된 히스토리 확인",
+     "marker": "# ── 저장된 히스토리 확인 ──────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "LangChain 방식의 한계",
+     "marker": "# ── LangChain 방식의 한계 ─────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "session_id별 InMemoryChatMessageHistory를 생성하고 반환해 주세요.",
+     "blank": {
+      "start": "if session_id not in session_store:",
+      "end": "# 이미 있으면?"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "RunnableWithMessageHistory로 체인과 세션 히스토리를 연결해 주세요.",
+     "blank": {
+      "start": "chain_with_history = RunnableWithMessageHistory(",
+      "end": "# ── 세션 A ────────────────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "05_memory_langgraph.py",
+   "title": "05_memory_langgraph",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "State 정의",
+     "marker": "# ── State 정의 ────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "그래프 빌드",
+     "marker": "# ── 그래프 빌드 ───────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "스레드 A: 홍길동",
+     "marker": "# ── 스레드 A: 홍길동 ───────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "스레드 B: 별개 세션",
+     "marker": "# ── 스레드 B: 별개 세션 ───────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "스냅샷 확인",
+     "marker": "# ── 스냅샷 확인 ───────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "LangGraph vs LangChain 방식 비교",
+     "marker": "# ── LangGraph vs LangChain 방식 비교 ─────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "system 메시지와 State의 messages를 함께 LLM에 전달하고 결과를 반환해 주세요.",
+     "blank": {
+      "start": "return {'messages': []}",
+      "end": "# ── 그래프 빌드 ───────────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "chatbot 노드와 START/END 엣지를 추가해 주세요.",
+     "blank": {
+      "start": "",
+      "end": "# MemorySaver: 스레드별 State를 메모리에 유지 (프로세스 재시작 시 초기화)"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "MemorySaver를 생성하고 그래프를 컴파일해 주세요.",
+     "blank": {
+      "start": "checkpointer = None",
+      "end": "# ── 스레드 A: 홍길동 ───────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  }
+ ],
+ "closing": "(작성 예정)"
+}

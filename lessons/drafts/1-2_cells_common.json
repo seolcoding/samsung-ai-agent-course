@@ -1,8 +1,8 @@
 {
- "title": "# LLM을 사용하며 알아야 할 것들\n\n이 노트북은 실제 API를 호출합니다.",
+ "title": "# LLM을 사용하며 알아야 할 것들\n\n이 노트북은 슬라이드와 설명, 퀴즈로 개념을 익히는 강의 노트북입니다. 코드 실습은 `1-2_llm_api_lab.ipynb`에서 합니다.",
  "env_check_code": "import os\nfrom dotenv import load_dotenv, find_dotenv\n\nload_dotenv(find_dotenv(usecwd=True))  # 프로젝트의 .env 파일을 읽습니다\n\n# 값은 출력하지 않습니다. 빠진 설정이 있는지만 봅니다.\nprovider = os.getenv(\"LLM_PROVIDER\", \"samsung\").strip().lower()\n필요한_이름 = {\n    \"openai\": [\"OPENAI_API_KEY\", \"OPENAI_MODEL\"],\n    \"samsung\": [\"api_base_url\", \"model\", \"credential_key\", \"send_system_name\", \"user_id\"],\n}.get(provider, [\"LLM_PROVIDER\"])\n빠진_이름 = [name for name in 필요한_이름 if not os.getenv(name)]\n\nimport config.llm  # 실습 코드가 쓰는 설정 모듈을 불러옵니다\n\nif 빠진_이름:\n    print(f\"준비가 덜 되었습니다. 빠진 설정 {len(빠진_이름)}개가 있습니다. 강사에게 알려 주세요.\")\n    print(\"(강사 확인용:\", \", \".join(빠진_이름), \")\")\nelse:\n    print(\"준비 완료: LLM에 연결할 설정이 모두 있습니다.\")",
  "env_check_look": "**볼 지점**\n- \"준비 완료\"가 나오면 다음으로 넘어갑니다.\n- \"준비가 덜 되었습니다\"가 나오면 강사에게 알립니다.\n- 키 값은 화면에 나오지 않습니다. 혹시 나오면 강사에게 알립니다.",
- "q11_lead": "슬라이드를 보기 전에 먼저 예측해 봅니다. 답은 바로 뒤의 p4에 있습니다.",
+ "q11_lead": "슬라이드를 보기 전에 먼저 예측해 봅니다. 답은 바로 다음 슬라이드에 있습니다.",
  "q11": {
   "question": "사전 학습만 거친 모델에 \"To be or not to be\"를 넣으면 무엇이 나올 가능성이 클까요?",
   "type": "multiple_choice",
@@ -357,17 +357,17 @@
     {
      "answer": "단어의 일부, 공백, 기호, 숫자 조각이 토큰이 될 수 있다",
      "correct": false,
-     "feedback": "p9에 적힌 설명 그대로입니다."
+     "feedback": "슬라이드에 적힌 설명 그대로입니다. 토큰은 단어의 일부나 공백·기호·숫자 조각도 될 수 있습니다."
     },
     {
      "answer": "한국어는 조사와 어미 때문에 더 잘게 나뉠 수 있다",
      "correct": false,
-     "feedback": "p9의 설명과 같습니다."
+     "feedback": "맞는 설명입니다. 조사와 어미가 따로 떨어져 나뉘기도 합니다."
     },
     {
      "answer": "입력 프롬프트와 모델의 답변 모두 토큰 단위로 계산한다",
      "correct": false,
-     "feedback": "p9에서 설명한 내용과 일치합니다."
+     "feedback": "맞는 설명입니다. 입력과 출력 모두 토큰 단위로 셉니다."
     }
    ]
   },
@@ -383,7 +383,7 @@
     {
      "answer": "이전 대화를 다음 요청의 메시지 목록에 다시 넣는다",
      "correct": true,
-     "feedback": "3.2의 context += 줄이 이 일을 했습니다."
+     "feedback": "모델은 이번 요청에 담긴 것만 보므로, 이전 대화를 매번 메시지 목록에 다시 넣어야 합니다."
     },
     {
      "answer": "temperature를 낮춘다",
@@ -398,34 +398,34 @@
    ]
   },
   {
-   "question": "4.2에서 \"너는 초보자를 위한 AI 튜터야\"는 어떤 역할의 메시지였나요?",
+   "question": "Assistant 메시지에 대한 설명으로 맞는 것은?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "System",
+     "answer": "모델의 전체 역할, 규칙, 제약 조건을 정한다",
+     "correct": false,
+     "feedback": "역할과 규칙을 정하는 것은 System 메시지입니다."
+    },
+    {
+     "answer": "사용자의 질문, 요청, 입력 데이터를 전한다",
+     "correct": false,
+     "feedback": "질문과 요청을 전하는 것은 User 메시지입니다."
+    },
+    {
+     "answer": "LLM이 만든 답이며, 이후 대화에 추가되어 맥락을 전한다",
      "correct": true,
-     "feedback": "모델의 역할을 정하는 지시라서 System입니다. 03에서는 SystemMessage로 보냈습니다."
+     "feedback": "Assistant 메시지는 모델의 답입니다. 다음 요청에 다시 넣으면 이어지는 대화의 맥락이 됩니다."
     },
     {
-     "answer": "User",
+     "answer": "화면에만 출력하고 메시지 목록에는 넣지 않는다",
      "correct": false,
-     "feedback": "User는 사용자의 질문과 요청을 전합니다. 03의 User 메시지는 질문 문장입니다."
-    },
-    {
-     "answer": "Assistant",
-     "correct": false,
-     "feedback": "Assistant는 LLM이 만든 답입니다."
-    },
-    {
-     "answer": "어느 역할에 넣어도 똑같다",
-     "correct": false,
-     "feedback": "역할 구분은 지시의 우선순위를 해석하는 기준이라, 넣는 역할에 따라 해석이 달라집니다."
+     "feedback": "Assistant 메시지도 메시지 목록에 추가되어 다음 대화의 맥락을 전합니다."
     }
    ]
   }
  ],
  "closing": "**이 노트북에서 본 것**\n- 사전 학습만 한 모델은 그럴듯하게 이어 쓰고 API로 쓰는 모델은 대체로 지시 수행을 강화한 모델입니다.\n- 모델은 토큰을 하나씩 예측해 붙이고, API는 요청 → 후보 계산 → 누적 → 반환 순서로 답을 돌려줍니다.\n- 비용은 입력 토큰과 출력 토큰으로 정해지고, 입력에는 시스템 프롬프트와 이전 대화까지 들어갑니다.\n- 모델은 요청에 담긴 컨텍스트만 읽습니다. 이전 대화도 요청에 다시 넣어야 합니다.\n- 좋은 입력은 역할·목표, 배경·제약, 출력 형식을 주고 모호함을 줄입니다.\n- 역할 구분(System, User, Assistant)은 모델이 지시의 우선순위와 대화 흐름을 해석하는 기준입니다.\n- Temperature와 Top-p가 낮으면 일관된 답, 높으면 다양한 답에 유리합니다.",
- "title__meta": "| 항목 | 내용 |\n|---|---|\n| 버전 | {VERSION} |\n| 원본 PDF | `docs/raw/Chapter01/day01/1-2-development-environment-and-llm-api-mechanism.pdf` (19쪽) |\n| 원본 코드 | `src/raw/Chapter01/01-llm-api/`의 `01_requests.py`, `02_openai.py`, `03_langchain.py` |\n| 실행 조건 | 사외는 `LLM_PROVIDER=openai`, 사내는 `LLM_PROVIDER=samsung`입니다. |\n| 버전 뜻 | A = 슬라이드 문구만, B = 슬라이드 요약 + 코드 연결, C = B + 왜 배우는지 |",
+ "title__meta": "| 항목 | 내용 |\n|---|---|\n| 버전 | {VERSION} |\n| 원본 PDF | `docs/raw/Chapter01/day01/1-2-development-environment-and-llm-api-mechanism.pdf` (19쪽) |\n| 원본 코드 | 이 노트북에는 없습니다. `src/raw/Chapter01/01-llm-api/`의 세 파일은 실습 노트북 `1-2_llm_api_lab.ipynb`에서 다룹니다. |\n| API 호출 | 없습니다. 슬라이드 준비 셀만 실행하면 됩니다. |",
  "env_check_look__meta": "- `LLM_PROVIDER`가 `openai` 또는 `samsung`으로 나오는지 확인합니다.\n- `False`가 있으면 `.env`에 그 값이 비어 있다는 뜻입니다.",
  "q_run1_lead__meta": "- 퀴즈 정답 해설에서 뺀 주의: 사내 환경에서 usage가 오는지는 아직 확인하지 않았습니다.",
  "look_r1s1__meta": "원래 '볼 지점' 설명:\n- 이 단계는 화면에 아무것도 출력하지 않습니다. 오류 없이 끝나면 준비가 된 것입니다.\n- 9줄에서 `LLM_PROVIDER` 값을 읽고, 10~28줄에서 그 값에 따라 주소·모델·헤더를 정합니다.\n- 오류가 나면 메시지를 읽습니다. \"OPENAI_MODEL과 OPENAI_API_KEY가 필요합니다\"(15줄)나 \"사내 API 설정이 부족합니다\"가 나오면 `.env`에서 메시지에 적힌 이름을 확인합니다.\n- 키는 헤더에만 넣습니다(16~19줄, 26줄). 화면에는 나오지 않습니다.",

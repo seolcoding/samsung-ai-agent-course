@@ -14,6 +14,8 @@
     show_line_pick   코드에서 틀린 줄 찾기 퀴즈
     run_step         원본 파일의 한 구간을 보여 주고 그대로 실행 (일부를 접어 둘 수 있음)
     show_code        원본 파일의 한 구간을 실행하지 않고 보여 주기
+    make_blank       실습용 복사본 만들기 (TODO 아래 정답 줄을 빈칸으로)
+    show_diff        내 코드와 솔루션을 나란히 비교
 """
 
 import html
@@ -747,3 +749,78 @@ def run_step(path, start=None, end=None, fold=(), collapsed=None):
     source = "\n" * first + "\n".join(lines[first:last]) + "\n"
     exec(compile(source, str(path), "exec"), space)
     return space
+
+
+# ── 실습 노트북: 빈칸 복사본과 솔루션 비교 ────────────────────────────────────
+
+BLANK_LINE = "...  # ✍ 여기를 CodeMate와 함께 채웁니다"
+
+
+def make_blank(raw, work, blanks, reset=False):
+    """원본(raw)을 실습용 복사본(work)으로 복사하면서 blanks 구간을 빈칸 한 줄로 바꾼다.
+
+    blanks: [{"start": 표시, "end": 표시 또는 None}] — start 표시가 든 줄부터 end 표시가 든 줄 직전까지를 비운다.
+    end가 None이면 start 줄 하나만, "EOF"이면 파일 끝까지 비운다. 표시는 앞 구간 뒤에서부터 차례로 찾는다.
+    빈칸 줄 `...`은 파이썬 문법상 어디에 있어도 오류가 나지 않는다(빈 목록 항목·빈 함수 몸통 등).
+    이미 복사본이 있으면 수강생이 채운 내용을 지키려고 덮어쓰지 않는다. reset=True일 때만 새로 만든다.
+    원본 파일은 읽기만 한다.
+    """
+    raw, work = Path(raw).resolve(), Path(work).resolve()
+    if work.exists() and not reset:
+        return HTML(f'<div style="{BOX}">실습 파일이 이미 있습니다: <code>{html.escape(str(work.name))}</code> '
+                    '(채운 내용을 지키려고 그대로 둡니다. 처음부터 다시 하려면 reset=True로 실행합니다.)</div>')
+    lines = raw.read_text(encoding="utf-8").splitlines()
+    cursor, cuts = 0, []
+    for b in blanks:
+        a = next((k for k in range(cursor, len(lines)) if b["start"] in lines[k]), None)
+        if a is None:
+            raise ValueError(f"{raw.name}에서 빈칸 시작 표시를 찾지 못했다: {b['start']!r}")
+        end = b.get("end")
+        if end is None:
+            e = a + 1
+        elif end == "EOF":
+            e = len(lines)
+        else:
+            e = next((k for k in range(a + 1, len(lines)) if end in lines[k]), None)
+        if e is None:
+            raise ValueError(f"{raw.name}에서 빈칸 끝 표시를 찾지 못했다: {b['end']!r}")
+        cuts.append((a, e))
+        cursor = e
+    out, k = [], 0
+    for a, e in cuts:
+        out += lines[k:a]
+        indent = lines[a][: len(lines[a]) - len(lines[a].lstrip())]
+        out.append(indent + BLANK_LINE)
+        k = e
+    out += lines[k:]
+    work.parent.mkdir(parents=True, exist_ok=True)
+    work.write_text("\n".join(out) + "\n", encoding="utf-8")
+    return HTML(f'<div style="{BOX}">실습 파일을 만들었습니다: <code>{html.escape(str(work))}</code><br>'
+                f'빈칸 {len(cuts)}곳(<code>{html.escape(BLANK_LINE)}</code>)을 CodeMate와 함께 채웁니다.</div>')
+
+
+def show_diff(mine, solution, title="내 코드 ↔ 솔루션"):
+    """두 파일을 나란히 보여 주고 다른 줄만 색으로 표시한다. 같으면 같다고 알려 준다."""
+    import difflib
+
+    a = Path(mine).resolve().read_text(encoding="utf-8").splitlines()
+    b = Path(solution).resolve().read_text(encoding="utf-8").splitlines()
+    rows, same = [], True
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+        n = max(i2 - i1, j2 - j1)
+        for k in range(n):
+            left = a[i1 + k] if i1 + k < i2 else ""
+            right = b[j1 + k] if j1 + k < j2 else ""
+            color = "" if tag == "equal" else f"background:{PALE};"
+            if tag != "equal":
+                same = False
+            mark = "" if tag == "equal" else f"border-left:3px solid {BLUE};"
+            rows.append(f'<tr><td style="{color}{mark}padding:0 6px;white-space:pre">{html.escape(left)}</td>'
+                        f'<td style="{color}padding:0 6px;white-space:pre">{html.escape(right)}</td></tr>')
+    note = "두 파일이 같습니다." if same else "파란 선이 있는 줄이 서로 다릅니다. 다르다고 틀린 것은 아닙니다. 왜 다른지 설명할 수 있는지 봅니다."
+    return HTML(f'<div style="{BOX};max-width:1200px"><div style="{QUIZ_TITLE}">{html.escape(title)}</div>'
+                f'<div style="color:#57606a;margin:8px 0">{note}</div>'
+                f'<div style="overflow:auto;max-height:520px"><table style="border-collapse:collapse;font-family:Menlo,Consolas,monospace;font-size:13px;width:100%">'
+                f'<tr><th style="text-align:left;padding:4px 6px;color:{NAVY}">내 코드 ({html.escape(Path(mine).name)})</th>'
+                f'<th style="text-align:left;padding:4px 6px;color:{NAVY}">솔루션</th></tr>{"".join(rows)}</table></div></div>')
+

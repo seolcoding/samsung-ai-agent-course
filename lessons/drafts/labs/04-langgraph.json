@@ -1,0 +1,247 @@
+{
+ "draft": true,
+ "title": "2-1 실습",
+ "intro": "(작성 예정)",
+ "files": [
+  {
+   "name": "01_basic_graph.py",
+   "title": "01_basic_graph",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "from typing import Annotated",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "LangGraph 3대 요소",
+     "marker": "# ── LangGraph 3대 요소 ──────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "State의 messages를 LLM에 전달하고 응답을 messages에 담아 반환해 주세요.",
+     "blank": {
+      "start": "response = llm.invoke(state['messages'])",
+      "end": "# 3. Edge: 노드 간 흐름을 정의한다."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "chatbot 노드를 추가하고 START에서 chatbot, chatbot에서 END로 이어 주세요.",
+     "blank": {
+      "start": "builder.add_node('chatbot', chatbot_node)",
+      "end": "# TODO: 그래프를 컴파일해 실행 가능한 app을 만들어 주세요."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "그래프를 컴파일해 실행 가능한 app을 만들어 주세요.",
+     "blank": {
+      "start": "app = builder.compile()",
+      "end": "# 그래프 구조 출력 (Mermaid 다이어그램)"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "02_conditional_edge.py",
+   "title": "02_conditional_edge",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "from typing import Annotated, Literal",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "노드 정의",
+     "marker": "# ── 노드 정의 ────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "라우팅 함수",
+     "marker": "# ── 라우팅 함수 ──────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "그래프 조립",
+     "marker": "# ── 그래프 조립 ──────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "실행",
+     "marker": "# ── 실행 ─────────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "LLM으로 언어를 감지하고 'ko' 또는 'en' 값을 정해 주세요.",
+     "blank": {
+      "start": "result = llm.invoke(f'다음 텍스트의 언어를 \"ko\" 또는 \"en\" 중 하나로만 판별해: {last}')",
+      "end": "def korean_response(state: State) -> dict:"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "detect_language 이후 조건부 엣지를 추가해 주세요.",
+     "blank": {
+      "start": "builder.add_conditional_edges('detect_language', route_by_language)",
+      "end": "# 병렬처리"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "03_tool_node.py",
+   "title": "03_tool_node",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "from typing import Annotated",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "create_agent: 위와 동일한 ReAct 루프를 한 줄로 만드는 편의 함수",
+     "marker": "# ── create_agent: 위와 동일한 ReAct 루프를 한 줄로 만드는 편의 함수 ────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "ToolNode와 LLM에 연결할 도구 목록을 작성해 주세요.",
+     "blank": {
+      "start": "tools = [get_exchange_rate, calculate]",
+      "end": "# TODO: bind_tools()로 LLM에 도구를 연결해 주세요."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "bind_tools()로 LLM에 도구를 연결해 주세요.",
+     "blank": {
+      "start": "llm = get_llm().bind_tools(tools)",
+      "end": "class State(TypedDict):"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "State의 messages를 도구가 연결된 LLM에 전달해 주세요.",
+     "blank": {
+      "start": "return {'messages': [llm.invoke(state['messages'])]}",
+      "end": "# ToolNode: AI 메시지에 포함된 tool_calls를 파싱하고 해당 도구를 실행한 뒤"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "ToolNode를 생성해 주세요.",
+     "blank": {
+      "start": "'''",
+      "end": "# tools_condition: 마지막 메시지에 tool_calls가 있으면 'tools'로,"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "도구 실행 후 다시 agent로 돌아가는 엣지를 추가해 주세요.",
+     "blank": {
+      "start": "builder.add_edge('tools', 'agent')",
+      "end": "app = builder.compile()"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "04_human_in_the_loop.py",
+   "title": "04_human_in_the_loop",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "from typing import Annotated",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "1단계: tools 노드 직전까지 실행",
+     "marker": "# ── 1단계: tools 노드 직전까지 실행 ──────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "2단계: 사용자 승인 후 재개",
+     "marker": "# ── 2단계: 사용자 승인 후 재개 ────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "거부 시나리오",
+     "marker": "# ── 거부 시나리오 ─────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "MemorySaver 체크포인터를 생성해 주세요.",
+     "blank": {
+      "start": "checkpointer = MemorySaver()",
+      "end": "# interrupt_before: 지정한 노드 실행 직전에 그래프를 일시 중단한다."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "tools 노드 실행 직전에 중단되도록 그래프를 컴파일해 주세요.",
+     "blank": {
+      "start": "app = builder.compile(checkpointer=checkpointer, interrupt_before=['tools'])",
+      "end": "config = {'configurable': {'thread_id': 'hitl_demo'}}"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "05_hitl_interactive.py",
+   "title": "05_hitl_interactive",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "from typing import Annotated",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    }
+   ],
+   "look": "(작성 예정)",
+   "explain_prompt": "(작성 예정)"
+  }
+ ],
+ "closing": "(작성 예정)"
+}

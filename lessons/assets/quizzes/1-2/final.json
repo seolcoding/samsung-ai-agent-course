@@ -37,17 +37,17 @@
    {
     "answer": "단어의 일부, 공백, 기호, 숫자 조각이 토큰이 될 수 있다",
     "correct": false,
-    "feedback": "p9에 적힌 설명 그대로입니다."
+    "feedback": "슬라이드에 적힌 설명 그대로입니다. 토큰은 단어의 일부나 공백·기호·숫자 조각도 될 수 있습니다."
    },
    {
     "answer": "한국어는 조사와 어미 때문에 더 잘게 나뉠 수 있다",
     "correct": false,
-    "feedback": "p9의 설명과 같습니다."
+    "feedback": "맞는 설명입니다. 조사와 어미가 따로 떨어져 나뉘기도 합니다."
    },
    {
     "answer": "입력 프롬프트와 모델의 답변 모두 토큰 단위로 계산한다",
     "correct": false,
-    "feedback": "p9에서 설명한 내용과 일치합니다."
+    "feedback": "맞는 설명입니다. 입력과 출력 모두 토큰 단위로 셉니다."
    }
   ]
  },
@@ -63,7 +63,7 @@
    {
     "answer": "이전 대화를 다음 요청의 메시지 목록에 다시 넣는다",
     "correct": true,
-    "feedback": "3.2의 context += 줄이 이 일을 했습니다."
+    "feedback": "모델은 이번 요청에 담긴 것만 보므로, 이전 대화를 매번 메시지 목록에 다시 넣어야 합니다."
    },
    {
     "answer": "temperature를 낮춘다",
@@ -78,28 +78,28 @@
   ]
  },
  {
-  "question": "4.2에서 \"너는 초보자를 위한 AI 튜터야\"는 어떤 역할의 메시지였나요?",
+  "question": "Assistant 메시지에 대한 설명으로 맞는 것은?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "System",
+    "answer": "모델의 전체 역할, 규칙, 제약 조건을 정한다",
+    "correct": false,
+    "feedback": "역할과 규칙을 정하는 것은 System 메시지입니다."
+   },
+   {
+    "answer": "사용자의 질문, 요청, 입력 데이터를 전한다",
+    "correct": false,
+    "feedback": "질문과 요청을 전하는 것은 User 메시지입니다."
+   },
+   {
+    "answer": "LLM이 만든 답이며, 이후 대화에 추가되어 맥락을 전한다",
     "correct": true,
-    "feedback": "모델의 역할을 정하는 지시라서 System입니다. 03에서는 SystemMessage로 보냈습니다."
+    "feedback": "Assistant 메시지는 모델의 답입니다. 다음 요청에 다시 넣으면 이어지는 대화의 맥락이 됩니다."
    },
    {
-    "answer": "User",
+    "answer": "화면에만 출력하고 메시지 목록에는 넣지 않는다",
     "correct": false,
-    "feedback": "User는 사용자의 질문과 요청을 전합니다. 03의 User 메시지는 질문 문장입니다."
-   },
-   {
-    "answer": "Assistant",
-    "correct": false,
-    "feedback": "Assistant는 LLM이 만든 답입니다."
-   },
-   {
-    "answer": "어느 역할에 넣어도 똑같다",
-    "correct": false,
-    "feedback": "역할 구분은 지시의 우선순위를 해석하는 기준이라, 넣는 역할에 따라 해석이 달라집니다."
+    "feedback": "Assistant 메시지도 메시지 목록에 추가되어 다음 대화의 맥락을 전합니다."
    }
   ]
  }

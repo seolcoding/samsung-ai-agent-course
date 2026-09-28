@@ -1,7 +1,11 @@
 """교안 노트북 QC 하네스 — 규칙으로 판정할 수 있는 것만 검사한다.
 
+노트북 종류는 파일 이름 끝으로 정한다.
+    *_lecture.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
+    *_lab.ipynb      실습 노트북: 코드 지도 → 빈칸 복사본 → TODO마다 CodeMate 지시문 → 실행 → 솔루션 비교.
+
 실행(프로젝트 루트):
-    uv run python lessons/qc/notebook_qc.py lessons/Chapter01/1-2_llm_api.ipynb
+    uv run python lessons/qc/notebook_qc.py lessons/Chapter01/1-2_llm_api_lecture.ipynb
     uv run python lessons/qc/notebook_qc.py                 # lessons/Chapter*/*.ipynb 전부
     uv run --extra notebooks python lessons/qc/notebook_qc.py <노트북> --execute   # 새 커널 실행까지
 
@@ -24,7 +28,16 @@ TAGS = {"슬라이드", "퀴즈", "코드", "실습"}
 BOX_HEAD = "<details><summary>강사용 메모</summary>"
 CITE = re.compile(r"\(p\d+")  # "(p6)", "(p13, p14)" 같은 쪽 인용
 STOCK = ("맞습니다.", "정답입니다.")
-TOOL_CALLS = ("show_quiz", "show_order_quiz", "run_step", "show_code", "show_code_map")
+LAB_TOOLS = ("run_step", "show_code", "show_code_map", "make_blank", "show_diff")
+PROMPT_LABELS = ("[역할·목표]", "[배경·제약]", "[출력 형식]", "[모호함 줄이기]", "[하지 말 것]")
+TODO_PLACEHOLDER = "작성 예정"
+RAW, SOL, CONF, WORK = "../../src/raw/", "../../src/solution/", "../../src/config/", "../work/"
+
+
+def kind_of(path):
+    """파일 이름 끝(_lecture/_lab)으로 노트북 종류를 정한다."""
+    stem = Path(path).stem
+    return "lecture" if stem.endswith("_lecture") else "lab" if stem.endswith("_lab") else None
 
 
 def excerpt(text, n=60):
@@ -47,7 +60,7 @@ def prose(src):
         if line.strip().startswith("```"):
             fence = not fence
             continue
-        if fence or line.lstrip().startswith(">"):
+        if fence or line.lstrip().startswith((">", "#")):  # 인용·제목 줄은 뺀다
             continue
         out.append(re.sub(r"`[^`]*`", "`…`", line))
     return "\n".join(out)
@@ -166,7 +179,7 @@ def check_student_text(nb, R):
     plain, seen = [], {}
     for i, src in md:
         for s in sentences(prose(src)):
-            if s.startswith("#"):
+            if re.fullmatch(r"\*\*[^*]+\*\*", s):  # "**CodeMate 지시문**" 같은 굵은 이름표는 문장이 아니다
                 continue
             if re.search(r"다\.$", s) and not re.search(r"니다\.$", s):
                 plain.append((i, excerpt(s)))
@@ -247,10 +260,19 @@ def check_structure(nb, R):
             hidden.append((i, f"숨겨지지 않은 도구 셀: {excerpt(c.source, 40)}"))
     R("구조", "도구 셀은 source_hidden, 예측 셀만 보임", hidden)
 
+
+
+# ── 강의 노트북 ─────────────────────────────────────────
+def check_slides(nb, kind, R):
     codes = [(i, c.source) for i, c in enumerate(nb.cells) if c.cell_type == "code"]
     setup = next((i for i, s in codes if "slide_setup()" in s), None)
     first_slide = next((i for i, s in codes if "show_slides(" in s), None)
     probs = []
+    if kind == "lab":
+        R("실습", "슬라이드(show_slides) 없음 — 슬라이드는 강의 노트북에", [(i, excerpt(s, 40)) for i, s in codes if "show_slides(" in s])
+        return
+    if kind == "lecture" and first_slide is None:
+        probs.append((0, "show_slides 셀이 하나도 없음"))
     if first_slide is not None and (setup is None or setup > first_slide):
         probs.append((first_slide, "show_slides 앞에 slide_setup() 준비 셀이 없음"))
     for i, s in codes:
@@ -263,36 +285,98 @@ def check_structure(nb, R):
     R("구조", "준비 셀 slide_setup()·PDF.js 슬라이드(show_slides)", probs)
 
 
-# ── 안전·실행 ───────────────────────────────────────────
-def check_safety(nb, folder, R):
-    R("안전·실행", "저장된 출력·실행 번호 없음 (커밋용)",
-      [(i, f"출력 {len(c.outputs)}개, 실행 번호 {c.execution_count}") for i, c in enumerate(nb.cells)
-       if c.cell_type == "code" and (c.outputs or c.execution_count)])
+def check_lecture(nb, R):
+    pat = re.compile(r"\b(" + "|".join(LAB_TOOLS) + r")\(")
+    R("강의", "실습 코드 도구(run_step·show_code·show_code_map·make_blank·show_diff) 없음",
+      [(i, f"{m.group(1)}: {excerpt(c.source, 40)}") for i, c in enumerate(nb.cells)
+       if c.cell_type == "code" for m in pat.finditer(c.source)])
 
-    urls = []
+
+# ── 실습 노트북 ─────────────────────────────────────────
+def check_lab(nb, folder, R):
+    # TODO 절마다 ```text 지시문과 다섯 칸 이름표
+    sections, cur = {}, None
     for i, c in enumerate(nb.cells):
-        if is_box(c):
+        if c.cell_type != "markdown" or is_box(c):
             continue
-        src = outside_text_blocks(c.source) if c.cell_type == "markdown" else c.source
-        urls += [(i, excerpt(m.group(0))) for m in re.finditer(r"(https?:)?//[\w.-]+\.\w+\S*|\bcdn\.\S+", src)]
-    R("안전·실행", "외부 주소(http/https/cdn) 없음", urls)
+        head = next((ln for ln in c.source.splitlines() if re.match(r"#{2,4} ", ln)), None)
+        if head:
+            cur = i if re.match(r"#{2,4} [\d.]+ TODO", head) else None
+            if cur is not None:
+                sections[cur] = []
+        elif cur is not None:
+            sections[cur] += re.findall(r"```text\n(.*?)```", c.source, flags=re.S)
+    bad, draft = [], []
+    for i, blocks in sections.items():
+        if not blocks:
+            bad.append((i, "TODO 절에 ```text CodeMate 지시문이 없음"))
+        elif any(TODO_PLACEHOLDER in b for b in blocks):
+            draft.append((i, "지시문이 아직 (작성 예정)"))
+        else:
+            missing = [lab for lab in PROMPT_LABELS if not any(lab in b for b in blocks)]
+            if missing:
+                bad.append((i, f"지시문에 없는 칸: {' '.join(missing)}"))
+    R("실습", "TODO 절마다 ```text 지시문 + 다섯 칸 [역할·목표]…[하지 말 것]", bad)
+    R("실습", "지시문이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)
+    R("실습", "(작성 예정) 자리표시 없음", [(i, excerpt(c.source, 50)) for i, c in enumerate(nb.cells)
+                                     if not is_box(c) and TODO_PLACEHOLDER in c.source], warn=True)
+
+    # 도구 호출 경로와 빈칸 복사본
+    import tempfile
 
     sys.path.insert(0, str(ROOT / "lessons"))
-    from assets.widgets import _slice  # 노트북과 같은 표시 찾기 방식을 쓴다
+    from assets.widgets import _slice, make_blank  # 노트북과 같은 방식으로 표시를 찾고 빈칸을 만든다
 
-    bad = []
+    rules = {"run_step": (WORK, RAW), "show_code": (RAW, CONF), "show_code_map": (WORK, RAW, CONF)}
+    bad, blanks_bad, works, diffed, blank_texts = [], [], {}, set(), {}
     for i, c in enumerate(nb.cells):
         if c.cell_type != "code":
             continue
         if "src/" in c.source and re.search(r"write_text|open\([^)]*['\"][wa]['\"]", c.source):
             bad.append((i, "src/ 파일에 쓰는 코드"))
-        for call in calls(c.source, set(TOOL_CALLS) - {"show_quiz", "show_order_quiz"}):
+        for call in calls(c.source, set(LAB_TOOLS)):
             name, args = call.func.id, [literal(a) for a in call.args]
             kw = {k.arg: literal(k.value) for k in call.keywords}
+            if name == "make_blank":
+                raw, work, blanks = (args + [None] * 3)[:3]
+                if not (isinstance(raw, str) and raw.startswith(RAW) and isinstance(work, str) and work.startswith(WORK)):
+                    bad.append((i, f"make_blank는 {RAW} → {WORK}: {raw!r} → {work!r}"))
+                    continue
+                works[work] = i
+                empty = [n for n, b in enumerate(blanks or [None], 1) if not isinstance(b, dict)]
+                if empty:
+                    blanks_bad.append((i, f"{Path(raw).name}: {empty}번째 빈칸 범위가 비어 있음 — labs JSON의 blank를 채운다"))
+                    continue
+                try:
+                    with tempfile.TemporaryDirectory() as d:
+                        out = Path(d) / Path(work).name
+                        make_blank(folder / raw, out, blanks, reset=True)
+                        blank_texts[work] = out.read_text(encoding="utf-8")
+                        ast.parse(blank_texts[work])
+                except Exception as e:  # noqa: BLE001 — 표시 못 찾음·문법 오류·범위 없음(None) 모두 보고
+                    blanks_bad.append((i, f"{Path(raw).name}: {type(e).__name__}: {excerpt(e, 70)}"))
+                continue
+            if name == "show_diff":
+                mine, sol = (args + [None] * 2)[:2]
+                if not (isinstance(mine, str) and mine.startswith(WORK) and isinstance(sol, str) and sol.startswith(SOL)):
+                    bad.append((i, f"show_diff는 ({WORK}…, {SOL}…): {mine!r}, {sol!r}"))
+                    continue
+                if not (folder / sol).resolve().exists():
+                    bad.append((i, f"솔루션 파일 없음: {sol}"))
+                diffed.add(mine)
+            else:
+                path = args[0] if args else None
+                if not (isinstance(path, str) and path.startswith(rules[name])):
+                    bad.append((i, f"{name} 경로가 {' 또는 '.join(rules[name])} 밖: {path!r}"))
+                    continue
             path = args[0] if args else None
-            allowed = ("../../src/raw/",) if name == "run_step" else ("../../src/raw/", "../../src/config/")
-            if not (isinstance(path, str) and path.startswith(allowed)):
-                bad.append((i, f"{name} 경로가 {' 또는 '.join(allowed)} 밖: {path!r}"))
+            if path.startswith(WORK):
+                if works.get(path, i) >= i:
+                    bad.append((i, f"{name}: 앞에서 make_blank로 만들지 않은 복사본 {path}"))
+                elif name == "show_code_map" and path in blank_texts:  # 코드 지도 표시는 빈칸 복사본에 있어야 한다
+                    for sec in (args[1] if len(args) > 1 and isinstance(args[1], list) else []):
+                        if sec.get("marker") and sec["marker"] not in blank_texts[path]:
+                            bad.append((i, f"빈칸 복사본 {Path(path).name}에 표시 없음: {sec['marker']!r}"))
                 continue
             f = (folder / path).resolve()
             if not f.exists():
@@ -313,7 +397,24 @@ def check_safety(nb, folder, R):
                         bad.append((i, f"{f.name} 구간 안에 접기 표시 없음: {fs!r}"))
             except ValueError as e:
                 bad.append((i, excerpt(e, 80)))
-    R("안전·실행", "run_step/show_code 경로는 src/raw(읽기만)이고 표시가 원본에 있음", bad)
+    bad += [(i, f"복사본 {w}를 솔루션과 비교하는 show_diff 없음") for w, i in works.items() if w not in diffed]
+    R("실습", f"경로: 복사본 {WORK}, 솔루션 {SOL}, 원본 {RAW}(읽기만)·코드 지도 표시가 보여 줄 파일에 있음", bad)
+    R("실습", "make_blank 빈칸이 원본에 맞고, 빈칸 복사본이 파이썬 문법에 맞음", blanks_bad)
+
+
+# ── 안전·실행 ───────────────────────────────────────────
+def check_safety(nb, folder, R):
+    R("안전·실행", "저장된 출력·실행 번호 없음 (커밋용)",
+      [(i, f"출력 {len(c.outputs)}개, 실행 번호 {c.execution_count}") for i, c in enumerate(nb.cells)
+       if c.cell_type == "code" and (c.outputs or c.execution_count)])
+
+    urls = []
+    for i, c in enumerate(nb.cells):
+        if is_box(c):
+            continue
+        src = outside_text_blocks(c.source) if c.cell_type == "markdown" else c.source
+        urls += [(i, excerpt(m.group(0))) for m in re.finditer(r"(https?:)?//[\w.-]+\.\w+\S*|\bcdn\.\S+", src)]
+    R("안전·실행", "외부 주소(http/https/cdn) 없음", urls)
 
 
 def secret_values():
@@ -373,14 +474,22 @@ def qc(path, execute=False):
         rows.append((group, name, status, problems))
 
     nb = nbformat.read(path, as_version=4)
+    kind = kind_of(path)
+    if kind is None:
+        R("종류", "파일 이름이 _lecture 또는 _lab으로 끝남", [(0, path.name)], warn=True)
     check_quiz(nb, path.parent, R)
     check_student_text(nb, R)
     check_structure(nb, R)
+    check_slides(nb, kind, R)
+    if kind == "lecture":
+        check_lecture(nb, R)
+    else:
+        check_lab(nb, path.parent, R)
     check_safety(nb, path.parent, R)
     if execute:
         check_execute(path, R)
 
-    print(f"\n=== {path.relative_to(ROOT) if path.is_relative_to(ROOT) else path} ===")
+    print(f"\n=== {path.relative_to(ROOT) if path.is_relative_to(ROOT) else path} ({kind or '종류 모름'}) ===")
     for group, name, status, problems in rows:
         print(f"{status:<4} | {group:<5} | {name}")
         for i, msg in problems[:15]:

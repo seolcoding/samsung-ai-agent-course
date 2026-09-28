@@ -1,0 +1,234 @@
+{
+ "draft": true,
+ "title": "1-4 실습",
+ "intro": "(작성 예정)",
+ "files": [
+  {
+   "name": "01_data_loading.py",
+   "title": "01_data_loading",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "PDF 로딩",
+     "marker": "# ── PDF 로딩 ─────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "문서 청킹",
+     "marker": "# ── 문서 청킹 ─────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "결과 확인",
+     "marker": "# ── 결과 확인 ─────────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "PDFMinerLoader로 PDF를 읽고 Document 목록을 생성해 주세요.",
+     "blank": {
+      "start": "loader = PDFMinerLoader(str(PDF_PATH.resolve()))",
+      "end": "# ── 문서 청킹 ─────────────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "Text Splitter를 사용해 Document 목록을 Chunk로 나누어 주세요.",
+     "blank": {
+      "start": "chunks = text_splitter.split_documents(documents)",
+      "end": "# ── 결과 확인 ─────────────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "02_embeddings.py",
+   "title": "02_embeddings",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "코사인 유사도",
+     "marker": "# ── 코사인 유사도 ─────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "실습: SamsungEmbeddings 구현",
+     "marker": "# ── 실습: SamsungEmbeddings 구현 ──────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "explain_prompt": "(작성 예정)"
+  },
+  {
+   "name": "03_vector_store.py",
+   "title": "03_vector_store",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "from pathlib import Path",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "임베딩 모델을 가져오고 Chroma 벡터스토어를 생성해 주세요.",
+     "blank": {
+      "start": "embeddings = get_embeddings()",
+      "end": "# TODO: 벡터스토어를 retriever로 변환해 주세요."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "벡터스토어를 retriever로 변환해 주세요.",
+     "blank": {
+      "start": "retriever = vectorstore.as_retriever(",
+      "end": "EOF"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "04_langchain_rag.py",
+   "title": "04_langchain_rag",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "from pathlib import Path",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "임베딩 모델을 가져오고 Chroma 벡터스토어를 생성해 주세요.",
+     "blank": {
+      "start": "embeddings = get_embeddings()",
+      "end": "# TODO: 벡터스토어를 retriever로 변환해 주세요."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "벡터스토어를 retriever로 변환해 주세요.",
+     "blank": {
+      "start": "retriever = vectorstore.as_retriever(search_kwargs={'k': 3})",
+      "end": "llm = get_llm()"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "검색된 Document 목록을 context 문자열로 합쳐 주세요.",
+     "blank": {
+      "start": "return '\\n\\n'.join(doc.page_content for doc in docs)",
+      "end": "# TODO: retriever, prompt, llm, output parser를 연결해 RAG 체인을 완성해 주세요."
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "retriever, prompt, llm, output parser를 연결해 RAG 체인을 완성해 주세요.",
+     "blank": {
+      "start": "rag_chain = (",
+      "end": "print('RAG ready')"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  },
+  {
+   "name": "05_ragaas.py",
+   "title": "05_ragaas",
+   "intro": "(작성 예정)",
+   "map": [
+    {
+     "title": "불러오기와 준비",
+     "marker": "\"\"\"",
+     "note": "필요한 도구를 불러오고 준비합니다."
+    },
+    {
+     "title": "1부: 문서 업로드",
+     "marker": "# ── 1부: 문서 업로드 ──────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "2부: 문서 검색",
+     "marker": "# ── 2부: 문서 검색 ────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "3부: RAG 체인",
+     "marker": "# ── 3부: RAG 체인 ─────────────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    },
+    {
+     "title": "4부: 문서 삭제 (선택)",
+     "marker": "# ── 4부: 문서 삭제 (선택) ─────────────────────────────────────────────────────",
+     "note": "(설명 작성 예정)"
+    }
+   ],
+   "look": "(작성 예정)",
+   "todos": [
+    {
+     "todo": "insert-doc 엔드포인트로 문서를 업로드해 주세요.",
+     "blank": {
+      "start": "",
+      "end": "# ── 2부: 문서 검색 ────────────────────────────────────────────────────────────"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "retrieve-rrf 엔드포인트로 관련 문서를 검색해 주세요.",
+     "blank": {
+      "start": "",
+      "end": "# print(result)"
+     },
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    },
+    {
+     "todo": "delete-doc 엔드포인트로 업로드한 문서를 삭제해 주세요.",
+     "blank": null,
+     "explain": "(작성 예정)",
+     "prompt": "(작성 예정)",
+     "look": "(작성 예정)"
+    }
+   ]
+  }
+ ],
+ "closing": "(작성 예정)"
+}

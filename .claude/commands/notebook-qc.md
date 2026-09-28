@@ -7,6 +7,10 @@ argument-hint: "[노트북 경로] [실행]"
 
 **목적:** `lessons/Chapter*/` 교안 노트북이 지금까지 정한 QC 기준을 지키는지 확인한다. 고치지 않고 보고만 한다.
 
+노트북은 두 종류이고, 파일 이름 끝으로 구분한다.
+- **강의** `*_lecture.ipynb`: 슬라이드(`show_slides`) + 설명 + 퀴즈. 실습 코드 도구는 없다.
+- **실습** `*_lab.ipynb`: `lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`으로 조립한다. 파일마다 코드 지도 → 빈칸 복사본(`lessons/work/`) → TODO마다 CodeMate 지시문 → 실행 → 솔루션 비교 → 체크리스트.
+
 **인자:** `$ARGUMENTS` = 노트북 경로. 비어 있으면 `lessons/Chapter*/*.ipynb` 전부.
 사용자가 "실행"·"execute"를 말하면 새 커널 실행까지 한다.
 
@@ -17,12 +21,18 @@ uv run python lessons/qc/notebook_qc.py $ARGUMENTS
 uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute   # 실행을 요청받았을 때
 ```
 
+- 하네스가 보는 것
+  - 공통: 번호 제목·`<small>` 표시·목차, 강사용 상자, 숨긴 도구 셀, 출력 없음, 외부 주소 없음, (pN) 없음, provider 단어, 합니다체(WARN), 반복(WARN), 퀴즈 규칙.
+  - 강의: `run_step`·`show_code`·`show_code_map`·`make_blank`·`show_diff`가 있으면 FAIL. `slide_setup()` 뒤 `show_slides` 필수.
+  - 실습: `show_slides` 있으면 FAIL. TODO 절마다 ```` ```text ```` 지시문에 다섯 칸 `[역할·목표] [배경·제약] [출력 형식] [모호함 줄이기] [하지 말 것]`. `make_blank` 빈칸이 원본에 맞고 빈칸 복사본이 문법에 맞음. 경로는 복사본 `../work/`, 솔루션 `../../src/solution/`, 원본 `../../src/raw/`(읽기만). `(작성 예정)`은 뼈대 상태라 WARN.
 - 결과의 FAIL/WARN과 셀 번호(0부터)를 그대로 가져온다. 실행본은 `~/000_Inbox/080_Temporary/notebook_qc/`에 생긴다.
 - 키 값이 출력에 나왔다는 결과가 있어도 값을 옮겨 적지 않는다. 셀 번호만 적는다.
 
 ## 2단계: 판단 점검표 (노트북을 직접 읽고 본다)
 
-노트북, 퀴즈 JSON(`lessons/assets/quizzes/<권>/`), 원본(`src/raw/`, `docs/raw/` PDF)을 대조한다.
+노트북, 퀴즈 JSON(`lessons/assets/quizzes/<권>/`), 원본(`src/raw/`, `docs/raw/` PDF)을 대조한다. 실습은 `src/solution/`과 `lessons/drafts/labs/<폴더>.json`도 본다.
+
+**공통**
 
 1. **내용 유지:** 내용·순서·실습 코드는 원본 그대로이고, 전달 방식만 바뀌었다. 새 예제·새 과제 코드가 없다.
 2. **설명 수준 C:** 슬라이드 요약 + 코드 연결. "왜 배우나"는 할 말이 있는 곳에만 있다.
@@ -40,6 +50,18 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
 14. **실행:** 새 커널에서 오류 0, 키 값이 출력되지 않는다.
 15. **커밋 전:** 노트북 출력과 실행 번호를 비웠다.
 
+**강의 노트북만**
+
+16. **실습 코드 없음:** 코드를 실행·빈칸·비교하는 셀이 없다. 코드 이야기는 슬라이드·설명으로만 한다.
+17. **실습 안내는 한 번씩:** 실습 노트북으로 넘기는 안내가 필요한 곳에만 있고, 절마다 같은 문장으로 기계적으로 되풀이되지 않는다.
+
+**실습 노트북만**
+
+18. **지시문은 동작을 말한다:** CodeMate 지시문이 무엇을 하게 할지(입력·출력·조건)를 말하고, 정답 코드를 그대로 불러 주지 않는다.
+19. **빈칸만 바뀐다:** 빈칸 복사본과 원본의 차이가 빈칸 줄뿐이다. 지시문의 [하지 말 것]이 빈칸 밖 수정을 막는다.
+20. **솔루션 비교:** 실행 뒤 `show_diff`로 솔루션과 비교하고, 수강생이 다른 점을 설명하게 한다(체크리스트).
+21. **TODO 하나 = 작은 목표 하나:** TODO 절 하나가 한 가지 작은 목표만 다룬다. 한 지시문에 여러 일을 몰아넣지 않는다.
+
 ## 3단계: 보고 (한국어, 짧게)
 
 ```
@@ -55,4 +77,4 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
 ```
 
 - 사용자가 고치라고 하기 전에는 파일을 고치지 않는다.
-- 노트북을 고칠 때는 빌더(`lessons/drafts/build_*.py`)와 `lessons/drafts/*.json`을 고치고 다시 조립한다. 노트북을 직접 고치지 않는다.
+- 노트북을 고칠 때는 빌더(`lessons/drafts/build_*.py`)와 `lessons/drafts/*.json`, `lessons/drafts/labs/*.json`을 고치고 다시 조립한다. 노트북을 직접 고치지 않는다.
