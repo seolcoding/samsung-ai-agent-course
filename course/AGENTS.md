@@ -7,7 +7,8 @@
 - `ChapterNN/notebooks/` 수업 노트북. `_LEC`는 강의(슬라이드·설명·퀴즈), `_LAB`은 실습. `data/`는 실습 자료.
 - `ChapterNN/code/raw/` 받은 원본 실습 코드, `ChapterNN/code/solution/` 그 정답. 참고용이며 수업은 노트북으로 한다.
 - `ChapterNN/slides/` 강의 슬라이드 PDF.
-- `config/` 모델·임베딩·RAG 연결 설정. `assets/` 노트북 화면 도구.
+- `ChapterNN/assets/` 그 챕터 노트북의 화면 도구(슬라이드 뷰어, 퀴즈).
+- `config/` 모델·임베딩·RAG 연결 설정(챕터 공통).
 
 ## 실습 노트북에서 도울 때
 
@@ -21,4 +22,4 @@
 
 - 모델은 `config.llm.get_llm()`, 임베딩은 `config.embeddings.get_embeddings()`로 부른다. 주소·모델 이름·키를 코드에 직접 쓰지 않는다.
 - `.env`의 키와 토큰은 출력하거나 파일에 쓰지 않는다.
-- `code/`, `config/`, `assets/`의 파일은 고치지 않는다.
+- `code/`, `assets/`, `config/`의 파일은 고치지 않는다.
