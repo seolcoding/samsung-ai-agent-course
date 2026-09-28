@@ -13,16 +13,18 @@
 
 모든 실습 노트북은 같은 구조다.
   제목 → 목차 → 1. 실습 방법 → 원본 파일마다 한 장:
-    준비 코드(접힘) → 구획마다 [TODO 설명·CodeMate 지시문 → 빈칸이 든 코드 셀 → 볼 지점 → 정답 보기(접힘)]
-  → 정리
-TODO 아래 정답 줄은 빈칸(`...  # ✍ …`)으로 바꿔 넣고, 정답은 접힌 "정답 보기"에 둔다.
+    준비 코드(접힘) → 구획마다 한 절 → CodeMate에게 물어보기(TODO가 없는 파일) → 정리
+구획은 두 종류다.
+  예제: 완성된 코드를 함께 실행한다. `# ✍️ TODO:` 주석이 붙은 줄(값)만 바꿔 다시 실행해 본다.
+  과제: `# ✍️ TODO:` 아래 정답 줄을 빈칸(`...  # ✍️ …`)으로 바꿔 넣는다. 수강생이 CodeMate와 채운다.
+    [TODO 설명 → CodeMate에게 줄 힌트 → 성공 기준(🟢/⛔)] → 빈칸 셀 → 성공 기준 검사 셀 → 정답 보기(접힘)
+CodeMate 지시문 완성본은 주지 않는다. 힌트와 성공 기준만 주고, 지시문은 수강생이 쓴다.
 """
 
 import ast
 import json
 import sys
 from pathlib import Path
-from pprint import pformat
 
 sys.path.insert(0, str(Path(__file__).parent))
 from nbkit import Notebook  # noqa: E402
@@ -44,7 +46,20 @@ UNITS = {
     "06-rag-streamlit": ("2-3", "rag_streamlit"),
 }
 
-PROMPT_GUIDE = """CodeMate에 주는 지시문은 다섯 칸으로 씁니다. 무엇을 원하는지, 어떤 조건인지, 어떤 모양으로 받을지, 헷갈릴 점과 하지 말 것을 미리 적어 두면 원하는 코드를 받기 쉽습니다.
+KIND_EXAMPLE, KIND_TASK = "예제", "과제"  # 절 제목 앞에 붙는 실습 종류
+
+PROMPT_GUIDE = f"""이 노트북의 실습은 두 종류입니다.
+
+- **{KIND_EXAMPLE}**: 완성된 코드를 함께 실행합니다. `# ✍️ TODO:` 주석이 붙은 줄이 있으면 그 값만 바꿔 다시 실행해 봅니다.
+- **{KIND_TASK}**: 코드 셀의 `...  # ✍️ 여기를 채웁니다` 줄이 빈칸입니다. CodeMate와 함께 채웁니다.
+
+{KIND_TASK}는 이렇게 진행합니다.
+1. `# ✍️ TODO:` 주석과 설명을 읽고, 무엇을 채워야 하는지 한 문장으로 말해 봅니다.
+2. **CodeMate에게 줄 힌트**를 보고 지시문을 직접 씁니다. 아래 다섯 칸 틀을 써도 좋습니다.
+3. CodeMate가 준 코드를 읽고, 모르는 줄은 "이 줄이 하는 일"을 다시 묻습니다.
+4. 빈칸에 넣고 실행합니다. 오류가 나면 오류 메시지를 그대로 CodeMate에 붙여 넣고 원인부터 묻습니다.
+5. 아래 **성공 기준 확인** 셀을 실행합니다. 모두 🟢이면 통과입니다. ⛔가 있으면 옆의 안내를 보고 다시 지시합니다.
+6. 접힌 "정답 보기"를 펼쳐 비교합니다. 다르다고 틀린 것은 아닙니다. 왜 다른지 말할 수 있으면 됩니다.
 
 ```text
 [역할·목표] 무엇을 하는 사람으로서, 무엇을 만들어 달라는지
@@ -52,24 +67,11 @@ PROMPT_GUIDE = """CodeMate에 주는 지시문은 다섯 칸으로 씁니다. �
 [출력 형식] 코드만? 코드 + 설명 3줄?
 [모호함 줄이기] 헷갈릴 만한 부분을 미리 정해 주기
 [하지 말 것] 빈칸 밖은 고치지 않기, 새 기능 추가하지 않기
-```
-
-순서는 늘 같습니다.
-1. 빈칸 위의 TODO 주석을 읽고, 무엇을 채워야 하는지 한 문장으로 말해 봅니다.
-2. 빈칸이 든 코드 셀을 선택한 상태에서 지시문을 CodeMate 채팅에 붙여 넣습니다.
-3. CodeMate가 채운 코드를 읽고, 모르는 줄이 있으면 "이 줄이 하는 일"을 다시 묻습니다.
-4. 실행해 봅니다. 오류가 나면 오류 메시지를 그대로 CodeMate에 붙여 넣고 원인부터 설명해 달라고 합니다.
-5. 셀 아래 "정답 보기"를 펼쳐 비교합니다. 다르다고 틀린 것은 아닙니다. 왜 다른지 말할 수 있으면 됩니다."""
-
-CHECK = [
-    "빈칸만 채웠고 다른 줄은 바꾸지 않았다",
-    "실행했을 때 오류 없이 결과가 나왔다",
-    "채운 코드의 각 줄이 하는 일을 말할 수 있다",
-    "정답과 다른 곳이 있다면 왜 다른지 설명할 수 있다",
-]
+```"""
 
 
-BLANK_LINE = "...  # ✍ 여기를 CodeMate와 함께 채웁니다"
+BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
+MARK = "# ✍️ TODO:"
 
 
 def _find(lines, marker, begin):
@@ -116,6 +118,34 @@ def _dedent_common(text):
     return textwrap.dedent(text)
 
 
+def _bullets(head, items, mark=""):
+    return f"**{head}**\n\n" + "\n".join(f"- {mark}{x}" for x in items)
+
+
+def _criteria_md(checks, fail=(), success=()):
+    """성공 기준 글: 통과 조건은 🟢, 다시 해야 하는 신호는 ⛔."""
+    return "**성공 기준**\n\n" + "\n".join([f"- 🟢 {c[0]}" for c in checks] + [f"- 🟢 {x}" for x in success]
+                                          + [f"- ⛔ {x}" for x in fail])
+
+
+def _check_cell(checks):
+    """성공 기준 검사 셀. checks: [[기준, 파이썬 식, 고칠 곳]]"""
+    rows = "\n".join(f"    ({label!r}, lambda: {expr}, {fix!r})," for label, expr, fix in checks)
+    return f"show_criteria([\n{rows}\n])"
+
+
+def _mark(lines, edits):
+    """과제의 TODO 주석에 ✍️를 붙이고, 예제에서 바꿔 볼 줄 끝에 `# ✍️ TODO:` 주석을 단다. 바꿔 볼 줄 위치를 돌려준다."""
+    out = [ln.replace("# TODO:", MARK) if "# TODO:" in ln and "✍" not in ln else ln for ln in lines]
+    at = []
+    for e in edits:
+        k = _find(out, e["line"], 0)
+        assert k is not None, f"바꿔 볼 줄을 찾지 못함: {e['line']!r}"
+        out[k] = out[k].rstrip() + f"  {MARK} {e['todo']}"
+        at.append(k)
+    return out, at
+
+
 def build(folder):
     spec = json.loads((LABS / f"{folder}.json").read_text(encoding="utf-8"))
     unit, slug = UNITS[folder]
@@ -123,7 +153,7 @@ def build(folder):
 
     nb.md(f"# [LAB] {spec['title']}\n\n{spec['intro']}")
     nb.meta(spec.get("intro__meta"))
-    nb.code("import sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\nfrom assets.widgets import show_checklist")
+    nb.code("import sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\nfrom assets.widgets import last_cell, show_criteria")
     nb.code(COMMON["env_check_code"])
     nb.md(COMMON["env_check_look"])
 
@@ -137,8 +167,10 @@ def build(folder):
             if not t.get("blank"):
                 print(f"✖ {folder}/{f['name']} TODO 빈칸 범위 없음 | 뼈대 추정 실패 | labs/{folder}.json의 blank를 채운다")
         lines, answers = _blank(raw, [t["blank"] for t in todos]) if todos else (raw, [])
+        edits = f.get("edits", [])
+        lines, edit_at = _mark(lines, edits)
         # TODO 주석 줄 위치로 어느 구획에 속하는지 정한다(찾지 못하면 순서대로 TODO 줄을 쓴다)
-        todo_lines = [k for k, ln in enumerate(lines) if "TODO" in ln]
+        todo_lines = [k for k, ln in enumerate(lines) if "TODO" in ln and k not in edit_at]
         todo_at = [next((k for k in todo_lines if t["todo"][:12] in lines[k]), todo_lines[min(i, len(todo_lines) - 1)] if todo_lines else 0)
                    for i, t in enumerate(todos)]
         split = f.get("split") or [ln.strip() for ln in lines if ln.startswith("# ──")]
@@ -165,32 +197,41 @@ def build(folder):
                 nb.md(f.get("setup_note", "준비 코드입니다. 필요한 도구를 불러오고 모델을 준비합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다."))
                 nb.code(text)
                 continue
-            mine = [i for i, at in enumerate(todo_at) if start <= at < start + len(body)]
+            inside = range(start, start + len(body))
+            mine = [i for i, at in enumerate(todo_at) if at in inside]
+            my_edits = [edits[i] for i, at in enumerate(edit_at) if at in inside]
             sub += 1
             names = f.get("chunk_titles") or []  # 구획 제목: 명시 목록 → 제목 대응표 → 원본 구분선 이름
             shown = names[visible] if visible < len(names) else (f.get("titles") or {}).get(title or "", title) or "실행하기"
             visible += 1
-            nb.h(3, f"{n}.{sub} {shown}")
+            nb.h(3, f"{n}.{sub} {KIND_TASK if mine else KIND_EXAMPLE}: {shown}")
+            for e in my_edits:
+                nb.md(f"**✍️ 바꿔 보기: {e['todo']}**\n\n{e['explain']}")
+            checks = []
             for i in mine:
                 t = todos[i]
-                nb.md(f"**TODO: {t['todo']}**\n\n{t['explain']}")
-                nb.md("**CodeMate 지시문**\n\n```text\n" + t["prompt"].strip() + "\n```")
-            nb.code(text, visible=True)  # 수강생이 채우고 실행하는 셀
+                nb.md(f"**✍️ TODO: {t['todo']}**\n\n{t['explain']}")
+                nb.md(_bullets("CodeMate에게 줄 힌트", t["hint"]))
+                nb.md(_criteria_md(t.get("checks", []), t.get("fail", [])))
+                nb.meta(t.get("look__meta"))
+                checks += t.get("checks", [])
+            nb.code(text, visible=True)  # 수강생이 채우거나 바꿔서 실행하는 셀
+            checks += (f.get("chunk_checks") or {}).get(shown, [])
+            if checks:
+                nb.code(_check_cell(checks))
             if mine:
-                for i in mine:
-                    nb.md(todos[i]["look"])
-                    nb.meta(todos[i].get("look__meta"))
                 # 정답은 원본에서 지운 줄이 기본이고, 솔루션과 다른 곳은 spec의 answer로 바꿔 보여 준다
                 ans = "\n\n".join("```python\n" + _dedent_common("\n".join(todos[i].get("answer") or answers[i])) + "\n```" for i in mine)
                 nb.md(f"<details><summary>정답 보기</summary>\n\n{ans}\n\n</details>")
         nb.md(f["look"])
         nb.meta(f.get("look__meta"))
-        if not todos and f.get("explain_prompt"):
+        ask = f.get("ask")
+        if not todos and ask:
             sub += 1
-            nb.h(3, f"{n}.{sub} CodeMate로 설명 받기")
-            nb.md("**CodeMate 지시문**\n\n```text\n" + f["explain_prompt"].strip() + "\n```")
-            nb.md(f.get("explain_look", "CodeMate의 설명을 실행 결과와 대조합니다."))
-        nb.code(f"show_checklist({pformat(f.get('checklist', CHECK), width=100)}, title='{f['title']} 리뷰')")
+            nb.h(3, f"{n}.{sub} CodeMate에게 물어보기")
+            nb.md(ask.get("intro", "코드를 고치지 않고, CodeMate에게 설명을 받아 실행 결과와 맞춰 봅니다. 지시문은 직접 씁니다."))
+            nb.md(_bullets("CodeMate에게 줄 힌트", ask["hint"]))
+            nb.md(_criteria_md([], ask.get("fail", []), ask.get("success", [])))
 
     nb.h(2, f"{len(spec['files']) + 2}. 정리")
     nb.md(spec["closing"])
@@ -246,13 +287,13 @@ def scaffold(folder):
             if "TODO" in line:
                 blank = _guess_blank(lines, t)
                 todos.append({"todo": line.split("TODO:", 1)[-1].strip(), "blank": blank,
-                              "explain": "(작성 예정)", "prompt": "(작성 예정)", "look": "(작성 예정)"})
+                              "explain": "(작성 예정)", "hint": ["(작성 예정)"], "checks": [], "fail": []})
         entry = {"name": py.name, "title": py.stem, "intro": "(작성 예정)", "map": _sections(lines),
                  "look": "(작성 예정)"}
         if todos:
             entry["todos"] = todos
         else:
-            entry["explain_prompt"] = "(작성 예정)"
+            entry["ask"] = {"hint": ["(작성 예정)"], "success": ["(작성 예정)"], "fail": []}
         files.append(entry)
     unit = UNITS[folder][0]
     spec = {"draft": True, "title": f"{unit} 실습", "intro": "(작성 예정)", "files": files, "closing": "(작성 예정)"}

@@ -28,10 +28,10 @@ def tags_of(cell):
             if "✍" in src:
                 return {"실습"}  # 빈칸을 채우는 셀
             return {"퀴즈"} if "예측" in src else {"코드"}
-        if "show_checklist(" in src or "slide_setup(" in src or "make_blank(" in src:
+        if any(k in src for k in ("show_checklist(", "show_criteria(", "slide_setup(", "make_blank(")):
             return set()
         return {"코드"}
-    return {"실습"} if "CodeMate" in src and "```text" in src else set()
+    return {"실습"} if "**CodeMate에게 줄 힌트**" in src or "**성공 기준**" in src else set()
 
 
 class Notebook:

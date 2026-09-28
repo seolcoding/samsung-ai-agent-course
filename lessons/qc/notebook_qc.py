@@ -2,7 +2,7 @@
 
 노트북 종류는 파일 이름 끝으로 정한다.
     *_LEC.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
-    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → CodeMate 지시문 → 빈칸(✍) 셀 → 정답 보기(접힘).
+    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → 예제(✍️ 값 바꿔 보기)·과제(힌트·성공 기준 → 빈칸 셀 → 성공 기준 검사 → 정답 보기).
 수강생은 노트북만 받는다. 그래서 수강생 글에 .py·경로·다른 노트북 이야기가 없어야 한다(노트북 하나로 완결).
 
 실행(프로젝트 루트):
@@ -32,9 +32,10 @@ STOCK = ("맞습니다.", "정답입니다.")
 LAB_TOOLS = ("run_step", "show_code", "show_code_map", "make_blank", "show_diff")  # 강의 노트북에 있으면 FAIL
 LAB_FILE_TOOLS = ("make_blank", "run_step", "show_diff", "show_code_map", "show_slides")  # 실습 노트북에 있으면 FAIL
 BLANK = "✍"
+BLANK_LINE = re.compile(r"^\s*\.\.\.\s*# ✍")  # 빈칸 줄: `...  # ✍️ 여기를 채웁니다`
 ANSWER_HEAD = "<details><summary>정답 보기</summary>"
 TOOL_CELL = re.compile(r"\b(show_\w+|slide_setup)\(|sys\.path\.insert|find_dotenv\(usecwd=True\)")  # 숨겨야 할 도구 셀
-PROMPT_LABELS = ("[역할·목표]", "[배경·제약]", "[출력 형식]", "[모호함 줄이기]", "[하지 말 것]")
+HINT_HEAD, CRITERIA_HEAD = "**CodeMate에게 줄 힌트**", "**성공 기준**"
 TODO_PLACEHOLDER = "작성 예정"
 
 
@@ -335,16 +336,27 @@ def is_head(c):
 
 
 def fill_blanks(src, answers):
-    """✍ 빈칸 줄을 정답 코드로 차례대로 바꾼다(빈칸 줄의 들여쓰기를 유지)."""
+    """빈칸 줄(`...  # ✍️`)을 정답 코드로 차례대로 바꾼다(빈칸 줄의 들여쓰기를 유지)."""
     out, k = [], 0
     for line in src.splitlines():
-        if BLANK in line and k < len(answers):
+        if BLANK_LINE.match(line) and k < len(answers):
             indent = line[: len(line) - len(line.lstrip())]
             out += [indent + a if a.strip() else a for a in answers[k].splitlines()]
             k += 1
         else:
             out.append(line)
     return "\n".join(out)
+
+
+def section(cells, i):
+    """셀 i가 든 절(앞 제목 다음 ~ 다음 제목 전)의 앞쪽·뒤쪽 셀 번호."""
+    a = i - 1
+    while a >= 0 and not is_head(cells[a]):
+        a -= 1
+    e = i + 1
+    while e < len(cells) and not is_head(cells[e]):
+        e += 1
+    return range(a + 1, i), range(i + 1, e)
 
 
 def check_lab(nb, R):
@@ -356,55 +368,65 @@ def check_lab(nb, R):
     R("실습", "src/ 파일에 쓰는 코드 없음",
       [(i, excerpt(c.source, 50)) for i, c in enumerate(cells) if c.cell_type == "code"
        and "src/" in c.source and re.search(r"write_text|open\([^)]*['\"][wa]['\"]", c.source)])
+    R("실습", "CodeMate 지시문 완성본을 주지 않음 — 힌트와 성공 기준만",
+      [(i, excerpt(c.source, 50)) for i, c in enumerate(cells)
+       if c.cell_type == "markdown" and not is_box(c) and "**CodeMate 지시문**" in c.source])
+    R("실습", "보이는 코드 셀의 TODO 주석에 ✍️ 표시",
+      [(i, ln.strip()[:50]) for i, c in enumerate(cells) if c.cell_type == "code" and not hidden(c)
+       for ln in c.source.splitlines() if "TODO" in ln and "✍️" not in ln])
 
-    syntax, prompt_bad, draft, answer_bad = [], [], [], []
+    syntax, guide_bad, draft, check_bad, answer_bad, edit_bad = [], [], [], [], [], []
     for i, c in enumerate(cells):
-        if c.cell_type != "code" or BLANK not in c.source:
+        if c.cell_type != "code" or BLANK not in c.source or "show_criteria(" in c.source:
             continue
+        before, after = section(cells, i)
+        has_check = any(cells[k].cell_type == "code" and "show_criteria(" in cells[k].source for k in after)
+        n_blank = sum(bool(BLANK_LINE.match(ln)) for ln in c.source.splitlines())
         if hidden(c):
-            syntax.append((i, "빈칸(✍) 셀이 숨겨져 있음 — 수강생이 채울 셀은 보여야 한다"))
+            syntax.append((i, "✍️ 셀이 숨겨져 있음 — 수강생이 채우거나 바꿀 셀은 보여야 한다"))
+            continue
+        if not n_blank:  # 예제: 값만 바꿔 보는 셀. 같은 장 안에 성공 기준 검사가 있어야 한다
+            later = range(i + 1, len(cells))
+            end = next((k for k in later if is_head(cells[k]) and cells[k].source.lstrip().startswith("## ")), len(cells))
+            if not any(cells[k].cell_type == "code" and "show_criteria(" in cells[k].source for k in range(i + 1, end)):
+                edit_bad.append((i, "✍️ 바꿔 보기 줄이 있는데 같은 장에 성공 기준 검사(show_criteria) 셀이 없음"))
             continue
         try:
             ast.parse(c.source)
         except SyntaxError as e:
             syntax.append((i, f"빈칸 상태로 문법 오류: {e.msg} ({e.lineno}행)"))
-        # (b) 같은 절 안, 앞쪽의 CodeMate 지시문
-        blocks, k = [], i - 1
-        while k >= 0 and not is_head(cells[k]):
-            if cells[k].cell_type == "markdown" and "**CodeMate 지시문**" in cells[k].source:
-                blocks += re.findall(r"```text\n(.*?)```", cells[k].source, flags=re.S)
-            k -= 1
-        if not blocks:
-            prompt_bad.append((i, "같은 절 앞쪽에 **CodeMate 지시문** ```text 블록이 없음"))
-        elif any(TODO_PLACEHOLDER in b for b in blocks):
-            draft.append((i, "지시문이 아직 (작성 예정)"))
+        # (b) 같은 절 앞쪽의 힌트와 성공 기준
+        text = "\n".join(cells[k].source for k in before if cells[k].cell_type == "markdown" and not is_box(cells[k]))
+        if TODO_PLACEHOLDER in text:
+            draft.append((i, "힌트·성공 기준이 아직 (작성 예정)"))
         else:
-            missing = [lab for lab in PROMPT_LABELS if not any(lab in b for b in blocks)]
+            missing = [h for h in (HINT_HEAD, CRITERIA_HEAD) if h not in text]
             if missing:
-                prompt_bad.append((i, f"지시문에 없는 칸: {' '.join(missing)}"))
-        # (c) 다음 제목 전까지의 정답 보기 상자
-        box, k = None, i + 1
-        while k < len(cells) and not is_head(cells[k]):
-            if cells[k].cell_type == "markdown" and cells[k].source.lstrip().startswith(ANSWER_HEAD):
-                box = cells[k]
-                break
-            k += 1
+                guide_bad.append((i, f"같은 절 앞쪽에 없음: {' '.join(missing)}"))
+            elif "🟢" not in text:
+                guide_bad.append((i, "성공 기준에 🟢 항목이 없음"))
+        # (c) 뒤쪽의 성공 기준 검사 셀
+        if not has_check:
+            (draft if TODO_PLACEHOLDER in text else check_bad).append((i, "셀 뒤(다음 제목 전)에 성공 기준 검사(show_criteria) 셀이 없음"))
+        # (d) 다음 제목 전까지의 정답 보기 상자
+        box = next((k for k in after if cells[k].cell_type == "markdown" and cells[k].source.lstrip().startswith(ANSWER_HEAD)), None)
         if box is None:
             answer_bad.append((i, "셀 뒤(다음 제목 전)에 <details><summary>정답 보기</summary> 상자가 없음"))
             continue
-        answers = re.findall(r"```python\n(.*?)```", box.source, flags=re.S)
-        n_blank = sum(BLANK in ln for ln in c.source.splitlines())
+        answers = re.findall(r"```python\n(.*?)```", cells[box].source, flags=re.S)
         if len(answers) != n_blank:
-            answer_bad.append((k, f"빈칸 {n_blank}곳인데 정답 코드 블록 {len(answers)}개"))
+            answer_bad.append((box, f"빈칸 {n_blank}곳인데 정답 코드 블록 {len(answers)}개"))
             continue
         try:
             ast.parse(fill_blanks(c.source, answers))
         except SyntaxError as e:
-            answer_bad.append((k, f"정답을 끼운 셀 {i}가 문법 오류: {e.msg} ({e.lineno}행)"))
-    R("실습", "빈칸(✍) 셀이 보이고, 빈칸 상태 그대로 파이썬 문법에 맞음", syntax)
-    R("실습", "빈칸 셀마다 앞에 ```text 지시문 + 다섯 칸 [역할·목표]…[하지 말 것]", prompt_bad)
-    R("실습", "빈칸 셀마다 뒤에 정답 보기 상자, 정답을 끼우면 문법에 맞음", answer_bad)
-    R("실습", "지시문이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)
+            answer_bad.append((box, f"정답을 끼운 셀 {i}가 문법 오류: {e.msg} ({e.lineno}행)"))
+    R("실습", "✍️ 셀이 보이고, 빈칸 상태 그대로 파이썬 문법에 맞음", syntax)
+    R("실습", "과제 셀마다 앞에 **CodeMate에게 줄 힌트**와 🟢 **성공 기준**", guide_bad)
+    R("실습", "과제 셀마다 뒤에 성공 기준 검사(show_criteria) 셀", check_bad)
+    R("실습", "과제 셀마다 뒤에 정답 보기 상자, 정답을 끼우면 문법에 맞음", answer_bad)
+    R("실습", "예제의 ✍️ 바꿔 보기마다 같은 장에 성공 기준 검사 셀", edit_bad)
+    R("실습", "힌트·성공 기준이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)
     R("실습", "(작성 예정) 자리표시 없음", [(i, excerpt(c.source, 50)) for i, c in enumerate(cells)
                                      if not is_box(c) and TODO_PLACEHOLDER in c.source], warn=True)
 

@@ -48,8 +48,11 @@
       "end": "def researcher_tools_node(state: State) -> dict:"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "마지막 메시지의 tool_calls 여부에 따라 researcher_tools 또는 writer를 반환해 주세요.",
@@ -58,8 +61,11 @@
       "end": "# ── Writer Agent ──────────────────────────────────────────────────────────────"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "START, 조건부 엣지, researcher_tools 반복, writer 종료 엣지를 연결해 주세요.",
@@ -68,8 +74,11 @@
       "end": "# TODO: 그래프를 컴파일해 주세요."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "그래프를 컴파일해 주세요.",
@@ -78,8 +87,11 @@
       "end": "# for chunk in app.stream({"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -130,7 +142,15 @@
     }
    ],
    "look": "(작성 예정)",
-   "explain_prompt": "(작성 예정)"
+   "ask": {
+    "hint": [
+     "(작성 예정)"
+    ],
+    "success": [
+     "(작성 예정)"
+    ],
+    "fail": []
+   }
   },
   {
    "name": "03_supervisor_with_critic.py",
@@ -194,7 +214,15 @@
     }
    ],
    "look": "(작성 예정)",
-   "explain_prompt": "(작성 예정)"
+   "ask": {
+    "hint": [
+     "(작성 예정)"
+    ],
+    "success": [
+     "(작성 예정)"
+    ],
+    "fail": []
+   }
   }
  ],
  "closing": "(작성 예정)"

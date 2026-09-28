@@ -38,8 +38,11 @@
       "end": "# ── 문서 청킹 ─────────────────────────────────────────────────────────────────"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "Text Splitter를 사용해 Document 목록을 Chunk로 나누어 주세요.",
@@ -48,8 +51,11 @@
       "end": "# ── 결과 확인 ─────────────────────────────────────────────────────────────────"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -75,7 +81,15 @@
     }
    ],
    "look": "(작성 예정)",
-   "explain_prompt": "(작성 예정)"
+   "ask": {
+    "hint": [
+     "(작성 예정)"
+    ],
+    "success": [
+     "(작성 예정)"
+    ],
+    "fail": []
+   }
   },
   {
    "name": "03_vector_store.py",
@@ -97,8 +111,11 @@
       "end": "# TODO: 벡터스토어를 retriever로 변환해 주세요."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "벡터스토어를 retriever로 변환해 주세요.",
@@ -107,8 +124,11 @@
       "end": "EOF"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -132,8 +152,11 @@
       "end": "# TODO: 벡터스토어를 retriever로 변환해 주세요."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "벡터스토어를 retriever로 변환해 주세요.",
@@ -142,8 +165,11 @@
       "end": "llm = get_llm()"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "검색된 Document 목록을 context 문자열로 합쳐 주세요.",
@@ -152,8 +178,11 @@
       "end": "# TODO: retriever, prompt, llm, output parser를 연결해 RAG 체인을 완성해 주세요."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "retriever, prompt, llm, output parser를 연결해 RAG 체인을 완성해 주세요.",
@@ -162,8 +191,11 @@
       "end": "print('RAG ready')"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -207,8 +239,11 @@
       "end": "# ── 2부: 문서 검색 ────────────────────────────────────────────────────────────"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "retrieve-rrf 엔드포인트로 관련 문서를 검색해 주세요.",
@@ -217,15 +252,21 @@
       "end": "# print(result)"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "delete-doc 엔드포인트로 업로드한 문서를 삭제해 주세요.",
      "blank": null,
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   }

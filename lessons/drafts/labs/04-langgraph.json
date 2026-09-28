@@ -28,8 +28,11 @@
       "end": "# 3. Edge: 노드 간 흐름을 정의한다."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "chatbot 노드를 추가하고 START에서 chatbot, chatbot에서 END로 이어 주세요.",
@@ -38,8 +41,11 @@
       "end": "# TODO: 그래프를 컴파일해 실행 가능한 app을 만들어 주세요."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "그래프를 컴파일해 실행 가능한 app을 만들어 주세요.",
@@ -48,8 +54,11 @@
       "end": "# 그래프 구조 출력 (Mermaid 다이어그램)"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -93,8 +102,11 @@
       "end": "def korean_response(state: State) -> dict:"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "detect_language 이후 조건부 엣지를 추가해 주세요.",
@@ -103,8 +115,11 @@
       "end": "# 병렬처리"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -133,8 +148,11 @@
       "end": "# TODO: bind_tools()로 LLM에 도구를 연결해 주세요."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "bind_tools()로 LLM에 도구를 연결해 주세요.",
@@ -143,8 +161,11 @@
       "end": "class State(TypedDict):"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "State의 messages를 도구가 연결된 LLM에 전달해 주세요.",
@@ -153,8 +174,11 @@
       "end": "# ToolNode: AI 메시지에 포함된 tool_calls를 파싱하고 해당 도구를 실행한 뒤"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "ToolNode를 생성해 주세요.",
@@ -163,8 +187,11 @@
       "end": "# tools_condition: 마지막 메시지에 tool_calls가 있으면 'tools'로,"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "도구 실행 후 다시 agent로 돌아가는 엣지를 추가해 주세요.",
@@ -173,8 +200,11 @@
       "end": "app = builder.compile()"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -213,8 +243,11 @@
       "end": "# interrupt_before: 지정한 노드 실행 직전에 그래프를 일시 중단한다."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "tools 노드 실행 직전에 중단되도록 그래프를 컴파일해 주세요.",
@@ -223,8 +256,11 @@
       "end": "config = {'configurable': {'thread_id': 'hitl_demo'}}"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -240,7 +276,15 @@
     }
    ],
    "look": "(작성 예정)",
-   "explain_prompt": "(작성 예정)"
+   "ask": {
+    "hint": [
+     "(작성 예정)"
+    ],
+    "success": [
+     "(작성 예정)"
+    ],
+    "fail": []
+   }
   }
  ],
  "closing": "(작성 예정)"

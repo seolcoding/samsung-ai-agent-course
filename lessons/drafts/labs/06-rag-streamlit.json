@@ -33,8 +33,11 @@
       "end": "with st.chat_message('user'):"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "RAG 체인의 stream() 결과를 Streamlit에 출력해 주세요.",
@@ -43,8 +46,11 @@
       "end": "# TODO: AI 응답을 session_state에 저장해 주세요."
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     },
     {
      "todo": "AI 응답을 session_state에 저장해 주세요.",
@@ -53,8 +59,11 @@
       "end": "EOF"
      },
      "explain": "(작성 예정)",
-     "prompt": "(작성 예정)",
-     "look": "(작성 예정)"
+     "hint": [
+      "(작성 예정)"
+     ],
+     "checks": [],
+     "fail": []
     }
    ]
   },
@@ -70,7 +79,15 @@
     }
    ],
    "look": "(작성 예정)",
-   "explain_prompt": "(작성 예정)"
+   "ask": {
+    "hint": [
+     "(작성 예정)"
+    ],
+    "success": [
+     "(작성 예정)"
+    ],
+    "fail": []
+   }
   }
  ],
  "closing": "(작성 예정)"
