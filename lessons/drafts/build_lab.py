@@ -28,6 +28,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from pprint import pformat
 
 sys.path.insert(0, str(Path(__file__).parent))
 from nbkit import Notebook, fmt  # noqa: E402
@@ -99,6 +100,8 @@ def _blank(lines, blanks):
             print(f"✖ 빈칸 범위 없음: {b['start'][:40]!r} | 원본에서 표시 줄을 찾지 못함 | labs/*.json의 blank를 고친다")
             answers.append(None)
             continue
+        while e - 1 > a and not lines[e - 1].strip():  # 끝 표시 앞의 빈 줄은 빈칸에 넣지 않고 남긴다
+            e -= 1
         out += lines[k:a]
         indent = lines[a][: len(lines[a]) - len(lines[a].lstrip())]
         out.append(indent + BLANK_LINE)
@@ -132,6 +135,39 @@ def _dedent_common(text):
     return textwrap.dedent(text)
 
 
+# 환경 점검 셀이 보는 설정: 설정 이름 → 종류별로 있어야 할 이름. LLM은 늘 보고, 임베딩·RAG는 spec "env"로 더한다
+ENV_GROUPS = {
+    "LLM_PROVIDER": {"openai": ["OPENAI_API_KEY", "OPENAI_MODEL"],
+                     "samsung": ["api_base_url", "model", "credential_key", "send_system_name", "user_id"]},
+    "EMBED_PROVIDER": {"openai": ["OPENAI_API_KEY", "OPENAI_EMBEDDING_MODEL"],
+                       "samsung": ["embedding_api_url", "embedding_x_dep_ticket"]},
+    "RAG_PROVIDER": {"mock": [], "samsung": ["search_url", "rag_credential_key", "rag_api_key"]},
+}
+
+
+def _env_check(extra):
+    groups = {k: ENV_GROUPS[k] for k in ["LLM_PROVIDER", *extra]}
+    return f"""import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv(usecwd=True))  # 프로젝트의 .env 파일을 읽습니다
+
+# 값은 출력하지 않습니다. 빠진 설정이 있는지만 봅니다.
+필요한_설정 = {pformat(groups, width=100, sort_dicts=False)}
+빠진_이름 = []
+for 설정, 종류별 in 필요한_설정.items():
+    종류 = os.getenv(설정, "samsung").strip().lower()
+    빠진_이름 += [n for n in 종류별.get(종류, [설정]) if not os.getenv(n)]
+
+import config.llm  # 실습 코드가 쓰는 설정 모듈을 불러옵니다
+
+if 빠진_이름:
+    print(f"준비가 덜 되었습니다. 빠진 설정 {{len(빠진_이름)}}개가 있습니다. 강사에게 알려 주세요.")
+    print("(강사 확인용:", ", ".join(빠진_이름), ")")
+else:
+    print("준비 완료: 실습에 필요한 설정이 모두 있습니다.")"""
+
+
 def _criteria_md(checks, fail=(), success=()):
     """성공 기준 글: 통과 조건은 🟢, 다시 해야 하는 신호는 ⛔."""
     return "**성공 기준**\n\n" + "\n".join([f"- 🟢 {x}" for x in [*checks, *success]]
@@ -158,7 +194,7 @@ def build(folder):
 
     nb.md(f"# [LAB] {spec['title']}\n\n{spec['intro']}")
     nb.meta(spec.get("intro__meta"))
-    nb.code(COMMON["env_check_code"])
+    nb.code(_env_check(spec.get("env", [])))
     nb.md(COMMON["env_check_look"])
 
     nb.h(2, "1. 실습 방법")
@@ -227,20 +263,21 @@ def build(folder):
             if shown in f.get("no_auto_run", []):  # input()처럼 사람이 답해야 하는 셀: 자동 실행 검사에서 건너뛴다
                 nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")
             done = (f.get("chunk_success") or {}).get(shown)
-            if done:  # 예제: 바꿔 실행한 뒤 스스로 확인할 성공 기준
-                nb.md(_criteria_md(done))
+            if done:  # 예제: 바꿔 실행한 뒤 스스로 확인할 성공 기준. 목록(🟢만) 또는 {"success": [...], "fail": [...]}
+                nb.md(_criteria_md([], done.get("fail", []), done.get("success", [])) if isinstance(done, dict) else _criteria_md(done))
             if mine:
                 # 정답은 원본에서 지운 줄이 기본이고, 솔루션과 다른 곳은 spec의 answer로 바꿔 보여 준다
                 ans = "\n\n".join("```python\n" + _dedent_common("\n".join(todos[i].get("answer") or answers[i])) + "\n```" for i in mine)
                 nb.md(f"<details><summary>정답 보기</summary>\n\n{ans}\n\n</details>")
         if wf:
             nb.md(f.get("run_note", "위 셀을 실행하면 이 폴더에 앱 파일이 만들어집니다. 아래 셀을 실행하면 브라우저에 앱이 열립니다. 앱을 멈출 때는 이 셀의 실행을 중지(■)합니다."))
-            nb.code(f"!streamlit run {wf}", visible=True, kind=KIND_EXAMPLE)
+            # 셸 PATH에 가상환경이 없어도 되도록, 노트북 커널의 파이썬으로 streamlit을 실행한다
+            nb.code(f"import sys\n\n!{{sys.executable}} -m streamlit run {wf}", visible=True, kind=KIND_EXAMPLE)
             nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")  # 앱은 멈출 때까지 돈다
         nb.md(f["look"])
         nb.meta(f.get("look__meta"))
         ask = f.get("ask")
-        if not todos and ask:
+        if ask:
             sub += 1
             nb.h(3, f"{n}.{sub} AI에게 물어보기")
             nb.md(f"**프롬프트 힌트** {ask['hint']}")

@@ -520,5 +520,9 @@
    }
   }
  ],
- "closing": "약관 PDF 한 권으로 RAG의 여섯 단계를 차례로 만들었습니다.\n\n| 장 | 단계 | 이 노트북에서 한 일 |\n|---|---|---|\n| 2. PDF 불러오기와 청크 나누기 | Loading, Splitting | `PDFMinerLoader`로 읽고 `RecursiveCharacterTextSplitter`로 나눔 |\n| 3. 임베딩과 유사도 | Embedding | 문장을 벡터로 바꾸고 코사인 유사도로 비교 |\n| 4. 벡터 저장소와 검색 | Storage, Retrieval | Chroma에 넣고 retriever로 가까운 청크 3개 찾기 |\n| 5. RAG 체인 | Generation | 검색 결과를 `context`로 넣어 답변을 스트리밍으로 받기 |\n| 6. RAGaaS | 전 단계 | 업로드·검색을 API에 맡기고 답변만 만들기 |\n\n청크 크기, 질문, system 지시문을 바꿔 다시 실행하고, 결과를 성공 기준(🟢/⛔)과 비교해 스스로 판단했습니다."
+ "closing": "약관 PDF 한 권으로 RAG의 여섯 단계를 차례로 만들었습니다.\n\n| 장 | 단계 | 이 노트북에서 한 일 |\n|---|---|---|\n| 2. PDF 불러오기와 청크 나누기 | Loading, Splitting | `PDFMinerLoader`로 읽고 `RecursiveCharacterTextSplitter`로 나눔 |\n| 3. 임베딩과 유사도 | Embedding | 문장을 벡터로 바꾸고 코사인 유사도로 비교 |\n| 4. 벡터 저장소와 검색 | Storage, Retrieval | Chroma에 넣고 retriever로 가까운 청크 3개 찾기 |\n| 5. RAG 체인 | Generation | 검색 결과를 `context`로 넣어 답변을 스트리밍으로 받기 |\n| 6. RAGaaS | 전 단계 | 업로드·검색을 API에 맡기고 답변만 만들기 |\n\n청크 크기, 질문, system 지시문을 바꿔 다시 실행하고, 결과를 성공 기준(🟢/⛔)과 비교해 스스로 판단했습니다.",
+ "env": [
+  "EMBED_PROVIDER",
+  "RAG_PROVIDER"
+ ]
 }

@@ -49,6 +49,28 @@ def fmt(src):
     return done.stdout.rstrip("\n") if done.returncode == 0 else src
 
 
+QUIET_CALLS = {"load_dotenv", "add_edge", "add_node", "add_conditional_edges", "set_entry_point"}
+
+
+def quiet(src):
+    """셀 마지막 줄이 값을 돌려주는 준비 호출(load_dotenv(), add_edge(...) 등)이면 끝에 ;를 붙여
+    `True`, `<StateGraph ...>` 같은 쓸모없는 출력을 숨긴다."""
+    import ast
+
+    try:
+        last = ast.parse(src).body[-1]
+    except (SyntaxError, IndexError):
+        return src
+    if isinstance(last, ast.Expr) and isinstance(last.value, ast.Call):
+        f = last.value.func
+        if (getattr(f, "attr", None) or getattr(f, "id", None)) in QUIET_CALLS:
+            lines = src.split("\n")
+            k = last.end_lineno - 1
+            lines[k] = lines[k].rstrip() + ";"
+            return "\n".join(lines)
+    return src
+
+
 class Notebook:
     def __init__(self, quiz_dir, quiz_ref):
         self.cells, self.pending = [], []
@@ -100,7 +122,7 @@ class Notebook:
         cells = self.cells
         for cell in cells:
             if cell.cell_type == "code":
-                cell.source = fmt(cell.source)
+                cell.source = quiet(fmt(cell.source))
         heads = [k for k, cell in enumerate(cells) if "heading" in cell.metadata]
         toc = []
         for n, k in enumerate(heads):
