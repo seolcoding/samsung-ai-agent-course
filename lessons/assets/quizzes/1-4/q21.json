@@ -1,0 +1,28 @@
+[
+ {
+  "question": "답변 끝에 \"어느 문서의 몇 쪽에서 찾았는지\"를 함께 보여 주려면, Loading 단계에서 무엇을 함께 남겨야 할까요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "청크 하나의 최대 길이(chunk_size)",
+    "correct": false,
+    "feedback": "chunk_size는 Splitting 단계에서 청크의 크기를 정하는 값입니다. 출처 정보가 아닙니다."
+   },
+   {
+    "answer": "본문을 바꾼 임베딩 벡터",
+    "correct": false,
+    "feedback": "임베딩 벡터는 의미를 비교하는 데 쓰는 숫자 목록입니다. 파일 이름이나 쪽 번호는 들어 있지 않습니다."
+   },
+   {
+    "answer": "모델에게 줄 시스템 프롬프트",
+    "correct": false,
+    "feedback": "시스템 프롬프트는 Generation 단계에서 모델에게 주는 지시입니다. 문서의 출처를 담지 않습니다."
+   },
+   {
+    "answer": "파일명·페이지 번호 같은 메타데이터",
+    "correct": true,
+    "feedback": "메타데이터가 본문과 함께 남아 있어야 답변에 출처를 붙이거나 문서를 골라 검색할 수 있습니다."
+   }
+  ]
+ }
+]
