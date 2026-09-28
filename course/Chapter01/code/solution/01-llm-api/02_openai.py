@@ -3,6 +3,7 @@ from collections import Counter
 from pprint import pprint
 
 from dotenv import load_dotenv
+import config  # noqa: F401  .env의 COURSE_ENV(사내/사외)에 맞춰 연결 방식을 채운다
 from openai import OpenAI
 
 load_dotenv()

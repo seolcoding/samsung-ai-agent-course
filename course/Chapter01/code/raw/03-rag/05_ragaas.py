@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+import config  # noqa: F401  .env의 COURSE_ENV(사내/사외)에 맞춰 연결 방식을 채운다
 
 from config.llm import get_llm
 from config.ragaas import post_ragaas
