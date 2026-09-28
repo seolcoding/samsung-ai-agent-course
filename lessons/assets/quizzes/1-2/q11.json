@@ -6,22 +6,22 @@
    {
     "answer": "\"that is the question\"처럼 문장을 이어 쓴다",
     "correct": true,
-    "feedback": "맞습니다. 사전 학습만 거친 모델은 지시를 따르기보다 그럴듯한 글을 이어 쓰는 성향이 강합니다 (p4)."
+    "feedback": "맞습니다. 사전 학습만 거친 모델은 지시를 따르기보다 그럴듯한 글을 이어 쓰는 성향이 강합니다."
    },
    {
     "answer": "\"이 문장은 햄릿의 대사입니다\"라고 설명한다",
     "correct": false,
-    "feedback": "문장을 설명하는 것은 입력을 요청으로 이해한 답입니다. 그렇게 만드는 과정은 다음 쪽의 Instruction Tuning입니다 (p5)."
+    "feedback": "문장을 설명하는 것은 입력을 요청으로 이해한 답입니다. 그렇게 만드는 과정은 다음 쪽의 Instruction Tuning입니다."
    },
    {
     "answer": "\"무엇을 도와드릴까요?\"라고 되묻는다",
     "correct": false,
-    "feedback": "되묻는 대화형 반응도 Instruction Tuning 뒤에 강해지는 행동입니다 (p5). 사전 학습만 한 모델은 이어 쓰는 성향이 강합니다 (p4)."
+    "feedback": "되묻는 대화형 반응도 Instruction Tuning 뒤에 강해지는 행동입니다. 사전 학습만 한 모델은 이어 쓰는 성향이 강합니다."
    },
    {
     "answer": "질문으로 알아듣고 짧게 답한다",
     "correct": false,
-    "feedback": "요청을 알아듣고 답하는 방식은 Instruction Tuning으로 강화된 행동입니다 (p5). 사전 학습만 한 모델은 이어 쓰는 성향이 강합니다 (p4)."
+    "feedback": "요청을 알아듣고 답하는 방식은 Instruction Tuning으로 강화된 행동입니다. 사전 학습만 한 모델은 이어 쓰는 성향이 강합니다."
    }
   ]
  }

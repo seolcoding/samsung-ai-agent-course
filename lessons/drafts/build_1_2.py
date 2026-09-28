@@ -8,6 +8,7 @@
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -32,6 +33,8 @@ def build(version):
     cells = []
 
     def md(src):
+        # 수강생 글에는 "(p6)" 같은 쪽 인용을 넣지 않는다(어색함). 쪽은 슬라이드 뷰어가 보여 준다.
+        assert not re.search(r"\(p\d+", src), f"수강생 글에 쪽 인용이 남아 있다: {src[:60]!r}"
         cells.append(nbf.v4.new_markdown_cell(src.strip()))
 
     def code(src, visible=False):
@@ -68,6 +71,7 @@ def build(version):
         for q in questions:  # 퀴즈 선택지는 항상 4개, 정답은 1개
             assert len(q["answers"]) == 4, f"{name}: 선택지가 {len(q['answers'])}개"
             assert sum(a["correct"] for a in q["answers"]) == 1, f"{name}: 정답이 1개가 아님"
+            assert "(p" not in json.dumps(q, ensure_ascii=False), f"{name}: 퀴즈에 쪽 인용이 남아 있다"
         QUIZ_DIR.mkdir(parents=True, exist_ok=True)
         (QUIZ_DIR / f"{name}.json").write_text(json.dumps(questions, ensure_ascii=False, indent=1), encoding="utf-8")
         code(f'display_quiz("assets/quizzes/1-2/{name}.json", max_width=800)')
@@ -139,13 +143,13 @@ def build(version):
     v("p9")
     n, words = len(P9_TOKENS), len(P9_SENTENCE.split())
     quiz_file("q21", [{
-        "question": f'p9 예시에서 "{P9_SENTENCE}"는 몇 개의 토큰으로 나뉘었나요?',
+        "question": f'슬라이드 예시에서 "{P9_SENTENCE}"는 몇 개의 토큰으로 나뉘었나요?',
         "type": "multiple_choice",
         "answers": [
-            {"answer": f"{words}개", "correct": False, "feedback": "띄어쓰기로 나눈 단어 수입니다. 토큰 수와는 다릅니다 (p9)."},
-            {"answer": f"{n - 2}개", "correct": False, "feedback": "한 단어가 둘로 나뉜 곳을 다시 세어 보세요 (p9)."},
-            {"answer": f"{n}개", "correct": True, "feedback": "맞습니다. 예시 목록의 항목 수입니다. 토큰은 단어의 일부나 조사로도 나뉩니다 (p9)."},
-            {"answer": f"{n + 3}개", "correct": False, "feedback": "슬라이드 예시 목록에 든 항목만 셉니다 (p9)."},
+            {"answer": f"{words}개", "correct": False, "feedback": "띄어쓰기로 나눈 단어 수입니다. 토큰 수와는 다릅니다."},
+            {"answer": f"{n - 2}개", "correct": False, "feedback": "한 단어가 둘로 나뉜 곳을 다시 세어 보세요."},
+            {"answer": f"{n}개", "correct": True, "feedback": "맞습니다. 예시 목록의 항목 수입니다. 토큰은 단어의 일부나 조사로도 나뉩니다."},
+            {"answer": f"{n + 3}개", "correct": False, "feedback": "슬라이드 예시 목록에 든 항목만 셉니다."},
         ],
     }])
     v("sum21")
@@ -194,7 +198,7 @@ def build(version):
     md("### 3-2 입력 품질과 출력 품질")
     slides(15, 16)
     v("p16")
-    code(f"show_checklist({pformat(common['check32'], width=100, sort_dicts=False)}, title='좋은 입력의 네 가지 (p16)')")
+    code(f"show_checklist({pformat(common['check32'], width=100, sort_dicts=False)}, title='좋은 입력의 네 가지')")
     v("sum32")
 
     # 4 대화 구조

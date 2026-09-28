@@ -6,22 +6,22 @@
    {
     "answer": "낮은 temperature / 낮은 top-p",
     "correct": true,
-    "feedback": "맞습니다. 보수적이고 반복 가능성이 높아 사실 기반 답변, 코드 생성, 요약에 맞습니다 (p19)."
+    "feedback": "맞습니다. 보수적이고 반복 가능성이 높아 사실 기반 답변, 코드 생성, 요약에 맞습니다."
    },
    {
     "answer": "낮은 temperature / 높은 top-p",
     "correct": false,
-    "feedback": "업무 문서, 설명문에 맞는 조합입니다 (p19)."
+    "feedback": "업무 문서, 설명문에 맞는 조합입니다."
    },
    {
     "answer": "높은 temperature / 낮은 top-p",
     "correct": false,
-    "feedback": "가벼운 문장 변형에 적합한 조합입니다 (p19)."
+    "feedback": "가벼운 문장 변형에 적합한 조합입니다."
    },
    {
     "answer": "높은 temperature / 높은 top-p",
     "correct": false,
-    "feedback": "아이디어 발산, 브레인스토밍에 어울리는 조합입니다 (p19)."
+    "feedback": "아이디어 발산, 브레인스토밍에 어울리는 조합입니다."
    }
   ]
  }
