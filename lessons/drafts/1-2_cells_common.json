@@ -1,5 +1,5 @@
 {
- "title": "# LLM을 사용하며 알아야 할 것들\n\n이 노트북은 슬라이드와 설명, 퀴즈로 개념을 익히는 강의 노트북입니다. 코드 실습은 `1-2_llm_api_lab.ipynb`에서 합니다.",
+ "title": "# [LEC] LLM을 사용하며 알아야 할 것들\n\n슬라이드와 설명, 퀴즈로 개념을 익히는 강의 노트북입니다. 짝이 되는 실습은 `1-2_llm_api_LAB.ipynb`입니다.",
  "env_check_code": "import os\nfrom dotenv import load_dotenv, find_dotenv\n\nload_dotenv(find_dotenv(usecwd=True))  # 프로젝트의 .env 파일을 읽습니다\n\n# 값은 출력하지 않습니다. 빠진 설정이 있는지만 봅니다.\nprovider = os.getenv(\"LLM_PROVIDER\", \"samsung\").strip().lower()\n필요한_이름 = {\n    \"openai\": [\"OPENAI_API_KEY\", \"OPENAI_MODEL\"],\n    \"samsung\": [\"api_base_url\", \"model\", \"credential_key\", \"send_system_name\", \"user_id\"],\n}.get(provider, [\"LLM_PROVIDER\"])\n빠진_이름 = [name for name in 필요한_이름 if not os.getenv(name)]\n\nimport config.llm  # 실습 코드가 쓰는 설정 모듈을 불러옵니다\n\nif 빠진_이름:\n    print(f\"준비가 덜 되었습니다. 빠진 설정 {len(빠진_이름)}개가 있습니다. 강사에게 알려 주세요.\")\n    print(\"(강사 확인용:\", \", \".join(빠진_이름), \")\")\nelse:\n    print(\"준비 완료: LLM에 연결할 설정이 모두 있습니다.\")",
  "env_check_look": "**볼 지점**\n- \"준비 완료\"가 나오면 다음으로 넘어갑니다.\n- \"준비가 덜 되었습니다\"가 나오면 강사에게 알립니다.\n- 키 값은 화면에 나오지 않습니다. 혹시 나오면 강사에게 알립니다.",
  "q11_lead": "슬라이드를 보기 전에 먼저 예측해 봅니다. 답은 바로 다음 슬라이드에 있습니다.",

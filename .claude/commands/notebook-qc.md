@@ -8,8 +8,8 @@ argument-hint: "[노트북 경로] [실행]"
 **목적:** `lessons/Chapter*/` 교안 노트북이 지금까지 정한 QC 기준을 지키는지 확인한다. 고치지 않고 보고만 한다.
 
 노트북은 두 종류이고, 파일 이름 끝으로 구분한다.
-- **강의** `*_lecture.ipynb`: 슬라이드(`show_slides`) + 설명 + 퀴즈. 실습 코드 도구는 없다.
-- **실습** `*_lab.ipynb`: `lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`으로 조립한다. 파일마다 코드 지도 → 빈칸 복사본(`lessons/work/`) → TODO마다 CodeMate 지시문 → 실행 → 솔루션 비교 → 체크리스트.
+- **강의** `*_LEC.ipynb`: 슬라이드(`show_slides`) + 설명 + 퀴즈. 실습 코드 도구는 없다.
+- **실습** `*_LAB.ipynb`: `lessons/drafts/build_lab.py`가 `lessons/drafts/labs/<폴더>.json`으로 조립한다. 파일마다 코드 지도 → 빈칸 복사본(`lessons/work/`) → TODO마다 CodeMate 지시문 → 실행 → 솔루션 비교 → 체크리스트.
 
 **인자:** `$ARGUMENTS` = 노트북 경로. 비어 있으면 `lessons/Chapter*/*.ipynb` 전부.
 사용자가 "실행"·"execute"를 말하면 새 커널 실행까지 한다.
@@ -53,7 +53,7 @@ uv run --extra notebooks python lessons/qc/notebook_qc.py $ARGUMENTS --execute  
 **강의 노트북만**
 
 16. **실습 코드 없음:** 코드를 실행·빈칸·비교하는 셀이 없다. 코드 이야기는 슬라이드·설명으로만 한다.
-17. **실습 안내는 한 번씩:** 실습 노트북으로 넘기는 안내가 필요한 곳에만 있고, 절마다 같은 문장으로 기계적으로 되풀이되지 않는다.
+17. **실습 안내 최소화:** 강의 본문에 "실습 노트북에서 확인합니다" 같은 안내를 넣지 않는다. 짝이 되는 LAB 파일은 제목 아래 한 줄로만 알린다.
 
 **실습 노트북만**
 

@@ -1,11 +1,11 @@
 """교안 노트북 QC 하네스 — 규칙으로 판정할 수 있는 것만 검사한다.
 
 노트북 종류는 파일 이름 끝으로 정한다.
-    *_lecture.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
-    *_lab.ipynb      실습 노트북: 코드 지도 → 빈칸 복사본 → TODO마다 CodeMate 지시문 → 실행 → 솔루션 비교.
+    *_LEC.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
+    *_LAB.ipynb      실습 노트북: 코드 지도 → 빈칸 복사본 → TODO마다 CodeMate 지시문 → 실행 → 솔루션 비교.
 
 실행(프로젝트 루트):
-    uv run python lessons/qc/notebook_qc.py lessons/Chapter01/1-2_llm_api_lecture.ipynb
+    uv run python lessons/qc/notebook_qc.py lessons/Chapter01/1-2_llm_api_LEC.ipynb
     uv run python lessons/qc/notebook_qc.py                 # lessons/Chapter*/*.ipynb 전부
     uv run --extra notebooks python lessons/qc/notebook_qc.py <노트북> --execute   # 새 커널 실행까지
 
@@ -35,9 +35,9 @@ RAW, SOL, CONF, WORK = "../../src/raw/", "../../src/solution/", "../../src/confi
 
 
 def kind_of(path):
-    """파일 이름 끝(_lecture/_lab)으로 노트북 종류를 정한다."""
+    """파일 이름 끝(_LEC/_LAB)으로 노트북 종류를 정한다."""
     stem = Path(path).stem
-    return "lecture" if stem.endswith("_lecture") else "lab" if stem.endswith("_lab") else None
+    return "lecture" if stem.endswith("_LEC") else "lab" if stem.endswith("_LAB") else None
 
 
 def excerpt(text, n=60):
@@ -476,7 +476,7 @@ def qc(path, execute=False):
     nb = nbformat.read(path, as_version=4)
     kind = kind_of(path)
     if kind is None:
-        R("종류", "파일 이름이 _lecture 또는 _lab으로 끝남", [(0, path.name)], warn=True)
+        R("종류", "파일 이름이 _LEC 또는 _LAB으로 끝남", [(0, path.name)], warn=True)
     check_quiz(nb, path.parent, R)
     check_student_text(nb, R)
     check_structure(nb, R)

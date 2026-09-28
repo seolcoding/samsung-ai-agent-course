@@ -1,8 +1,8 @@
-"""Chapter01 1-2 강의 노트북을 조립한다. 슬라이드·설명·퀴즈만 담고 실습 코드는 넣지 않는다(실습은 1-2_llm_api_lab).
+"""Chapter01 1-2 강의 노트북을 조립한다. 슬라이드·설명·퀴즈만 담고 실습 코드는 넣지 않는다(실습은 1-2_llm_api_LAB).
 
 실행(프로젝트 루트): uv run python lessons/drafts/build_lecture_1_2.py
 입력: lessons/drafts/1-2_cells_common.json(공통 셀·퀴즈), 1-2_cells_C.json(설명 셀, C 수준)
-출력: lessons/Chapter01/1-2_llm_api_lecture.ipynb (출력 없음)
+출력: lessons/Chapter01/1-2_llm_api_LEC.ipynb (출력 없음)
 """
 
 import json
@@ -14,7 +14,7 @@ from nbkit import Notebook  # noqa: E402
 
 HERE = Path(__file__).parent
 LESSONS = HERE.parent
-OUT = LESSONS / "Chapter01" / "1-2_llm_api_lecture.ipynb"
+OUT = LESSONS / "Chapter01" / "1-2_llm_api_LEC.ipynb"
 # p9 예시의 토큰 목록. 2.1 퀴즈의 정답(목록 길이)을 여기서 계산한다.
 P9_TOKENS = ["Lang", "Chain", "으로", " AI", " Agent", "를", " 만든", "다", "."]
 P9_SENTENCE = "LangChain으로 AI Agent를 만든다."

@@ -6,7 +6,7 @@
   uv run python lessons/drafts/build_lab.py --scaffold        # 아직 없는 실습 폴더의 뼈대 JSON 만들기
 
 입력: lessons/drafts/labs/<실습 폴더>.json
-출력: lessons/Chapter01/<번호>_<이름>_lab.ipynb (출력 없음)
+출력: lessons/Chapter01/<번호>_<이름>_LAB.ipynb (출력 없음)
 
 모든 실습 노트북은 같은 구조다.
   제목 → 목차 → 1. 실습 방법 → 파일마다 한 장(코드 구조 → TODO마다 CodeMate 지시 → 실행과 솔루션 비교) → 정리
@@ -71,7 +71,7 @@ def build(folder):
     work_dir = f"../work/Chapter01/{folder}"
     nb = Notebook(LESSONS / "assets" / "quizzes" / f"{unit}-lab", f"../assets/quizzes/{unit}-lab")
 
-    nb.md(f"# {spec['title']}\n\n{spec['intro']}")
+    nb.md(f"# [LAB] {spec['title']}\n\n{spec['intro']}")
     nb.meta(spec.get("intro__meta"))
     nb.code(
         "import sys\n\nsys.path.insert(0, '..')  # lessons/assets 도구를 불러오기 위한 경로\n\n"
@@ -128,7 +128,7 @@ def build(folder):
 
     nb.h(2, f"{len(spec['files']) + 2}. 정리")
     nb.md(spec["closing"])
-    nb.finish(LESSONS / "Chapter01" / f"{unit}_{slug}_lab.ipynb")
+    nb.finish(LESSONS / "Chapter01" / f"{unit}_{slug}_LAB.ipynb")
 
 
 def _sections(lines):
