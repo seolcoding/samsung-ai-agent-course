@@ -56,6 +56,18 @@ def _item(status, name, detail, fix=""):
     return {"status": status, "name": name, "detail": detail, "fix": fix}
 
 
+def _env_encoding(path):
+    """설정 파일이 어떻게 저장되었는지 본다. BOM 없는 UTF-8이 아니면 윈도우에서 문제가 생길 수 있다."""
+    raw = Path(path).read_bytes()
+    if raw.startswith(b"\xef\xbb\xbf"):
+        return "utf-8-bom"
+    try:
+        raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return "other"
+    return "utf-8"
+
+
 def report(groups=("LLM_PROVIDER",), live=False):
     """점검 결과를 목록으로 돌려준다. 값은 담지 않는다."""
     items = []
@@ -72,6 +84,11 @@ def report(groups=("LLM_PROVIDER",), live=False):
     env_file = config.ENV_FILE
     items.append(_item("🟢" if env_file else "⛔", ".env 파일", env_file or "찾지 못함",
                        "" if env_file else ".env.sample을 저장소 맨 위에 .env로 복사한다"))
+    saved = _env_encoding(env_file) if env_file else "utf-8"
+    if saved != "utf-8":  # 정상일 때는 줄을 늘리지 않는다
+        detail = ("UTF-8(BOM 있음). 노트북은 읽지만 uv run --env-file은 값을 읽지 못한다" if saved == "utf-8-bom"
+                  else "UTF-8이 아님(cp949 등). 지금은 cp949로 읽지만 다른 도구는 읽지 못할 수 있다")
+        items.append(_item("⚠️", ".env 저장 방식", detail, "VS Code로 .env를 열고 오른쪽 아래 인코딩을 눌러 'UTF-8로 저장'을 고른다"))
 
     # 3. 실행 환경(COURSE_ENV)
     raw_mode = os.getenv("COURSE_ENV", "")
@@ -149,6 +166,9 @@ def check_env(groups=(), live=False):
 
 
 if __name__ == "__main__":
+    # 출력을 파이프·파일로 받아도(AI 도우미가 --json을 붙잡는 경우 등) 윈도우 cp949에서 이모지가 깨지지 않게 한다.
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
     args = sys.argv[1:]
     groups = ["LLM_PROVIDER", "EMBED_PROVIDER", "RAG_PROVIDER"]  # 명령으로 실행하면 전부 본다
     if "--langfuse" in args:  # 2부 관측 실습·캡스톤

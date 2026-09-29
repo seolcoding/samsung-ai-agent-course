@@ -31,6 +31,7 @@
 - 모델은 `config.llm.get_llm()`, 임베딩은 `config.embeddings.get_embeddings()`로 부른다. 주소·모델 이름·키를 코드에 직접 쓰지 않는다.
 - `.env`의 키와 토큰은 출력하거나 파일에 쓰지 않는다.
 - `code/`, `assets/`, `config/`의 파일은 고치지 않는다. `capstone/`은 고쳐도 된다.
+- 텍스트 파일을 읽고 쓰는 코드는 늘 `encoding="utf-8"`을 넣는다. 수강생 PC는 윈도우라 기본값(cp949)으로 열면 한글 파일이 깨진다.
 
 ## 문제가 생기면 (설치·경로·연결)
 

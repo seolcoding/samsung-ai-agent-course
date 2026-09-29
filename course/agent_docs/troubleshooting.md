@@ -33,6 +33,8 @@
 | 값이 `# …`로 시작하는 글자로 들어감(주소·모델 이름이 이상함) | `KEY=   # 설명`처럼 빈 값 뒤에 주석을 붙임 | 설명은 윗줄로 옮기고 `KEY=값`만 남긴다 |
 | 사내 PC인데 OpenAI로 연결하려 함 / 사외 PC인데 사내 주소로 연결하려 함 | `.env`의 `COURSE_ENV`가 틀렸거나, 따로 적은 `*_PROVIDER`가 덮어씀 | 사내 `COURSE_ENV=samsung`, 사외 `COURSE_ENV=out`. 따로 적은 `LLM_PROVIDER` 등은 지운다 |
 | `.env`를 못 찾음 | 이름이 `.env`가 아님(예: `.env.txt`, `.env.external`) 또는 위치가 다름 | 저장소 맨 위에 정확히 `.env`로 둔다. 윈도우 탐색기는 확장자를 숨기니 주의 |
+| `[주의] .env가 UTF-8이 아니라 cp949로 저장되어 있어…` 또는 `RuntimeError: …를 읽을 수 없습니다(UTF-8도 cp949도 아님)` | 옛 메모장이나 `>` 명령으로 저장해 글자 저장 방식이 UTF-8이 아님(`.env.sample`에 한글 설명이 있어 드러남) | VS Code로 `.env`를 열고 오른쪽 아래 인코딩(예: `Korean (EUC-KR)`)을 눌러 "인코딩으로 저장" → `UTF-8`. 저장 뒤 커널을 다시 시작한다 |
+| `UnicodeDecodeError: 'cp949' codec can't decode…` (파일을 읽는 코드에서) | 윈도우는 파일을 cp949로 읽는 것이 기본인데 한글 파일은 UTF-8로 저장되어 있음 | 코드의 `open(경로)`, `Path(경로).read_text()`에 `encoding="utf-8"`을 넣는다. 파일을 쓸 때도 같다 |
 
 ## LLM·API 호출
 

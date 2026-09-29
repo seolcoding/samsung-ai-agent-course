@@ -77,7 +77,7 @@ class RagProviderTests(unittest.TestCase):
             Path(__file__).resolve().parents[2]
             / "course/Chapter02/code/solution/06-capstone/solution.py"
         )
-        tree = ast.parse(source.read_text())
+        tree = ast.parse(source.read_text(encoding="utf-8"))
         function = next(
             node for node in tree.body
             if isinstance(node, ast.FunctionDef) and node.name == "rag_search"
@@ -114,7 +114,7 @@ class RagProviderTests(unittest.TestCase):
             Path(__file__).resolve().parents[2]
             / "course/Chapter01/code/raw/03-rag/05_ragaas.py"
         )
-        self.assertIn("INDEX_NAME = 'rp-aicoa-meritz-pet'", source.read_text())
+        self.assertIn("INDEX_NAME = 'rp-aicoa-meritz-pet'", source.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

@@ -78,8 +78,11 @@ def show_quiz(path):
     from IPython.display import display
     from jupyterquiz import display_quiz
 
+    # jupyterquiz는 경로를 받으면 인코딩 없이 파일을 열어 한국어 Windows(cp949)에서 깨진다.
+    # UTF-8로 직접 읽어 목록으로 넘긴다.
+    questions = json.loads(Path(path).read_text(encoding="utf-8"))
     display(HTML(_QUIZ_FIT))
-    return display_quiz(path, max_width=800, colors=QUIZ_COLORS)
+    return display_quiz(questions, max_width=800, colors=QUIZ_COLORS)
 
 
 def _id():
