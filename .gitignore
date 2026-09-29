@@ -204,3 +204,4 @@ dev/work/
 course/Chapter02/notebooks/*.py
 course/Chapter02/notebooks/harness/
 course/Chapter02/capstone/solution.py
+demo*
