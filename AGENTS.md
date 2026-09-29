@@ -92,8 +92,8 @@ dev/                       ← 강사·개발용. 전달하지 않는다
   materials/               커리큘럼 제안서 PPTX(09-03 정본, 05-22 구판), 인수인계서, 설문, 피드백 xlsx
   archive/                 원본 .py 옆에 있던 .ipynb 변환본, main.py, 폴더 개편 전 안내 문서(docs/)
   tests/                   환경 분기·실습 경로 검증
+  release.sh               main에서 수강생용 브랜치 study와 전달 zip 만들기
   study_materials/, work/  강사 공부 자료, 실습 작업 복사본(Git 제외)
-scripts/release.sh         main에서 수강생용 브랜치 study와 전달 zip 만들기
 .env.sample, pyproject.toml, uv.lock   설치 파일(study에도 들어간다)
 README.md                  처음 받은 고객사 담당자용 안내
 ```
@@ -101,7 +101,7 @@ README.md                  처음 받은 고객사 담당자용 안내
 **중요**: 사내 GitHub 레포는 원래 *"TODO가 전부 정답으로 채워진 최종본"*이다.
 `course/Chapter01/code/raw/`가 정답과 거의 같은 것은 사고가 아니라 **의도된 배포 상태**다.
 차수별 브랜치(4종)는 10차수 강사가 임의 구성한 것이고 **강사별 재구성이 허용**된다.
-브랜치는 셋이다(2026-09-29 결정). `dev`에서 고치고 검사한 뒤 `main`(완성본 전체)에 합친다. 수강생용 `study`는 `main`에서 `scripts/release.sh`로 만든다(`course/`와 설치 파일만, 이력이 섞이지 않는 별도 브랜치). `study`에서 직접 고치지 않는다. `main`을 깎지 않는다.
+브랜치는 셋이다(2026-09-29 결정). `dev`에서 고치고 검사한 뒤 `main`(완성본 전체)에 합친다. 수강생용 `study`는 `main`에서 `dev/release.sh`로 만든다(`course/`와 설치 파일만, 이력이 섞이지 않는 별도 브랜치). `study`에서 직접 고치지 않는다. `main`을 깎지 않는다.
 `raw`는 원본 파일 형식인 `.py`와 PDF를 뜻한다. 변경 금지 아카이브라는 뜻은 아니다.
 수업은 노트북으로 한다. 교안 노트북은 `dev/builders/`의 빌더로 만들고 `dev/AGENTS.md`를 따른다. 설명·슬라이드·실습을 노트북 안에 인라인으로 넣고, 외부 CDN을 쓰지 않는다. 노트북을 직접 고치지 말고 빌더의 글·spec을 고쳐 다시 빌드한다.
 실행에 쓰는 `skills.md`, `SKILL.md`, `data/*.md`는 문서 형식이어도 코드가 읽으므로 `course/ChapterNN/code/`의 실습 폴더에 둔다. 그 밖의 안내 문서는 `dev/docs/`에 둔다.

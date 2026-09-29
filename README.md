@@ -31,7 +31,7 @@
 고치는 흐름은 한 방향입니다.
 
 ```text
-dev (고치고 검사) → main (합치기) → study (scripts/release.sh가 main에서 만든다)
+dev (고치고 검사) → main (합치기) → study (dev/release.sh가 main에서 만든다)
 ```
 
 - `study`는 `main`과 이력이 섞이지 않는 별도 브랜치입니다. 강사용 자료는 `study`의 이력에도 들어가지 않습니다.
@@ -51,11 +51,10 @@ dev (고치고 검사) → main (합치기) → study (scripts/release.sh가 mai
 | `dev/` | **강사·개발용**. 수강생에게 나가지 않습니다 |
 | `dev/instructor/` | 강사본 노트북(강사용 메모 포함) |
 | `dev/builders/`, `dev/qc/`, `dev/tests/` | 노트북을 만드는 빌더, 노트북 검사 도구, 테스트 |
+| `dev/release.sh` | `main`에서 `study` 브랜치와 전달용 zip을 만드는 스크립트 |
 | `dev/docs/` | 커리큘럼, 수강생 피드백 정리, 검증 기록 |
 | `dev/materials/` | 커리큘럼 제안서, 인수인계서, 설문 원본 |
-| `scripts/release.sh` | `main`에서 `study` 브랜치와 전달용 zip을 만드는 스크립트 |
 | `pyproject.toml`, `uv.lock`, `.env.sample` | 설치 파일과 연결 설정 견본 |
-| `infra/langfuse/` | Langfuse 서버를 직접 띄울 때 쓰는 설정(선택) |
 | `AGENTS.md` | 강사와 AI 도우미를 위한 작업 규칙·배경 |
 
 ## 강의장 PC 준비
@@ -81,7 +80,7 @@ dev (고치고 검사) → main (합치기) → study (scripts/release.sh가 mai
    ```bash
    git switch main
    git merge dev
-   bash scripts/release.sh v5
+   bash dev/release.sh v6
    git switch dev
    ```
 

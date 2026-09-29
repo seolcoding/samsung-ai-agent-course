@@ -2,7 +2,7 @@
 # 수강생용 브랜치 study를 main의 course/와 설치 파일로 갱신하고, 고객사에 보낼 zip을 만든다.
 #
 # 브랜치: dev(작업) → main(완성본, 병합) → study(수강생용, 이 스크립트가 만든다)
-# 실행(프로젝트 루트, main에서): git switch main && git merge dev && bash scripts/release.sh <버전>   예: v4
+# 실행(프로젝트 루트, main에서): git switch main && git merge dev && bash dev/release.sh <버전>   예: v4
 # - study는 개발 이력과 섞이지 않는 별도 브랜치(orphan)다. dev/·materials·인수인계 자료가 이력에도 남지 않는다.
 # - 교안은 dev에서 고친다. study에서 직접 고치지 않는다.
 # - push하지 않는다.
