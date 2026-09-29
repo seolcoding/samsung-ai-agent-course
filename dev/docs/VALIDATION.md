@@ -1,5 +1,7 @@
 # 실행 검증 기록
 
+> 2026-09-28 폴더 개편 전 기록이라 옛 경로를 쓴다. 지금 경로: `src/raw/ChapterNN/` → `course/ChapterNN/code/raw/`, `src/solution/ChapterNN/` → `course/ChapterNN/code/solution/`, `src/config/` → `course/config/`, `tests/` → `dev/tests/`.
+
 기존 실습 코드(`src/raw/`·`src/solution/`)와 환경 설정(`src/config/`)의 검증 기록이다. 환경: macOS, 프로젝트 `.venv`, Python 3.12.7. 설치 버전은 `uv.lock`으로 고정한다.
 
 환경·설정 테스트: `uv run --extra notebooks python -m unittest discover -s tests -p 'test_*.py'`

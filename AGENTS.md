@@ -1,4 +1,4 @@
-# AGENTS.md — 삼성전자 DS AI Agent 개발 프로젝트 교육 (2026-AI-PD, v2.0, 2026-09-29)
+# AGENTS.md — 삼성전자 DS AI Agent 개발 프로젝트 교육 (2026-AI-PD, v2.1, 2026-09-29)
 
 이 리포지토리는 **강의용 실습 코드 + 교안**이다. 제품 코드가 아니다.
 모든 변경은 "수강생 앞에서 이게 어떻게 보이는가"를 기준으로 판단한다.
@@ -88,19 +88,20 @@ dev/                       ← 강사·개발용. 전달하지 않는다
   qc/                      노트북 QC 하네스
   instructor/ChapterNN/    강사본 노트북(강사용 메모 포함, 빌드 산출)
   demos/                   교수법 데모 노트북과 그 자산
-  docs/                    CURRICULUM.md, 11차수 피드백, VALIDATION, COURSE_MAP, guides, templates, PDF 해설 노트북(notebooks/)
+  docs/                    CURRICULUM.md, 11차수 피드백, VALIDATION, guides(받은 캡스톤 README), templates, PDF 해설 노트북(notebooks/)
   materials/               커리큘럼 제안서 PPTX(09-03 정본, 05-22 구판), 인수인계서, 설문, 피드백 xlsx
-  archive/                 원본 .py 옆에 있던 .ipynb 변환본, main.py
+  archive/                 원본 .py 옆에 있던 .ipynb 변환본, main.py, 폴더 개편 전 안내 문서(docs/)
   tests/                   환경 분기·실습 경로 검증
   study_materials/, work/  강사 공부 자료, 실습 작업 복사본(Git 제외)
-scripts/release.sh         전달 브랜치 release/course 갱신
-.env.sample, pyproject.toml, uv.lock   설치 파일(전달 브랜치에도 들어간다)
+scripts/release.sh         main에서 수강생용 브랜치 study와 전달 zip 만들기
+.env.sample, pyproject.toml, uv.lock   설치 파일(study에도 들어간다)
+README.md                  처음 받은 고객사 담당자용 안내
 ```
 
 **중요**: 사내 GitHub 레포는 원래 *"TODO가 전부 정답으로 채워진 최종본"*이다.
 `course/Chapter01/code/raw/`가 정답과 거의 같은 것은 사고가 아니라 **의도된 배포 상태**다.
 차수별 브랜치(4종)는 10차수 강사가 임의 구성한 것이고 **강사별 재구성이 허용**된다.
-수강생 전달본은 `release/course` 브랜치로 관리한다(`dev/`를 뺀 상태). `scripts/release.sh`로 갱신하고, 전달 브랜치에서 직접 고치지 않는다. `main`을 깎지 않는다.
+브랜치는 셋이다(2026-09-29 결정). `dev`에서 고치고 검사한 뒤 `main`(완성본 전체)에 합친다. 수강생용 `study`는 `main`에서 `scripts/release.sh`로 만든다(`course/`와 설치 파일만, 이력이 섞이지 않는 별도 브랜치). `study`에서 직접 고치지 않는다. `main`을 깎지 않는다.
 `raw`는 원본 파일 형식인 `.py`와 PDF를 뜻한다. 변경 금지 아카이브라는 뜻은 아니다.
 수업은 노트북으로 한다. 교안 노트북은 `dev/builders/`의 빌더로 만들고 `dev/AGENTS.md`를 따른다. 설명·슬라이드·실습을 노트북 안에 인라인으로 넣고, 외부 CDN을 쓰지 않는다. 노트북을 직접 고치지 말고 빌더의 글·spec을 고쳐 다시 빌드한다.
 실행에 쓰는 `skills.md`, `SKILL.md`, `data/*.md`는 문서 형식이어도 코드가 읽으므로 `course/ChapterNN/code/`의 실습 폴더에 둔다. 그 밖의 안내 문서는 `dev/docs/`에 둔다.
@@ -150,7 +151,7 @@ scripts/release.sh         전달 브랜치 release/course 갱신
 - 메일 원문·첨부·추출문은 `~/800_Archives/830_Courses/samsung_ds_ai_developer/private/`에 보관한다. 개인정보와 로그인 정보를 문서나 커밋에 복사하지 않는다. 별도 격리된 로그인 원본의 위치는 그 안의 `download_manifest.json`을 따른다.
 - 전달받은 ZIP은 같은 아카이브의 `source_archives/`에, 수업용 교안 정본은 이 저장소의 `course/ChapterNN/slides/`에 있다.
 - 통합 전 두 저장소의 Git 이력은 `main`에 보존했다. 통합 전 코드 기준점은 `6f8db3c`이며, `organize/consolidate-20260924` 브랜치는 통합·Chapter02 정리 상태(`2aecc12`)를 보존한다.
-- 폴더 구조 개편은 `refactor/course-layout`, 통합 교안 작업은 `feat/integrated-course-suite` 브랜치에 있다(기존 통합 교안은 2026-09-26 삭제). 이 작업에서는 push하지 않는다.
+- 폴더 구조 개편은 `refactor/course-layout` 브랜치에 있다. 통합 교안 작업 브랜치 `feat/integrated-course-suite`는 2026-09-29 `main`에 합치고 이름을 `dev`로 바꿨다. 전달 브랜치 `release/course`(v1~v3)는 이름을 `study`로 바꿨다. 기록은 `~/_MANIFESTS/samsung_ds_branch_model_20260929.md`. push하지 않는다.
 - 이동 기록과 복구용 전체 백업: `/Users/sdh/_MANIFESTS/samsung_ds_consolidation_20260924/`.
 - 폴더 구조 개편의 이동·복구 기록: `/Users/sdh/_MANIFESTS/samsung_ds_course_layout_20260924.md`.
 - 이전 회차의 `checkpoints.db`와 `large_tool_results/ai_agent_trend_report.md`는 삭제 대기 폴더에 분리해 두었다.

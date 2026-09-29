@@ -27,4 +27,4 @@ Constraints: no logos, no brands, no readable words, no tiny UI text, no invente
 **표현의 한계:** [삽화가 실제 코드·데이터·순서를 보증하지 않는 부분].
 ```
 
-그림이 없어도 이해되는 장식 이미지는 만들지 않는다. 한 그림에는 주장이 하나여야 한다. 생성 결과에 잘못된 글자·UI·연결이 있으면 수업에 넣지 않는다. 최종 PNG는 `lessons/assets/`에 두고 노트북에는 Markdown attachment로 포함한다. 생성 원본과 노트북의 설명이 서로 같은 개념을 가리키는지 확인한다.
+그림이 없어도 이해되는 장식 이미지는 만들지 않는다. 한 그림에는 주장이 하나여야 한다. 생성 결과에 잘못된 글자·UI·연결이 있으면 수업에 넣지 않는다. 최종 PNG는 `course/ChapterNN/assets/`에 두고 노트북에는 Markdown attachment로 포함한다. 생성 원본과 노트북의 설명이 서로 같은 개념을 가리키는지 확인한다.

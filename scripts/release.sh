@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# 전달 브랜치 release/course를 지금 커밋의 course/와 설치 파일로 갱신하고, 고객사에 보낼 zip을 만든다.
+# 수강생용 브랜치 study를 main의 course/와 설치 파일로 갱신하고, 고객사에 보낼 zip을 만든다.
 #
-# 실행(프로젝트 루트): bash scripts/release.sh [버전]      예: bash scripts/release.sh v1
-# - 전달 브랜치는 개발 이력과 섞이지 않는 별도 브랜치(orphan)다. dev/·materials·인수인계 자료가 이력에도 남지 않는다.
-# - 교안은 개발 브랜치에서 고치고 이 스크립트로 전달 브랜치를 갱신한다. 전달 브랜치에서 직접 고치지 않는다.
+# 브랜치: dev(작업) → main(완성본, 병합) → study(수강생용, 이 스크립트가 만든다)
+# 실행(프로젝트 루트, main에서): git switch main && git merge dev && bash scripts/release.sh <버전>   예: v4
+# - study는 개발 이력과 섞이지 않는 별도 브랜치(orphan)다. dev/·materials·인수인계 자료가 이력에도 남지 않는다.
+# - 교안은 dev에서 고친다. study에서 직접 고치지 않는다.
 # - push하지 않는다.
 set -euo pipefail
 
 ROOT=$(git rev-parse --show-toplevel)
 cd "$ROOT"
-BRANCH=release/course
+BRANCH=study
 VERSION=${1:-v1}
 REV=$(git rev-parse --short HEAD)
 SRC_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -19,7 +20,10 @@ FILES=(course pyproject.toml uv.lock .env.sample .gitignore)
 
 fail() { echo "✖ $1 | $2 | $3" >&2; exit 1; }
 
-# 1. 보낼 파일이 모두 커밋되어 있어야 한다(작업 중인 변경이 섞이지 않게)
+# 1. main에서, 보낼 파일이 모두 커밋된 상태여야 한다(작업 중인 변경이 섞이지 않게)
+if [ "$SRC_BRANCH" != main ]; then
+  fail "지금 브랜치가 $SRC_BRANCH" "study는 main에서만 만든다" "git switch main && git merge dev 후 다시 실행"
+fi
 if [ -n "$(git status --porcelain -- "${FILES[@]}")" ]; then
   fail "커밋 안 된 변경이 있음" "course/ 또는 설치 파일이 수정된 상태" "커밋한 뒤 다시 실행"
 fi
@@ -48,7 +52,7 @@ sys.exit(1 if bad else 0)
 PY
 echo "✔ [2/5] 수강생본 검사 통과(출력·강사용 메모·키 파일 없음)"
 
-# 3. 임시 작업 폴더에서 전달 브랜치를 새 내용으로 맞춘다
+# 3. 임시 작업 폴더에서 수강생용 브랜치를 새 내용으로 맞춘다
 WT=$(mktemp -d "${TMPDIR:-/tmp}/release_course.XXXXXX")
 cleanup() { git worktree remove --force "$WT" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
@@ -67,17 +71,17 @@ sed -E -e 's#\| `(Chapter|config|agent_docs)#| `course/\1#g' -e 's#`agent_docs/#
 sed -e 's#](agent_docs/#](course/agent_docs/#g' "$WT/course/AGENTS.md" > "$WT/AGENTS.md"
 git -C "$WT" add -A
 if git -C "$WT" diff --cached --quiet; then
-  echo "✔ [3/5] 전달 브랜치 $BRANCH: 바뀐 내용 없음"
+  echo "✔ [3/5] 수강생용 브랜치 $BRANCH: 바뀐 내용 없음"
 else
   git -C "$WT" commit -q -m "release: course from $SRC_BRANCH@$REV ($VERSION)"
-  echo "✔ [3/5] 전달 브랜치 $BRANCH 갱신: $(git rev-parse --short "$BRANCH")"
+  echo "✔ [3/5] 수강생용 브랜치 $BRANCH 갱신: $(git rev-parse --short "$BRANCH")"
 fi
 
-# 4. 전달 브랜치에 dev/가 없는지 확인
+# 4. 수강생용 브랜치에 dev/가 없는지 확인
 if git ls-tree -r --name-only "$BRANCH" | grep -q "^dev/"; then
-  fail "전달 브랜치에 dev/가 있음" "복사 대상이 잘못됨" "FILES 목록 확인"
+  fail "수강생용 브랜치에 dev/가 있음" "복사 대상이 잘못됨" "FILES 목록 확인"
 fi
-echo "✔ [4/5] 전달 브랜치에 dev/ 없음"
+echo "✔ [4/5] 수강생용 브랜치에 dev/ 없음"
 
 # 5. zip 만들기
 mkdir -p "$OUT_DIR"
