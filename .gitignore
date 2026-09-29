@@ -72,8 +72,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-dev/docs/_build/
 
 # PyBuilder
 .pybuilder/
@@ -192,7 +190,6 @@ node_modules/
 ~$*
 
 
-dev/study_materials/
 infra/
 
 # 교안 노트북 실습이 실행 중 만드는 파일

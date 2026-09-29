@@ -93,7 +93,7 @@ dev/                       ← 강사·개발용. 전달하지 않는다
   archive/                 원본 .py 옆에 있던 .ipynb 변환본, main.py, 폴더 개편 전 안내 문서(docs/)
   tests/                   환경 분기·실습 경로 검증
   release.sh               main에서 수강생용 브랜치 study와 전달 zip 만들기
-  study_materials/, work/  강사 공부 자료, 실습 작업 복사본(Git 제외)
+  work/                    실습 작업 복사본(Git 제외, 필요할 때만 만든다). 강사 공부 자료는 저장소 밖 ~/800_Archives/830_Courses/samsung_ds_ai_developer/study_materials/
 .env.sample, pyproject.toml, uv.lock   설치 파일(study에도 들어간다)
 README.md                  처음 받은 고객사 담당자용 안내
 ```
