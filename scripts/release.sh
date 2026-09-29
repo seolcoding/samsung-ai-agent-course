@@ -69,6 +69,8 @@ git archive "$REV" "${FILES[@]}" | tar -x -C "$WT"
 sed -E -e 's#\| `(Chapter|config|agent_docs)#| `course/\1#g' -e 's#`agent_docs/#`course/agent_docs/#g' \
   "$WT/course/README.md" > "$WT/README.md"
 sed -e 's#](agent_docs/#](course/agent_docs/#g' "$WT/course/AGENTS.md" > "$WT/AGENTS.md"
+# .gitignore에서 강사·개발용 폴더(dev/, infra/, 보관 폴더) 줄은 뺀다
+grep -v -E '^(/?dev/|infra/|/private/|/source_archives/)' "$WT/.gitignore" > "$WT/.gitignore.tmp" && mv "$WT/.gitignore.tmp" "$WT/.gitignore"
 git -C "$WT" add -A
 if git -C "$WT" diff --cached --quiet; then
   echo "✔ [3/5] 수강생용 브랜치 $BRANCH: 바뀐 내용 없음"
@@ -81,7 +83,11 @@ fi
 if git ls-tree -r --name-only "$BRANCH" | grep -q "^dev/"; then
   fail "수강생용 브랜치에 dev/가 있음" "복사 대상이 잘못됨" "FILES 목록 확인"
 fi
-echo "✔ [4/5] 수강생용 브랜치에 dev/ 없음"
+if git grep -q -I -E "(^|[^A-Za-z0-9.])dev/" "$BRANCH" -- . ':!uv.lock'; then
+  git grep -n -I -E "(^|[^A-Za-z0-9.])dev/" "$BRANCH" -- . ':!uv.lock' >&2
+  fail "수강생용 파일이 dev/를 가리킴" "위 줄" "dev에서 그 문구를 고친 뒤 다시 실행"
+fi
+echo "✔ [4/5] 수강생용 브랜치에 dev/ 폴더도, dev/를 가리키는 글도 없음"
 
 # 5. zip 만들기
 mkdir -p "$OUT_DIR"
