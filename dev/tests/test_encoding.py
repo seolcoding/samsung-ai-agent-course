@@ -7,6 +7,7 @@ import importlib.util
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -153,6 +154,16 @@ class EncodingTests(unittest.TestCase):
                 path = Path(folder, expected)
                 path.write_bytes(data)
                 self.assertEqual(_env_encoding(path), expected)
+
+    @unittest.skipUnless(shutil.which("git"), "needs git to list the tracked files")
+    def test_tracked_env_files_are_plain_ascii(self):
+        """Comments in .env files are English, so an ANSI or UTF-8 save gives the same bytes."""
+        listing = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True).stdout
+        names = [name for name in listing.decode("utf-8").split("\0") if name and Path(name).name.startswith(".env")]
+        self.assertIn(".env.sample", names)
+        for name in names:
+            with self.subTest(file=name):
+                self.assertTrue((ROOT / name).read_bytes().isascii(), "write .env comments in English (ASCII only)")
 
 
 if __name__ == "__main__":
