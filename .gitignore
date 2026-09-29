@@ -73,7 +73,6 @@ instance/
 .scrapy
 
 # Sphinx documentation
-dev/docs/_build/
 
 # PyBuilder
 .pybuilder/
@@ -181,8 +180,6 @@ pyrightconfig.json
 .DS_Store
 
 # Local originals and credentials (merged from the context repository)
-/private/
-/source_archives/
 .env.*
 !.env.sample
 !.env.example
@@ -192,14 +189,10 @@ node_modules/
 ~$*
 
 
-dev/study_materials/
-infra/langfuse/docker-compose.override.yml
-infra/
 
 # 교안 노트북 실습이 실행 중 만드는 파일
 course/Chapter01/notebooks/app.py
 course/Chapter01/notebooks/test.py
-dev/work/
 # Chapter02 노트북이 %%writefile로 만드는 서버 파일·하네스 작업 폴더
 course/Chapter02/notebooks/*.py
 course/Chapter02/notebooks/harness/

@@ -1,7 +1,7 @@
 """교안 노트북에서 쓰는 HTML 위젯 모음.
 
 모든 함수는 IPython.display.HTML을 돌려준다. 코드 셀의 마지막 줄에 두면 출력 영역에 그려진다.
-규칙은 dev/AGENTS.md(노트북 제작 규칙)를 따른다: 외부 CDN 없음, 이미지·스크립트는 HTML 안에 넣음, 위젯마다 고유 id.
+지키는 것: 외부 CDN 없음, 이미지·스크립트는 HTML 안에 넣음, 위젯마다 고유 id.
 
     show_slides      원본 PDF에서 원하는 쪽만 뷰어로 보기 (PDF.js, 글자 선택 가능)
     slide_setup      PDF.js를 화면에 불러오기 (노트북 맨 위 준비 셀)
