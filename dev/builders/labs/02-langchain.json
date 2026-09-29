@@ -137,7 +137,7 @@
     {
      "line": "answer = chain.invoke({\"topic\": \"LLM\"})",
      "todo": "주제를 바꿔 봅니다",
-     "explain": "먼저 그대로 실행해 세 가지 실행 결과를 봅니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 `\"LLM\"`을 다른 주제(예: `\"벡터 데이터베이스\"`)로 바꿔 다시 실행합니다. 이 셀은 모델을 네 번 호출하므로 조금 기다립니다."
+     "explain": "먼저 그대로 실행해 세 가지 실행 결과를 봅니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 `\"LLM\"`을 다른 주제(예: `\"벡터 데이터베이스\"`)로 바꿔 다시 실행합니다. 아래 코드 셀은 모델을 네 번 호출하므로 조금 기다립니다.\n\n2.4 이후에 아래 코드 셀을 다시 실행하려면 2.1 셀부터 다시 실행합니다(2.4·2.5가 `chain`을 바꿉니다)."
     },
     {
      "line": "answers = runnable.invoke({\"country\": \"베트남\"})",
@@ -305,7 +305,7 @@
      "데이터에 없는 도시로 바꾸면 \"날씨 데이터를 찾을 수 없습니다\"라는 도구 결과를 바탕으로 답한다"
     ]
    },
-   "look": "**볼 지점**\n- 호출 정보 줄의 `name`은 모델이 고른 도구, `args`는 모델이 채운 인자, `id`는 호출 번호입니다. 모델은 도구를 실행하지 않고 이 정보만 돌려줍니다.\n- 도구를 실행한 것은 `run_with_tools()` 안의 코드입니다. 실행 결과는 `ToolMessage`로 대화에 들어가고, 모델이 그것을 읽고 최종 답을 만듭니다.\n- 복합 질문(서울과 부산)에서는 호출 정보 줄이 두 번 나올 수 있습니다. 모델이 도구를 두 번 고른 것입니다.",
+   "look": "**볼 지점**\n- 호출 정보 줄의 `name`은 모델이 고른 도구, `args`는 모델이 채운 인자, `id`는 호출 번호입니다. 모델은 도구를 실행하지 않고 이 정보만 돌려줍니다. 도구 이름과 인자를 `tool`·`arguments`라고 적는 자료도 있습니다. 이름만 다르고 담긴 정보는 같습니다.\n- 도구를 실행한 것은 `run_with_tools()` 안의 코드입니다. 실행 결과는 `ToolMessage`로 대화에 들어가고, 모델이 그것을 읽고 최종 답을 만듭니다.\n- 복합 질문(서울과 부산)에서는 호출 정보 줄이 두 번 나올 수 있습니다. 모델이 도구를 두 번 고른 것입니다.",
    "look__meta": "- 사내 게이트웨이에서 tool calling(`bind_tools`)이 동작하는지 미확인입니다. 안 되면 성공 기준과 정답 보기만 읽고 넘어갑니다.\n- 슬라이드 JSON(`tool`/`arguments`)과 호출 정보(`name`/`args`/`id`)의 이름이 다릅니다. 슬라이드를 가리키며 대응을 짚어 줍니다.\n- `calculate`는 `eval`을 씁니다(builtins 비움). 수업용 가짜 도구입니다. 물으면 \"실서비스에서는 쓰지 않는다\"고만 답합니다.\n- LangGraph의 `ToolNode`가 이 루프를 자동화합니다(2일차 `src/raw/Chapter01/04-langgraph/03_tool_node.py`)."
   },
   {
@@ -371,7 +371,7 @@
      "blank": {
       "start": "parser = PydanticOutputParser(pydantic_object=MovieReview)"
      },
-     "explain": "`PydanticOutputParser`에 4.1의 `MovieReview`를 알려 주면, 모델의 글 답을 `MovieReview`로 바꾸는 파서가 됩니다.",
+     "explain": "`PydanticOutputParser`에 4.1의 `MovieReview`를 알려 주면, 모델의 글 답을 `MovieReview`로 바꾸는 파서가 됩니다.\n\n4.2의 코드 셀은 빈칸이 세 곳입니다. 세 곳을 모두 채운 뒤 한 번 실행합니다.",
      "hint": "`MovieReview` 스키마를 쓰는 `PydanticOutputParser`를 `parser` 변수에 만드는 한 줄을 달라고 합니다.",
      "checks": [
       "빈칸 자리에 `parser = …` 한 줄이 들어갔다"
@@ -407,6 +407,7 @@
       "평점이 숫자로, 추천이 ✓ 또는 ✗로 출력된다"
      ],
      "fail": [
+      "`NameError: name 'chain1'`이 난다 → 세 번째 빈칸까지 채웠는지 확인합니다",
       "`has no attribute 'title'` 오류가 난다 → 체인 끝에 `parser`가 있는지 확인합니다"
      ]
     }
@@ -546,7 +547,7 @@
    "name": "05_memory_langgraph.py",
    "source": "solution",
    "title": "상태 안에 담는 메모리",
-   "intro": "같은 일을 LangGraph로 합니다. 대화 기록을 그래프의 State(그래프가 들고 다니는 정보 묶음) 안 `messages`에 두고, `MemorySaver`(스레드별 State를 저장해 두는 장치)가 스레드(대화방)별로 저장합니다.\n\nLangGraph는 2일차에 자세히 배우므로 이 장은 모두 예제입니다. 완성된 코드를 실행하고 5장과 비교합니다. 6.1의 `chatbot` 노드는 system 메시지와 State의 `messages`를 함께 모델에 보내고 답을 `messages`에 더합니다. 6.2는 그 노드 하나를 시작(START)과 끝(END) 사이에 두고 `MemorySaver`와 함께 그래프를 만듭니다.\n\n**왜 배우나:** Agent를 만들 때는 대화 기록뿐 아니라 도구 결과, 분기 같은 흐름도 함께 관리해야 합니다. State 안에 기록을 두면 이것들을 한곳에서 다룰 수 있습니다.",
+   "intro": "같은 일을 LangGraph로 합니다. 대화 기록을 그래프의 State(그래프가 들고 다니는 정보 묶음) 안 `messages`에 두고, `MemorySaver`(스레드별 State를 저장해 두는 장치)가 스레드(대화방)별로 저장합니다. 5장과 이 장은 모두 대화를 그대로 쌓아 다시 넣는 Buffer 방식입니다. 다른 점은 기록을 두는 곳입니다.\n\nLangGraph는 2일차에 자세히 배우므로 이 장은 모두 예제입니다. 완성된 코드를 실행하고 5장과 비교합니다. 6.1의 `chatbot` 노드는 system 메시지와 State의 `messages`를 함께 모델에 보내고 답을 `messages`에 더합니다. 6.2는 그 노드 하나를 시작(START)과 끝(END) 사이에 두고 `MemorySaver`와 함께 그래프를 만듭니다.\n\n**왜 배우나:** Agent를 만들 때는 대화 기록뿐 아니라 도구 결과, 분기 같은 흐름도 함께 관리해야 합니다. State 안에 기록을 두면 이것들을 한곳에서 다룰 수 있습니다.",
    "intro__meta": "- 원본: `src/solution/Chapter01/02-langchain/05_memory_langgraph.py`(raw는 TODO 3곳이 빈 상태: `return {'messages': []}`, `checkpointer = None`, `app = None`). LangGraph는 2-1에서 배우므로 예제로 실행만 합니다(목차 결정). 노트북에서만 손본 것: 끝의 ASCII 비교 표를 빼고 장 끝 \"볼 지점\"의 표로 옮김, docstring의 실행 경로 삭제.\n- 같은 커널에서 6.3을 다시 실행하면 스레드 A 기록이 계속 쌓입니다. 처음 상태로 보려면 6.2부터 다시 실행합니다(`MemorySaver`를 새로 만듦).",
    "setup_note": "준비 코드입니다. LangGraph 도구와 메시지 종류를 불러오고 모델을 준비합니다. 이 셀도 실행을 잊지 않습니다.",
    "patch": [

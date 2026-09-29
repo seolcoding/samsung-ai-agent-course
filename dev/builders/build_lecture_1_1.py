@@ -53,7 +53,7 @@ def build():
     slides(3, 4)
     v("p4")
     nb.quiz_file("q_ai", [{
-        "question": "AI, 머신러닝, 딥러닝(LLM)의 관계로 맞는 것은?",
+        "question": "AI, 머신러닝, 딥러닝의 관계로 맞는 것은?",
         "type": "multiple_choice",
         "answers": [
             {"answer": "셋은 서로 관계없는 별개의 분야다", "correct": False,

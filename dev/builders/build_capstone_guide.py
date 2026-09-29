@@ -196,15 +196,16 @@ SERVER = f"""VS Code 메뉴 **터미널 → 새 터미널**로 터미널을 엽�
 이 터미널은 끝날 때까지 닫지 않습니다. 서버 파일은 고치지 않으니 한 번 켜 두면 됩니다. 다 쓴 뒤에는 **Ctrl+C**로 끕니다."""
 
 SERVER_OK = criteria(
-    ["터미널 A에 `Uvicorn running on`으로 시작하는 줄이 나오고, 명령이 끝나지 않고 기다립니다."],
-    ["`address already in use` 오류가 납니다 → 8001 포트를 다른 서버(3일차 A2A 서버 등)가 쓰고 있습니다. 그 서버를 띄운 터미널에서 **Ctrl+C**로 끄고 다시 실행합니다.",
+    ["터미널 A에 `Uvicorn running on`과 `127.0.0.1:8001`이 든 줄이 나오고, 명령이 끝나지 않고 기다립니다."],
+    ["`error while attempting to bind on address`가 든 `ERROR:` 줄이 나오고 명령이 끝납니다(맥은 `address already in use`, Windows는 `[Errno 10048]`) → 8001 포트를 다른 서버(3일차 A2A 서버, 앞서 켠 캡스톤 서버 등)가 쓰고 있습니다. 그 서버를 띄운 터미널에서 **Ctrl+C**로 끄고 다시 실행합니다. 이때도 위쪽에 `Starting MCP server` 줄은 나오니, 마지막 줄로 판단합니다.",
      "환경 점검 셀에서 Langfuse가 ⛔입니다 → `.env`의 Langfuse 값 세 개를 확인합니다. 그대로 진행해도 보고서와 점수는 나오지만 Langfuse에 기록되지 않습니다."])
 
-STEPS_NOTE = """`capstone/starter.py`의 `TODO` 12개를 일곱 단계(6.1~6.7)로 묶었습니다. 6.1~6.5는 코드만 고치고, 실행 확인은 6.6까지 마친 뒤 7장에서 한 번에 합니다. 각 단계의 🟢/⛔는 그때 볼 화면입니다.
+STEPS_NOTE = """`capstone/starter.py`의 `TODO` 12개를 일곱 단계(6.1~6.7)로 묶었습니다. 6.1~6.7을 모두 채운 뒤 7장에서 한 번에 실행해 확인합니다. 각 단계의 🟢/⛔는 그때 볼 화면입니다.
 
-- 중간에 실행하면 6.5를 채우기 전에는 `Graph must have an entrypoint` 오류로 멈추고, 6.5까지 채웠으면 `MCP 도구 로드: [...]` 한 줄만 나오고 끝납니다. 아직 채우지 않은 단계 때문이니 정상입니다.
+- 중간에 실행하면 6.5를 채우기 전에는 `Graph must have an entrypoint` 오류로 멈추고, 6.5까지 채웠으면 `MCP 도구 로드: [...]` 한 줄만 나오고 끝납니다. 6.6까지 채웠으면 보고서까지 나오고 점수는 나오지 않습니다. 아직 채우지 않은 단계 때문이니 정상입니다.
 - 🟢에 적힌 `🔍 Researcher 실행 중...` 같은 출력 문구는 정답 코드가 출력하는 문구입니다. 내 코드의 문구가 달라도 같은 뜻의 줄이 나오면 통과입니다.
 - "정답 보기"의 코드는 `capstone/starter.py`에서 그 코드가 들어갈 자리와 같은 들여쓰기로 보여 줍니다. 옮겨 붙일 때는 바꿀 줄 전체(줄 앞 공백까지)를 지우고 그 자리에 붙여 넣습니다.
+- 정답 보기에 함수나 클래스가 통째로 있으면 `capstone/starter.py`에 있던 같은 이름의 빈 함수·클래스도 지웁니다. 같은 이름이 두 번 있으면 뒤에 있는 것이 앞의 것을 덮어씁니다.
 
 단계를 마칠 때마다 AI가 고친 부분을 직접 읽어 봅니다. 모르는 줄이 있으면 그 줄이 무엇을 하는지 AI에게 물어봅니다."""
 
@@ -262,8 +263,10 @@ def build():
     nb.h(2, "5. 준비: MCP 서버 켜기")
     nb.md(SERVER)
     nb.md(SERVER_OK)
-    nb.meta("- 서버 시작 문구(사외 확인): FastMCP 배너 → `Starting MCP server 'capstone-filesystem' with transport 'sse' on …:8001/sse` → `Application startup complete.` → `Uvicorn running on …:8001 (Press CTRL+C to quit)`.\n"
-            "- 3-3 A2A 서버(`01_a2a_server.py`)도 8001을 씁니다. 포트는 그대로 두고 앞 서버를 끄도록 안내합니다(사용자 결정 6). `address already in use` 문구는 uvicorn 표준 문구이며 이번 제작에서 직접 재현하지는 않았습니다.")
+    nb.meta("- 서버 시작 문구(사외 확인): FastMCP 배너 → `Starting MCP server 'capstone-filesystem' with transport 'sse' on …:8001/sse` → `Application startup complete.` → `Uvicorn running on http://127.0.0.1:8001 (Press CTRL+C to quit)`.\n"
+            "- 2026-09-29 리뷰: `read_doc`이 `data/` 밖(`../`·절대 경로)을 읽지 못하게 막고, 바인딩을 `0.0.0.0` → `127.0.0.1`로 바꿨습니다(같은 망의 다른 PC가 수강생 키 파일을 읽을 수 있었음). 원본 `code/solution/06-capstone/mcp_server.py`는 그대로입니다. 맥에서 두 번째 서버는 `[Errno 48] error while attempting to bind on address ('127.0.0.1', 8001): [errno 48] address already in use`로 끝나고, 이때도 `Starting MCP server` 줄은 먼저 나왔습니다. Windows `[Errno 10048]` 문구는 재현하지 않았습니다.\n"
+            "- 맥에서는 `0.0.0.0:8001`(A2A 서버처럼)을 다른 프로세스가 잡고 있어도 캡스톤 서버가 `127.0.0.1:8001`에 떴습니다(주소가 더 구체적이라 함께 바인딩됨). Windows 동작은 미확인입니다.\n"
+            "- 3-3 A2A 서버(`01_a2a_server.py`)도 8001을 씁니다. 포트는 그대로 두고 앞 서버를 끄도록 안내합니다(사용자 결정 6). 포트 충돌 문구는 위 항목 참고.")
 
     nb.h(2, "6. 단계별 체크리스트")
     nb.md(STEPS_NOTE)
@@ -271,7 +274,8 @@ def build():
     # 6.1 도구
     nb.h(3, "6.1 도구 만들기")
     nb.md("**할 일** `capstone/starter.py`의 `# TODO: 사용할 도구를 정의` 아래 `search_web`과, `rag_search` 안의 TODO를 채웁니다. "
-          "`search_web`은 실제 검색 대신 정해 둔 검색 결과 몇 줄을 돌려주는 흉내 도구면 충분합니다. `rag_search`는 RAGaaS의 `retrieve-rrf`로 문서를 찾아 본문을 돌려줍니다.\n\n"
+          "`search_web`은 실제 검색 대신 정해 둔 검색 결과 몇 줄을 돌려주는 흉내 도구면 충분합니다. `rag_search`는 RAGaaS의 `retrieve-rrf`로 문서를 찾아 본문을 돌려줍니다. "
+          "정답 보기를 옮겨 붙일 때는 `@tool` 줄부터 `rag_search`의 TODO 주석 끝까지를 통째로 바꿉니다.\n\n"
           "RAGaaS 요청 값(AI에게 그대로 알려 줍니다): `index_name`(인덱스 이름, `.env`의 `index_name` 값), `permission_groups`(`[\"rag-public\"]`), "
           "`query_text`(검색어), `num_result_doc`(결과 개수, 예: 3), `fields_exclude`(`[\"v_merge_title_content\"]`). "
           "요청은 `config.ragaas`의 `post_ragaas(\"retrieve-rrf\", payload)`로 보내고, 본문은 응답 JSON의 `hits` → `hits` 목록 → `_source` → `merge_title_content`에 있습니다.")
@@ -281,7 +285,7 @@ def build():
     nb.md(criteria(
         ["7장 실행 뒤 Langfuse에서 먼저 생긴 `LangGraph` trace(Researcher 실행, 7.1 표)를 열면 `rag_search` 도구 결과가 보입니다. 사내망 밖에서는 `[MOCK RAGaaS] 질문: …`으로 시작하는 문장, 사내망에서는 실제 문서 본문입니다.",
          "같은 trace의 마지막 출력(리서치 결과) 맨 아래 `### 출처`에 `rag_search`와 `search_web`이 보입니다. 정답 코드는 터미널에 리서치 결과의 앞 500자만 보여 줍니다."],
-        ["도구 결과가 `None`입니다 → 함수 끝에 `return`이 있는지 봅니다.",
+        ["도구 결과가 `null`입니다 → 함수 끝에 `return`이 있는지, 뒤에 같은 이름의 빈 함수가 남아 있지 않은지 봅니다.",
          "`KeyError: 'hits'`가 납니다 → 응답에서 본문을 꺼내는 순서를 AI와 다시 확인합니다.",
          "사내망에서 인증 오류(401)가 납니다 → 저장소 맨 위에서 `uv run python -m config.check`로 RAGaaS 키 이름을 확인합니다."]))
     nb.md(answer(between(L, "@tool", "# ── State")))
@@ -319,14 +323,16 @@ def build():
 
     # 6.4 nodes
     nb.h(3, "6.4 노드 만들기")
-    nb.md("**할 일** `# TODO: Supervisor 노드 정의`, `# TODO: Researcher 노드 정의`, `# TODO: Writer 노드 정의` 아래 세 함수의 `pass`를 채웁니다.")
+    nb.md("**할 일** `# TODO: Supervisor 노드 정의`, `# TODO: Researcher 노드 정의`, `# TODO: Writer 노드 정의` 아래 세 함수의 `pass`를 채웁니다. "
+          "정답 보기를 옮겨 붙일 때는 `supervisor_llm` 줄부터 `writer_node`의 `pass`까지를 통째로 바꿉니다.")
     nb.md("**프롬프트 힌트** Supervisor에게 지금 상황(주제, 리서치 완료 여부, 초안 완료 여부)을 알려 주고, 세 선택지(researcher, writer, END)를 언제 고르는지 먼저 정리해 AI에게 줍니다. "
           "Researcher·Writer 노드는 Agent 실행 결과의 마지막 메시지를 State의 어느 값에 넣는지 말합니다. "
           "두 노드는 비동기(`async`)이고 Langfuse 추적 설정을 함께 넘기며, 시작할 때 `🔍 Researcher 실행 중...`·`✍️  Writer 실행 중...`을 출력한다고 덧붙입니다.")
     nb.md(criteria(["7장 실행에서 `🔍 Researcher 실행 중...`과 `✍️  Writer 실행 중...`이 한 번씩만 나옵니다."],
                    ["같은 Agent가 되풀이해 실행됩니다 → 터미널 B에서 **Ctrl+C**로 멈춥니다. Supervisor가 받는 상황 글에 리서치·초안 완료 여부가 들어 있는지, "
                     "두 노드가 결과를 State 값으로 돌려주는지(정답은 `return {'research_result': …}`·`return {'draft': …}`) 봅니다.",
-                    "Writer가 리서치 결과 없이 글을 씁니다 → Writer 노드가 State의 리서치 결과를 지시에 넣는지 봅니다."]))
+                    "Writer가 리서치 결과 없이 글을 씁니다 → Writer 노드가 State의 리서치 결과를 지시에 넣는지 봅니다.",
+                    "`KeyError: ''`가 납니다 → Supervisor 노드가 다음 차례를 돌려주지 않은 것입니다. `pass`만 있는 같은 이름의 빈 함수가 뒤에 남아 있지 않은지 봅니다."]))
     nb.md(answer(between(L, "supervisor_llm = get_llm()", "def route(")))
 
     # 6.5 graph + approval
@@ -334,7 +340,7 @@ def build():
     nb.md("**할 일** `# TODO: 그래프 조립` 아래에 노드 사이 연결을 넣고, 바로 아래 `app = builder.compile()`에 Writer 앞에서 멈추는 설정을 더합니다.")
     nb.md("**프롬프트 힌트** 노드 사이 연결(시작 → Supervisor, Supervisor의 세 갈래, 각 Agent 뒤 Supervisor로 복귀)을 그림처럼 말로 적어 AI에게 줍니다. "
           "Writer 실행 전에 멈춰야 한다는 조건과, 멈춘 상태를 기억할 장치가 필요하다는 점을 함께 말합니다.")
-    nb.md(criteria(["7장 실행에서 리서치 결과가 나온 뒤 `보고서 작성을 시작할까요? (y/n):`에서 멈춥니다(6.6까지 채운 뒤)."],
+    nb.md(criteria(["7장 실행에서 리서치 결과가 나온 뒤 `보고서 작성을 시작할까요? (y/n):`에서 멈춥니다."],
                    ["멈추지 않고 곧장 Writer까지 갑니다 → `compile()`에 체크포인터와 Writer 앞 중단 설정이 있는지 봅니다.",
                     "`KeyError: 'END'` 같은 갈림길 오류가 납니다 → Supervisor의 세 선택지가 모두 연결되어 있는지 봅니다."]))
     nb.md(answer(between(L, "builder.add_edge(START", "config = {'configurable'")))
@@ -346,10 +352,11 @@ def build():
           "재개할 때는 같은 `thread_id`로, 새 입력 없이 이어서 실행한다고 말합니다. "
           "`n`이면 안내 문구를 출력하고 끝낸다고 덧붙입니다.")
     nb.md(criteria(["`y`를 입력하면 `--- 2단계: 보고서 작성 ---` 뒤에 `[SDS-AI-RPT v2.1]`로 시작하는 보고서가 나옵니다. TL;DR이 세 줄(①②③)이고 현황 분석에 표가 있습니다.",
-                    "`n`을 입력하면 `취소됐습니다.`가 나오고 끝납니다."],
+                    "`n`을 입력하면 `취소됐습니다.`가 나오고 끝납니다. 한 번 실행에서는 한쪽만 볼 수 있으니, 다른 쪽은 한 번 더 실행해 확인합니다."],
                    ["승인한 뒤 아무것도 나오지 않습니다 → 재개할 때 같은 `thread_id`와 빈 입력(`None`)으로 실행하는지 봅니다. Writer 노드가 `draft`를 돌려주는지도 봅니다.",
                     "`No synchronous function provided` 오류가 납니다 → 노드가 비동기라 `invoke` 대신 `ainvoke`로 실행합니다.",
-                    "보고서가 `[SDS-AI-RPT v2.1]` 양식이 아닙니다 → 6.3의 Writer skill 경로를 봅니다."]))
+                    "보고서가 `[SDS-AI-RPT v2.1]` 양식이 아닙니다 → 6.3의 Writer skill 경로를 봅니다.",
+                    "`y`를 넣었는데 `취소됐습니다.`가 나옵니다 → 한글 입력 상태라 `ㅛ`가 들어갔거나, `yes`나 빈 Enter를 넣은 것입니다. 정답 코드는 `y` 한 글자만 승인으로 봅니다. 영문 입력으로 바꾸고 다시 실행합니다."]))
     nb.md(answer(between(L, "# ── 1단계", "# ── 3단계")))
 
     # 6.7 evaluation
@@ -375,10 +382,10 @@ def build():
 
 1. `MCP 도구 로드: [...]`가 나오고 `🔍 Researcher 실행 중...`으로 리서치가 시작됩니다.
 2. 리서치 결과(앞부분)가 나온 뒤 `보고서 작성을 시작할까요? (y/n):`에서 멈춥니다. 결과를 읽어 봅니다.
-3. `y`를 입력하고 Enter를 누르면 보고서 작성과 평가가 이어집니다. `n`이면 여기서 끝납니다.
+3. 영문 입력 상태에서 `y`를 입력하고 Enter를 누르면 보고서 작성과 평가가 이어집니다. `n`이면 여기서 끝납니다. 한글 입력 상태의 `ㅛ`나 빈 Enter도 취소로 처리됩니다.
 4. 보고서와 네 항목 점수, `종합 점수`가 나오면 끝입니다. 한 번 실행에 1분 안팎이 걸립니다.
 
-코드를 고친 뒤에는 터미널 B에서 같은 명령으로 다시 실행합니다. 터미널 A의 서버는 다시 켤 필요가 없습니다.""")
+프로그램이 끝나면 멈춰 둔 상태도 사라집니다. `y`와 `n`의 결과를 둘 다 보려면 한 번 더 실행합니다. 코드를 고친 뒤에도 터미널 B에서 같은 명령으로 다시 실행합니다. 터미널 A의 서버는 다시 켤 필요가 없습니다.""")
     nb.h(3, "7.1 Langfuse에서 내 실행 찾기")
     nb.md("""Langfuse 대시보드의 Traces 목록은 최근 실행이 위에 옵니다. 방금 실행한 시각의 trace 세 개를 찾습니다.
 
@@ -389,7 +396,7 @@ def build():
 | `RunnableSequence` | LLM Judge 채점 | **Scores**에 relevance·faithfulness·completeness·clarity 네 점수 |
 
 같은 Langfuse 프로젝트를 여럿이 함께 쓰면 다른 사람의 trace도 섞여 보입니다. 실행한 시각으로 내 것을 고릅니다.""")
-    nb.md(criteria(["방금 실행한 시각에 위 세 trace가 있고, 채점 trace에 점수 네 개가 붙어 있습니다."],
+    nb.md(criteria(["`y`로 끝까지 실행한 뒤, 방금 실행한 시각에 위 세 trace가 있고 채점 trace에 점수 네 개가 붙어 있습니다."],
                    ["trace가 하나도 없습니다 → 환경 점검 셀의 Langfuse 결과를 다시 봅니다. ⛔이면 `.env`의 Langfuse 값을 고치고 7장을 다시 실행합니다."]))
     nb.meta("- trace 이름은 2026-09-28 사외 실행으로 확인했습니다(Researcher·Writer: `LangGraph`, Judge: `RunnableSequence`). 원본 코드는 trace 이름·태그를 붙이지 않으므로 시각으로 찾습니다. Supervisor 호출은 추적 설정이 없어 trace가 없습니다.\n"
             "- 채점 trace에 score 네 개가 보이는지는 Langfuse 조회 API 제한으로 자동 확인하지 못했습니다(미확인). 수업 전에 대시보드에서 직접 확인합니다.\n"
@@ -414,7 +421,7 @@ def build():
     # 정답 코드 셀: 보이게 둔다(출력 문구에 ✍️가 있어, 숨기면 QC가 "빈칸 셀이 숨겨짐"으로 본다)
     nb.code("%%writefile ../capstone/solution.py\n" + sol.rstrip("\n"), visible=True, kind="")
     nb.md(criteria(["정답 실행에서도 `[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수가 나옵니다. 내 점수의 근거와 정답 점수의 근거를 비교해 차이 한 가지를 말할 수 있습니다."],
-                   ["`address already in use` 또는 연결 오류가 납니다 → 5장의 서버 안내를 다시 봅니다."]))
+                   ["`error while attempting to bind on address` 또는 연결 오류가 납니다 → 5장의 서버 안내를 다시 봅니다."]))
     nb.meta("- 정답 코드 셀은 원본 정답에 두 곳만 바꿨습니다(실행 명령 설명, Writer skill 경로). 사외 실행 종합 점수 0.90(원본 skill 경로), 0.93(바꾼 경로).\n"
             "- `capstone/solution.py`는 `.gitignore` 대상이라 제작 저장소에 남지 않습니다.")
 
@@ -431,7 +438,7 @@ def build():
 
 **일찍 끝났다면(선택):** 터미널의 `y/n` 승인을 Streamlit 화면의 버튼으로 바꿔 봅니다. 또는 2장의 B(자유 주제)로 바꿔 한 번 더 실행합니다.
 
-다 쓴 뒤에는 터미널 A와 B에서 **Ctrl+C**로 실행을 멈춥니다.""")
+다 쓴 뒤에는 터미널 A에서 **Ctrl+C**로 MCP 서버를 끕니다. 터미널 B의 프로그램은 점수를 출력하면 저절로 끝납니다.""")
     nb.meta("- 사용자 결정 4: 배점은 슬라이드의 Judge 평가 4항목 + 체크리스트만. 받은 zip README의 배점 표(Supervisor 30 / HITL 25 / MCP 20 / Streamlit UI 15 / skills 10)는 흐름이 현재 슬라이드·코드와 달라 옮기지 않았습니다. Streamlit은 조기 완료자 선택 과제.")
     nb.finish(OUT)
 

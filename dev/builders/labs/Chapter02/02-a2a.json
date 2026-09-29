@@ -7,7 +7,7 @@
    "name": "01_a2a_server.py",
    "title": "Researcher Agent를 A2A 서버로 띄우기",
    "intro": "검색 도구를 쓰는 작은 LangGraph Agent(Researcher)를 만들고, 다른 Agent가 요청할 수 있도록 A2A 서버로 감쌉니다. 서버는 노트북 셀에서 돌리지 않고 파일로 쓴 뒤 터미널에서 띄웁니다.\n\n아래 셀은 모두 서버 파일 `a2a_server.py`의 한 부분입니다. 첫 셀이 파일을 새로 쓰고(`%%writefile`), 다음 셀부터는 뒤에 이어 씁니다(`%%writefile -a`). 그래서 **위에서부터 차례로** 실행해야 하고, 한 셀을 고쳤다면 **첫 셀(2.1)부터 다시** 실행해 파일을 새로 씁니다. 서버가 켜져 있으면 Ctrl+C로 끄고 다시 띄워야 고친 내용이 반영됩니다.\n\n셀을 실행하면 파일만 써지고 코드는 아직 실행되지 않습니다. 빈칸을 제대로 채웠는지는 서버를 띄우고 3장의 클라이언트로 요청을 보내야 보입니다.\n\n**왜 배우나:** 안쪽 Agent는 지금까지 만든 LangGraph Agent와 같습니다. 여기에 AgentExecutor, Agent Card, RequestHandler 세 가지를 더하면 다른 Agent가 요청할 수 있는 서버가 됩니다.",
-   "intro__meta": "- 원본: `course/Chapter02/code/raw/02-a2a/01_a2a_server.py`(raw). `%%writefile`로 `course/Chapter02/notebooks/a2a_server.py`를 쓰고 터미널에서 `uv run python course/Chapter02/notebooks/a2a_server.py`로 띄웁니다.\n- 노트북에서만 손본 곳(patch, 원본 파일은 그대로):\n  - docstring의 실행·curl 안내를 뺐습니다(실행 안내는 터미널 안내 셀이 맡습니다).\n  - `search_web` 안에 `print(f\"[search_web] 검색어: {query}\")` 한 줄을 더했습니다. 원본은 도구 호출이 보이지 않아, 조건부 엣지 빈칸을 잘못 채워도 답이 그럴듯하게 나와 조용히 틀립니다(목차 질문 1, 사용자 결정).\n  - protobuf·gRPC 설명 주석 3줄을 한 줄로 줄였고, `# t.Message: protobuf 기반 응답 메시지`를 `A2A 응답 메시지`로 바꿨습니다(목차 질문 3).\n  - 예제로 남긴 TODO 4개(Message 발행, Agent Card, RequestHandler, 라우트)는 같은 내용의 설명 주석으로 바꿨습니다.\n  - Card `description`과 skill `examples` 둘째 항목은 솔루션 문구로 바꿨습니다(슬라이드 p7·p11 문구, 영문 표기).\n- 원본 서버 터미널에는 HTTP 접속 로그(uvicorn)만 나옵니다. `[search_web]` 줄은 patch로 더한 것입니다.",
+   "intro__meta": "- 원본: `course/Chapter02/code/raw/02-a2a/01_a2a_server.py`(raw). `%%writefile`로 `course/Chapter02/notebooks/a2a_server.py`를 쓰고 터미널에서 `uv run python course/Chapter02/notebooks/a2a_server.py`로 띄웁니다.\n- 노트북에서만 손본 곳(patch, 원본 파일은 그대로):\n  - docstring의 실행·curl 안내를 뺐습니다(실행 안내는 터미널 안내 셀이 맡습니다).\n  - `search_web` 안에 `print(f\"[search_web] 검색어: {query}\")` 한 줄을 더했습니다. 원본은 도구 호출이 보이지 않아, 조건부 엣지 빈칸을 잘못 채워도 답이 그럴듯하게 나와 조용히 틀립니다(목차 질문 1, 사용자 결정).\n  - protobuf·gRPC 설명 주석 3줄을 한 줄로 줄였고, `# t.Message: protobuf 기반 응답 메시지`를 `A2A 응답 메시지`로 바꿨습니다(목차 질문 3).\n  - 예제로 남긴 TODO 4개(Message 발행, Agent Card, RequestHandler, 라우트)는 같은 내용의 설명 주석으로 바꿨습니다.\n  - Card `description`과 skill `examples` 둘째 항목은 솔루션 문구로 바꿨습니다(슬라이드 p7·p11 문구, 영문 표기).\n  - `uvicorn.run`의 host를 `0.0.0.0`에서 `127.0.0.1`로 바꿨습니다(2026-09-29 리뷰). 클라이언트는 `127.0.0.1`로 접속하므로 충분하고, `0.0.0.0`이면 Windows 방화벽 허용 창이 뜨고 같은 망의 다른 PC가 수강생 서버(수강생 키로 모델 호출)에 접속할 수 있습니다. Agent Card의 `supported_interfaces` url(`http://localhost:8001`)은 원본대로 두었습니다. 노트북 클라이언트는 `RESEARCHER_URL`로 카드 조회·전송 주소를 직접 정해 이 값을 접속에 쓰지 않습니다.\n- 원본 서버 터미널에는 HTTP 접속 로그(uvicorn)만 나옵니다. `[search_web]` 줄은 patch로 더한 것입니다.",
    "writefile": "a2a_server.py",
    "run": "terminal",
    "patch": [
@@ -73,6 +73,13 @@
      "lines": [
       "# Agent Card 조회 라우트와 JSON-RPC 라우트를 만든다"
      ]
+    },
+    {
+     "find": "uvicorn.run(app, host=\"0.0.0.0\", port=8001)",
+     "lines": [
+      "    # 127.0.0.1: 이 PC에서 오는 요청만 받는다. 0.0.0.0이면 다른 PC의 요청도 받는다.",
+      "    uvicorn.run(app, host=\"127.0.0.1\", port=8001)"
+     ]
     }
    ],
    "split": [
@@ -122,7 +129,8 @@
      ],
      "fail": [
       "셀을 실행하자마자 `NameError`가 나고 `Appending…`이 안 보인다 → AI가 돌려준 코드에 맨 윗줄 `%%writefile -a a2a_server.py`가 빠졌습니다. 이 줄을 맨 위에 되살리고 2.1 셀부터 차례로 다시 실행합니다",
-      "서버를 띄우자마자 터미널에 `NameError: name 'tool_node' is not defined`(또는 `llm`)가 나오고 끝난다 → 빈칸이 남았거나 이름이 다릅니다"
+      "서버를 띄우자마자 터미널에 `NameError: name 'tool_node' is not defined`가 나오고 끝난다 → 빈칸이 남았거나 이름이 다릅니다. 고친 뒤 2.1 셀부터 차례로 다시 실행하고 서버를 다시 띄웁니다",
+      "3장에서 위임할 때 서버 터미널에 `name 'llm' is not defined`가 나온다 → 모델을 `llm`이라는 이름에 담았는지 봅니다. 고친 뒤 2.1 셀부터 차례로 다시 실행하고, 서버를 Ctrl+C로 끈 뒤 다시 띄우고, 3.3 위임 셀을 다시 실행합니다"
      ]
     },
     {
@@ -150,12 +158,12 @@
      "hint": "이 셀을 붙여 넣고, 위 설명의 두 가지 흐름을 엣지로 연결해 달라고 합니다. 갈림길에는 LangGraph가 제공하는 `tools_condition`을 쓰고 노드 이름은 바꾸지 말라고 적습니다.",
      "checks": [
       "셀 아래에 `Appending to a2a_server.py` 한 줄이 출력되었다",
-      "3장에서 위임했을 때 서버 터미널에 `[search_web] 검색어: …` 줄이 나오고, 리서치 결과 글이 나온다"
+      "3장에서 위임했을 때 서버 터미널에 `[search_web] 검색어: …` 줄이 나오고, 리서치 결과 글이 나온다(모델이 검색 없이 답하면 안 나올 수 있으니 한두 번 더 위임해 봅니다)"
      ],
      "fail": [
       "셀을 실행하자마자 `NameError`가 나고 `Appending…`이 안 보인다 → AI가 돌려준 코드에 맨 윗줄 `%%writefile -a a2a_server.py`가 빠졌습니다. 이 줄을 맨 위에 되살리고 2.1 셀부터 차례로 다시 실행합니다",
       "`리서치 결과:` 아래가 비어 있다 → 모델이 도구 호출을 요청했는데 tools로 가지 못하고 끝났습니다",
-      "두세 번 위임해도 서버 터미널에 `[search_web]` 줄이 한 번도 나오지 않는다 → 도구를 거치지 않습니다. 조건부 엣지를 다시 봅니다"
+      "세 번 위임해도 서버 터미널에 `[search_web]` 줄이 한 번도 나오지 않는다 → 이 셀의 엣지를 정답 보기와 비교합니다. 정답과 같은데도 안 나오면 모델이 검색하지 않기로 한 것이니 그대로 진행합니다"
      ]
     },
     {
@@ -169,7 +177,7 @@
       "서버를 띄울 때 오류 없이 켜지고, 3장에서 위임했을 때 리서치 결과 글이 나온다"
      ],
      "fail": [
-      "3장에서 위임하면 오류가 나고 `name 'langgraph_agent' is not defined`가 보인다 → 빈칸이 남았거나 이름이 다릅니다"
+      "3장에서 위임하면 오류가 나고 `name 'langgraph_agent' is not defined`가 보인다 → 빈칸이 남았거나 이름이 다릅니다. 컴파일 줄을 고쳤으면 2.1 셀부터 다시 실행 → 서버 다시 띄우기 → 3.3 위임 셀 다시 실행 순서로 확인합니다"
      ]
     },
     {
@@ -185,12 +193,12 @@
      ],
      "fail": [
       "셀을 실행하자마자 `NameError`가 나고 `Appending…`이 안 보인다 → 함수를 붙여 넣다가 맨 윗줄 `%%writefile -a a2a_server.py`까지 지웠습니다. 되살리고 2.1 셀부터 차례로 다시 실행합니다",
-      "3장에서 위임하면 오류가 나고 `name 'answer' is not defined`가 보인다 → 빈칸이 남았거나 이름이 다릅니다",
+      "3장에서 위임하면 오류가 나고 `name 'answer' is not defined`가 보인다 → 빈칸이 남았거나 이름이 다릅니다. `execute` 안을 고쳤으면 2.1 셀부터 다시 실행하고 서버를 다시 띄운 뒤, 3.3 위임 셀로 확인합니다",
       "`await` 없이 `invoke`로 썼다 → 비동기 함수 안이므로 `ainvoke`와 `await`로 다시 씁니다"
      ]
     }
    ],
-   "look": "**볼 지점**\n- 서버를 띄운 터미널에 먼저 아래 두 줄이 나옵니다. 서버 파일 맨 끝의 `print`가 출력한 것입니다. 그 아래에 서버 프로그램(uvicorn)이 `INFO:`로 시작하는 줄을 이어서 출력하고, 마지막 줄에 `Uvicorn running on`과 `0.0.0.0:8001`이 보입니다(`0.0.0.0`은 이 PC의 모든 주소에서 요청을 기다린다는 뜻입니다).\n\n```\nResearcher A2A 서버 시작: http://localhost:8001\nAgent Card: http://localhost:8001/.well-known/agent-card.json\n```\n\n- 시작 문구 위에 `DeprecationWarning`이 나옵니다. 슬라이드대로 `queue_manager`를 넘기지만, 지금 설치된 버전은 이벤트를 안에서 따로 관리해 이 값을 쓰지 않는다는 안내입니다. 서버 동작에는 영향이 없으니 넘어갑니다.\n- 서버는 요청이 올 때까지 기다리기만 합니다. 모델은 요청이 들어올 때 호출됩니다.\n- 3장에서 요청을 보내면 이 터미널에 `\"POST / HTTP/1.1\" 200 OK`로 끝나는 접속 기록이 나옵니다. 모델이 검색하기로 하면 그 앞에 `[search_web] 검색어: …` 줄도 나옵니다. 검색 여부는 모델이 정하므로 없는 때도 있습니다.\n- 클라이언트에서 오류가 나면 **이 터미널부터** 봅니다. 서버 코드에서 난 오류(Traceback)가 여기에 나옵니다.\n\n**성공 기준**\n\n- 🟢 터미널 마지막 줄에 `Uvicorn running on`과 `0.0.0.0:8001`이 보이고, 명령이 끝나지 않고 기다린다\n- ⛔ `NameError`·`SyntaxError`가 나오고 바로 끝난다 → 빈칸을 확인하고, 2.1 셀부터 차례로 다시 실행한 뒤 다시 띄웁니다\n- ⛔ `address already in use`가 나온다 → 8001 포트를 쓰는 서버가 이미 켜져 있습니다. 앞서 띄운 서버 터미널에서 Ctrl+C로 끄고 다시 띄웁니다",
+   "look": "**볼 지점**\n- 서버를 띄운 터미널에 먼저 아래 두 줄이 나옵니다. 서버 파일 맨 끝의 `print`가 출력한 것입니다. 그 아래에 서버 프로그램(uvicorn)이 `INFO:`로 시작하는 줄을 이어서 출력하고, 마지막 줄에 `Uvicorn running on`과 `127.0.0.1:8001`이 보입니다(`127.0.0.1`은 이 PC에서 오는 요청만 기다린다는 뜻입니다).\n\n```\nResearcher A2A 서버 시작: http://localhost:8001\nAgent Card: http://localhost:8001/.well-known/agent-card.json\n```\n\n- 시작 문구 위에 `DeprecationWarning`이 나옵니다. 슬라이드대로 `queue_manager`를 넘기지만, 지금 설치된 버전은 이벤트를 안에서 따로 관리해 이 값을 쓰지 않는다는 안내입니다. 서버 동작에는 영향이 없으니 넘어갑니다.\n- 서버는 요청이 올 때까지 기다리기만 합니다. 모델은 요청이 들어올 때 호출됩니다.\n- 3장에서 요청을 보내면 이 터미널에 `\"POST / HTTP/1.1\" 200 OK`로 끝나는 접속 기록이 나옵니다. 모델이 검색하기로 하면 그 앞에 `[search_web] 검색어: …` 줄도 나옵니다. 검색 여부는 모델이 정하므로 없는 때도 있습니다.\n- 클라이언트에서 오류가 나면 **이 터미널부터** 봅니다. 서버 코드에서 난 오류(Traceback)가 여기에 나옵니다.\n\n**성공 기준**\n\n- 🟢 터미널 마지막 줄에 `Uvicorn running on`과 `127.0.0.1:8001`이 보이고, 명령이 끝나지 않고 기다린다\n- ⛔ `NameError`·`SyntaxError`가 나오고 바로 끝난다 → 빈칸을 확인하고, 2.1 셀부터 차례로 다시 실행한 뒤 다시 띄웁니다\n- ⛔ `address already in use` 또는 `10048`(Windows)이 나온다 → 8001 포트를 쓰는 서버가 이미 켜져 있습니다. 앞서 띄운 서버 터미널에서 Ctrl+C로 끄고 다시 띄웁니다",
    "look__meta": "- 실측(2026-09-28, 사외 OpenAI): 서버 시작 때 `DeprecationWarning: A queue_manager was passed to DefaultRequestHandlerV2, but it is not used…`가 두 번 나온 뒤 시작 문구 2줄, uvicorn `INFO:` 4줄이 나옵니다. a2a-sdk 1.1.5에서 V2 핸들러가 queue_manager를 쓰지 않아 생기는 경고입니다. 원본 코드·슬라이드 p12가 queue_manager를 넘기므로 그대로 두었습니다.\n- 빈칸을 남긴 채 띄워 본 결과(사외): ① 빈칸 → 시작하자마자 `NameError: name 'tool_node' is not defined`로 종료. ② 빈칸 → 오류 없이 보낸 주제가 그대로 돌아옴(`agent_node`가 None을 돌려 상태가 안 바뀜). ③ 빈칸 → 모델이 검색을 요청하면 빈 문자열이 돌아오고, 안 하면 정상처럼 보임. ④·⑤ 빈칸 → 서버 터미널에 Traceback, 클라이언트는 `InternalError`(메시지 `name '…' is not defined`).\n- 정답 상태에서 위임 6회 중 4회 `search_web`을 호출했습니다(시스템 프롬프트 없음, 검색어는 영어로 만들기도 함). 그래서 `[search_web]` 줄은 \"한두 번 더 위임해 봅니다\"로 적었습니다.\n- 캡스톤 `mcp_server.py`도 8001 포트를 씁니다. 두 서버를 동시에 띄우지 않습니다.",
    "ask": {
     "hint": "`ResearcherExecutor`, `request_handler`, `routes` 셀을 붙여 넣고, 요청 한 건이 들어와 응답이 나갈 때까지 어떤 객체를 어떤 순서로 거치는지 설명해 달라고 합니다. 코드는 고치지 말라고 적습니다.",
@@ -208,7 +216,7 @@
    "name": "02_a2a_client.py",
    "title": "Researcher에게 일을 맡기는 클라이언트",
    "intro": "이제 노트북이 클라이언트가 되어, 터미널에 띄운 Researcher 서버에 A2A로 조사를 맡깁니다. 순서는 슬라이드와 같습니다. Agent Card를 읽고, 그 정보로 Client를 만들고, 요청을 `t.Message`에 담아 보냅니다. 받은 조사 결과로는 이 노트북의 모델(Writer)이 블로그 글을 씁니다.\n\n**이 장을 시작하기 전에 2장의 서버가 터미널에서 켜져 있어야 합니다.**\n\n**왜 배우나:** 조사는 원격 Agent에게 맡기고 글쓰기는 여기서 직접 하는 분업입니다. 맡기는 쪽은 Researcher가 안에서 어떻게 만들어졌는지 몰라도 됩니다.",
-   "intro__meta": "- 원본: `course/Chapter02/code/raw/02-a2a/02_a2a_client.py`(raw). 노트북에서만 손본 곳:\n  - docstring(실행 순서 안내)을 뺐습니다.\n  - `RESEARCHER_URL`을 솔루션 값 `http://127.0.0.1:8001`로 바꿨습니다. 서버는 `0.0.0.0`(IPv4)에 뜨는데 `localhost`가 IPv6(`::1`)로 먼저 풀리는 PC에서는 연결이 늦거나 실패할 수 있습니다(강의장 Windows PC 미확인).\n  - 예제로 남긴 TODO 2개(CardResolver, transport·client)는 바로 위에 같은 뜻의 번호 주석(`# 1. …`, `# 2. …`)이 있어 지웠습니다.\n  - `main()`을 셀 세 개(Agent Card 확인 / 위임 / Writer)로 풀어 top-level `await`로 실행합니다(목차 질문 2, 사용자 결정). `asyncio.run(main())`은 노트북에서 이미 이벤트 루프가 돌고 있어 쓰지 않습니다.\n- 원본 코드에는 Task 조회·완료 처리 코드가 없습니다(커리큘럼 3.3 항목과 다름). 받은 내용을 유지해 더하지 않았습니다.",
+   "intro__meta": "- 원본: `course/Chapter02/code/raw/02-a2a/02_a2a_client.py`(raw). 노트북에서만 손본 곳:\n  - docstring(실행 순서 안내)을 뺐습니다.\n  - `RESEARCHER_URL`을 솔루션 값 `http://127.0.0.1:8001`로 바꿨습니다. 서버는 `127.0.0.1`(IPv4)에 뜨는데 `localhost`가 IPv6(`::1`)로 먼저 풀리는 PC에서는 연결이 늦거나 실패할 수 있습니다(강의장 Windows PC 미확인).\n  - 예제로 남긴 TODO 2개(CardResolver, transport·client)는 바로 위에 같은 뜻의 번호 주석(`# 1. …`, `# 2. …`)이 있어 지웠습니다.\n  - `main()`을 셀 세 개(Agent Card 확인 / 위임 / Writer)로 풀어 top-level `await`로 실행합니다(목차 질문 2, 사용자 결정). `asyncio.run(main())`은 노트북에서 이미 이벤트 루프가 돌고 있어 쓰지 않습니다.\n- 원본 코드에는 Task 조회·완료 처리 코드가 없습니다(커리큘럼 3.3 항목과 다름). 받은 내용을 유지해 더하지 않았습니다.",
    "setup_note": "준비 코드입니다. A2A 클라이언트 도구를 불러오고, Researcher 서버 주소(`RESEARCHER_URL`)를 정합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다.",
    "patch": [
     {
@@ -295,7 +303,7 @@
       "아래 \"Researcher에게 위임\" 셀에서 리서치 결과 글이 나온다"
      ],
      "fail": [
-      "\"Researcher에게 위임\" 셀에서 `NameError: name 'req' is not defined`가 나온다 → 빈칸이 남았거나 이름이 다릅니다",
+      "\"Researcher에게 위임\" 셀에서 `NameError: name 'req' is not defined`가 나온다 → 빈칸이 남았거나 이름이 다릅니다. 고친 뒤 이 셀을 다시 실행하고, 3.3 위임 셀을 다시 실행합니다(서버는 다시 띄우지 않아도 됩니다)",
       "`TextPart`·`MessageSendParams` 같은 이름에서 오류가 난다 → 예전 버전 방식입니다. 서버 코드의 `t.Message`와 같은 모양으로 다시 요청합니다"
      ]
     }
@@ -325,7 +333,7 @@
       "주제를 바꾸면 바꾼 주제에 맞는 글이 나온다"
      ],
      "fail": [
-      "오류가 나거나 `리서치 결과:` 아래가 비어 있다 → 이 셀에서 오류가 났는데 서버 터미널에 새 오류(Traceback)가 없으면 3.1 빈칸을, 그 밖에는 2장 빈칸을 성공 기준과 비교해 고칩니다. 2장을 고쳤으면 2.1 셀부터 차례로 다시 실행하고, 서버를 Ctrl+C로 끈 뒤 다시 띄우고 이 셀을 다시 실행합니다"
+      "오류가 나거나 `리서치 결과:` 아래가 비어 있다 → 이 셀에서 오류가 났는데 서버 터미널에 새 오류(Traceback)가 없으면 3.1 빈칸을, 그 밖에는 2장 빈칸을 성공 기준과 비교해 고칩니다. 2장을 고쳤으면 2.1 셀부터 차례로 다시 실행하고, 서버를 Ctrl+C로 끈 뒤 다시 띄우고 이 셀을 다시 실행합니다. 3.1을 고쳤으면 3.1 셀을 다시 실행한 뒤 이 셀을 다시 실행합니다(서버는 그대로 둡니다)"
      ]
     },
     "Writer가 글 작성": {

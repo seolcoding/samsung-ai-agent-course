@@ -57,14 +57,17 @@
 | 셀이 입력을 기다리며 멈춤 | `input()` 셀 | VS Code 위쪽 입력창에 답을 입력 |
 | 같은 셀을 다시 실행하니 결과가 쌓임(대화 기록, 검색 결과 중복) | 앞 실행의 값이 메모리에 남음 | 커널 다시 시작 후 맨 위부터 실행 |
 | `LangChainDeprecationWarning` 등 경고 | 라이브러리 안내 문구 | 무시해도 된다 |
+| Windows에서 `checkpoints.db`를 지우려는데 "다른 프로세스가 사용 중" | 커널이 그 파일을 열어 두고 있음 | 커널을 다시 시작한 뒤 `checkpoints.db`·`checkpoints.db-wal`·`checkpoints.db-shm` 세 파일을 지운다 |
 
 ## Streamlit 앱(파일로 띄우는 실습)
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
 | `No module named streamlit` | 커널이 저장소 `.venv`가 아님 | 커널 확인 |
-| 첫 실행에서 이메일을 묻고 멈춤 | Streamlit 첫 실행 안내 | 셀을 멈추고 실행 명령 끝에 `--server.headless true`를 붙여 다시 실행, 주소(`http://localhost:8501`)를 직접 연다 |
-| "Port 8501 is already in use" | 앞 앱이 아직 떠 있음 | 앞 셀을 멈추거나 `--server.port 8502` |
+| 앱 셀을 실행했는데 앱이 뜨지 않고 셀도 끝나지 않음(macOS면 출력에 `Email:`) | 새 PC의 Streamlit 첫 실행이 이메일 입력을 기다림. Windows는 셀 출력이 앱이 끝날 때까지 비어 있어 문구도 안 보임 | 셀을 멈추고 실행 줄에 `--server.showEmailPrompt false --server.address 127.0.0.1`이 있는지 확인(노트북 셀에는 들어 있다). 없으면 붙여 다시 실행. `--server.headless true`는 브라우저가 저절로 열리지 않게 되므로 쓰지 않는다 |
+| 브라우저가 저절로 열리지 않음 | 브라우저 자동 열기가 막힘 | 주소창에 `127.0.0.1:8501`을 넣는다. Windows에서는 앱이 도는 동안 셀 출력이 비어 있는 것이 정상이다 |
+| 다시 띄우니 주소 끝이 `8502`인 탭이 열림, 또는 8501 탭에 고치기 전 앱이 보임 | Windows에서는 ■로 셀을 멈춰도 앞 Streamlit이 8501을 계속 잡고 있을 수 있음. 포트를 지정하지 않았으므로 새 앱은 다음 번호로 뜬다 | 새로 열린 8502 탭을 쓰고 예전 탭은 닫는다 |
+| "Port 8501 is not available" | 앞 앱이 아직 떠 있는데, 실행 줄에 `--server.port 8501`을 직접 적음 | 포트 지정을 지우고 다시 실행(빈 번호로 뜬다) |
 | 앱이 떠 있는 동안 다른 셀이 안 돎 | 앱 셀이 커널을 붙잡고 있음 | 앱 셀을 멈춘(■) 뒤 진행 |
 | 파일을 고쳤는데 앱이 그대로 | 파일 쓰기 셀을 다시 안 돌림 | 앱 멈춤 → 파일 쓰기 셀 → 앱 셀 순서로 다시 실행 |
 
@@ -72,13 +75,14 @@
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| 터미널: `No such file or directory` / `can't open file …_server.py` | 서버 파일을 쓰는 셀(`%%writefile`)을 아직 안 돌림, 또는 터미널이 저장소 맨 위가 아님 | 노트북의 쓰기 셀을 먼저 실행. 터미널에서 `pwd`가 저장소 맨 위인지 확인([paths.md](paths.md)) |
-| `address already in use` / `Errno 48`·`10048` | 같은 포트의 서버가 이미 떠 있음(A2A와 캡스톤 MCP는 둘 다 8001) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
+| 터미널: `No such file or directory` / `can't open file …_server.py` | 서버 파일을 쓰는 셀(`%%writefile`)을 아직 안 돌림, 또는 터미널이 저장소 맨 위가 아님 | 노트북의 쓰기 셀을 먼저 실행. 터미널이 저장소 맨 위인지 확인: `uv run python -c "import os; print(os.getcwd())"`(PowerShell·cmd·macOS 모두 된다, [paths.md](paths.md)) |
+| `address already in use` / `Errno 48`·`[Errno 10048]` / "소켓 주소(프로토콜/네트워크 주소/포트)는 하나만 사용할 수 있습니다"(Windows) | 같은 포트의 서버가 이미 떠 있음(A2A와 캡스톤 MCP는 둘 다 8001) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
 | 클라이언트 셀: `ConnectError`, `Connection refused`, 오래 기다리다 실패 | 서버가 꺼져 있거나 시작 중 오류로 끝남 | 서버 터미널에 `Uvicorn running on …`이 있는지 본다. 없으면 터미널의 마지막 오류 줄부터 고친다 |
 | 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일의 빈칸이 비었거나 틀림 | 서버 코드 셀의 빈칸을 다시 채우고 → Ctrl+C → 첫 쓰기 셀(`%%writefile <파일>`)부터 마지막 이어 쓰기 셀까지 차례로 다시 실행 → 서버 다시 띄우기 |
 | 서버를 고쳤는데 결과가 그대로 | 예전 서버가 계속 떠 있음, 또는 고친 이어 쓰기 셀(`%%writefile -a`)만 다시 실행해 코드가 파일 끝(서버 실행 줄 뒤)에 붙음 | Ctrl+C로 끄고 → 첫 쓰기 셀부터 차례로 모두 다시 실행 → 다시 띄운다 |
 | 서버 시작 때 `DeprecationWarning`, `Update available` 상자 | 라이브러리 안내 문구 | 무시해도 된다 |
 | stdio로 바꿨더니 추가한 할 일이 목록에 없음 | stdio는 도구를 부를 때마다 서버를 새로 띄워 기억이 사라진다 | 정상. SSE와 비교하는 실습이다 |
+| Windows에서 stdio로 바꾼 셀이 `io.UnsupportedOperation: fileno` 또는 `NotImplementedError`로 실패 | Windows 노트북 커널에서는 stdio 방식이 서버 프로그램을 띄우지 못한다 | 정상. `"sse"`로 되돌리고 다음으로 진행한다 |
 
 ## Langfuse(관측·평가, 캡스톤)
 

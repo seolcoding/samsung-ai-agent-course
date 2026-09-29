@@ -53,9 +53,11 @@ SELF_HELP = """**막혔을 때: 스스로 먼저 확인합니다**
 
 1. 오류가 난 셀과 오류의 마지막 줄을 AI에게 붙여 넣고, 원인과 고칠 곳을 물어봅니다. 처음 한 번은 "저장소 맨 위 AGENTS.md를 읽고 도와줘"라고 먼저 말합니다. AI가 설치·경로·연결 문제의 해결 순서를 알게 됩니다.
 2. 설정 문제로 보이면 맨 위 환경 점검 셀을 다시 실행하고, ⛔ 줄의 → 안내대로 고칩니다.
-3. 커널을 다시 시작하고 맨 위 셀부터 다시 실행합니다.
+3. 커널을 다시 시작하고 맨 위 셀부터 다시 실행합니다. 앱을 띄우는 셀은 끝나지 않으니 ■로 멈추고 다음 셀로 넘어갑니다. 입력을 기다리는 셀에는 답을 입력합니다.
 4. 옆 사람 화면과 비교해 봅니다.
 5. 그래도 안 되면 오류 화면을 그대로 두고 강사에게 보여 줍니다. 그동안 그 셀은 건너뛰고 다음 절을 진행해도 됩니다."""
+
+LEC_RUN_NOTE = "셀을 위에서부터 차례로 실행하면 슬라이드와 퀴즈가 나타납니다."
 
 QUIET_CALLS = {"load_dotenv", "add_edge", "add_node", "add_conditional_edges", "set_entry_point"}
 
@@ -144,6 +146,9 @@ class Notebook:
                 toc.append("  " * (level - 2) + f"- {title}" + (f" {label}" if label else ""))
         cells.insert(1, nbf.v4.new_markdown_cell("**목차**\n\n" + "\n".join(toc)))
         out = Path(out)
+        # 강의 노트북은 코드 셀이 접혀 있고 저장된 출력이 없어, 실행 전에는 슬라이드·퀴즈가 보이지 않는다
+        if out.name.endswith("_LEC.ipynb") and cells[0].source.startswith("# [LEC]") and LEC_RUN_NOTE not in cells[0].source:
+            cells[0].source += "\n\n" + LEC_RUN_NOTE
         # 두 벌로 쓴다. 수강생본(course/…/notebooks/)은 강사용 메모를 빼고,
         # 강사본(dev/instructor/<챕터>/)은 메모를 두고 맨 위에서 수강생본 폴더로 옮겨 가 같은 경로로 실행한다.
         student = [c for c in cells if "강사용" not in c.metadata.get("tags", [])]

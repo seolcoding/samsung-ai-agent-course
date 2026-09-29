@@ -28,8 +28,11 @@ def list_docs() -> list[str]:
 @mcp.tool()
 def read_doc(filename: str) -> str:
     """data/ 폴더의 문서를 읽어 전체 내용을 반환한다."""
-    path = DATA_DIR / filename
-    if not path.exists():
+    path = (DATA_DIR / filename).resolve()
+    # data/ 밖의 파일(../.env, 절대 경로 등)은 읽지 않는다
+    if not path.is_relative_to(DATA_DIR.resolve()):
+        return f'data/ 밖의 파일은 읽을 수 없음: {filename}'
+    if not path.is_file():
         return f'파일 없음: {filename}'
     return path.read_text(encoding='utf-8')
 
@@ -49,4 +52,5 @@ def search_docs(keyword: str) -> str:
 
 if __name__ == '__main__':
     # SSE 모드로 실행 — starter.py가 http://localhost:8001/sse 로 연결
-    mcp.run(transport='sse', host='0.0.0.0', port=8001)
+    # 127.0.0.1: 이 PC에서 오는 요청만 받는다. 0.0.0.0이면 다른 PC의 요청도 받는다.
+    mcp.run(transport='sse', host='127.0.0.1', port=8001)

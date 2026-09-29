@@ -251,7 +251,7 @@ def build(folder):
                 ref = code_only.strip('"').strip("\n")
                 sub += 1
                 nb.h(3, f"{n}.{sub} 참고: {(f.get('titles') or {}).get(title or '', title) or '실행하지 않는 코드'}")
-                nb.md("문자열로 감싸 두어 실행되지 않는 참고 코드입니다. 읽어만 봅니다.\n\n```python\n" + (notes + "\n" if notes else "") + ref + "\n```")
+                nb.md("실행되지 않는 참고 코드입니다. 읽어만 봅니다.\n\n```python\n" + (notes + "\n" if notes else "") + ref + "\n```")
                 continue
             if wf:
                 if c == 0 and "/" in wf:  # %%writefile은 폴더를 만들지 않는다
@@ -303,8 +303,13 @@ def build(folder):
                 warn=" 고친 셀 하나만 다시 실행하면 파일 끝에 덧붙기만 해서 반영되지 않습니다." if many else ""))
         elif wf:
             nb.md(f.get("run_note", "위 셀을 실행하면 이 폴더에 앱 파일이 만들어집니다. 아래 셀을 실행하면 브라우저에 앱이 열립니다. 앱을 멈출 때는 이 셀의 실행을 중지(■)합니다."))
-            # 셸 PATH에 가상환경이 없어도 되도록, 노트북 커널의 파이썬으로 streamlit을 실행한다
-            nb.code(f"import sys\n\n!{{sys.executable}} -m streamlit run {wf}", visible=True, kind=KIND_EXAMPLE)
+            # 셸 PATH에 가상환경이 없어도 되도록, 노트북 커널의 파이썬으로 streamlit을 실행한다.
+            # 경로에 공백이 있어도 되게 따옴표로 감싼다(Windows cmd). showEmailPrompt false: 새 PC의 첫 실행이
+            # 이메일 입력을 기다리며 멈추지 않게 한다. address 127.0.0.1: 방화벽 허용 창과 같은 망의 다른 PC 접속을 막는다.
+            # --server.headless true는 브라우저 자동 열림까지 꺼지므로 쓰지 않는다.
+            nb.code(f"import sys\n\n# 첫 실행 때 이메일을 묻지 않고, 이 PC에서만 열리게 합니다\n"
+                    f"!\"{{sys.executable}}\" -m streamlit run {wf} --server.showEmailPrompt false --server.address 127.0.0.1",
+                    visible=True, kind=KIND_EXAMPLE)
             nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")  # 앱은 멈출 때까지 돈다
         nb.md(f["look"])
         nb.meta(f.get("look__meta"))

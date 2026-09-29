@@ -4,9 +4,9 @@
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "SKILL.md가 든 폴더를 Agent에 연결한다",
+    "answer": "Skill 폴더들이 든 상위 폴더를 연결한다",
     "correct": true,
-    "feedback": "Agent는 이 폴더의 Skill 목록을 보고 필요한 SKILL.md를 읽어 절차를 따릅니다."
+    "feedback": "Agent는 이 폴더 아래 폴더마다 든 SKILL.md의 이름과 설명을 보고, 필요한 SKILL.md를 읽어 절차를 따릅니다."
    },
    {
     "answer": "Agent가 쓸 모델을 고른다",
