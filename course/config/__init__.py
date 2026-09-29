@@ -12,11 +12,33 @@
 """
 
 import os
+import sys
 
 from dotenv import find_dotenv, load_dotenv
 
 ENV_FILE = find_dotenv(usecwd=True) or find_dotenv()  # 찾지 못하면 빈 문자열
-load_dotenv(ENV_FILE or None)
+
+
+def _load_env(path):
+    """.env를 UTF-8로 읽는다. 옛 메모장이 cp949로 저장했다면 그 방식으로 다시 읽고 알려 준다."""
+    try:
+        load_dotenv(path or None, encoding="utf-8")
+    except UnicodeDecodeError:
+        try:
+            load_dotenv(path, encoding="cp949")
+        except UnicodeDecodeError as e:
+            raise RuntimeError(
+                f"{path}를 읽을 수 없습니다(UTF-8도 cp949도 아님). VS Code로 열어 오른쪽 아래 인코딩을 눌러 'UTF-8로 저장'을 고릅니다."
+            ) from e
+        # stdout이 아니라 stderr로 낸다(stdio 방식 MCP 서버가 config를 불러와도 통신을 깨지 않게).
+        print(
+            f"[주의] {path}가 UTF-8이 아니라 cp949로 저장되어 있어 그 방식으로 읽었습니다. "
+            "VS Code로 열어 오른쪽 아래 인코딩을 눌러 'UTF-8로 저장'을 고릅니다.",
+            file=sys.stderr,
+        )
+
+
+_load_env(ENV_FILE)
 
 # COURSE_ENV 값 → 연결 방식. 사외를 뜻하는 다른 이름도 받는다.
 MODES = {
