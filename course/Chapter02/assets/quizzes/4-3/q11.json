@@ -1,0 +1,28 @@
+[
+ {
+  "question": "사용자가 보고서 작성을 승인하는 때는 언제인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "주제를 입력하기 직전",
+    "correct": false,
+    "feedback": "주제 입력은 첫 단계입니다. 승인은 리서치 결과를 본 뒤에 합니다."
+   },
+   {
+    "answer": "리서치 결과를 확인한 뒤, Writer가 초안을 쓰기 전",
+    "correct": true,
+    "feedback": "리서치 결과를 먼저 보고 보고서 작성 여부를 정합니다. 승인해야 Writer가 일을 시작합니다."
+   },
+   {
+    "answer": "Writer가 초안을 다 쓴 뒤",
+    "correct": false,
+    "feedback": "초안을 쓴 다음이 아니라 쓰기 전에 승인합니다. 쓰기 전에 멈춰야 불필요한 작업을 막을 수 있습니다."
+   },
+   {
+    "answer": "LLM Judge가 점수를 매긴 뒤",
+    "correct": false,
+    "feedback": "평가는 마지막 단계입니다. 승인은 그보다 앞, Writer 실행 전입니다."
+   }
+  ]
+ }
+]

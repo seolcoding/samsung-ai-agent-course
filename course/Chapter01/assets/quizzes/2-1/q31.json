@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Checkpointer가 없으면 하기 어려운 일은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "승인을 기다리며 멈췄다가 같은 지점부터 이어서 실행하기",
+    "correct": true,
+    "feedback": "Checkpointer가 실행 상태를 저장해 두기 때문에 멈춘 지점부터 다시 이어 갈 수 있습니다."
+   },
+   {
+    "answer": "노드를 더하고 엣지로 이어 그래프 만들기",
+    "correct": false,
+    "feedback": "노드와 엣지를 잇는 일은 Checkpointer 없이도 됩니다."
+   },
+   {
+    "answer": "LLM을 한 번 호출해 답 받기",
+    "correct": false,
+    "feedback": "한 번 호출하고 끝나는 일에는 저장해 둘 중간 상태가 없습니다."
+   },
+   {
+    "answer": "조건부 Edge로 분기하기",
+    "correct": false,
+    "feedback": "분기는 Edge가 정합니다. 실행 상태 저장과는 별개입니다."
+   }
+  ]
+ }
+]

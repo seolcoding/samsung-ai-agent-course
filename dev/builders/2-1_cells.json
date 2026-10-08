@@ -1,0 +1,312 @@
+{
+ "title": "# [LEC] LangGraph 정통 이론 & 고급 기능\n\n슬라이드와 설명, 퀴즈로 LangGraph가 왜 필요한지, 그래프를 무엇으로 조립하는지, Agent를 어떻게 안정적으로 실행하는지 익힙니다.",
+ "title__meta": "| 항목 | 내용 |\n|---|---|\n| 원본 PDF | `docs/raw/Chapter01/day02/2-1-langgraph-theory-and-advanced-features.pdf` (14쪽) |\n| 원본 코드 | 이 노트북에는 없습니다. `src/raw/Chapter01/04-langgraph/`의 다섯 파일은 실습 노트북 `2-1_langgraph_LAB.ipynb`에서 다룹니다. |\n| API 호출 | 없습니다. 슬라이드 준비 셀만 실행하면 됩니다. |\n| 커리큘럼 | 2일차 2.2 \"LangGraph 정통 이론 & 고급 기능 실습\" 3.0H (커리큘럼 번호 2.2 = PDF 번호 2-1) |\n\n- 슬라이드 p7·p9·p10의 코드는 슬라이드로만 보여 줍니다. 이 노트북에는 실행 코드가 없습니다.\n- PDF에 있고 실습 코드에 없는 것: p9 Pydantic State(실습 코드는 모두 TypedDict), p10 병렬 실행 Reducer. 설명과 퀴즈로만 다룹니다.",
+ "intro": "이번 시간은 LangGraph를 세 덩어리로 봅니다.\n\n1. LangGraph의 필요성: 반복하는 Agent를 순환 그래프로 표현하는 이유, LangChain과의 차이\n2. 그래프 구성 요소: Node(노드), Edge(엣지), State(상태), State Schema(상태의 모양 정의), Reducer(값을 합치는 규칙)\n3. 안정적인 Agent 실행: Checkpointer(실행 상태 저장)와 Human-in-the-loop(사람의 판단 끼워 넣기)\n\n이 노트북은 개념만 다룹니다.",
+ "p4": "Agent는 모델을 한 번 호출하고 끝나지 않는 경우가 많습니다.\n다음 행동을 판단하고, 도구를 쓰고, 결과를 관찰한 뒤 다시 판단합니다.\n\n- 검색 결과가 부족하면 다시 검색합니다.\n- 도구 실행이 실패하면 다른 경로를 고릅니다.\n- 답변 품질이 낮으면 스스로 검토하고 보완합니다.\n\n그림에서 \"실행 결과 확인\" 뒤에 \"다음 행동을 추론\"으로 되돌아가는 화살표(추가 판단 필요)가 있습니다.\n이렇게 앞 단계로 돌아가는 흐름을 Cyclic Graph(순환 그래프)로 표현합니다.\n\n**왜 배우나:** 1일차에 본 ReAct(추론 → 행동 → 관찰의 반복)를 코드로 만드는 틀이 순환 그래프입니다. 반복을 그래프로 그려 두면 어디서 되돌아가고 어디서 끝나는지 한눈에 보입니다.",
+ "q11": {
+  "question": "검색 결과가 부족하면 Agent가 다시 검색하게 만들고 싶습니다. 이 흐름을 표현하기에 알맞은 구조는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "앞 단계로 되돌아갈 수 있는 순환 그래프",
+    "correct": true,
+    "feedback": "관찰 뒤에 다시 판단으로 돌아가는 길이 있어야 \"다시 검색\"을 표현할 수 있습니다."
+   },
+   {
+    "answer": "입력에서 출력까지 한 방향으로만 가는 체인",
+    "correct": false,
+    "feedback": "한 방향 흐름에는 되돌아갈 길이 없어서, 결과를 보고 다시 검색하는 반복을 담기 어렵습니다."
+   },
+   {
+    "answer": "모델을 한 번만 호출하는 프롬프트 하나",
+    "correct": false,
+    "feedback": "한 번의 호출로는 결과를 확인하고 다시 시도하는 단계가 생기지 않습니다."
+   },
+   {
+    "answer": "검색 결과를 미리 모두 넣어 둔 긴 프롬프트",
+    "correct": false,
+    "feedback": "결과가 부족한지 판단하고 다시 검색하는 단계가 없습니다. 반복에는 되돌아가는 경로가 필요합니다."
+   }
+  ]
+ },
+ "sum11": "**정리:** Agent는 판단 → 도구 사용 → 관찰을 되풀이하고, 이 반복은 순환 그래프로 표현합니다.",
+ "p5": "두 도구는 잘하는 일이 다릅니다.\n\n| | LangChain | LangGraph |\n|---|---|---|\n| 강한 곳 | LLM, 프롬프트, 도구, 파서를 잇는 체인 | 상태를 가진 반복 흐름과 분기 흐름 |\n| 흐름 모양 | 입력에서 출력까지 비교적 한 방향 | 조건에 따라 다음 노드를 고르고, 되돌아가기도 함 |\n| 대표 기능 | LCEL(실행 단위를 파이프 기호로 잇는 문법) | 조건부 라우팅, 중단·재개·승인·재시도 |\n| 데이터 | 앞 단계의 출력이 다음 단계의 입력 | 작업 상태를 그래프 전체에서 공유 |\n\nLangGraph는 복잡한 Agent를 추적할 수 있는 실행 그래프로 표현합니다.\n\n**왜 배우나:** 만들려는 기능이 한 방향 파이프라인인지, 반복·분기·승인이 필요한 흐름인지 보고 도구를 고를 수 있습니다.",
+ "q12": {
+  "question": "다음 중 LangGraph가 더 알맞은 경우는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "메일을 보내기 전에 사람 승인을 받고, 승인되면 이어서 실행하는 Agent",
+    "correct": true,
+    "feedback": "중단·재개·승인 같은 서비스 요구사항은 상태를 가진 그래프로 구조화하기 좋습니다."
+   },
+   {
+    "answer": "문장 하나를 번역해 한 번 출력하는 기능",
+    "correct": false,
+    "feedback": "입력에서 출력까지 한 방향인 흐름은 LangChain 체인으로 간결하게 만들 수 있습니다."
+   },
+   {
+    "answer": "프롬프트 → 모델 → 파서 순서로 요약문을 만드는 기능",
+    "correct": false,
+    "feedback": "순서가 정해진 파이프라인이라 LCEL로 잇는 것이 잘 맞습니다."
+   },
+   {
+    "answer": "정해진 질문 하나에 답을 한 번 받는 기능",
+    "correct": false,
+    "feedback": "분기도 반복도 없는 일이라 그래프로 나눌 이유가 적습니다."
+   }
+  ]
+ },
+ "sum12": "**정리:** 한 방향 파이프라인은 LangChain, 상태를 들고 반복·분기·중단·재개하는 흐름은 LangGraph가 강합니다.",
+ "p7": "LangGraph의 기본 요소는 세 가지입니다.\n\n- **Node(노드):** 실제 작업을 하는 실행 단위입니다. 파이썬 함수 하나가 노드 하나입니다.\n- **Edge(엣지):** 한 노드가 끝난 뒤 이동할 노드를 정합니다.\n- **State(상태):** 그래프가 실행되는 동안 유지되는 공유 데이터입니다.\n\n슬라이드 코드에서 `AgentState`가 State이고 `call_llm`이 Node입니다.\n`call_llm`은 State를 받아서 바꿀 값(`answer`)만 담은 딕셔너리를 돌려줍니다.\n`graph.add_node(\"llm\", call_llm)`이 이 함수를 `\"llm\"`이라는 이름의 노드로 그래프에 올립니다.",
+ "p8": "Agent 그래프는 State를 읽고 고치는 노드들을 이어 놓은 것으로 볼 수 있습니다.\n\n- LLM 호출 노드는 다음 행동을 판단합니다.\n- Tool Node(도구 노드)는 고른 도구를 실행하고 결과를 State에 기록합니다.\n- 조건부 Edge는 State를 보고 도구를 더 쓸지, 최종 답변으로 갈지 정합니다.\n\n그림에서 \"정보가 충분한가?\" 뒤의 두 갈래(추가 검색 필요 / 충분함)가 조건부 Edge입니다.\n\n**왜 배우나:** 이번 실습의 그래프는 모두 이 세 가지로만 조립합니다. 노드를 더하고, 엣지로 잇고, State로 값을 넘기는 순서를 알면 처음 보는 그래프 코드도 읽을 수 있습니다.",
+ "p8__meta": "- p8 그림의 노드 이름(조사 계획 수립, 문서/웹 검색, 근거 읽기, 답변 작성)은 예시입니다. 실습 코드의 노드 이름(chatbot, agent, tools 등)과 다릅니다.",
+ "q21": {
+  "question": "한 노드가 끝난 뒤 어디로 갈지 정하는 요소는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Node",
+    "correct": false,
+    "feedback": "Node는 실제 작업을 하는 실행 단위입니다. 다음 행선지는 다른 요소가 정합니다."
+   },
+   {
+    "answer": "Edge",
+    "correct": true,
+    "feedback": "Edge가 노드가 끝난 뒤 이동할 노드를 정합니다. 조건부 Edge는 State를 보고 행선지를 고릅니다."
+   },
+   {
+    "answer": "State",
+    "correct": false,
+    "feedback": "State는 실행 중 노드들이 함께 읽고 고치는 데이터입니다."
+   },
+   {
+    "answer": "Reducer",
+    "correct": false,
+    "feedback": "Reducer는 같은 필드에 들어온 값을 합치는 규칙이라 이동과는 관계가 없습니다."
+   }
+  ]
+ },
+ "sum21": "**정리:** Node는 일을 하고, Edge는 다음 행선지를 정하고, State는 노드들이 함께 쓰는 데이터입니다.",
+ "p9": "State Schema(상태 스키마)는 그래프가 어떤 데이터를 들고 실행되는지 정합니다.\n\n- **TypedDict:** 가볍고 직관적입니다. 필드 이름과 타입만 적습니다.\n- **Pydantic `BaseModel`:** 값 검증, 기본값, 설명이 필요할 때 유리합니다. 슬라이드처럼 `Field(description=...)`로 설명을, `default_factory=list`나 `= None`으로 기본값을 줍니다.\n\n스키마를 분명히 정해 두면 노드끼리 주고받는 데이터의 약속이 흔들리지 않습니다.",
+ "q22": {
+  "question": "기본값과 값 검증이 필요한 State를 정의할 때 더 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Pydantic `BaseModel`",
+    "correct": true,
+    "feedback": "`Field`로 설명과 기본값을 주고, 들어온 값의 형식도 검사할 수 있습니다."
+   },
+   {
+    "answer": "TypedDict",
+    "correct": false,
+    "feedback": "TypedDict는 가볍고 직관적이지만, 기본값과 검증이 필요하면 Pydantic이 유리합니다."
+   },
+   {
+    "answer": "타입 없이 쓰는 일반 dict",
+    "correct": false,
+    "feedback": "스키마가 없으면 노드 사이에 어떤 데이터가 오가는지 약속이 흐려집니다."
+   },
+   {
+    "answer": "문자열 하나",
+    "correct": false,
+    "feedback": "문자열 하나로는 질문, 문서, 답변처럼 여러 필드를 나눠 담을 수 없습니다."
+   }
+  ]
+ },
+ "sum22": "**정리:** 가볍게 쓸 때는 TypedDict, 검증·기본값·설명이 필요하면 Pydantic으로 State를 정의합니다.",
+ "p10": "Reducer(리듀서)는 여러 노드가 같은 State 필드를 고칠 때 값을 합치는 규칙입니다.\n규칙이 분명해야 그래프를 실행한 결과를 예측할 수 있습니다.\n\n- 메시지 목록은 새 메시지를 기존 목록 뒤에 쌓아야 합니다.\n- 점수나 카운터는 더하거나 최신 값으로 바꿀 수 있습니다.\n- 여러 노드를 동시에 실행(병렬 실행)할 때는 여러 결과를 한 State로 합치는 규칙이 특히 중요합니다.\n\n슬라이드 코드의 `Annotated[list, add_messages]`는 \"`messages` 필드는 `add_messages` 규칙으로 합친다\"는 뜻입니다.\n\n**왜 배우나:** 합치는 규칙이 없으면 노드가 돌려준 값이 기존 값을 덮어씁니다. 메시지 목록이 덮어써지면 앞 대화를 잃습니다.",
+ "p10__meta": "- p10 슬라이드 코드의 주석은 \"steps를 반환하면\"이라고 적었지만 코드에 정의된 필드는 `messages`입니다. 수강생이 물으면 `messages`로 읽으면 된다고 답합니다.",
+ "q23": {
+  "question": "State에 `messages: Annotated[list, add_messages]`를 정의했습니다. 노드가 새 메시지 하나를 돌려주면 어떻게 될까요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "기존 메시지 목록 뒤에 새 메시지가 더해진다",
+    "correct": true,
+    "feedback": "`add_messages`가 새 메시지를 기존 목록에 쌓습니다. 그래서 앞 대화가 남습니다."
+   },
+   {
+    "answer": "기존 목록이 새 메시지 하나로 바뀐다",
+    "correct": false,
+    "feedback": "합치는 규칙이 없는 필드라면 이렇게 바뀝니다. `add_messages`는 바꾸지 않고 쌓습니다."
+   },
+   {
+    "answer": "새 메시지는 버려지고 기존 목록만 남는다",
+    "correct": false,
+    "feedback": "노드가 돌려준 값은 버려지지 않고 규칙에 따라 State에 반영됩니다."
+   },
+   {
+    "answer": "오류가 나서 그래프가 멈춘다",
+    "correct": false,
+    "feedback": "목록 필드에 메시지를 돌려주는 것은 정상적인 사용법입니다."
+   }
+  ]
+ },
+ "sum23": "**정리:** Reducer는 같은 필드에 들어온 값을 합치는 규칙이고, `add_messages`는 메시지를 쌓습니다.",
+ "p12": "Checkpointer(체크포인터)는 그래프의 실행 상태를 저장해 두었다가 중단한 곳부터 다시 이어 가게 하는 기능입니다.\nAgent 작업이 길어지면 중간에 실패하거나, 사람의 입력이 더 필요할 때가 있습니다. 대화형 서비스에서는 사용자별 세션 상태도 유지해야 합니다.\n\n안정적인 서비스에 필요한 이유는 세 가지입니다.\n\n- 장애가 나면 이전 단계까지의 실행 기록을 복원합니다.\n- 승인 대기, 외부 시스템 응답 대기처럼 기다렸다가 이어 가는 흐름을 다룹니다.\n- 실행 이력을 추적해 디버깅과 평가에 씁니다.\n\n**왜 배우나:** 다음 절의 사람 승인은 \"멈췄다가 이어 가기\"입니다. 멈춘 지점의 상태가 저장되어 있어야 이어 갈 수 있으므로 Checkpointer가 먼저 있어야 합니다.",
+ "q31": {
+  "question": "Checkpointer가 없으면 하기 어려운 일은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "승인을 기다리며 멈췄다가 같은 지점부터 이어서 실행하기",
+    "correct": true,
+    "feedback": "Checkpointer가 실행 상태를 저장해 두기 때문에 멈춘 지점부터 다시 이어 갈 수 있습니다."
+   },
+   {
+    "answer": "노드를 더하고 엣지로 이어 그래프 만들기",
+    "correct": false,
+    "feedback": "노드와 엣지를 잇는 일은 Checkpointer 없이도 됩니다."
+   },
+   {
+    "answer": "LLM을 한 번 호출해 답 받기",
+    "correct": false,
+    "feedback": "한 번 호출하고 끝나는 일에는 저장해 둘 중간 상태가 없습니다."
+   },
+   {
+    "answer": "조건부 Edge로 분기하기",
+    "correct": false,
+    "feedback": "분기는 Edge가 정합니다. 실행 상태 저장과는 별개입니다."
+   }
+  ]
+ },
+ "sum31": "**정리:** Checkpointer는 실행 상태를 저장해 중단·재개, 장애 복원, 실행 이력 추적을 가능하게 합니다.",
+ "p13": "Human-in-the-loop(휴먼 인 더 루프)는 Agent가 실행되는 도중 특정 지점에서 사람의 판단을 받는 설계입니다.\n\n- 민감한 도구를 실행하기 전에 승인을 받을 수 있습니다.\n- 모델의 판단이 불확실할 때 사용자에게 선택지를 물을 수 있습니다.\n- 자동화의 효율과 사람의 통제권을 함께 챙깁니다.\n\n그림에서 Action(도구 실행) 앞에 \"판단 대기, 사람 승인 후 실행\"이 붙어 있습니다. 승인되어야 Observation(결과 관찰)으로 넘어갑니다.",
+ "p14": "사람이 개입할 지점은 위험도와 비용을 기준으로 정합니다.\n\n- 외부 발송, 결제, 삭제처럼 되돌리기 어려운 행동 앞에 둡니다.\n- 정보가 부족하면 추측하지 않고 사람에게 묻습니다.\n- 승인을 너무 자주 받으면 흐름이 느려집니다. 승인 기준을 분명히 정합니다.\n- 승인 결과도 State에 기록합니다. 그래야 이후 실행이 같은 결정을 참조합니다.\n\n**왜 배우나:** 승인 지점을 어디에 둘지는 Agent가 실제 업무에 들어갈 때 가장 먼저 부딪히는 설계 문제입니다. 거부한 결과를 State에 남기지 않으면 Agent는 거부 사실을 모른 채 멈춘 곳부터 그대로 이어 갈 수 있습니다.",
+ "q32": {
+  "question": "다음 도구 실행 중 사람 승인을 받기에 가장 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "고객에게 메일 발송",
+    "correct": true,
+    "feedback": "외부 발송은 되돌리기 어려운 행동이라 실행 전에 사람이 확인하는 지점으로 알맞습니다."
+   },
+   {
+    "answer": "사내 문서 검색",
+    "correct": false,
+    "feedback": "읽기만 하는 작업은 되돌릴 것이 없습니다. 매번 승인을 받으면 흐름만 느려집니다."
+   },
+   {
+    "answer": "환율 조회",
+    "correct": false,
+    "feedback": "값을 조회만 하는 도구입니다. 승인 기준을 분명히 해서 불필요한 승인을 줄입니다."
+   },
+   {
+    "answer": "계산기로 금액 계산",
+    "correct": false,
+    "feedback": "계산 결과는 바깥에 영향을 주지 않습니다. 승인 지점은 위험도와 비용으로 정합니다."
+   }
+  ]
+ },
+ "sum32": "**정리:** 되돌리기 어려운 행동 앞에서 사람의 승인을 받고, 승인·거부 결과도 State에 기록합니다.",
+ "final": [
+  {
+   "question": "Agent를 순환 그래프로 표현하는 이유로 가장 알맞은 것은?",
+   "type": "multiple_choice",
+   "answers": [
+    {
+     "answer": "판단 → 도구 사용 → 관찰을 결과에 따라 되풀이해야 해서",
+     "correct": true,
+     "feedback": "결과를 보고 다시 판단하려면 앞 단계로 되돌아가는 길이 있어야 합니다."
+    },
+    {
+     "answer": "모델 호출 비용을 줄이려고",
+     "correct": false,
+     "feedback": "순환 그래프는 비용이 아니라 반복하는 흐름을 표현하려고 씁니다."
+    },
+    {
+     "answer": "프롬프트를 짧게 쓰려고",
+     "correct": false,
+     "feedback": "프롬프트 길이와는 관계없습니다. 흐름의 모양을 표현하는 방법입니다."
+    },
+    {
+     "answer": "항상 같은 순서로 한 번만 실행하려고",
+     "correct": false,
+     "feedback": "한 번만 가는 흐름이라면 한 방향 체인으로 충분합니다."
+    }
+   ]
+  },
+  {
+   "question": "Node, Edge, State를 바르게 짝지은 것은?",
+   "type": "multiple_choice",
+   "answers": [
+    {
+     "answer": "Node: 작업 단위 / Edge: 다음 이동 / State: 공유 데이터",
+     "correct": true,
+     "feedback": "Node가 일을 하고, Edge가 행선지를 정하고, State를 노드들이 함께 씁니다."
+    },
+    {
+     "answer": "Node: 공유 데이터 / Edge: 작업 단위 / State: 다음 이동",
+     "correct": false,
+     "feedback": "실제 작업을 하는 쪽은 Node입니다."
+    },
+    {
+     "answer": "Node: 다음 이동 / Edge: 공유 데이터 / State: 작업 단위",
+     "correct": false,
+     "feedback": "다음 이동을 정하는 쪽은 Edge입니다."
+    },
+    {
+     "answer": "Node: 작업 단위 / Edge: 공유 데이터 / State: 다음 이동",
+     "correct": false,
+     "feedback": "State는 행선지가 아니라 노드들이 함께 쓰는 데이터입니다."
+    }
+   ]
+  },
+  {
+   "question": "Reducer의 역할은?",
+   "type": "multiple_choice",
+   "answers": [
+    {
+     "answer": "여러 노드가 같은 필드를 고칠 때 값을 합치는 규칙을 정한다",
+     "correct": true,
+     "feedback": "메시지는 쌓고, 카운터는 더하거나 바꾸는 식으로 필드마다 규칙을 정합니다."
+    },
+    {
+     "answer": "다음에 실행할 노드를 고른다",
+     "correct": false,
+     "feedback": "다음 노드를 고르는 것은 조건부 Edge의 일입니다."
+    },
+    {
+     "answer": "실행 상태를 저장해 이어서 실행하게 한다",
+     "correct": false,
+     "feedback": "상태 저장과 재개는 Checkpointer의 일입니다."
+    },
+    {
+     "answer": "도구를 실행하고 결과를 돌려준다",
+     "correct": false,
+     "feedback": "도구 실행은 Tool Node의 일입니다."
+    }
+   ]
+  },
+  {
+   "question": "사람이 도구 실행을 거부했을 때 그 결과도 State에 기록하는 이유는?",
+   "type": "multiple_choice",
+   "answers": [
+    {
+     "answer": "이후 실행이 거부 결정을 참조해 그 도구를 실행하지 않고 이어 가도록",
+     "correct": true,
+     "feedback": "기록이 있어야 Agent가 거부 사실을 알고 다음 행동을 정합니다."
+    },
+    {
+     "answer": "기록해야 그래프가 빨리 끝나서",
+     "correct": false,
+     "feedback": "속도 때문이 아닙니다. 이후 실행이 같은 결정을 참조하게 하려는 것입니다."
+    },
+    {
+     "answer": "거부하면 State가 자동으로 지워져서",
+     "correct": false,
+     "feedback": "거부해도 State는 지워지지 않습니다. 그래서 거부 결과를 따로 남겨야 합니다."
+    },
+    {
+     "answer": "기록하지 않아도 결과는 같지만 형식상 남기려고",
+     "correct": false,
+     "feedback": "기록하지 않으면 멈춘 곳부터 그대로 이어져 거부한 도구가 실행될 수 있습니다."
+    }
+   ]
+  }
+ ],
+ "closing": "**이 노트북에서 본 것**\n- Agent는 판단 → 도구 사용 → 관찰을 되풀이하고, 이 반복은 순환 그래프로 표현합니다.\n- 한 방향 파이프라인은 LangChain, 상태를 들고 반복·분기·중단·재개하는 흐름은 LangGraph가 강합니다.\n- 그래프는 Node(작업 단위), Edge(다음 이동), State(공유 데이터)로 조립합니다. 조건부 Edge는 State를 보고 행선지를 고릅니다.\n- State Schema는 TypedDict로 가볍게, 검증·기본값이 필요하면 Pydantic으로 정의합니다.\n- Reducer는 같은 필드의 값을 합치는 규칙이고, `add_messages`는 메시지를 쌓습니다.\n- Checkpointer는 실행 상태를 저장해 중단·재개와 장애 복원을 가능하게 합니다.\n- 되돌리기 어려운 행동 앞에서는 사람의 승인을 받고, 승인·거부 결과도 State에 기록합니다."
+}

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "슬라이드의 방식에서 자식 그래프(Subgraph)를 부모 그래프에 연결하는 방법은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "부모 그래프의 노드 함수 안에서 컴파일된 자식 그래프를 invoke로 호출한다",
+    "correct": true,
+    "feedback": "`summarize_document` 노드가 `summary_subgraph.invoke(...)`를 호출하고, 그 결과를 부모 State에 담습니다."
+   },
+   {
+    "answer": "자식 그래프의 State를 부모 그래프의 State와 똑같이 맞춘다",
+    "correct": false,
+    "feedback": "Subgraph는 State를 따로 정의할 수 있습니다. 슬라이드 코드도 자식은 `text`·`summary`, 부모는 `document`·`summary`를 씁니다."
+   },
+   {
+    "answer": "자식 그래프를 컴파일하지 않고 builder 그대로 부모에 넘긴다",
+    "correct": false,
+    "feedback": "Subgraph는 독립적으로 컴파일한 그래프입니다. `summary_builder.compile()`로 만든 `summary_subgraph`를 호출합니다."
+   },
+   {
+    "answer": "부모 그래프의 END에서 자식 그래프의 START로 엣지를 잇는다",
+    "correct": false,
+    "feedback": "두 그래프 사이에 엣지를 잇지 않습니다. 부모의 노드 하나가 자식 그래프 전체를 호출합니다."
+   }
+  ]
+ }
+]

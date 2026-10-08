@@ -1,0 +1,28 @@
+[
+ {
+  "question": "`create_deep_agent`의 `skills=[\"skills/\"]`가 하는 일은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Skill 폴더들이 든 상위 폴더를 연결한다",
+    "correct": true,
+    "feedback": "Agent는 이 폴더 아래 폴더마다 든 SKILL.md의 이름과 설명을 보고, 필요한 SKILL.md를 읽어 절차를 따릅니다."
+   },
+   {
+    "answer": "Agent가 쓸 모델을 고른다",
+    "correct": false,
+    "feedback": "모델은 `model` 인자로 넣습니다."
+   },
+   {
+    "answer": "대화 상태를 저장한다",
+    "correct": false,
+    "feedback": "상태 기억은 `checkpointer`가 맡습니다."
+   },
+   {
+    "answer": "범위를 벗어난 요청을 거절한다",
+    "correct": false,
+    "feedback": "거절 규칙은 `system_prompt`에 적습니다."
+   }
+  ]
+ }
+]

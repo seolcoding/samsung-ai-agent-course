@@ -1,0 +1,28 @@
+[
+ {
+  "question": "SendMessageRequest에서 사용자 입력 텍스트를 담는 곳은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Agent Card의 description",
+    "correct": false,
+    "feedback": "description은 서버가 자기 Agent를 설명하는 글입니다. 요청 내용이 아닙니다."
+   },
+   {
+    "answer": "A2A-Version 헤더",
+    "correct": false,
+    "feedback": "헤더에는 SDK 1.x 요청이라는 버전 정보를 담습니다."
+   },
+   {
+    "answer": "t.Message의 parts",
+    "correct": true,
+    "feedback": "입력은 t.Message의 parts에 텍스트로 담고, 답도 응답 메시지의 parts에서 꺼냅니다."
+   },
+   {
+    "answer": "EventQueue",
+    "correct": false,
+    "feedback": "EventQueue는 서버가 결과를 발행하는 곳입니다."
+   }
+  ]
+ }
+]

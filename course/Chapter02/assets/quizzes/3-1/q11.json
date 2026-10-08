@@ -1,0 +1,28 @@
+[
+ {
+  "question": "슬라이드의 정의로 Agent를 가장 잘 설명한 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "다음에 어떤 말이 나올지 예측하는 모델",
+    "correct": false,
+    "feedback": "그것은 LLM의 정의입니다. Agent는 LLM으로 구성한 파이프라인입니다."
+   },
+   {
+    "answer": "함수 호출과 그 결과 검토를 반복해 복잡한 작업을 처리하는 LLM 파이프라인",
+    "correct": true,
+    "feedback": "Agent는 한 번 답하고 끝나지 않습니다. 도구를 호출하고 결과를 보고 다시 판단하는 일을 반복합니다."
+   },
+   {
+    "answer": "LLM 워크플로를 만드는 데 쓰는 라이브러리",
+    "correct": false,
+    "feedback": "그것은 LangChain(LangGraph)의 설명입니다."
+   },
+   {
+    "answer": "LLM의 출력을 해석해 컴퓨터 기능을 한 번 실행하는 일",
+    "correct": false,
+    "feedback": "그것은 Function(Tool) Calling입니다. Agent는 이 호출과 결과 검토를 반복합니다."
+   }
+  ]
+ }
+]

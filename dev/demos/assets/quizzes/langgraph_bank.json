@@ -1,0 +1,47 @@
+[
+  {
+    "question": "LangGraph에서 실제 작업을 수행하는 실행 단위는?",
+    "type": "multiple_choice",
+    "answers": [
+      {"answer": "Node", "correct": true, "feedback": "맞다. 노드는 State를 받아 바꿀 부분을 돌려주는 함수다."},
+      {"answer": "Edge", "correct": false, "feedback": "Edge는 노드가 끝난 뒤 이동할 곳을 정한다."},
+      {"answer": "State", "correct": false, "feedback": "State는 그래프가 공유하는 데이터다."}
+    ]
+  },
+  {
+    "question": "조건부 엣지의 라우팅 함수가 돌려주는 것은?",
+    "type": "multiple_choice",
+    "answers": [
+      {"answer": "다음에 실행할 노드의 이름", "correct": true, "feedback": "맞다. 이름(문자열)을 돌려주면 그 노드로 간다."},
+      {"answer": "새 State 전체", "correct": false, "feedback": "State를 바꾸는 것은 노드의 일이다."},
+      {"answer": "LLM 응답 메시지", "correct": false, "feedback": "라우팅 함수는 LLM을 부르지 않아도 된다."}
+    ]
+  },
+  {
+    "question": "Checkpointer가 필요한 상황으로 가장 알맞은 것은?",
+    "type": "multiple_choice",
+    "answers": [
+      {"answer": "승인을 기다리는 동안 실행을 멈췄다가 이어서 재개할 때", "correct": true, "feedback": "맞다. 상태를 저장해 중단·재개를 가능하게 한다(2-1 p12)."},
+      {"answer": "LLM 응답 속도를 높일 때", "correct": false, "feedback": "속도와는 관계없다."},
+      {"answer": "도구 스키마를 만들 때", "correct": false, "feedback": "도구 스키마는 @tool과 타입 힌트가 만든다."}
+    ]
+  },
+  {
+    "question": "메시지 목록에 add_messages Reducer를 붙이는 이유는?",
+    "type": "multiple_choice",
+    "answers": [
+      {"answer": "새 메시지를 기존 목록 뒤에 누적하려고", "correct": true, "feedback": "맞다. 덮어쓰지 않고 대화 맥락을 쌓는다(2-1 p10)."},
+      {"answer": "메시지를 암호화하려고", "correct": false, "feedback": "Reducer는 값을 합치는 규칙이다."},
+      {"answer": "메시지를 요약하려고", "correct": false, "feedback": "요약은 Summary Memory의 일이다."}
+    ]
+  },
+  {
+    "question": "Human-in-the-loop 승인 지점으로 가장 알맞은 행동은?",
+    "type": "multiple_choice",
+    "answers": [
+      {"answer": "외부로 메일을 발송하기 직전", "correct": true, "feedback": "맞다. 되돌리기 어려운 행동 앞에 둔다(2-1 p14)."},
+      {"answer": "State를 읽을 때마다", "correct": false, "feedback": "반복 승인은 흐름을 느리게 만든다."},
+      {"answer": "그래프를 컴파일할 때", "correct": false, "feedback": "컴파일은 실행 전 준비 단계다."}
+    ]
+  }
+]

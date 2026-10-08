@@ -1,0 +1,80 @@
+[
+ {
+  "question": "같은 대화 안에서 사용자가 앞에서 한 말을 이어받아 답하게 하는 것은 무엇이 맡나요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "같은 thread_id로 호출하고 Checkpointer를 붙인 그래프",
+    "correct": true,
+    "feedback": "Checkpointer가 thread별로 State를 저장하므로, 같은 thread_id로 부르면 앞 메시지를 이어받습니다."
+   },
+   {
+    "answer": "Memory Store의 namespace",
+    "correct": false,
+    "feedback": "namespace는 장기 기억을 사용자·조직별로 나누는 이름입니다. 한 대화의 흐름은 Checkpointer가 잇습니다."
+   },
+   {
+    "answer": "Send로 만든 Worker",
+    "correct": false,
+    "feedback": "Send는 작업을 병렬로 나누는 API입니다. 대화 기록과는 관계가 없습니다."
+   },
+   {
+    "answer": "Subgraph",
+    "correct": false,
+    "feedback": "Subgraph는 흐름을 기능 단위로 나누는 구조입니다. 앞 대화를 저장하지 않습니다."
+   }
+  ]
+ },
+ {
+  "question": "Memory Store에서 namespace의 역할은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "체크포인트가 저장되는 파일 이름을 정한다",
+    "correct": false,
+    "feedback": "파일에 저장하는 것은 SqliteSaver입니다. namespace는 Store 안의 기억을 나누는 이름입니다."
+   },
+   {
+    "answer": "사용자, 조직, 프로젝트별로 기억을 나눈다",
+    "correct": true,
+    "feedback": "`(\"memories\", user_id)`처럼 namespace를 정하면 사용자마다 자기 기억만 찾고 저장합니다."
+   },
+   {
+    "answer": "병렬로 실행할 Worker 수를 정한다",
+    "correct": false,
+    "feedback": "Worker 수는 Send 목록의 길이로 정해집니다."
+   },
+   {
+    "answer": "대화 하나의 흐름을 구분한다",
+    "correct": false,
+    "feedback": "대화 하나의 흐름은 Checkpointer의 thread_id로 구분합니다."
+   }
+  ]
+ },
+ {
+  "question": "여러 분기나 Worker의 결과를 State의 한 필드에 모으려면 무엇이 필요한가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "결과를 어떻게 합칠지 정한 병합 규칙(Annotated reducer 등)",
+    "correct": true,
+    "feedback": "여러 곳에서 같은 필드에 쓰므로, 이어 붙일지 덮어쓸지 규칙을 정해야 결과가 모두 남습니다."
+   },
+   {
+    "answer": "Worker마다 다른 thread_id",
+    "correct": false,
+    "feedback": "thread_id는 Checkpointer가 대화 흐름을 나누는 이름입니다. 결과를 합치는 규칙과는 관계가 없습니다."
+   },
+   {
+    "answer": "SqliteSaver",
+    "correct": false,
+    "feedback": "SqliteSaver는 State를 파일에 저장할 뿐, 여러 결과를 합치는 방법을 정하지 않습니다."
+   },
+   {
+    "answer": "더 큰 Context Window를 가진 모델",
+    "correct": false,
+    "feedback": "모델의 크기와 관계없이, 같은 필드에 여러 결과가 들어올 때의 규칙은 State에서 정합니다."
+   }
+  ]
+ }
+]

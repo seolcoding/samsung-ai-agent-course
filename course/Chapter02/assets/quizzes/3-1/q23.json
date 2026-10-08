@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Harness Engineering에서 다루는 것이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "필요한 컨텍스트를 어떻게 제공할지 설계하기",
+    "correct": false,
+    "feedback": "슬라이드의 첫 항목입니다."
+   },
+   {
+    "answer": "도구 사용 조건과 실패 복구 전략 정하기",
+    "correct": false,
+    "feedback": "슬라이드의 두 번째 항목입니다."
+   },
+   {
+    "answer": "모델 가중치를 새로 학습시키기",
+    "correct": true,
+    "feedback": "Harness Engineering은 모델 자체가 아니라 Agent가 일하는 환경과 맥락을 설계합니다."
+   },
+   {
+    "answer": "Skill, 지침, 파일 구조를 Agent가 읽기 쉽게 정리하기",
+    "correct": false,
+    "feedback": "슬라이드의 세 번째 항목입니다."
+   }
+  ]
+ }
+]

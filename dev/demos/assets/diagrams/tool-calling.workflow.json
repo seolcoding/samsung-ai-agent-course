@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Tool Calling 수동 루프",
+    "animation": "trace",
+    "visual_preset": "classic",
+    "quality_profile": "standard"
+  },
+  "lanes": [
+    {
+      "id": "user",
+      "label": "사용자"
+    },
+    {
+      "id": "app",
+      "label": "우리 코드 (run_with_tools)"
+    },
+    {
+      "id": "model",
+      "label": "LLM"
+    },
+    {
+      "id": "tools",
+      "label": "도구 함수"
+    }
+  ],
+  "mainPath": [
+    "question",
+    "invoke",
+    "decide",
+    "execute",
+    "append"
+  ],
+  "nodes": [
+    {
+      "id": "question",
+      "lane": "user",
+      "col": 0,
+      "type": "external",
+      "label": "질문",
+      "sublabel": "서울 날씨 알려줘",
+      "width": 160
+    },
+    {
+      "id": "invoke",
+      "lane": "app",
+      "col": 1,
+      "type": "backend",
+      "label": "llm_with_tools.invoke",
+      "sublabel": "messages + 도구 스키마",
+      "width": 160
+    },
+    {
+      "id": "decide",
+      "lane": "model",
+      "col": 2,
+      "type": "backend",
+      "label": "도구 선택",
+      "sublabel": "tool_calls 생성",
+      "width": 160
+    },
+    {
+      "id": "execute",
+      "lane": "app",
+      "col": 3,
+      "type": "backend",
+      "label": "tool_map[name].invoke",
+      "sublabel": "실제 실행은 앱",
+      "width": 160
+    },
+    {
+      "id": "tool",
+      "lane": "tools",
+      "col": 3,
+      "type": "backend",
+      "label": "get_weather",
+      "sublabel": "가짜 데이터",
+      "width": 160
+    },
+    {
+      "id": "append",
+      "lane": "app",
+      "col": 4,
+      "type": "backend",
+      "label": "ToolMessage 추가",
+      "sublabel": "tool_call_id로 짝",
+      "width": 160
+    },
+    {
+      "id": "answer",
+      "lane": "user",
+      "col": 5,
+      "type": "external",
+      "label": "최종 답변",
+      "sublabel": "tool_calls 없음",
+      "width": 160
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "question",
+      "to": "invoke"
+    },
+    {
+      "id": "e2",
+      "from": "invoke",
+      "to": "decide"
+    },
+    {
+      "id": "e3",
+      "from": "decide",
+      "to": "execute",
+      "label": "tool_calls"
+    },
+    {
+      "id": "e4",
+      "from": "execute",
+      "to": "tool"
+    },
+    {
+      "id": "e5",
+      "from": "execute",
+      "to": "append"
+    },
+    {
+      "id": "e6",
+      "from": "append",
+      "to": "invoke",
+      "label": "다시 판단",
+      "variant": "dashed"
+    },
+    {
+      "id": "e7",
+      "from": "decide",
+      "to": "answer",
+      "label": "도구 불필요"
+    }
+  ]
+}

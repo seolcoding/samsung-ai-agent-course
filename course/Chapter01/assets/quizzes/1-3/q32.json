@@ -1,0 +1,28 @@
+[
+ {
+  "question": "대화가 길어져 컨텍스트 사용량을 줄여야 할 때 알맞은 메모리는 무엇인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Buffer Memory",
+    "correct": false,
+    "feedback": "Buffer Memory는 대화를 그대로 넣으므로 대화가 길수록 컨텍스트 사용량도 커집니다."
+   },
+   {
+    "answer": "Summary Memory",
+    "correct": true,
+    "feedback": "긴 대화를 요약해 핵심 맥락만 남기므로 컨텍스트 사용량이 줄어듭니다."
+   },
+   {
+    "answer": "VectorStoreRetriever Memory",
+    "correct": false,
+    "feedback": "이 방식은 누적 지식이 많은 서비스에서 관련 기억만 검색해 올 때 알맞습니다."
+   },
+   {
+    "answer": "메모리를 쓰지 않는다",
+    "correct": false,
+    "feedback": "메모리가 없으면 이전 맥락이 요청에 들어가지 않아 대화가 이어지지 않습니다."
+   }
+  ]
+ }
+]

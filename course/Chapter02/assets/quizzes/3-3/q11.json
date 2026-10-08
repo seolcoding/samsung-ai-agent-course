@@ -1,0 +1,28 @@
+[
+ {
+  "question": "A2A로 다른 Agent에게 일을 맡길 때, 요청하는 Agent가 상대 Agent에 대해 몰라도 되는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "상대 Agent의 내부 구현",
+    "correct": true,
+    "feedback": "요청하는 Agent는 상대가 어떤 프레임워크로 어떻게 만들어졌는지 몰라도 일을 맡길 수 있습니다."
+   },
+   {
+    "answer": "상대 Agent의 연결 주소",
+    "correct": false,
+    "feedback": "주소를 모르면 요청을 보낼 수 없습니다. 몰라도 되는 것은 상대의 내부 구현입니다."
+   },
+   {
+    "answer": "상대 Agent가 할 수 있는 일",
+    "correct": false,
+    "feedback": "무엇을 할 수 있는지는 알아야 맡길 수 있습니다. 그래서 Agent Card로 능력을 알립니다."
+   },
+   {
+    "answer": "맡길 작업의 내용",
+    "correct": false,
+    "feedback": "무엇을 맡길지는 요청하는 쪽이 정해 보냅니다. 몰라도 되는 것은 상대의 내부 구현입니다."
+   }
+  ]
+ }
+]

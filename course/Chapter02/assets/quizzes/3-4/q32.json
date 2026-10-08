@@ -1,0 +1,28 @@
+[
+ {
+  "question": "엣지로 만든 fan-out 대신 Send를 쓰는 것이 알맞은 상황은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "항상 장점과 단점, 두 가지만 분석할 때",
+    "correct": false,
+    "feedback": "작업이 늘 두 개로 정해져 있으면 엣지 두 개로 만든 fan-out으로 충분합니다."
+   },
+   {
+    "answer": "들어오는 질문 목록의 길이에 따라 작업 수가 달라질 때",
+    "correct": true,
+    "feedback": "Send는 실행할 때 목록 길이만큼 Worker를 만듭니다. 작업 수를 미리 정할 수 없을 때 씁니다."
+   },
+   {
+    "answer": "앞 노드의 결과를 받아 다음 노드가 이어서 처리할 때",
+    "correct": false,
+    "feedback": "앞 결과가 필요한 작업은 병렬이 아니라 차례로 잇는 엣지로 만듭니다."
+   },
+   {
+    "answer": "대화 기록을 파일에 저장해야 할 때",
+    "correct": false,
+    "feedback": "기록 저장은 Checkpointer(SqliteSaver)가 맡습니다. Send는 병렬 실행 API입니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,150 @@
+{
+ "title": "# [LEC] A2A 프로토콜의 이해\n\n슬라이드와 설명, 퀴즈로 Agent가 다른 Agent에게 일을 맡기는 표준인 A2A를 익힙니다.",
+ "title__meta": "| 항목 | 내용 |\n|---|---|\n| 버전 | C (슬라이드 요약 + 내용 있는 곳만 \"왜 배우나\") |\n| 원본 PDF | `course/Chapter02/slides/day01/3-3-a2a-protocol-understanding.pdf` (15쪽. 표지 p1, 목차 p2, 장 표지 p3·p6·p9·p13) |\n| 원본 코드 | 이 노트북에는 없습니다. `course/Chapter02/code/raw/02-a2a/`의 두 파일은 `3-3_a2a_LAB.ipynb`에서 다룹니다. |\n| API 호출 | 없습니다. 슬라이드 준비 셀만 실행하면 됩니다. |\n| 시간 | 커리큘럼 3.3은 1.5H입니다. 목차 단계에서 강의 30분 + 실습 60분을 가정했습니다. |",
+ "intro": "이번 시간은 Agent가 다른 Agent에게 일을 맡기고 결과를 받는 표준인 A2A(Agent to Agent)를 봅니다.\n\n1. Agent 2 Agent: A2A 등장 배경, MCP와 A2A의 차이\n2. A2A 핵심 개념: Agent Card, Task·Message·Artifact\n3. A2A Server 구현: AgentExecutor, AgentCard, RequestHandler\n4. A2A Client 구현: A2ACardResolver, SendMessageRequest",
+ "p4": "A2A는 Agent가 다른 Agent에게 작업을 위임하고 결과를 주고받기 위한 통신 프로토콜입니다.\n\nMulti-Agent 시스템에서는 Agent마다 역할, 도구, 실행 환경이 다를 수 있습니다. 서로 다른 프레임워크로 만든 Agent끼리도 협업할 수 있어야 하고, 단순 함수 호출보다 긴 작업, 상태 변화, 결과 산출물을 다룰 수 있는 구조가 필요합니다.\n\n요청하는 Agent는 상대 Agent의 내부 구현을 몰라도 됩니다. 슬라이드 그림에서 배달앱 Agent는 배달관리 Agent와 가게 주문 관리 Agent에게 일을 맡기지만, 그 Agent들이 안에서 어떻게 만들어졌는지는 알 필요가 없습니다.\n\n**왜 배우나:** 앞에서 만든 Multi-Agent는 Researcher와 Writer가 한 그래프 안에 함께 있었습니다. A2A를 쓰면 Researcher를 따로 떨어진 서버로 두고, 요청만 보내 결과를 받을 수 있습니다.",
+ "p4__meta": "- \"왜 배우나\"의 연결 근거: 커리큘럼 2.3(Researcher·Writer Multi-Agent)과 3.3 \"[실습] Researcher(A2A) + Writer(로컬 LLM) 분업 흐름 구성\".\n- 그림 속 이름(배달앱·배달관리·가게 주문 관리 Agent)은 PDF에서 추출된 글자 그대로입니다.",
+ "sum11": "**정리:** A2A는 Agent끼리 일을 맡기고 결과를 주고받는 약속입니다. 맡기는 쪽은 상대의 내부 구현을 몰라도 됩니다.",
+ "p5": "MCP와 A2A는 모두 연결 표준이지만 연결하는 대상이 다릅니다.\n\n| | 연결 대상 | 핵심 |\n|---|---|---|\n| MCP | Agent ↔ Tool·데이터 소스 | 도구 사용 |\n| A2A | Agent ↔ Agent | 작업 위임과 협업 |\n\n둘은 함께 쓸 수 있습니다. 전문 Agent는 A2A로 작업을 받고, 안에서는 MCP로 도구를 씁니다. 슬라이드 그림에서 개인 Agent는 가게 Agent에게 일을 맡기고(A2A), 가게 Agent는 재고 서비스와 POS 서비스를 MCP로 씁니다.\n\n**왜 배우나:** 앞에서 MCP로 도구를 연결했습니다. 도구를 붙일지, 다른 Agent에게 맡길지 고를 때 이 구분이 기준이 됩니다.",
+ "sum12": "**정리:** 도구를 쓰면 MCP, 다른 Agent에게 일을 맡기면 A2A입니다. 한 Agent가 둘을 함께 쓸 수 있습니다.",
+ "p7": "Agent Card는 Agent가 자신이 누구이고 어떤 일을 할 수 있는지 외부에 설명하는 메타데이터입니다.\n\n- Agent의 이름, 설명, 제공 기능을 담습니다.\n- 입출력 모드, 연결 정보, 제공 Skill도 함께 설명합니다.\n- 다른 Agent나 클라이언트는 이 카드를 보고 협업할 수 있는 상대인지 판단합니다.\n\n슬라이드의 예시는 이름이 \"Researcher Agent\"이고, \"웹 리서치\"라는 Skill 하나를 가진 카드입니다.",
+ "sum21": "**정리:** Agent Card는 Agent의 자기소개서입니다. 이름·설명·Skill·입출력 모드·연결 정보를 담습니다.",
+ "p8": "A2A의 협업 단위는 셋으로 나눠 봅니다.\n\n- **Task**: Agent에게 위임되는 작업의 단위\n- **Message**: Agent끼리 주고받는 요청, 질문, 중간 응답\n- **Artifact**: 보고서, 코드, 파일, 구조화 데이터 같은 최종 또는 중간 산출물\n\n시간이 오래 걸리는 작업은 Task 상태와 Message 이력으로 어디까지 진행되었는지 추적합니다.\n\n**왜 배우나:** 이번 시간의 실습 코드는 Task를 따로 다루지 않고 Message 한 번으로 답을 돌려줍니다. 작업이 길어지면 Task 상태와 Artifact로 진행과 결과를 나눠 관리한다는 점을 개념으로 알아 둡니다.",
+ "p8__meta": "- 커리큘럼 3.3의 \"[실습] A2A Client로 task 생성/조회/완료 처리 구현\"은 받은 코드에 없습니다. 서버는 `t.Message` 하나를 발행하고, 클라이언트는 응답의 `message`만 읽습니다. Task 조회·완료 처리 코드는 더하지 않았습니다(받은 내용 유지).",
+ "sum22": "**정리:** Task는 맡긴 일, Message는 주고받는 말, Artifact는 만들어 낸 결과물입니다.",
+ "p10": "AgentExecutor는 A2A 요청을 실제 Agent 실행으로 잇는 서버의 핵심 클래스입니다. `execute`에서 하는 일은 세 가지입니다.\n\n1. `RequestContext`에서 사용자 입력과 task/context id를 읽습니다.\n2. 내부 LangGraph Agent를 실행합니다(`ainvoke`).\n3. 결과를 `t.Message`로 감싸 `EventQueue`에 발행합니다.\n\n**왜 배우나:** 안쪽의 LangGraph Agent는 지금까지 만든 것과 같습니다. A2A는 그 바깥을 감싸 다른 Agent가 요청할 수 있게 해 주는 층입니다. 이미 만든 Agent를 A2A로 내놓을 때 새로 쓰는 부분이 바로 이 클래스입니다.",
+ "sum31": "**정리:** AgentExecutor는 요청을 읽고, 내부 Agent를 실행하고, 결과를 EventQueue에 발행합니다.",
+ "p11": "코드에서는 `t.AgentCard`로 Agent Card를 만듭니다.\n\n- 카드는 `/.well-known/agent-card.json` 주소에서 JSON으로 공개됩니다. 클라이언트는 이 주소를 읽어 Agent의 능력과 연결 정보를 알아냅니다.\n- 이름, 설명, 입출력 모드, 지원 인터페이스(연결 주소)를 담습니다.\n- `skills`에는 Agent가 제공하는 대표 기능을 적습니다.",
+ "sum32": "**정리:** Agent Card는 정해진 주소 `/.well-known/agent-card.json`에 공개되어, 누구나 먼저 읽어 볼 수 있습니다.",
+ "p12": "RequestHandler는 A2A 서버에서 요청을 받는 층(라우팅)과 Agent를 실행하는 층을 잇는 객체입니다.\n\n- `agent_executor`에 실제 실행 로직(앞의 AgentExecutor)을 연결합니다.\n- `task_store`와 `queue_manager`로 작업 상태와 이벤트를 관리합니다.\n- Agent Card 조회 라우트와 JSON-RPC 라우트(정해진 JSON 형식으로 \"이것을 실행해 달라\"는 요청을 받는 주소)를 만들어 Starlette 앱에 등록합니다.\n\n서버 쪽 세 요소를 합치면 이렇습니다. Agent Card는 \"나는 누구인가\"를 알리고, RequestHandler는 요청을 받아 넘기고, AgentExecutor는 실제로 Agent를 실행합니다.",
+ "p12__meta": "- JSON-RPC는 슬라이드에 설명 없이 나오는 용어입니다. 물으면 \"정해진 JSON 형식으로 함수 이름과 인자를 보내 원격에서 실행하는 약속\" 정도로 짧게 답합니다.\n- Starlette는 파이썬 웹 서버 프레임워크입니다. 실습에서는 uvicorn이 이 앱을 8001 포트로 띄웁니다.",
+ "sum33": "**정리:** RequestHandler가 라우트와 AgentExecutor를 잇고, 작업 상태와 이벤트를 관리합니다.",
+ "p14": "클라이언트는 메시지를 보내기 전에 상대 Agent의 Card부터 읽습니다. 이 일을 `A2ACardResolver`가 맡습니다.\n\n1. `A2A-Version` 헤더로 SDK 1.x 요청임을 밝힙니다.\n2. Agent Card를 먼저 읽어 URL, 기능, 입출력 모드를 확인합니다.\n3. 읽은 Card를 바탕으로 JSON-RPC transport(요청을 실어 보내는 통로)와 Client를 만듭니다.",
+ "p14__meta": "- 원본 코드 주석: 헤더가 없으면 서버가 레거시(0.3) 버전으로 가정해 거부합니다.",
+ "sum41": "**정리:** 클라이언트 순서는 Card 조회 → transport·Client 생성입니다. 헤더로 버전을 밝힙니다.",
+ "p15": "`SendMessageRequest`는 사용자 요청을 A2A Message로 감싸 원격 Agent에게 보내는 요청 객체입니다.\n\n- 사용자 입력은 `t.Message`의 `parts`에 텍스트로 담습니다.\n- `client.send_message(req)`는 응답을 하나씩 흘려보내는 스트림을 돌려줍니다.\n- 응답 메시지의 `parts`에서 Agent가 만든 텍스트를 꺼냅니다.\n\n서버가 결과를 `t.Message`로 발행했듯이, 클라이언트도 요청을 `t.Message`로 보냅니다. 주고받는 형식이 같습니다.",
+ "sum42": "**정리:** 요청은 `t.Message`의 `parts`에 담아 보내고, 답도 응답 메시지의 `parts`에서 꺼냅니다.",
+ "q11": {
+  "question": "A2A로 다른 Agent에게 일을 맡길 때, 요청하는 Agent가 상대 Agent에 대해 몰라도 되는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "상대 Agent의 내부 구현", "correct": true, "feedback": "요청하는 Agent는 상대가 어떤 프레임워크로 어떻게 만들어졌는지 몰라도 일을 맡길 수 있습니다."},
+   {"answer": "상대 Agent의 연결 주소", "correct": false, "feedback": "주소를 모르면 요청을 보낼 수 없습니다. 몰라도 되는 것은 상대의 내부 구현입니다."},
+   {"answer": "상대 Agent가 할 수 있는 일", "correct": false, "feedback": "무엇을 할 수 있는지는 알아야 맡길 수 있습니다. 그래서 Agent Card로 능력을 알립니다."},
+   {"answer": "맡길 작업의 내용", "correct": false, "feedback": "무엇을 맡길지는 요청하는 쪽이 정해 보냅니다. 몰라도 되는 것은 상대의 내부 구현입니다."}
+  ]
+ },
+ "q12": {
+  "question": "MCP와 비교할 때 A2A의 핵심으로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "도구 사용", "correct": false, "feedback": "도구 사용은 MCP의 핵심입니다. MCP는 Agent와 Tool·데이터 소스를 연결합니다."},
+   {"answer": "데이터 소스 연결", "correct": false, "feedback": "데이터 소스 연결은 MCP가 맡습니다. A2A는 Agent와 Agent를 연결합니다."},
+   {"answer": "작업 위임과 협업", "correct": true, "feedback": "A2A는 Agent끼리 작업을 맡기고 협업하는 연결 표준입니다."},
+   {"answer": "화면 표시", "correct": false, "feedback": "화면 표시는 두 표준 어느 쪽의 핵심도 아닙니다. A2A의 핵심은 작업 위임과 협업입니다."}
+  ]
+ },
+ "q21": {
+  "question": "Agent Card에 담는 내용이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "Agent의 이름과 설명", "correct": false, "feedback": "이름과 설명은 Agent Card의 기본 내용입니다."},
+   {"answer": "제공하는 Skill", "correct": false, "feedback": "Skill은 Agent가 제공하는 대표 기능으로, 카드에 담습니다."},
+   {"answer": "입출력 모드와 연결 정보", "correct": false, "feedback": "입출력 모드와 연결 정보도 카드에 함께 적습니다."},
+   {"answer": "내부 LangGraph 코드", "correct": true, "feedback": "카드는 밖에서 보는 자기소개입니다. 내부 구현은 담지 않고, 상대도 몰라도 됩니다."}
+  ]
+ },
+ "q22": {
+  "question": "보고서, 코드, 파일처럼 Agent가 만들어 낸 산출물을 가리키는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "Task", "correct": false, "feedback": "Task는 Agent에게 위임되는 작업의 단위입니다."},
+   {"answer": "Message", "correct": false, "feedback": "Message는 요청, 질문, 중간 응답을 주고받는 말입니다."},
+   {"answer": "Artifact", "correct": true, "feedback": "Artifact는 최종 또는 중간 산출물입니다."},
+   {"answer": "Agent Card", "correct": false, "feedback": "Agent Card는 Agent가 누구이고 무엇을 할 수 있는지 알리는 메타데이터입니다."}
+  ]
+ },
+ "q31": {
+  "question": "AgentExecutor가 내부 Agent를 실행한 뒤 결과를 발행하는 곳은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "RequestContext", "correct": false, "feedback": "RequestContext는 사용자 입력과 task/context id를 읽어 오는 곳입니다."},
+   {"answer": "EventQueue", "correct": true, "feedback": "결과를 t.Message로 감싸 EventQueue에 발행합니다."},
+   {"answer": "Agent Card", "correct": false, "feedback": "Agent Card는 Agent를 소개하는 정보입니다. 실행 결과를 담지 않습니다."},
+   {"answer": "task_store", "correct": false, "feedback": "task_store는 RequestHandler가 작업 상태를 관리할 때 씁니다. AgentExecutor는 결과를 EventQueue에 발행합니다."}
+  ]
+ },
+ "q32": {
+  "question": "클라이언트가 Agent의 능력과 연결 정보를 알아내려고 읽는 주소는?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "/.well-known/agent-card.json", "correct": true, "feedback": "Agent Card는 이 주소에서 JSON으로 공개됩니다."},
+   {"answer": "/agent/execute", "correct": false, "feedback": "슬라이드에 없는 주소입니다. Agent Card는 /.well-known/agent-card.json에서 공개됩니다."},
+   {"answer": "/skills", "correct": false, "feedback": "Skill은 카드 안의 한 항목입니다. 카드 전체는 /.well-known/agent-card.json에서 읽습니다."},
+   {"answer": "/message/send", "correct": false, "feedback": "메시지를 보내는 주소가 아니라 카드를 읽는 주소를 묻습니다. 답은 /.well-known/agent-card.json입니다."}
+  ]
+ },
+ "q33": {
+  "question": "RequestHandler에 연결하는 task_store와 queue_manager가 맡는 일은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "Agent Card를 JSON으로 공개하기", "correct": false, "feedback": "카드 공개는 Agent Card 조회 라우트가 맡습니다."},
+   {"answer": "작업 상태와 이벤트 관리", "correct": true, "feedback": "task_store는 작업 상태를, queue_manager는 이벤트를 관리합니다."},
+   {"answer": "내부 LangGraph Agent 실행", "correct": false, "feedback": "실제 실행은 agent_executor에 연결한 AgentExecutor가 맡습니다."},
+   {"answer": "사용자 입력을 t.Message로 감싸 보내기", "correct": false, "feedback": "요청을 t.Message로 감싸 보내는 일은 클라이언트가 합니다."}
+  ]
+ },
+ "q41": {
+  "question": "A2A 클라이언트가 메시지를 보내기 전에 먼저 하는 일은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "상대 Agent의 내부 코드 내려받기", "correct": false, "feedback": "내부 코드는 몰라도 됩니다. 클라이언트는 공개된 Agent Card만 읽습니다."},
+   {"answer": "Agent Card 조회", "correct": true, "feedback": "A2ACardResolver로 카드를 읽어 URL, 기능, 입출력 모드를 확인한 뒤 Client를 만듭니다."},
+   {"answer": "EventQueue에 결과 발행", "correct": false, "feedback": "EventQueue에 발행하는 것은 서버의 AgentExecutor입니다."},
+   {"answer": "task_store 만들기", "correct": false, "feedback": "task_store는 서버의 RequestHandler에 연결하는 것입니다."}
+  ]
+ },
+ "q42": {
+  "question": "SendMessageRequest에서 사용자 입력 텍스트를 담는 곳은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "Agent Card의 description", "correct": false, "feedback": "description은 서버가 자기 Agent를 설명하는 글입니다. 요청 내용이 아닙니다."},
+   {"answer": "A2A-Version 헤더", "correct": false, "feedback": "헤더에는 SDK 1.x 요청이라는 버전 정보를 담습니다."},
+   {"answer": "t.Message의 parts", "correct": true, "feedback": "입력은 t.Message의 parts에 텍스트로 담고, 답도 응답 메시지의 parts에서 꺼냅니다."},
+   {"answer": "EventQueue", "correct": false, "feedback": "EventQueue는 서버가 결과를 발행하는 곳입니다."}
+  ]
+ },
+ "final": [
+  {
+   "question": "여행 계획 Agent가 항공권 예약을 전문으로 하는 다른 팀의 Agent에게 예약 작업을 맡기려고 합니다. 알맞은 연결 표준은?",
+   "type": "multiple_choice",
+   "answers": [
+    {"answer": "MCP", "correct": false, "feedback": "MCP는 Agent와 도구·데이터 소스를 연결합니다. 다른 Agent에게 일을 맡길 때는 A2A를 씁니다."},
+    {"answer": "A2A", "correct": true, "feedback": "Agent와 Agent 사이의 작업 위임은 A2A입니다. 예약 Agent는 안에서 MCP 도구를 쓸 수도 있습니다."},
+    {"answer": "Agent Card", "correct": false, "feedback": "Agent Card는 연결 표준이 아니라 Agent를 소개하는 메타데이터입니다."},
+    {"answer": "EventQueue", "correct": false, "feedback": "EventQueue는 A2A 서버 안에서 결과를 발행하는 곳입니다."}
+   ]
+  },
+  {
+   "question": "A2A 서버의 요소 중 요청을 실제 Agent 실행으로 잇는 것은?",
+   "type": "multiple_choice",
+   "answers": [
+    {"answer": "AgentCard", "correct": false, "feedback": "AgentCard는 Agent의 능력과 연결 정보를 알리는 메타데이터입니다."},
+    {"answer": "RequestHandler", "correct": false, "feedback": "RequestHandler는 라우팅 계층과 실행 계층을 잇습니다. 실제 실행은 여기에 연결한 AgentExecutor가 합니다."},
+    {"answer": "AgentExecutor", "correct": true, "feedback": "입력을 읽고, 내부 LangGraph Agent를 실행하고, 결과를 발행합니다."},
+    {"answer": "A2ACardResolver", "correct": false, "feedback": "A2ACardResolver는 클라이언트 쪽에서 Agent Card를 읽는 도구입니다."}
+   ]
+  },
+  {
+   "question": "A2A 클라이언트가 일하는 순서로 알맞은 것은?",
+   "type": "multiple_choice",
+   "answers": [
+    {"answer": "메시지 전송 → Agent Card 조회 → Client 생성", "correct": false, "feedback": "메시지를 보내려면 Client가 먼저 있어야 하고, Client는 Card를 읽어야 만들 수 있습니다."},
+    {"answer": "Client 생성 → 메시지 전송 → Agent Card 조회", "correct": false, "feedback": "Client는 Card를 바탕으로 만듭니다. Card 조회가 먼저입니다."},
+    {"answer": "Agent Card 조회 → Client 생성 → 메시지 전송", "correct": true, "feedback": "Card를 읽고, 그 정보로 transport와 Client를 만든 뒤, SendMessageRequest를 보냅니다."},
+    {"answer": "Agent Card 조회 → 메시지 전송 → Client 생성", "correct": false, "feedback": "메시지는 Client로 보냅니다. Client를 먼저 만들어야 합니다."}
+   ]
+  }
+ ],
+ "closing": "**이 노트북에서 본 것**\n- A2A는 Agent가 다른 Agent에게 작업을 위임하고 결과를 주고받는 프로토콜입니다. 맡기는 쪽은 상대의 내부 구현을 몰라도 됩니다.\n- MCP는 Agent와 도구를, A2A는 Agent와 Agent를 잇습니다. 한 Agent가 둘을 함께 쓸 수 있습니다.\n- Agent Card는 이름·설명·Skill·입출력 모드·연결 정보를 담아 `/.well-known/agent-card.json`에 공개됩니다.\n- 협업 단위는 Task(맡긴 일), Message(주고받는 말), Artifact(산출물)입니다.\n- 서버: AgentExecutor가 내부 Agent를 실행해 결과를 EventQueue에 발행하고, RequestHandler가 라우트와 실행을 잇습니다.\n- 클라이언트: Agent Card 조회 → Client 생성 → `t.Message`를 담은 SendMessageRequest 전송 → 응답의 `parts`에서 텍스트 꺼내기."
+}

@@ -1,0 +1,80 @@
+[
+ {
+  "question": "Streamlit 앱이 다시 실행되어도 값이 남는 곳은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "스크립트 맨 위에 만든 일반 리스트",
+    "correct": false,
+    "feedback": "일반 리스트는 재실행 때마다 새로 만들어집니다."
+   },
+   {
+    "answer": "`st.session_state`",
+    "correct": true,
+    "feedback": "사용자 세션 동안 유지해야 하는 값을 저장하는 공간이라 재실행 뒤에도 남습니다."
+   },
+   {
+    "answer": "`if prompt := ...` 안에서 만든 변수",
+    "correct": false,
+    "feedback": "이 변수도 재실행 때마다 새로 만들어지고, 입력이 없으면 아예 실행되지 않습니다."
+   },
+   {
+    "answer": "이미 그려 둔 말풍선",
+    "correct": false,
+    "feedback": "화면은 재실행 때마다 새로 그려집니다. 그래서 저장된 메시지를 매번 다시 출력합니다."
+   }
+  ]
+ },
+ {
+  "question": "`@st.cache_resource`와 `st.session_state`의 쓰임을 바르게 짝지은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "cache_resource: 대화 기록 / session_state: RAG 체인",
+    "correct": false,
+    "feedback": "반대입니다. 무거운 체인은 cache_resource로, 계속 바뀌는 대화 기록은 session_state로 둡니다."
+   },
+   {
+    "answer": "cache_resource: RAG 체인 / session_state: 대화 기록",
+    "correct": true,
+    "feedback": "한 번 만들어 재사용할 무거운 객체는 cache_resource, 세션 동안 유지할 값은 session_state입니다."
+   },
+   {
+    "answer": "둘 다 LLM이 이전 대화를 기억하게 한다",
+    "correct": false,
+    "feedback": "둘 다 재실행 때 무엇을 남길지 정하는 기능입니다. LLM의 기억과는 관계가 없습니다."
+   },
+   {
+    "answer": "둘 다 화면 요소를 꾸미는 기능이다",
+    "correct": false,
+    "feedback": "화면 요소는 title, caption, chat_message 같은 함수가 그립니다. 두 기능은 값을 남기는 역할입니다."
+   }
+  ]
+ },
+ {
+  "question": "예시 챗봇에서 질문 하나를 입력했을 때 일어나는 순서로 맞는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "질문 저장 → user 말풍선 출력 → 체인 가져오기 → 답변 스트리밍 → 답변 저장",
+    "correct": true,
+    "feedback": "질문을 먼저 저장하고 출력한 뒤, 체인의 답변을 스트리밍으로 출력하고 마지막에 저장합니다."
+   },
+   {
+    "answer": "체인 가져오기 → 답변 스트리밍 → 질문 저장 → user 말풍선 출력 → 답변 저장",
+    "correct": false,
+    "feedback": "답변보다 질문이 먼저입니다. 입력을 받으면 질문부터 저장하고 출력합니다."
+   },
+   {
+    "answer": "질문 저장 → 답변 저장 → user 말풍선 출력 → 답변 스트리밍",
+    "correct": false,
+    "feedback": "답변은 스트리밍이 끝나야 `response`로 받을 수 있습니다. 저장은 그 뒤입니다."
+   },
+   {
+    "answer": "user 말풍선 출력 → 답변 스트리밍 → 질문과 답변을 한꺼번에 저장",
+    "correct": false,
+    "feedback": "예시 코드는 질문을 받자마자 먼저 저장하고, 답변은 스트리밍이 끝난 뒤 따로 저장합니다."
+   }
+  ]
+ }
+]

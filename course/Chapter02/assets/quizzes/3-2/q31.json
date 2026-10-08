@@ -1,0 +1,28 @@
+[
+ {
+  "question": "MCP 설정(MCP_CONFIG)에 적는 항목이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "서버 이름",
+    "correct": false,
+    "feedback": "슬라이드 설정의 `\"tutorial\"`이 서버 이름입니다."
+   },
+   {
+    "answer": "transport",
+    "correct": false,
+    "feedback": "연결 방식입니다. 슬라이드 설정은 `\"sse\"`입니다."
+   },
+   {
+    "answer": "url",
+    "correct": false,
+    "feedback": "서버 주소입니다. 슬라이드 설정은 `http://localhost:8000/sse`입니다."
+   },
+   {
+    "answer": "모델 이름",
+    "correct": true,
+    "feedback": "MCP 설정은 서버에 연결하는 방법만 적습니다. 어떤 LLM을 쓸지는 Agent 쪽에서 정합니다."
+   }
+  ]
+ }
+]

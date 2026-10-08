@@ -1,0 +1,106 @@
+[
+ {
+  "question": "LLM이 하는 일을 한마디로 말하면?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "입력 다음에 올 말을 예측한다",
+    "correct": true,
+    "feedback": "LLM은 말뭉치에서 배운 대로 다음에 올 말을 예측하는 모델입니다."
+   },
+   {
+    "answer": "질문의 정답을 데이터베이스에서 찾는다",
+    "correct": false,
+    "feedback": "LLM은 정답을 찾아오지 않고, 나올 가능성이 높은 말을 만들어 냅니다."
+   },
+   {
+    "answer": "사람이 적은 규칙대로 문장을 조립한다",
+    "correct": false,
+    "feedback": "규칙을 적어 두지 않고, 글 데이터에서 패턴을 배웁니다."
+   },
+   {
+    "answer": "컴퓨터를 직접 조작해 작업을 끝낸다",
+    "correct": false,
+    "feedback": "LLM의 입출력은 문자에서 문자입니다. 스스로 컴퓨터를 조작하지 못합니다."
+   }
+  ]
+ },
+ {
+  "question": "LLM이 사실이 아닌 말을 그럴듯하게 출력하는(환각) 까닭은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "일부러 틀린 답을 섞도록 학습해서",
+    "correct": false,
+    "feedback": "일부러 틀리게 학습한 것이 아닙니다. 검증 없이 예측하기 때문입니다."
+   },
+   {
+    "answer": "입력이 길면 앞부분을 잊어버려서",
+    "correct": false,
+    "feedback": "슬라이드가 든 까닭은 입력 길이가 아니라 다음 단어 예측이라는 동작 방식입니다."
+   },
+   {
+    "answer": "Instruction Tuning을 거치지 않아서",
+    "correct": false,
+    "feedback": "Instruction Tuning을 거친 챗봇도 다음 말을 예측하므로 환각이 생길 수 있습니다."
+   },
+   {
+    "answer": "나올 가능성이 높은 단어를 검증 없이 출력해서",
+    "correct": true,
+    "feedback": "사실인지 확인하지 않고 그럴듯한 다음 단어를 고르기 때문입니다."
+   }
+  ]
+ },
+ {
+  "question": "Function Calling에서 LLM이 맡는 일로 맞는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "함수를 직접 실행하고 결과를 저장한다",
+    "correct": false,
+    "feedback": "실행은 LLM 바깥의 프로그램이 합니다."
+   },
+   {
+    "answer": "어떤 함수를 어떤 인자로 호출할지 텍스트로 출력한다",
+    "correct": true,
+    "feedback": "LLM은 호출할 함수와 인자를 글로 쓰고, 바깥 프로그램이 그 글을 읽어 호출합니다."
+   },
+   {
+    "answer": "쓸 수 있는 함수 목록을 스스로 만든다",
+    "correct": false,
+    "feedback": "쓸 수 있는 함수 목록은 요청을 보낼 때 맥락에 함께 넣어 줍니다."
+   },
+   {
+    "answer": "함수 코드를 새로 작성해 설치한다",
+    "correct": false,
+    "feedback": "함수는 미리 준비되어 있고, LLM은 그중 무엇을 호출할지 출력합니다."
+   }
+  ]
+ },
+ {
+  "question": "이 노트북에서 말하는 Agent에 가장 가까운 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "질문 하나에 답 하나를 돌려주는 챗봇",
+    "correct": false,
+    "feedback": "Instruction Tuning으로 만든 챗봇입니다. Agent는 행동을 되풀이하며 목표를 이룹니다."
+   },
+   {
+    "answer": "정해진 순서대로만 도는 자동화 스크립트",
+    "correct": false,
+    "feedback": "Agent는 LLM의 출력으로 다음 행동을 스스로 정합니다."
+   },
+   {
+    "answer": "Reason → Action → Observation을 목표를 이룰 때까지 되풀이하는 AI",
+    "correct": true,
+    "feedback": "출력 흐름을 조정해 스스로 목표를 이루게 만든 AI가 Agent입니다."
+   },
+   {
+    "answer": "더 큰 말뭉치로 다시 학습한 LLM",
+    "correct": false,
+    "feedback": "모델을 더 크게 학습시키는 것과 Agent는 다릅니다. Agent는 출력 흐름을 조정한 구성입니다."
+   }
+  ]
+ }
+]

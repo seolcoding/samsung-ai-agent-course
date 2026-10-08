@@ -1,0 +1,28 @@
+[
+ {
+  "question": "검색해 온 청크들의 순서를 다시 매겨, 질문과 더 관련 있는 청크를 앞에 두는 보완 단계는 무엇일까요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Query Rewrite",
+    "correct": false,
+    "feedback": "Query Rewrite는 검색하기 전에 질문을 검색하기 좋은 형태로 다시 쓰는 단계입니다."
+   },
+   {
+    "answer": "Hybrid Search",
+    "correct": false,
+    "feedback": "Hybrid Search는 키워드 검색과 벡터 검색을 함께 써서 후보를 찾는 방식입니다."
+   },
+   {
+    "answer": "Re-ranking",
+    "correct": true,
+    "feedback": "Re-ranking은 이미 찾아온 검색 결과의 우선순위를 다시 계산합니다."
+   },
+   {
+    "answer": "Self-check",
+    "correct": false,
+    "feedback": "Self-check는 답변을 만든 뒤 답변과 근거가 맞는지 점검하는 단계입니다."
+   }
+  ]
+ }
+]

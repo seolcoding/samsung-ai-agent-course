@@ -1,0 +1,44 @@
+<div id="__VIEWER_ID__" tabindex="0" style="font-family:sans-serif;font-size:15px;color:#1f2328;max-width:960px;outline:none">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+    <strong style="flex:1">__TITLE__</strong>
+    <button data-act="prev">◀ 이전</button>
+    <span data-role="pos"></span>
+    <button data-act="next">다음 ▶</button>
+  </div>
+  <img data-role="img" style="width:100%;border:1px solid #ccc;border-radius:6px" alt="slide">
+  <div data-role="thumbs" style="display:flex;gap:4px;overflow-x:auto;margin-top:6px"></div>
+  <small style="color:#888">뷰어를 한 번 클릭한 뒤 ← → 키로도 넘길 수 있다.</small>
+</div>
+<script>
+(() => {
+  const pages = __PAGES__;
+  const images = __IMAGES__;
+  const root = document.getElementById("__VIEWER_ID__");
+  const img = root.querySelector('[data-role="img"]');
+  const pos = root.querySelector('[data-role="pos"]');
+  const thumbs = root.querySelector('[data-role="thumbs"]');
+  let i = 0;
+  const show = (n) => {
+    i = Math.max(0, Math.min(images.length - 1, n));
+    img.src = images[i];
+    pos.textContent = `p${pages[i]} (${i + 1} / ${images.length})`;
+    [...thumbs.children].forEach((t, k) => t.style.outline = k === i ? "2px solid #1f6feb" : "none");
+  };
+  if (images.length > 1) {
+    images.forEach((src, k) => {
+      const t = document.createElement("img");
+      t.src = src; t.title = `p${pages[k]}`;
+      t.style.cssText = "height:50px;cursor:pointer;border-radius:3px";
+      t.onclick = () => show(k);
+      thumbs.appendChild(t);
+    });
+  }
+  root.querySelector('[data-act="prev"]').onclick = () => show(i - 1);
+  root.querySelector('[data-act="next"]').onclick = () => show(i + 1);
+  root.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") show(i - 1);
+    if (e.key === "ArrowRight") show(i + 1);
+  });
+  show(0);
+})();
+</script>

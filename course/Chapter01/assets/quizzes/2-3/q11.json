@@ -1,0 +1,28 @@
+[
+ {
+  "question": "LLM 실습에서 Streamlit을 쓰는 이유가 **아닌** 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "콘솔 실행 결과를 보기 쉬운 화면으로 바꾼다",
+    "correct": false,
+    "feedback": "이유가 맞습니다. 콘솔 출력 대신 사용자가 보기 쉬운 화면으로 결과를 보여 줍니다."
+   },
+   {
+    "answer": "모델 응답이 생성되는 과정을 스트리밍으로 보여 준다",
+    "correct": false,
+    "feedback": "이것도 이유입니다. 답변이 만들어지는 대로 글자가 이어지며 나타나게 할 수 있습니다."
+   },
+   {
+    "answer": "RAG 체인의 답변 정확도를 높여 준다",
+    "correct": true,
+    "feedback": "Streamlit은 화면을 만드는 도구입니다. 답변의 내용은 체인과 모델이 정합니다."
+   },
+   {
+    "answer": "실습한 RAG 체인을 서비스 형태로 확인한다",
+    "correct": false,
+    "feedback": "Streamlit을 쓰는 이유 중 하나입니다. 체인을 웹 화면에 연결해 실제 서비스처럼 써 봅니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "A2A 클라이언트가 메시지를 보내기 전에 먼저 하는 일은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "상대 Agent의 내부 코드 내려받기",
+    "correct": false,
+    "feedback": "내부 코드는 몰라도 됩니다. 클라이언트는 공개된 Agent Card만 읽습니다."
+   },
+   {
+    "answer": "Agent Card 조회",
+    "correct": true,
+    "feedback": "A2ACardResolver로 카드를 읽어 URL, 기능, 입출력 모드를 확인한 뒤 Client를 만듭니다."
+   },
+   {
+    "answer": "EventQueue에 결과 발행",
+    "correct": false,
+    "feedback": "EventQueue에 발행하는 것은 서버의 AgentExecutor입니다."
+   },
+   {
+    "answer": "task_store 만들기",
+    "correct": false,
+    "feedback": "task_store는 서버의 RequestHandler에 연결하는 것입니다."
+   }
+  ]
+ }
+]

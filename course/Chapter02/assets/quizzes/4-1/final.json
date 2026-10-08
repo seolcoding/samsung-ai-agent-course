@@ -1,0 +1,80 @@
+[
+ {
+  "question": "\"모델이 참고할 정보, 규칙, 예시, 이전 상태를 구성한다\"는 어느 엔지니어링의 초점인가요?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Context Engineering",
+    "correct": true,
+    "feedback": "정보 설계입니다."
+   },
+   {
+    "answer": "Prompt Engineering",
+    "correct": false,
+    "feedback": "Prompt Engineering은 질문을 어떤 표현으로 던질지 설계합니다."
+   },
+   {
+    "answer": "Harness Engineering",
+    "correct": false,
+    "feedback": "Harness Engineering은 AI가 목표를 수행하고 검증하며 상태를 이어 가는 실행 환경을 만듭니다."
+   },
+   {
+    "answer": "Data Engineering",
+    "correct": false,
+    "feedback": "슬라이드의 세 가지 엔지니어링에 없습니다."
+   }
+  ]
+ },
+ {
+  "question": "여러 자료를 탐색하며 새 정보에 따라 계획을 바꿔야 하는 리서치에 알맞은 구조와 그 이유는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Agent. 다음 행동을 미리 알기 어렵고 관찰 결과에 따라 계획을 바꿔야 한다",
+    "correct": true,
+    "feedback": "실행 경로를 모델이 상황에 따라 정하는 Agent가 알맞습니다."
+   },
+   {
+    "answer": "Workflow. 실행 순서가 분명하다",
+    "correct": false,
+    "feedback": "탐색하는 리서치는 순서를 미리 정하기 어렵습니다."
+   },
+   {
+    "answer": "Workflow. 재현성과 테스트 가능성이 가장 중요하다",
+    "correct": false,
+    "feedback": "재현성이 중요한 일은 Workflow에 맞지만, 이 일은 계획을 바꿔야 한다는 점이 핵심입니다."
+   },
+   {
+    "answer": "Agent. 구조가 복잡할수록 결과가 좋다",
+    "correct": false,
+    "feedback": "Agent를 고르는 이유가 틀렸습니다. 하네스는 복잡해야 좋은 것이 아니라 충분해야 좋습니다."
+   }
+  ]
+ },
+ {
+  "question": "SKILL.md의 \"When to use\"에 적는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "이 Skill을 적용해야 하는 상황",
+    "correct": true,
+    "feedback": "상단 정보의 When to use입니다. 작성 순서의 \"조건\" 단계에서 쓰지 않을 때도 함께 나눕니다."
+   },
+   {
+    "answer": "실제 작업 순서",
+    "correct": false,
+    "feedback": "작업 순서는 Workflow에 적습니다."
+   },
+   {
+    "answer": "금지 행동과 안전 규칙",
+    "correct": false,
+    "feedback": "금지 행동은 Constraints에 적습니다."
+   },
+   {
+    "answer": "입력과 기대 결과",
+    "correct": false,
+    "feedback": "입력과 기대 결과는 Examples에 적습니다."
+   }
+  ]
+ }
+]

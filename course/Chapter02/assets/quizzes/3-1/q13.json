@@ -1,0 +1,28 @@
+[
+ {
+  "question": "LangGraph에서 조건에 따라 다음에 갈 노드를 고르는 요소는?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "State",
+    "correct": false,
+    "feedback": "State는 실행 맥락을 담는 곳입니다. 어디로 갈지는 정하지 않습니다."
+   },
+   {
+    "answer": "Conditional Edge",
+    "correct": true,
+    "feedback": "Conditional Edge는 조건을 보고 다음 노드를 고릅니다. 분기와 반복이 여기서 생깁니다."
+   },
+   {
+    "answer": "ToolNode",
+    "correct": false,
+    "feedback": "ToolNode는 모델이 고른 도구를 실행하는 노드입니다."
+   },
+   {
+    "answer": "Human-in-the-loop",
+    "correct": false,
+    "feedback": "Human-in-the-loop는 사람이 중간에 확인하는 패턴입니다. 조건 분기를 맡는 요소는 따로 있습니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,126 @@
+{
+ "title": "# [LEC] 과정 1 리뷰와 과정 2 목표\n\n슬라이드와 설명, 퀴즈로 과정 1에서 배운 것을 다시 짚고, 과정 2에서 다룰 주제를 미리 봅니다.",
+ "title__meta": "| 항목 | 내용 |\n|---|---|\n| 버전 | C (슬라이드 요약 + 내용 있는 곳만 \"왜 배우나\") |\n| 원본 PDF | `course/Chapter02/slides/day01/3-1-course-one-review-and-advanced-direction.pdf` (11쪽. 표지 p1, 목차 p2, 장 표지 p3·p7) |\n| 원본 코드 | 이 노트북에는 없습니다. `course/Chapter02/code/raw/00-review/`의 네 파일은 `3-1_review_LAB.ipynb`에서 다룹니다. |\n| API 호출 | 없습니다. 슬라이드 준비 셀만 실행하면 됩니다. |",
+ "intro": "이번 시간은 두 부분입니다.\n\n1. 과정 1 리뷰: LLM·Agent·LangChain, RAG, LangGraph\n2. 과정 2 목표: MCP와 A2A, LangGraph 심화, Harness Engineering, Observability\n\n과정 1에서 만든 것을 짧게 되짚고, 과정 2에서 그 위에 무엇을 더하는지 봅니다.",
+ "intro__meta": "- 커리큘럼 3.1(3일차 2.0H) \"과정1 복습 & 심화 방향 정렬\". 목차 단계 가정: LEC 30분 + 환경 확인 20분 + LAB 60분 + 여유 10분. LEC가 운영 요청 \"3일차 시작 커리큘럼 소개(30분 이내)\"를 겸합니다.\n- 과정 2 일정(0903 커리큘럼): 3일차 3.1 복습(2.0H) → 3.2 MCP(1.5H) → 3.3 A2A(1.5H) → 3.4 LangGraph 심화(3.0H) / 4일차 4.1 Harness Engineering(2.0H) → 4.2 Observability & Evaluation(Langfuse, 2.0H) → 4.3 캡스톤(4.0H, 리서치 자동화 멀티 에이전트 시스템, 자유 주제 또는 스켈레톤).\n- 운영 요청 \"3일차에 캡스톤 예고\"는 슬라이드에 없어 수강생 글에 넣지 않았습니다. 위 일정을 보여 주며 구두로 예고합니다.\n- 커리큘럼 항목 ③ 개발 환경 구성(VS Code, CodeMate, venv, .env)은 슬라이드에 없습니다. LAB 첫 환경 점검 셀과 강사 진행으로 처리합니다. 3일차에 PC를 다시 셋팅해야 하는지(계정별 초기화 정책)는 미확인입니다.\n- 커리큘럼 항목 ④ \"코드로 server, client 기초 이해\"는 3-1에서 다루지 않고 3-2(MCP)·3-3(A2A) 실습이 맡습니다(2026-09-28 사용자 결정).",
+ "p4": "LLM이 어떻게 컴퓨터를 쓰는 Agent가 되었는지를 네 낱말로 정리합니다.\n\n- **LLM**: 방대한 언어 데이터로 \"이 다음엔 어떤 말이 나올까?\"를 예측하는 모델입니다.\n- **Function(Tool) Calling**: LLM의 출력을 해석해 컴퓨터의 기능을 실행하는 일입니다.\n- **Agent**: 함수를 호출하고 그 결과를 검토하는 과정을 반복해, 복잡한 작업을 처리하도록 구성한 LLM 파이프라인입니다.\n- **LangChain(LangGraph)**: LLM을 활용한 워크플로를 만드는 데 쓰는 라이브러리입니다.\n\n슬라이드 아래 코드는 LangChain의 기본 모양입니다. 프롬프트 템플릿(`prompt`), 모델(`model`), 출력 파서(`parser`)를 `|`로 이어 체인 하나를 만들고, `invoke`에 `{\"topic\": \"LLM\"}`을 넣으면 `{topic}` 자리가 채워진 질문이 모델로 가서 답변 텍스트가 나옵니다.\n\n**왜 배우나:** 과정 2의 MCP와 A2A는 모두 \"도구를 호출하고 결과를 검토하는 반복\" 위에 올라갑니다. Agent의 정의를 먼저 맞춰 두면 새 주제가 어디에 붙는지 보입니다.",
+ "p4__meta": "- 슬라이드 코드(`ChatPromptTemplate` 체인)는 LAB 2장 코드(메시지 목록 + `invoke`/`stream`)와 모양이 다릅니다. LAB 2장 소개에 \"같은 모델을 메시지 목록으로 호출한다\"고 적었습니다.",
+ "q11": {
+  "question": "슬라이드의 정의로 Agent를 가장 잘 설명한 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "다음에 어떤 말이 나올지 예측하는 모델", "correct": false, "feedback": "그것은 LLM의 정의입니다. Agent는 LLM으로 구성한 파이프라인입니다."},
+   {"answer": "함수 호출과 그 결과 검토를 반복해 복잡한 작업을 처리하는 LLM 파이프라인", "correct": true, "feedback": "Agent는 한 번 답하고 끝나지 않습니다. 도구를 호출하고 결과를 보고 다시 판단하는 일을 반복합니다."},
+   {"answer": "LLM 워크플로를 만드는 데 쓰는 라이브러리", "correct": false, "feedback": "그것은 LangChain(LangGraph)의 설명입니다."},
+   {"answer": "LLM의 출력을 해석해 컴퓨터 기능을 한 번 실행하는 일", "correct": false, "feedback": "그것은 Function(Tool) Calling입니다. Agent는 이 호출과 결과 검토를 반복합니다."}
+  ]
+ },
+ "sum11": "**정리:** LLM은 다음 말을 예측하고, Tool Calling은 그 출력으로 기능을 실행하며, Agent는 호출과 검토를 반복합니다. LangChain은 이 흐름을 만드는 라이브러리입니다.",
+ "p5": "RAG는 LLM 응답의 품질을 올리는 기법 중 하나입니다. 세 단계로 이뤄집니다.\n\n1. 문서를 쪼개고, 의미가 얼마나 비슷한지 비교할 수 있는 형태로 바꿉니다.\n2. 사용자 질문과 가장 관련이 높은 문서를 검색합니다.\n3. LLM이 답변을 만들 때 검색한 문서 내용을 더해 답변 품질을 높입니다.\n\n슬라이드 화면은 과정 1에서 Streamlit으로 만든 보험 약관 QA 챗봇입니다. 메리츠 펫보험 약관을 근거로 답변합니다.",
+ "q12": {
+  "question": "슬라이드가 설명한 RAG의 단계가 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "문서를 쪼개 의미를 비교할 수 있는 형태로 바꾸기", "correct": false, "feedback": "RAG의 첫 단계입니다. 쪼갠 문서를 벡터로 바꿔 두어야 검색할 수 있습니다."},
+   {"answer": "질문과 가장 관련이 높은 문서 검색하기", "correct": false, "feedback": "RAG의 두 번째 단계입니다."},
+   {"answer": "답변을 만들 때 검색한 문서 내용 더하기", "correct": false, "feedback": "RAG의 세 번째 단계입니다."},
+   {"answer": "문서 내용으로 모델을 다시 학습시키기", "correct": true, "feedback": "RAG는 모델을 다시 학습시키지 않습니다. 검색한 문서를 질문과 함께 넣어 답변하게 합니다."}
+  ]
+ },
+ "sum12": "**정리:** RAG는 문서를 쪼개 검색할 수 있게 바꾸고, 질문과 가까운 문서를 찾아, 답변에 그 내용을 더합니다.",
+ "p6": "LangGraph는 Agent의 실행 흐름을 그래프로 표현해, 복잡한 분기와 반복을 다룰 수 있게 합니다.\n\n- **State**를 중심으로 실행 맥락을 관리합니다.\n- **Node**와 **Edge**로 Agent 흐름을 구성합니다.\n- **Conditional Edge**로 조건에 따라 갈 길을 나눕니다.\n- **ToolNode**, **Human-in-the-loop** 같은 Agent 패턴을 표현합니다.\n\n슬라이드 그림은 과정 1의 멀티 에이전트 구조입니다. 사용자 요청을 Supervisor가 받아 Research, Writer, Critic Agent에게 일을 나누고, 최종 답변을 만듭니다.",
+ "q13": {
+  "question": "LangGraph에서 조건에 따라 다음에 갈 노드를 고르는 요소는?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "State", "correct": false, "feedback": "State는 실행 맥락을 담는 곳입니다. 어디로 갈지는 정하지 않습니다."},
+   {"answer": "Conditional Edge", "correct": true, "feedback": "Conditional Edge는 조건을 보고 다음 노드를 고릅니다. 분기와 반복이 여기서 생깁니다."},
+   {"answer": "ToolNode", "correct": false, "feedback": "ToolNode는 모델이 고른 도구를 실행하는 노드입니다."},
+   {"answer": "Human-in-the-loop", "correct": false, "feedback": "Human-in-the-loop는 사람이 중간에 확인하는 패턴입니다. 조건 분기를 맡는 요소는 따로 있습니다."}
+  ]
+ },
+ "sum13": "**정리:** LangGraph는 State로 맥락을 관리하고, Node·Edge로 흐름을 짜고, Conditional Edge로 분기합니다.",
+ "p8": "과정 2에서는 Agent 시스템이 외부 도구와 다른 Agent를 **표준 방식으로 연결**하는 흐름을 다룹니다.\n\n- **MCP**: Agent와 도구(Tool) 또는 데이터 소스를 연결합니다.\n- **A2A**: Agent와 Agent 사이에서 작업을 위임합니다.\n\n**왜 배우나:** 과정 1에서는 도구를 Agent 코드 안에 직접 만들었습니다. 과정 2에서는 도구와 다른 Agent를 밖에 두고 약속된 방식으로 연결합니다. MCP와 A2A는 \"무엇과 무엇을 잇는가\"로 구분합니다.",
+ "p8__meta": "- 3.2 MCP, 3.3 A2A 실습에서 서버를 터미널에서 띄우고 노트북에서 클라이언트로 호출합니다. 커리큘럼 3.1 ④ \"server, client 기초 이해\"는 이 두 권이 맡습니다.",
+ "q21": {
+  "question": "한 Agent가 다른 Agent에게 작업을 맡기는 연결 방식은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "MCP", "correct": false, "feedback": "MCP는 Agent와 도구 또는 데이터 소스를 잇습니다."},
+   {"answer": "A2A", "correct": true, "feedback": "A2A는 Agent와 Agent 사이의 작업 위임을 다룹니다."},
+   {"answer": "RAG", "correct": false, "feedback": "RAG는 문서를 검색해 답변에 더하는 기법입니다. Agent끼리 연결하는 방식이 아닙니다."},
+   {"answer": "Tool Calling", "correct": false, "feedback": "Tool Calling은 모델 출력으로 기능을 실행하는 일입니다. 다른 Agent에게 일을 맡기는 표준은 따로 있습니다."}
+  ]
+ },
+ "sum21": "**정리:** MCP는 Agent와 도구·데이터를, A2A는 Agent와 Agent를 표준 방식으로 연결합니다.",
+ "p9": "LangGraph 심화에서는 Agent 실행 흐름을 더 안정적이고 확장하기 쉬운 구조로 다듬습니다.\n\n- **Subgraph**로 그래프를 모듈로 나눕니다.\n- **Persistence**로 상태를 저장하고 이어서 실행합니다.\n- **Parallel Execution**으로 여러 일을 동시에 처리합니다.\n- **Memory Store**로 장기 기억을 관리합니다.",
+ "q22": {
+  "question": "LangGraph 심화에서 장기 기억을 관리하는 기능은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "Subgraph", "correct": false, "feedback": "Subgraph는 그래프를 모듈로 나누는 기능입니다."},
+   {"answer": "Persistence", "correct": false, "feedback": "Persistence는 상태를 저장해 이어서 실행하게 합니다. 장기 기억은 따로 관리합니다."},
+   {"answer": "Parallel Execution", "correct": false, "feedback": "Parallel Execution은 병렬 처리입니다."},
+   {"answer": "Memory Store", "correct": true, "feedback": "Memory Store가 장기 기억을 관리합니다."}
+  ]
+ },
+ "sum22": "**정리:** Subgraph는 모듈화, Persistence는 저장과 재개, Parallel Execution은 병렬 처리, Memory Store는 장기 기억입니다.",
+ "p10": "Harness Engineering은 Agent가 안정적으로 일할 수 있도록 **실행 환경과 맥락을 설계**하는 관점입니다.\n\n- 필요한 컨텍스트를 어떻게 제공할지 설계합니다.\n- 도구를 쓰는 조건과 실패했을 때 복구하는 전략을 정합니다.\n- Skill, 지침, 파일 구조를 Agent가 읽기 쉽게 정리합니다.\n\n**왜 배우나:** 과정 2의 실습은 AI와 함께 코드를 만들고 결과를 검토하는 방식으로 진행합니다. AI에게 어떤 맥락과 지침을 주느냐에 따라 결과가 달라지므로, 그 맥락을 설계하는 일이 곧 Harness Engineering의 대상입니다.",
+ "p10__meta": "- \"왜 배우나\"의 근거: 루트 AGENTS.md 2절 교육 목표 3(하네스·루프 엔지니어링)과 실습 전반의 Coding AI 페어 프로그래밍 전환.",
+ "q23": {
+  "question": "Harness Engineering에서 다루는 것이 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "필요한 컨텍스트를 어떻게 제공할지 설계하기", "correct": false, "feedback": "슬라이드의 첫 항목입니다."},
+   {"answer": "도구 사용 조건과 실패 복구 전략 정하기", "correct": false, "feedback": "슬라이드의 두 번째 항목입니다."},
+   {"answer": "모델 가중치를 새로 학습시키기", "correct": true, "feedback": "Harness Engineering은 모델 자체가 아니라 Agent가 일하는 환경과 맥락을 설계합니다."},
+   {"answer": "Skill, 지침, 파일 구조를 Agent가 읽기 쉽게 정리하기", "correct": false, "feedback": "슬라이드의 세 번째 항목입니다."}
+  ]
+ },
+ "sum23": "**정리:** Harness Engineering은 모델을 바꾸지 않고, 컨텍스트·도구 사용 규칙·지침과 파일 구조를 설계해 Agent를 안정시킵니다.",
+ "p11": "Observability는 Agent가 실제로 어떻게 실행됐는지 **추적하고 평가**하는 역량입니다.\n\n- **Trace**로 모델 호출, 도구 실행, 체인 흐름을 확인합니다.\n- **Score**로 응답 품질을 수치로 나타냅니다.\n- **Langfuse**로 실행 로그와 평가 결과를 관리합니다.\n- 이렇게 모은 기록으로 RAG와 Agent 응답을 계속 개선합니다.",
+ "q24": {
+  "question": "응답 품질을 수치로 나타내는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {"answer": "Trace", "correct": false, "feedback": "Trace는 모델 호출·도구 실행·체인 흐름을 확인하는 기록입니다."},
+   {"answer": "Score", "correct": true, "feedback": "Score가 응답 품질을 수치로 나타냅니다."},
+   {"answer": "Subgraph", "correct": false, "feedback": "Subgraph는 LangGraph에서 그래프를 모듈로 나누는 기능입니다."},
+   {"answer": "Memory Store", "correct": false, "feedback": "Memory Store는 장기 기억을 관리하는 기능입니다."}
+  ]
+ },
+ "sum24": "**정리:** Trace로 실행을 보고, Score로 품질을 재고, Langfuse로 둘을 관리해 응답을 개선합니다.",
+ "final": [
+  {
+   "question": "Agent가 실제로 어떤 모델 호출과 도구 실행을 거쳤는지 확인하고 싶습니다. 과정 2의 어느 주제에서 다루나요?",
+   "type": "multiple_choice",
+   "answers": [
+    {"answer": "MCP와 A2A", "correct": false, "feedback": "MCP와 A2A는 도구와 다른 Agent를 연결하는 방식입니다."},
+    {"answer": "LangGraph 심화", "correct": false, "feedback": "LangGraph 심화는 흐름을 모듈화·저장·병렬화하는 구조를 다룹니다."},
+    {"answer": "Harness Engineering", "correct": false, "feedback": "Harness Engineering은 Agent가 일할 환경과 맥락을 설계합니다."},
+    {"answer": "Observability", "correct": true, "feedback": "Observability는 Trace로 모델 호출·도구 실행·체인 흐름을 확인합니다."}
+   ]
+  },
+  {
+   "question": "Function(Tool) Calling을 가장 잘 설명한 것은?",
+   "type": "multiple_choice",
+   "answers": [
+    {"answer": "LLM의 출력을 해석해 컴퓨터의 기능을 실행하는 일", "correct": true, "feedback": "모델은 어떤 기능을 어떤 값으로 실행할지 출력하고, 그 출력을 해석해 실제로 실행합니다."},
+    {"answer": "LLM이 다음에 올 말을 예측하는 일", "correct": false, "feedback": "그것은 LLM 자체의 정의입니다."},
+    {"answer": "질문과 관련된 문서를 검색해 답변에 더하는 일", "correct": false, "feedback": "그것은 RAG입니다."},
+    {"answer": "Agent와 Agent 사이에서 작업을 위임하는 일", "correct": false, "feedback": "그것은 A2A입니다."}
+   ]
+  },
+  {
+   "question": "LangGraph에서 실행 맥락을 관리하는 중심은?",
+   "type": "multiple_choice",
+   "answers": [
+    {"answer": "Edge", "correct": false, "feedback": "Edge는 노드 사이의 흐름을 잇습니다."},
+    {"answer": "ToolNode", "correct": false, "feedback": "ToolNode는 도구를 실행하는 노드입니다."},
+    {"answer": "State", "correct": true, "feedback": "LangGraph는 State를 중심으로 실행 맥락을 관리합니다. 노드는 State를 읽고 바꿉니다."},
+    {"answer": "Supervisor", "correct": false, "feedback": "Supervisor는 멀티 에이전트 구조에서 일을 나누는 Agent입니다. 맥락을 담는 곳은 따로 있습니다."}
+   ]
+  }
+ ],
+ "closing": "**이 노트북에서 본 것**\n- 과정 1: LLM은 다음 말을 예측하고, Tool Calling으로 기능을 실행하며, Agent는 호출과 검토를 반복합니다. LangChain은 이 흐름을 만드는 라이브러리입니다.\n- RAG는 문서를 쪼개 검색하고, 찾은 내용을 답변에 더합니다.\n- LangGraph는 State·Node·Edge·Conditional Edge로 분기와 반복을 표현합니다.\n- 과정 2: MCP와 A2A로 도구와 다른 Agent를 표준 방식으로 연결합니다.\n- LangGraph 심화에서 Subgraph, Persistence, Parallel Execution, Memory Store를 다룹니다.\n- Harness Engineering으로 Agent가 일할 환경과 맥락을 설계하고, Observability로 실행을 추적·평가합니다."
+}

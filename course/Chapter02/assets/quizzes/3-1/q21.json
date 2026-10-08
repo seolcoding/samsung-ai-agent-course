@@ -1,0 +1,28 @@
+[
+ {
+  "question": "한 Agent가 다른 Agent에게 작업을 맡기는 연결 방식은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "MCP",
+    "correct": false,
+    "feedback": "MCP는 Agent와 도구 또는 데이터 소스를 잇습니다."
+   },
+   {
+    "answer": "A2A",
+    "correct": true,
+    "feedback": "A2A는 Agent와 Agent 사이의 작업 위임을 다룹니다."
+   },
+   {
+    "answer": "RAG",
+    "correct": false,
+    "feedback": "RAG는 문서를 검색해 답변에 더하는 기법입니다. Agent끼리 연결하는 방식이 아닙니다."
+   },
+   {
+    "answer": "Tool Calling",
+    "correct": false,
+    "feedback": "Tool Calling은 모델 출력으로 기능을 실행하는 일입니다. 다른 Agent에게 일을 맡기는 표준은 따로 있습니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "AgentExecutor가 내부 Agent를 실행한 뒤 결과를 발행하는 곳은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "RequestContext",
+    "correct": false,
+    "feedback": "RequestContext는 사용자 입력과 task/context id를 읽어 오는 곳입니다."
+   },
+   {
+    "answer": "EventQueue",
+    "correct": true,
+    "feedback": "결과를 t.Message로 감싸 EventQueue에 발행합니다."
+   },
+   {
+    "answer": "Agent Card",
+    "correct": false,
+    "feedback": "Agent Card는 Agent를 소개하는 정보입니다. 실행 결과를 담지 않습니다."
+   },
+   {
+    "answer": "task_store",
+    "correct": false,
+    "feedback": "task_store는 RequestHandler가 작업 상태를 관리할 때 씁니다. AgentExecutor는 결과를 EventQueue에 발행합니다."
+   }
+  ]
+ }
+]

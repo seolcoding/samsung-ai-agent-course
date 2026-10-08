@@ -1,0 +1,28 @@
+[
+ {
+  "question": "중앙 병목은 가장 적지만 전체 흐름을 통제하기 어려운 패턴은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "Supervisor",
+    "correct": false,
+    "feedback": "Supervisor는 중앙 조정자가 흐름을 쥐고 있어 통제는 쉽지만, 조정자가 병목이 될 수 있습니다."
+   },
+   {
+    "answer": "Hierarchical",
+    "correct": false,
+    "feedback": "Hierarchical은 상위·중간·하위 층이 흐름을 나눠 관리합니다. 층마다 관리자가 있습니다."
+   },
+   {
+    "answer": "Network",
+    "correct": true,
+    "feedback": "중앙 관리자 없이 Agent끼리 직접 주고받아 병목은 적지만 흐름 통제가 어렵습니다. 그래서 규칙이 중요합니다."
+   },
+   {
+    "answer": "단일 Agent",
+    "correct": false,
+    "feedback": "단일 Agent는 모델 하나가 흐름 전체를 맡습니다. Agent 사이에 주고받는 일이 없습니다."
+   }
+  ]
+ }
+]

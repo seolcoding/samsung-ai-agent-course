@@ -1,0 +1,28 @@
+[
+ {
+  "question": "Function Calling에서 `get_weather` 함수를 실제로 실행하는 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "LLM이 스스로 실행한다",
+    "correct": false,
+    "feedback": "LLM은 함수 이름과 인자를 적은 텍스트만 출력합니다. 컴퓨터를 직접 조작하지 못합니다."
+   },
+   {
+    "answer": "LLM의 출력을 읽은 외부 프로그램",
+    "correct": true,
+    "feedback": "LLM 바깥의 프로그램이 출력에 적힌 함수를 대신 호출합니다."
+   },
+   {
+    "answer": "사용자가 직접 날씨 사이트를 연다",
+    "correct": false,
+    "feedback": "사람이 대신 하는 것이 아니라, 출력을 읽은 프로그램이 함수를 호출합니다."
+   },
+   {
+    "answer": "Fine-Tuning 때 미리 실행해 둔 결과를 쓴다",
+    "correct": false,
+    "feedback": "Fine-Tuning은 함수 호출 형태의 출력을 만들도록 조정할 뿐, 함수를 미리 실행해 두지 않습니다."
+   }
+  ]
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "question": "FastMCP로 만든 서버를 실행하는 방식 두 가지로 알맞은 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "REST 모드와 GraphQL 모드",
+    "correct": false,
+    "feedback": "슬라이드가 든 실행 방식이 아닙니다."
+   },
+   {
+    "answer": "HTTP/SSE 모드와 stdio 모드",
+    "correct": true,
+    "feedback": "FastMCP는 HTTP/SSE 모드와 stdio 모드로 실행할 수 있습니다. Claude Code 같은 Host와도 stdio로 연결할 수 있습니다."
+   },
+   {
+    "answer": "동기 모드와 비동기 모드",
+    "correct": false,
+    "feedback": "슬라이드는 서버를 실행하는 방식으로 HTTP/SSE와 stdio를 듭니다."
+   },
+   {
+    "answer": "로컬 모드와 클라우드 모드",
+    "correct": false,
+    "feedback": "실행 위치가 아니라 통신 방식으로 나눕니다. HTTP/SSE와 stdio입니다."
+   }
+  ]
+ }
+]

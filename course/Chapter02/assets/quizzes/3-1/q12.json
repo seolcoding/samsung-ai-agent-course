@@ -1,0 +1,28 @@
+[
+ {
+  "question": "슬라이드가 설명한 RAG의 단계가 아닌 것은?",
+  "type": "multiple_choice",
+  "answers": [
+   {
+    "answer": "문서를 쪼개 의미를 비교할 수 있는 형태로 바꾸기",
+    "correct": false,
+    "feedback": "RAG의 첫 단계입니다. 쪼갠 문서를 벡터로 바꿔 두어야 검색할 수 있습니다."
+   },
+   {
+    "answer": "질문과 가장 관련이 높은 문서 검색하기",
+    "correct": false,
+    "feedback": "RAG의 두 번째 단계입니다."
+   },
+   {
+    "answer": "답변을 만들 때 검색한 문서 내용 더하기",
+    "correct": false,
+    "feedback": "RAG의 세 번째 단계입니다."
+   },
+   {
+    "answer": "문서 내용으로 모델을 다시 학습시키기",
+    "correct": true,
+    "feedback": "RAG는 모델을 다시 학습시키지 않습니다. 검색한 문서를 질문과 함께 넣어 답변하게 합니다."
+   }
+  ]
+ }
+]
