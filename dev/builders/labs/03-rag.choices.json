@@ -1,0 +1,305 @@
+{
+ "_about": "객관식 시험판(build_lab.py --mc 03-rag)의 보기. 열쇠는 03-rag.json의 todo 글이다. answer는 1부터 센 정답 번호, lines는 빈칸 자리에 들어갈 줄(빈칸 들여쓰기 기준), note는 줄 끝 짧은 설명, why는 정답 보기의 해설이다. blank를 주면 원래 빈칸 범위 대신 이 범위를 보기로 바꾼다. fail은 성공 기준에 덧붙일 ⛔ 줄이다. _text는 객관식판에서 spec 글을 바꿔 쓸 것이다(intro, closing, files.<파일>.intro). rewrite: true면 정답 보기를 원본 정답 줄과 다르게(읽기 쉽게 풀어서) 쓴 것이라 빌드 때 같은지 비교하지 않는다. 과제마다 explain·checks를 주면 그 글로 바꾸고, fail_all을 주면 ⛔ 줄 전체를 바꾼다(fail은 덧붙임). _text.files의 열쇠는 파일 이름이고, 같은 파일이 spec에 여러 번 나오면 '<파일 이름>#<0부터 센 순서>'로 따로 줄 수 있다. 파일 단위로는 intro 말고도 look·setup_note·chunk_success 등 spec의 어떤 칸이든 바꿀 수 있다. 이 노트북은 같은 todo 글(벡터 저장소 만들기, retriever로 바꾸기)이 4장과 5장에 한 번씩 나와 보기 한 벌을 함께 쓴다. 그래서 해설은 두 장에 모두 맞게 쓰고, 5장 원본이 한 줄로 쓴 벡터 저장소 코드는 4장처럼 여러 줄로 풀어 rewrite: true를 준다.",
+ "_text": {
+  "intro": "보험 약관 PDF 한 권으로 RAG를 처음부터 끝까지 만들어 봅니다. 장마다 RAG 핵심 모듈을 하나씩 더합니다. 보기 중 하나를 골라 주석을 풀어 코드를 완성하고, 완성된 코드는 실행하며 값을 바꿔 봅니다.\n\n- **2장 PDF 불러오기와 청크 나누기**: Loading과 Splitting입니다. PDF를 읽고 청크로 나눕니다.\n- **3장 임베딩과 유사도**: Embedding입니다. 문장을 벡터로 바꾸고 뜻이 가까운 정도를 숫자로 비교합니다.\n- **4장 벡터 저장소와 검색**: Storage와 Retrieval입니다. 청크를 Chroma에 넣고 질문과 가까운 청크를 찾습니다.\n- **5장 RAG 체인**: Generation입니다. 검색 결과를 근거로 답변하는 체인을 완성하고 스트리밍으로 받습니다.\n- **6장 RAGaaS**: 청킹·임베딩·저장을 API가 대신 하는 방식으로 같은 일을 합니다.\n\n셀은 위에서부터 차례로 실행합니다. 각 장 첫머리의 접힌 준비 코드도 실행해야 그 아래 셀이 동작합니다.",
+  "closing": "약관 PDF 한 권으로 RAG의 여섯 단계를 차례로 만들었습니다.\n\n| 장 | 단계 | 이 노트북에서 한 일 |\n|---|---|---|\n| 2. PDF 불러오기와 청크 나누기 | Loading, Splitting | `PDFMinerLoader`로 읽고 `RecursiveCharacterTextSplitter`로 나눔 |\n| 3. 임베딩과 유사도 | Embedding | 문장을 벡터로 바꾸고 코사인 유사도로 비교 |\n| 4. 벡터 저장소와 검색 | Storage, Retrieval | Chroma에 넣고 retriever로 가까운 청크 3개 찾기 |\n| 5. RAG 체인 | Generation | 검색 결과를 `context`로 넣어 답변을 스트리밍으로 받기 |\n| 6. RAGaaS | 전 단계 | 업로드·검색을 API에 맡기고 답변만 만들기 |\n\n보기를 골라 실행하고, 결과를 성공 기준(🟢/⛔)과 비교한 뒤 정답 보기의 해설로 확인했습니다. 청크 크기, 질문, system 지시문도 바꿔 다시 실행해 보았습니다.",
+  "files": {
+   "01_data_loading.py": {
+    "intro": "약관 PDF를 읽어 `Document`로 만들고, 검색하기 좋은 크기의 청크로 나눕니다. RAG 핵심 모듈 중 Loading과 Splitting입니다. 이 장은 API를 호출하지 않습니다.\n\n고를 곳은 두 군데입니다. 위에서부터 한 셀씩 고르고 실행합니다. 그다음 `# ✍️ CHANGE_HERE:` 줄의 청크 크기를 바꿔 결과가 어떻게 달라지는지 봅니다.\n\n**왜 배우나:** 청크 크기는 검색 정확도와 문맥 보존 사이의 균형을 정합니다. 4·5장은 준비 코드에서 이 장의 원래 설정(`chunk_size=500`, `chunk_overlap=75`)으로 PDF를 다시 나눠 씁니다. 여기서 바꾼 값은 뒤 장에 이어지지 않습니다.",
+    "edits": [
+     {
+      "line": "chunk_size=500",
+      "todo": "청크 크기를 바꿔 봅니다",
+      "explain": "먼저 아래 보기를 골라 이 셀과 청크 확인 셀까지 실행합니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 `500`을 `200`처럼 작은 값으로 바꾸고, 이 셀과 청크 확인 셀을 다시 실행합니다. `len=` 값이 어떻게 바뀌는지 봅니다."
+     }
+    ]
+   },
+   "03_vector_store.py": {
+    "intro": "약관 PDF를 2장과 같은 설정으로 나눈 청크를 임베딩해 Chroma 벡터 저장소에 넣고, 질문과 가까운 청크 3개를 찾아봅니다. RAG 핵심 모듈 중 Embedding, Storage, Retrieval입니다. PDF를 읽고 나누는 코드는 준비 코드에 들어 있습니다.\n\n고를 곳은 두 군데입니다. 마지막 셀에서는 `# ✍️ CHANGE_HERE:` 줄의 질문을 바꿔 검색해 봅니다.\n\n**왜 배우나:** 검색 결과가 틀리면 생성 단계가 좋아도 답변이 흔들립니다. 답변을 만들기 전에 검색 결과만 따로 확인해 봅니다.",
+    "edits": [
+     {
+      "line": "question = \"펫보험 보장 내용이 뭐야?\"",
+      "todo": "질문을 바꿔 봅니다",
+      "explain": "4.1과 4.2에서 보기를 골라 실행한 뒤 이 셀을 실행합니다. 그다음 `# ✍️ CHANGE_HERE:` 바로 아래 줄의 질문을 약관에 있을 법한 다른 질문(예: \"보험금을 청구하려면 무엇이 필요해?\")으로 바꿔 다시 실행합니다."
+     }
+    ],
+    "split": [
+     "# 이 셀을 다시 실행해도",
+     "CHOOSE_HERE: 벡터스토어를 retriever",
+     "print(\"retriever ready\")"
+    ]
+   },
+   "04_langchain_rag.py": {
+    "intro": "4장까지 만든 검색에 LLM을 이어, 약관을 근거로 답변하는 RAG 체인을 완성합니다. 검색 결과를 `context` 문자열로 합치고, 검색 → 프롬프트 → 모델 → 출력 파서를 `|`로 연결합니다. 답변은 스트리밍(조각이 생기는 대로 받는 방식)으로 출력합니다.\n\n고를 곳은 네 군데입니다. 앞의 두 곳(벡터 저장소, retriever)은 4장과 같은 보기입니다. 마지막 셀에서는 `# ✍️ CHANGE_HERE:` 줄의 질문을, 프롬프트 셀에서는 system 지시문을 바꿔 봅니다.\n\n**왜 배우나:** RAG의 Generation 단계입니다. \"검색된 근거 안에서만 답하라\"는 지시가 프롬프트에 어떻게 들어가고, 답변을 어떻게 바꾸는지 직접 봅니다.",
+    "split": [
+     "# 이 셀을 다시 실행해도",
+     "CHOOSE_HERE: 벡터스토어를 retriever",
+     "llm = get_llm()",
+     "def format_docs",
+     "CHOOSE_HERE: retriever, prompt",
+     "print(\"RAG ready\")"
+    ]
+   },
+   "05_ragaas.py": {
+    "intro": "RAGaaS(RAG as a Service)는 청킹·임베딩·벡터 저장소 관리를 API가 대신 해 주는 방식입니다. 앞 장에서 직접 만든 흐름(나누기 → 임베딩 → 저장 → 검색)이 API 호출 두 번(문서 업로드, 검색)으로 줄어듭니다.\n\n이 장은 고를 곳 없이 실행만 합니다. 여럿이 같은 인덱스(검색용 문서 묶음)를 쓰므로 문서 업로드와 삭제는 강사가 따로 하고, 코드에는 주석으로 막아 두었습니다. 검색과 답변 만들기를 실행하고, `# ✍️ CHANGE_HERE:` 줄의 질문을 바꿔 봅니다.\n\n준비 코드의 출력이 `RAGaaS 모드: mock`이면 연습용 모의 응답입니다. 검색 결과는 늘 1건이고, 실제 약관 내용이 아닌 연습용 문장입니다. 그래서 2부는 `검색된 문서 수: 1`만 출력하고, 3부 답변은 \"주어진 자료에 답이 없다\"는 취지로 나오는 것이 정상입니다.\n\n**왜 배우나:** 문서를 올리고 검색하는 일을 RAGaaS API에 맡기면 직접 만들 코드가 줄어듭니다. 직접 만든 RAG와 단계가 어떻게 대응하는지 알아 두면 둘 중 무엇을 쓸지 고를 수 있습니다."
+   }
+  }
+ },
+ "PDFMinerLoader로 PDF를 읽고 Document 목록을 생성해 주세요.": {
+  "answer": 3,
+  "rewrite": true,
+  "fail_all": [
+   "`NameError`가 난다 → 준비 코드를 먼저 실행했는지 봅니다",
+   "`ValueError`에 `is not a valid file or url`이 보인다 → 푼 줄을 다시 주석 처리하고 다른 보기를 고릅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "loader = PDFMinerLoader(str(PDF_PATH.resolve()))",
+     "documents = loader"
+    ],
+    "note": "읽는 도구를 documents에 담음",
+    "why": "읽는 도구만 만들고 PDF는 읽지 않았습니다. 이 셀은 오류 없이 끝나지만 2.2에서 `TypeError: 'PDFMinerLoader' object is not iterable`이 납니다."
+   },
+   {
+    "lines": [
+     "loader = PDFMinerLoader(\"meritz_pet_insurance.pdf\")",
+     "documents = loader.load()"
+    ],
+    "note": "파일 이름만 적어 읽음",
+    "why": "PDF는 `data` 폴더 안에 있어 파일 이름만으로는 찾지 못합니다. 이 셀에서 `ValueError: File path meritz_pet_insurance.pdf is not a valid file or url`이 납니다. 경로는 준비 코드의 `PDF_PATH`를 씁니다."
+   },
+   {
+    "lines": [
+     "loader = PDFMinerLoader(str(PDF_PATH.resolve()))",
+     "documents = loader.load()"
+    ],
+    "note": "PDF_PATH로 도구를 만들고 load()로 읽음",
+    "why": "`PDF_PATH`의 약관 PDF로 읽는 도구를 만들고, `load()`를 불러 `Document` 목록을 받습니다. 이 약관은 `Document` 1개로 읽힙니다."
+   },
+   {
+    "lines": [
+     "loader = PDFMinerLoader(str(PDF_PATH.resolve()))",
+     "documents = loader.load"
+    ],
+    "note": "괄호 없이 load를 담음",
+    "why": "괄호가 없어 PDF를 읽지 않고 `load` 함수 자체를 담습니다. 이 셀은 오류 없이 끝나지만 2.2에서 `TypeError: 'method' object is not iterable`이 납니다."
+   }
+  ]
+ },
+ "Text Splitter를 사용해 Document 목록을 Chunk로 나누어 주세요.": {
+  "answer": 1,
+  "fail_all": [
+   "`NameError: name 'documents'`가 난다 → 2.1에서 보기를 골라 먼저 실행합니다",
+   "`TypeError`에 `is not iterable`이 보인다 → 2.1에서 고른 보기를 다시 봅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "chunks = text_splitter.split_documents(documents)"
+    ],
+    "note": "Document 목록을 split_documents로 나눔",
+    "why": "`Document` 목록을 `chunk_size` 이하의 청크로 나눕니다. 나뉜 청크도 `Document`라 메타데이터가 그대로 따라갑니다. 약관은 청크 50개가 됩니다."
+   },
+   {
+    "lines": [
+     "chunks = documents"
+    ],
+    "note": "Document 목록을 그대로 씀",
+    "why": "나누지 않았습니다. 오류 없이 2.3에 `0. len=20927` 한 줄만 나옵니다. 약관 전체가 청크 하나에 들어 있습니다."
+   },
+   {
+    "lines": [
+     "chunks = text_splitter.split_text(documents)"
+    ],
+    "note": "Document 목록을 split_text로 나눔",
+    "why": "`split_text`는 문자열 하나를 받습니다. `Document` 목록을 넘겨 이 셀에서 `TypeError: expected string or bytes-like object, got 'list'`가 납니다."
+   },
+   {
+    "lines": [
+     "chunks = text_splitter.create_documents(documents)"
+    ],
+    "note": "Document 목록으로 create_documents 호출",
+    "why": "`create_documents`는 문자열 목록을 받아 새 `Document`를 만듭니다. `Document`를 넘겨 이 셀에서 `TypeError: expected string or bytes-like object, got 'Document'`가 납니다."
+   }
+  ]
+ },
+ "임베딩 모델을 가져오고 Chroma 벡터스토어를 생성해 주세요.": {
+  "answer": 4,
+  "rewrite": true,
+  "options": [
+   {
+    "lines": [
+     "embeddings = get_embeddings()",
+     "vectorstore = Chroma.from_documents(",
+     "    documents,",
+     "    embedding=embeddings,",
+     ")"
+    ],
+    "note": "documents로 벡터 저장소를 만듦",
+    "why": "나누기 전의 `documents`(약관 전체가 든 `Document` 1개)를 넣었습니다. 오류는 없지만 저장소에 2만 자짜리 문서 하나만 들어갑니다. 4.3에서 결과가 `0. len=20927` 하나만 나옵니다. 5장은 답변만 보여서 잘 드러나지 않습니다."
+   },
+   {
+    "lines": [
+     "embeddings = get_embeddings()",
+     "vectorstore = Chroma.from_documents(",
+     "    chunks,",
+     "    embedding=get_embeddings,",
+     ")"
+    ],
+    "note": "embedding에 get_embeddings를 넘김",
+    "why": "괄호가 없어 임베딩 모델이 아니라 모델을 만드는 함수를 넘겼습니다. 이 셀에서 `AttributeError: 'function' object has no attribute 'embed_documents'`가 납니다."
+   },
+   {
+    "lines": [
+     "embeddings = get_embeddings()",
+     "vectorstore = Chroma.from_texts(",
+     "    chunks,",
+     "    embedding=embeddings,",
+     ")"
+    ],
+    "note": "chunks로 from_texts 호출",
+    "why": "`from_texts`는 문자열 목록을 받습니다. 청크는 `Document`라서 이 셀에서 `TypeError: 'Document' object is not an instance of 'str'`이 납니다."
+   },
+   {
+    "lines": [
+     "embeddings = get_embeddings()",
+     "vectorstore = Chroma.from_documents(",
+     "    chunks,",
+     "    embedding=embeddings,",
+     ")"
+    ],
+    "note": "chunks로 벡터 저장소를 만듦",
+    "why": "청크 50개를 `embeddings`로 벡터로 바꿔 메모리의 Chroma 저장소에 넣습니다."
+   }
+  ]
+ },
+ "벡터스토어를 retriever로 변환해 주세요.": {
+  "answer": 2,
+  "fail_all": [
+   "`NameError: name 'vectorstore'`가 난다 → 앞 셀에서 보기를 골라 먼저 실행합니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "retriever = vectorstore.as_retriever(k=3)"
+    ],
+    "note": "as_retriever에 k=3을 넘김",
+    "why": "`k`가 검색 설정(`search_kwargs`) 밖에 있어 무시되고 기본값 4개를 가져옵니다. 오류 없이 4.3에 `0.`~`3.` 네 개가 나옵니다. 5장은 답변만 보여서 잘 드러나지 않습니다."
+   },
+   {
+    "lines": [
+     "retriever = vectorstore.as_retriever(search_kwargs={\"k\": 3})"
+    ],
+    "note": "search_kwargs에 k=3을 넣음",
+    "why": "벡터 저장소를 retriever로 바꾸고, 검색 설정 `search_kwargs`에 `k=3`을 넣어 가까운 청크 3개를 가져오게 합니다."
+   },
+   {
+    "lines": [
+     "retriever = vectorstore.as_retriever(search_kwargs={\"top_k\": 3})"
+    ],
+    "note": "search_kwargs에 top_k=3을 넣음",
+    "why": "Chroma 검색에는 `top_k`라는 설정이 없습니다. 이 셀은 오류 없이 끝나지만, 검색할 때(4.3, 5.6) `TypeError: Collection.query() got an unexpected keyword argument 'top_k'`가 납니다."
+   },
+   {
+    "lines": [
+     "retriever = vectorstore"
+    ],
+    "note": "벡터 저장소를 그대로 씀",
+    "why": "벡터 저장소는 retriever가 아닙니다. 이 셀은 오류 없이 끝나지만, 4.3에서 `AttributeError: 'Chroma' object has no attribute 'invoke'`, 5.5에서 `TypeError: unsupported operand type(s) for |`가 납니다."
+   }
+  ]
+ },
+ "검색된 Document 목록을 context 문자열로 합쳐 주세요.": {
+  "answer": 1,
+  "fail_all": [
+   "`IndentationError`가 난다 → 주석을 풀 때 줄 앞 공백(함수 안쪽 들여쓰기)이 지워지지 않았는지 봅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "return \"\\n\\n\".join(doc.page_content for doc in docs)"
+    ],
+    "note": "본문을 빈 줄로 이어 돌려줌",
+    "why": "`Document`마다 본문(`page_content`)만 꺼내 빈 줄로 이어 붙인 문자열을 돌려줍니다. 이 문자열이 프롬프트의 `{context}` 자리에 들어갑니다."
+   },
+   {
+    "lines": [
+     "return \"\\n\\n\".join(docs)"
+    ],
+    "note": "Document 목록을 그대로 이어 붙임",
+    "why": "`join`은 문자열만 이어 붙입니다. 이 셀은 오류 없이 끝나지만 5.6에서 `TypeError: sequence item 0: expected str instance, Document found`가 납니다."
+   },
+   {
+    "lines": [
+     "return \"\\n\\n\".join(doc.metadata for doc in docs)"
+    ],
+    "note": "메타데이터를 빈 줄로 이어 돌려줌",
+    "why": "본문이 아니라 메타데이터(딕셔너리)를 꺼냅니다. 5.6에서 `TypeError: sequence item 0: expected str instance, dict found`가 납니다."
+   },
+   {
+    "lines": [
+     "\"\\n\\n\".join(doc.page_content for doc in docs)"
+    ],
+    "note": "본문을 이어 붙이기만 함",
+    "why": "`return`이 없어 함수가 `None`을 돌려줍니다. 오류 없이 5.6에서 \"제공된 context가 없어 확인할 수 없다\"는 취지의 답변이 나옵니다."
+   }
+  ]
+ },
+ "retriever, prompt, llm, output parser를 연결해 RAG 체인을 완성해 주세요.": {
+  "answer": 3,
+  "fail_all": [
+   "다음 셀에서 `KeyError`나 `AttributeError`가 난다 → 푼 줄을 다시 주석 처리하고 다른 보기를 고릅니다",
+   "다음 셀에서 답변 대신 `content='…' additional_kwargs=…` 같은 줄이 이어진다 → 다른 보기를 고릅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "rag_chain = (",
+     "    {\"context\": format_docs | retriever, \"question\": RunnablePassthrough()}",
+     "    | prompt",
+     "    | llm",
+     "    | StrOutputParser()",
+     ")"
+    ],
+    "note": "format_docs를 먼저, retriever를 나중에",
+    "why": "순서가 반대라 질문 문자열이 먼저 `format_docs`로 갑니다. 5.6에서 `AttributeError: 'str' object has no attribute 'page_content'`가 납니다."
+   },
+   {
+    "lines": [
+     "rag_chain = (",
+     "    {\"context\": retriever | format_docs, \"question\": RunnablePassthrough()}",
+     "    | prompt",
+     "    | llm",
+     ")"
+    ],
+    "note": "출력 파서 없이 llm까지",
+    "why": "출력 파서가 없어 조각이 글자가 아니라 메시지 객체로 나옵니다. 오류 없이 5.6에 `content='이' additional_kwargs={} …` 같은 줄이 길게 이어집니다."
+   },
+   {
+    "lines": [
+     "rag_chain = (",
+     "    {\"context\": retriever | format_docs, \"question\": RunnablePassthrough()}",
+     "    | prompt",
+     "    | llm",
+     "    | StrOutputParser()",
+     ")"
+    ],
+    "note": "context·question을 채워 prompt → llm → 파서",
+    "why": "질문은 retriever와 `format_docs`를 거쳐 `context`가 되고, `RunnablePassthrough()`로 그대로 `question`이 됩니다. 프롬프트 → 모델 → 문자열 출력 파서로 이어져 5.6에 답변 글자가 조금씩 나옵니다."
+   },
+   {
+    "lines": [
+     "rag_chain = (",
+     "    {\"context\": retriever | format_docs, \"query\": RunnablePassthrough()}",
+     "    | prompt",
+     "    | llm",
+     "    | StrOutputParser()",
+     ")"
+    ],
+    "note": "질문을 query 이름으로 넘김",
+    "why": "프롬프트에는 `{question}` 자리가 있습니다. 5.6에서 `KeyError: Input to ChatPromptTemplate is missing variables {'question'}`이 납니다."
+   }
+  ]
+ }
+}

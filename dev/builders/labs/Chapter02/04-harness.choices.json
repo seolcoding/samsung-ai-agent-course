@@ -1,0 +1,73 @@
+{
+ "_about": "객관식판(build_lab.py --mc 04-harness)의 보기. 형식은 labs/04-langgraph.choices.json의 _about과 같다. 정답 보기는 spec answer에서 설명 주석 한 줄(# 범위 이탈 거절은 ...)만 뺐다(rewrite: true). 주석 줄이 보기 안에 들면 '# # ...'로 겹쳐 읽기 어렵다. 오답 셋은 모두 오류 없이 실행되고 3.3 출력에서만 드러난다(2026-10-13 사외 gpt-6-luna 실측).",
+ "_text": {
+  "intro": "Agent가 읽을 스킬 문서(SKILL.md)를 쓰고, 그 문서를 읽고 따르는 Agent를 만들어 실행합니다. 그다음 코드와 모델은 그대로 두고 SKILL.md 한 줄만 바꿔 Agent의 동작이 달라지는 것을 봅니다.\n\n- **2장 Agent가 읽을 스킬 쓰기**: 삼성SDS 보고서 양식이 적힌 SKILL.md를 파일로 씁니다. AI에게 문서의 윗부분과 아랫부분이 각각 무슨 일을 하는지 설명받습니다.\n- **3장 스킬을 읽는 Agent 만들기**: 모델·도구·작업 공간·스킬 폴더·시스템 프롬프트를 묶어 Agent를 만듭니다. `# ✅ CHOOSE_HERE:` 아래 보기 중 하나를 골라 주석을 풀고, 보고서 요청과 범위 밖 요청을 차례로 실행합니다.\n- **4장 SKILL.md 고쳐 동작 바꾸기**: `# ✍️ CHANGE_HERE:` 줄의 스킬 설명을 바꾸고 Agent를 다시 실행해 결과를 비교합니다. AI와 함께 SKILL.md의 빠진 항목도 찾아봅니다.\n\n셀은 위에서부터 차례로 실행합니다. 각 장 첫머리의 접힌 준비 코드도 실행해야 그 아래 셀이 동작합니다. Agent를 실행하는 셀은 모델을 여러 번 호출하므로 결과가 나오기까지 수십 초가 걸리고, 답은 실행할 때마다 조금씩 다릅니다.",
+  "closing": "**이 노트북에서 한 것**\n- Agent가 읽을 스킬 문서(SKILL.md)를 파일로 썼습니다. 맨 위 설명은 스킬을 **언제** 쓰는지, 본문은 **어떻게** 쓰는지 알려 줍니다.\n- `create_deep_agent`로 모델·도구·작업 공간·스킬 폴더·시스템 프롬프트·체크포인터를 묶어 Agent를 만들었습니다.\n- 보고서 요청에는 Agent가 SKILL.md를 읽고 SDS 양식으로 썼고, 범위 밖 요청은 시스템 프롬프트에 따라 거절했습니다.\n- 코드와 모델은 그대로 두고 SKILL.md 설명 한 줄만 바꿔 Agent의 동작이 달라지는 것을 보았습니다.\n- AI와 함께 SKILL.md를 좋은 스킬의 기본 구조와 비교해 빠진 항목을 찾고 보강했습니다.\n\n보기를 골라 실행하고, 결과를 성공 기준(🟢/⛔)과 비교한 뒤 정답 보기의 해설로 확인했습니다."
+ },
+ "LLM, 사용 가능한 도구, 백엔드, 스킬, 시스템 프롬프트를 이용해 Deep Agent를 정의해 주세요.": {
+  "answer": 3,
+  "rewrite": true,
+  "explain": "`create_deep_agent(...)`로 Agent를 만들어 `agent`에 담는 보기를 고릅니다. 네 보기는 모델(`get_llm()`)·도구(`search_web`)·체크포인터(`MemorySaver()`)가 같고, 작업 공간(`backend`)·스킬 폴더(`skills`)·시스템 프롬프트(`system_prompt`) 줄이 조금씩 다릅니다. 줄 끝 설명을 보고 어느 줄이 다른지 찾아 고릅니다.\n\n이 셀은 Agent만 만들고 아무것도 출력하지 않습니다. 네 보기 모두 오류 없이 실행되므로, 맞게 골랐는지는 아래 \"두 요청 실행하기\" 셀의 출력을 성공 기준과 비교해 압니다. 다른 보기로 바꿨으면 이 셀을 다시 실행한 뒤 \"두 요청 실행하기\" 셀을 실행합니다.",
+  "fail_all": [
+   "사례 1의 마지막 답이 SDS 양식이 아니고 SKILL.md를 읽은 줄도 없다 → Agent가 스킬을 찾지 못한 것입니다. 고른 보기의 `backend` 줄과 `skills` 줄을 다시 봅니다",
+   "사례 2에서 퀵소트 코드가 나온다 → 고른 보기에 `system_prompt` 줄이 있는지 봅니다",
+   "`GraphRecursionError`가 난다 → \"두 요청 실행하기\" 셀을 다시 실행합니다. 되풀이되면 출력을 AI에게 보여 어느 단계에서 반복되는지 물어보고, Agent 만들기 셀부터 다시 실행합니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "agent = create_deep_agent(",
+     "    model=get_llm(),",
+     "    tools=[search_web],",
+     "    backend=backend,",
+     "    skills=[\"skills/samsung-sds-report/\"],",
+     "    system_prompt=\"코드 작성, 수학 계산 등 보고서·리서치 범위를 벗어난 요청은 정중히 거절한다.\",",
+     "    checkpointer=MemorySaver(),",
+     ")"
+    ],
+    "note": "skills에 스킬 하나의 폴더를 넣음",
+    "why": "`skills`에는 스킬 폴더들을 담은 상위 폴더를 넣습니다. SKILL.md가 든 폴더를 직접 넣으면 그 아래에서 스킬 폴더를 찾다가 하나도 찾지 못합니다. 오류 없이 실행되지만 사례 1에 SKILL.md를 읽는 줄이 없고, 마지막 답이 `[SDS-AI-RPT v2.1]`로 시작하지 않습니다(일반 보고서 형식으로 씁니다)."
+   },
+   {
+    "lines": [
+     "agent = create_deep_agent(",
+     "    model=get_llm(),",
+     "    tools=[search_web],",
+     "    backend=backend,",
+     "    skills=[\"skills/\"],",
+     "    checkpointer=MemorySaver(),",
+     ")"
+    ],
+    "note": "system_prompt 없이 만듦",
+    "why": "스킬은 보고서 요청을 어떻게 처리할지만 알려 줍니다. 범위 밖 요청을 막는 규칙이 없어, 사례 1은 SDS 양식으로 잘 쓰지만 사례 2에서 퀵소트 코드를 그대로 써 줍니다."
+   },
+   {
+    "lines": [
+     "agent = create_deep_agent(",
+     "    model=get_llm(),",
+     "    tools=[search_web],",
+     "    backend=backend,",
+     "    skills=[\"skills/\"],",
+     "    system_prompt=\"코드 작성, 수학 계산 등 보고서·리서치 범위를 벗어난 요청은 정중히 거절한다.\",",
+     "    checkpointer=MemorySaver(),",
+     ")"
+    ],
+    "note": "skills에 상위 폴더 skills/를 넣음",
+    "why": "`harness` 폴더를 작업 공간으로 주고, 그 안의 `skills/` 아래에서 SKILL.md를 찾게 합니다. 사례 1은 SKILL.md를 읽고 SDS 양식으로 쓰고, 사례 2는 시스템 프롬프트에 따라 도구 없이 거절합니다."
+   },
+   {
+    "lines": [
+     "agent = create_deep_agent(",
+     "    model=get_llm(),",
+     "    tools=[search_web],",
+     "    skills=[\"skills/\"],",
+     "    system_prompt=\"코드 작성, 수학 계산 등 보고서·리서치 범위를 벗어난 요청은 정중히 거절한다.\",",
+     "    checkpointer=MemorySaver(),",
+     ")"
+    ],
+    "note": "backend 없이 만듦",
+    "why": "`backend`를 빼면 Agent는 `harness` 폴더가 아니라 비어 있는 기본 작업 공간을 봅니다. `skills/` 폴더가 거기에는 없어 스킬을 하나도 찾지 못합니다. 오류 없이 실행되지만 사례 1에 SKILL.md를 읽는 줄이 없고, 마지막 답이 `[SDS-AI-RPT v2.1]`로 시작하지 않습니다(SDS 내부 양식은 재현할 수 없다고 적기도 합니다)."
+   }
+  ]
+ }
+}

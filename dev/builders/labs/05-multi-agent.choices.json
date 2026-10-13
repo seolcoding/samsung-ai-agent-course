@@ -1,0 +1,194 @@
+{
+ "_about": "객관식 시험판(build_lab.py --mc 05-multi-agent)의 보기. 형식은 04-langgraph.choices.json의 _about과 같다. 오답 해설(why)은 사외 실측(2026-10-13, LLM_PROVIDER=openai)으로 확인했다.",
+ "_text": {
+  "intro": "Agent 여럿이 일을 나눠 맡는 그래프를 만들고 실행해 봅니다. 주제는 모두 \"조사해서 글로 쓰기\"입니다. 누가 조사하고, 누가 쓰고, 누가 다음 차례를 정하는지를 실행 결과로 확인하는 것이 이 노트북의 목표입니다.\n\n- **2장 Researcher와 Writer 나누기**: 조사하는 Agent와 글 쓰는 Agent를 한 그래프로 잇습니다. 보기 중 하나를 골라 주석을 풀어 코드를 완성합니다.\n- **3장 Supervisor가 다음 차례 정하기**: Supervisor가 researcher, writer, FINISH 중 하나를 골라 흐름을 이끕니다. `# ✍️ CHANGE_HERE:` 줄을 바꿔 Supervisor의 선택이 어떻게 달라지는지 보고, AI에게 원인을 묻습니다.\n- **4장 Critic 더하기** (선택): 초안의 치명적 오류를 찾는 Critic을 더합니다. 앞 장을 일찍 끝낸 분만 해 봅니다.\n\n셀은 위에서부터 차례로 실행합니다. 각 장 첫머리의 접힌 준비 코드도 실행해야 그 아래 셀이 동작합니다. 모든 장이 LLM을 여러 번 호출하므로 결과가 나오기까지 수십 초가 걸리고, 답은 실행할 때마다 조금씩 다릅니다.",
+  "closing": "Agent를 나누고, 다음 차례를 정하는 방법을 세 가지로 보았습니다.\n\n| 장 | 다음 차례를 정하는 것 | 확인한 것 |\n|---|---|---|\n| 2. Researcher와 Writer 나누기 | 조건 함수(코드)가 `tool_calls`를 보고 정함 | Researcher만 도구를 쓰고, 조사 결과를 Writer가 받아 글을 씀 |\n| 3. Supervisor가 다음 차례 정하기 | Supervisor 모델이 정해진 형식(`next`)으로 고름 | 모델의 선택은 흔들릴 수 있고, Researcher의 출력 형식을 정하면 흐름이 안정됨 |\n| 4. Critic 더하기 (선택) | Supervisor 모델이 Critic 판정을 보고 고름 | 반복을 끝내는 조건이 코드가 아니라 프롬프트에만 있음 |\n\n역할을 나눌 때는 Agent마다 받을 입력과 돌려줄 출력의 형식을 정해야 합니다. 형식이 흐리면 Supervisor처럼 다음 차례를 정하는 쪽도 판단을 잘못할 수 있습니다.\n\n보기를 고르고 값을 바꿔 실행한 뒤, 결과를 성공 기준(🟢/⛔)과 비교하고 정답 보기의 해설로 확인했습니다.",
+  "files": {
+   "01_researcher_writer.py": {
+    "intro": "조사하는 Agent(Researcher)와 글 쓰는 Agent(Writer)를 나눠 한 그래프로 잇습니다. Researcher는 검색 도구 `search_web`을 쓸 수 있고, Writer는 도구 없이 조사 결과와 지금까지의 대화를 받아 글을 씁니다. 두 Agent는 같은 상태(State)를 함께 봅니다. 조사 결과는 `research_result`, 완성된 글은 `draft`에 담깁니다.\n\n검색 도구는 실제로 검색하지 않고, 정해 둔 글(검색 결과 흉내)을 돌려줍니다.\n\n고를 곳은 네 군데입니다. 그래프는 맨 아래 \"컴파일하고 실행하기\" 셀에서 처음 실행되므로, **네 곳의 보기를 모두 고른 뒤에** 결과를 볼 수 있습니다. 보기를 고른 셀은 그때마다 실행해 두고, 마지막 셀에서 한꺼번에 확인합니다. 결과가 성공 기준과 다르면, 마지막 셀의 오류나 출력을 보고 어느 셀의 보기를 바꿀지 정합니다. 보기를 바꾼 셀부터 아래 셀을 차례로 다시 실행합니다.\n\n**왜 배우나:** 역할을 나누면 Agent마다 필요한 도구와 지시만 갖게 됩니다. Researcher만 도구를 쓰고 Writer는 쓰지 않는 구조를 직접 만들어 보면, 역할 분리가 코드에서 어떤 모양인지 알 수 있습니다.",
+    "split": [
+     "# ── 도구",
+     "# ── 상태",
+     "# ── Researcher Agent",
+     "def researcher_condition",
+     "# ── Writer Agent",
+     "# ── 그래프 조립",
+     "CHOOSE_HERE: 그래프를 컴파일"
+    ]
+   }
+  }
+ },
+ "Researcher LLM을 호출하고 응답 메시지를 반환해 주세요.": {
+  "answer": 3,
+  "fail_all": [
+   "2.7에서 오류가 나고 오류 글에 `researcher_node`가 보인다 → 이 셀의 보기를 다시 고릅니다",
+   "2.7에서 \"=== 최종 글 ===\" 바로 아래에 검색 결과 줄 없이 글만 나온다 → Researcher가 도구를 쓰지 못했습니다. 이 셀이나 2.4의 보기를 다시 봅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "response = llm.invoke([system] + state[\"messages\"])",
+     "return {\"messages\": [response]}"
+    ],
+    "note": "llm에 시스템 메시지 + 메시지 목록을 넘김",
+    "why": "`llm`은 도구가 연결되지 않은 모델이라 도구를 부르지 않습니다. 오류 없이 곧장 writer로 가서, 2.7의 \"=== 최종 글 ===\" 아래에 검색 결과 줄 없이 글만 나옵니다."
+   },
+   {
+    "lines": [
+     "response = researcher_llm.invoke([system] + state[\"messages\"][-1])",
+     "return {\"messages\": [response]}"
+    ],
+    "note": "목록에 마지막 메시지 하나를 더함",
+    "why": "`state[\"messages\"][-1]`은 목록이 아니라 메시지 하나입니다. 목록과 메시지는 `+`로 더할 수 없어 2.7에서 `TypeError: can only concatenate list (not \"HumanMessage\") to list`가 납니다."
+   },
+   {
+    "lines": [
+     "response = researcher_llm.invoke([system] + state[\"messages\"])",
+     "return {\"messages\": [response]}"
+    ],
+    "note": "researcher_llm에 시스템 메시지 + 메시지 목록을 넘김",
+    "why": "시스템 메시지를 목록 맨 앞에 붙여 도구가 연결된 `researcher_llm`에 보냅니다. 받은 응답을 대괄호로 감싸 `messages`에 담으면 `add_messages`가 기존 목록 뒤에 쌓습니다."
+   },
+   {
+    "lines": [
+     "response = researcher_llm.invoke([system] + state[\"messages\"])",
+     "return response"
+    ],
+    "note": "응답 메시지를 그대로 돌려줌",
+    "why": "딕셔너리가 아니라서 상태에 더해지지 않습니다. 오류 없이 Researcher의 답(도구 호출 요청)이 버려지고 곧장 writer로 가서, 2.7에 검색 결과 줄 없이 글만 나옵니다."
+   }
+  ]
+ },
+ "마지막 메시지의 tool_calls 여부에 따라 researcher_tools 또는 writer를 반환해 주세요.": {
+  "answer": 1,
+  "fail_all": [
+   "2.7에서 `BadRequestError`가 나거나, 오류 글에 `researcher_tools_node`가 보인다 → 이 셀의 보기를 다시 고릅니다",
+   "2.7에서 \"=== 최종 글 ===\" 아래가 비어 있다 → 돌려준 이름의 노드가 그래프에 없습니다. 이 셀의 보기를 다시 고릅니다",
+   "2.7이 몇 분이 지나도 끝나지 않는다 → 셀 실행을 중지(■)하고 이 셀의 보기를 다시 봅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "if hasattr(last, \"tool_calls\") and last.tool_calls:",
+     "    return \"researcher_tools\"",
+     "return \"writer\""
+    ],
+    "note": "도구 호출 요청이 있으면 researcher_tools, 없으면 writer",
+    "why": "`tool_calls` 속성이 있고 비어 있지 않을 때만 검색 도구 노드로 보냅니다. 요청이 없으면 조사가 끝난 것이므로 writer로 갑니다."
+   },
+   {
+    "lines": [
+     "if hasattr(last, \"tool_calls\") and last.tool_calls:",
+     "    return \"writer\"",
+     "return \"researcher_tools\""
+    ],
+    "note": "도구 호출 요청이 있으면 writer, 없으면 researcher_tools",
+    "why": "갈 곳이 서로 바뀌었습니다. 도구를 실행하지 않은 채 writer로 가서, 2.7에서 `BadRequestError: Error code: 400`(`An assistant message with 'tool_calls' must be followed by tool messages`)가 납니다. 도구 호출 요청 뒤에는 도구 결과가 와야 합니다."
+   },
+   {
+    "lines": [
+     "if hasattr(last, \"tool_calls\") and last.tool_calls:",
+     "    return \"tools\"",
+     "return \"writer\""
+    ],
+    "note": "도구 호출 요청이 있으면 tools",
+    "why": "그래프에 `tools`라는 노드는 없습니다(이름은 `researcher_tools`). 오류 없이 researcher에서 그래프가 끝나, 2.7의 \"=== 최종 글 ===\" 아래가 비어 있습니다."
+   },
+   {
+    "lines": [
+     "if hasattr(last, \"tool_calls\"):",
+     "    return \"researcher_tools\"",
+     "return \"writer\""
+    ],
+    "note": "tool_calls 속성이 있으면 researcher_tools",
+    "why": "AI 메시지에는 도구를 부르지 않을 때도 빈 `tool_calls`가 있습니다. 그래서 늘 검색 도구 노드로 가고, 실행할 도구가 없을 때 2.7에서 `IndexError: list index out of range`(`researcher_tools_node` 안)가 납니다."
+   }
+  ]
+ },
+ "START, 조건부 엣지, researcher_tools 반복, writer 종료 엣지를 연결해 주세요.": {
+  "answer": 4,
+  "fail_all": [
+   "2.7에서 `ValueError`나 `BadRequestError`가 난다 → 이 셀의 보기를 다시 고릅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "builder.add_conditional_edges(\"researcher\", researcher_condition)",
+     "builder.add_edge(\"researcher_tools\", \"researcher\")",
+     "builder.add_edge(\"writer\", END)"
+    ],
+    "note": "조건부 엣지 + 반복 + 종료",
+    "why": "START에서 researcher로 가는 엣지가 없어 그래프가 어디서 시작할지 모릅니다. 2.7의 컴파일 줄에서 `ValueError: Graph must have an entrypoint`가 납니다."
+   },
+   {
+    "lines": [
+     "builder.add_edge(START, \"researcher\")",
+     "builder.add_conditional_edges(\"researcher\", tools_condition)",
+     "builder.add_edge(\"researcher_tools\", \"researcher\")",
+     "builder.add_edge(\"writer\", END)"
+    ],
+    "note": "갈림길에 tools_condition을 씀",
+    "why": "`tools_condition`은 `tools` 또는 END만 돌려줍니다. 이 그래프에는 `tools` 노드가 없어 2.7에서 `ValueError: ... branch found unknown target 'tools'`가 납니다. writer로 보내려면 직접 만든 조건 함수가 필요합니다."
+   },
+   {
+    "lines": [
+     "builder.add_edge(START, \"researcher\")",
+     "builder.add_edge(\"researcher\", \"writer\")",
+     "builder.add_edge(\"researcher_tools\", \"researcher\")",
+     "builder.add_edge(\"writer\", END)"
+    ],
+    "note": "researcher → writer를 바로 이음",
+    "why": "researcher 다음이 언제나 writer라 검색 도구가 실행되지 않습니다. 도구 호출 요청만 남은 채 writer가 모델을 불러 2.7에서 `BadRequestError: Error code: 400`이 납니다."
+   },
+   {
+    "lines": [
+     "builder.add_edge(START, \"researcher\")",
+     "builder.add_conditional_edges(\"researcher\", researcher_condition)",
+     "builder.add_edge(\"researcher_tools\", \"researcher\")",
+     "builder.add_edge(\"writer\", END)"
+    ],
+    "note": "START + 조건부 엣지 + 반복 + 종료",
+    "why": "시작하면 researcher로 가고, 그다음은 `researcher_condition`이 정합니다. 검색 도구를 실행한 뒤에는 researcher로 돌아와 결과를 보고, writer가 끝나면 그래프도 끝납니다."
+   }
+  ]
+ },
+ "그래프를 컴파일해 주세요.": {
+  "answer": 2,
+  "explain": "연결을 마친 그래프를 실행할 수 있는 앱으로 만듭니다. 그 아래 코드는 요청 한 문장을 넣어 그래프를 실행하고, 조사 결과와 완성된 글을 차례로 출력합니다. 앞의 세 곳(2.3, 2.4, 2.6)의 보기를 모두 고르고 실행한 뒤 이 셀을 실행합니다.",
+  "fail_all": [
+   "`AttributeError`나 `NameError: name 'app' is not defined`가 난다 → 이 셀의 보기를 다시 고릅니다",
+   "다른 오류가 나거나 검색 결과 줄이 없다 → 오류 글에 보이는 함수 이름으로 2.3, 2.4, 2.6 중 어느 셀의 보기를 바꿀지 정합니다",
+   "셀이 몇 분이 지나도 끝나지 않는다 → 셀 실행을 중지(■)하고 2.4와 2.6의 보기를 다시 봅니다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "app = builder.compile"
+    ],
+    "note": "괄호 없이 compile을 담음",
+    "why": "괄호가 없어 컴파일하지 않고 `compile` 함수 자체를 담습니다. 아래 실행 줄에서 `AttributeError: 'function' object has no attribute 'invoke'`가 납니다."
+   },
+   {
+    "lines": [
+     "app = builder.compile()"
+    ],
+    "note": "builder를 컴파일해 app에 담음",
+    "why": "연결을 마친 설계도(`builder`)를 실행할 수 있는 `app`으로 만듭니다. 아래 줄이 `app.invoke`로 그래프를 실행합니다."
+   },
+   {
+    "lines": [
+     "app = builder"
+    ],
+    "note": "builder를 그대로 app에 담음",
+    "why": "`builder`는 설계도라서 실행할 수 없습니다. 아래 실행 줄에서 `AttributeError: 'StateGraph' object has no attribute 'invoke'`가 납니다."
+   },
+   {
+    "lines": [
+     "builder.compile()"
+    ],
+    "note": "builder를 컴파일만 함",
+    "why": "컴파일은 하지만 결과를 어디에도 담지 않습니다. 아래 실행 줄에서 `NameError: name 'app' is not defined`가 납니다."
+   }
+  ]
+ }
+}

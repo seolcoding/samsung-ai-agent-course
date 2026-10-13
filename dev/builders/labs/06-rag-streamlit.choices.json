@@ -1,0 +1,148 @@
+{
+ "_about": "객관식 시험판(build_lab.py --mc 06-rag-streamlit)의 보기. 형식은 04-langgraph.choices.json의 _about과 같다. why는 2026-10-13 streamlit AppTest로 보기마다 질문 세 개를 차례로 넣어 확인한 결과다(사외 openai). 앱 셀은 멈출 때까지 돌아서 자동 실행 QC에서 건너뛴다.",
+ "_text": {
+  "intro": "보험 약관을 근거로 답하는 RAG 챗봇을 웹 화면으로 띄웁니다. Streamlit 앱은 노트북 셀에서 바로 돌지 않으므로, 셀이 앱 파일을 쓰고 그다음 셀이 그 파일을 실행해 브라우저에 앱을 엽니다.\n\n- **2장 버튼 앱으로 재실행 보기**: 버튼을 누를 때마다 스크립트 전체가 다시 실행되는 모습을 봅니다. `# ✍️ CHANGE_HERE:` 줄의 늘어나는 값을 바꿔 보고, 일반 변수로 세면 어떻게 되는지 AI에게 묻습니다.\n- **3장 보험 약관 QA 챗봇**: 대화 기록 저장 두 곳과 답변 스트리밍 한 곳에서 보기를 하나씩 고릅니다. 앱 제목 아래 안내 문구도 바꿔 봅니다.\n\n앱을 띄운 셀은 멈출 때까지 끝나지 않습니다. 다음 셀로 넘어가기 전에 그 셀의 실행을 중지(■)합니다.",
+  "closing": "**이 노트북에서 한 것**\n- 셀로 앱 파일을 쓰고, 그 파일을 실행해 브라우저에 Streamlit 앱을 띄웠습니다.\n- 버튼을 누르거나 질문을 입력할 때마다 스크립트 전체가 다시 실행되는 것을 보았습니다. 남겨야 하는 값은 `st.session_state`에 담았습니다.\n- 질문과 답변을 대화 기록에 저장해, 다시 실행되어도 이전 대화가 화면에 남게 했습니다.\n- RAG 체인의 답변을 `st.write_stream`으로 글자가 이어지며 나타나게 했습니다.\n- 무거운 체인 준비는 `@st.cache_resource`로 한 번만 하고 다시 썼습니다.\n\n보기를 골라 앱을 띄우고, 결과를 성공 기준(🟢/⛔)과 비교한 뒤 정답 보기의 해설로 확인했습니다.\n\n마치기 전에 앱 셀이 아직 돌고 있으면 실행을 중지(■)하고 앱 브라우저 탭을 닫습니다.",
+  "files": {
+   "app.py": {
+    "intro": "메리츠 펫보험 약관(PDF)을 근거로 답하는 챗봇입니다. 코드는 두 부분입니다.\n\n- **RAG 파이프라인 준비** `load_rag_chain()`: 약관 PDF를 읽고 조각으로 나눈 뒤 임베딩해 벡터 저장소에 넣고, 검색 → 프롬프트 → LLM → 글자만 꺼내기로 이어지는 체인을 만듭니다. `@st.cache_resource`가 붙어 있어 한 번 만든 체인을 다시 씁니다.\n- **Streamlit 화면**: 제목과 안내 문구, 이전 대화 다시 그리기, 입력창, 답변 말풍선입니다.\n\n고를 곳은 세 군데입니다. 질문 저장, 답변 스트리밍, 답변 저장입니다. 한 셀 안에 세 곳이 모두 있으니 세 곳에서 보기를 하나씩 고른 뒤 파일을 쓰고 앱을 띄워 확인합니다. 아무것도 고르지 않고 띄우면 오류 없이 앱이 뜨지만, 답변 말풍선이 비어 있고 질문도 기록에 남지 않습니다.\n\n시작하기 전에 2장의 버튼 앱 셀이 아직 돌고 있으면 실행을 중지(■)합니다. 앱 셀이 도는 동안에는 이 장의 셀이 실행되지 않습니다.",
+    "edits": [
+     {
+      "line": "st.caption(\"메리츠 펫보험 약관을 기반으로 답변합니다.\")",
+      "todo": "제목 아래 안내 문구를 바꿔 봅니다",
+      "explain": "이 절은 맨 나중에 합니다. 세 곳에서 보기를 고르고 앱이 동작하는 것을 확인한 다음, 앱 셀을 중지(■)하고 `# ✍️ CHANGE_HERE:` 줄의 따옴표 안 문구를 바꿔(예: \"펫보험 약관에 있는 내용만 답합니다.\") 파일 쓰기 셀과 앱 셀을 다시 실행합니다."
+     }
+    ],
+    "look__meta": "- `load_rag_chain()`은 원본 구분선 주석(\"앱 시작 시 한 번만 실행\")과 달리 첫 질문 때 처음 실행됩니다(`if prompt := ...` 안에서 호출). 그래서 첫 답변만 느립니다.\n- 서버를 새로 띄울 때마다 첫 질문에서 약관 전체를 임베딩합니다(메모리 Chroma, 저장 안 함). 사외 openai 경로는 소액 과금이 됩니다.\n- 체인에는 이번 질문(`prompt`)만 들어갑니다. `session_state.messages`는 화면 표시용이라 \"그건 얼마야?\" 같은 이어지는 질문은 앞 대화를 모르고 답합니다. 수강생이 물으면 강의의 session_state \"왜 배우나\"로 연결합니다.\n- 객관식판에서 아무 보기도 고르지 않으면 질문 자리는 `pass`만 남고 나머지 두 자리는 주석뿐이라 오류 없이 앱이 뜹니다. 2026-10-13 AppTest 확인: 질문 말풍선은 보이고 답변 말풍선은 비며, 기록이 쌓이지 않아 다음 질문 때 앞 질문이 사라집니다. 답변 스트리밍만 고르지 않고 답변 저장을 고르면 `NameError: name 'response' is not defined`가 납니다.\n- 앱을 띄운 채 파일만 다시 쓰는 것은 커널이 앱 셀에 묶여 있어 할 수 없습니다. 항상 ■ → 파일 쓰기 → 앱 실행 순서입니다. 이때 서버가 새로 떠서 캐시도 비워집니다.\n- 2026-09-28 사외(openai) 실행 확인: 입력창 예시 질문 \"보험료는 어떻게 계산되나요?\"에는 \"보험료 계산 방식이나 산출 기준이 나와 있지 않다\"는 취지로 답했습니다(검색된 조각에 계산식이 없음). 시연 질문은 약관에 답이 있는 것으로 미리 골라 둡니다. 사내 모델의 답은 미확인입니다.\n- 볼 지점의 예시 \"자기부담금은 얼마인가요?\"는 2026-10-13 AppTest(사외 openai)에서 통원·입원의료비 1일당 1만 원·2만 원… 식으로 약관 내용을 근거로 답했습니다. 입력창 예시(원본 코드)는 슬라이드와 같게 그대로 두었습니다.",
+    "chunk_titles": [
+     "챗봇 앱 보기 고르고 쓰기"
+    ],
+    "chunk_success": {
+     "챗봇 앱 보기 고르고 쓰기": [
+      "셀 아래에 파일을 썼다는 한 줄(Writing … 또는 Overwriting …)이 출력되었다",
+      "안내 문구를 바꾼 뒤 다시 띄운 앱에서 제목 아래 글자가 바뀌어 보인다"
+     ]
+    }
+   }
+  }
+ },
+ "사용자 메시지를 session_state에 저장해 주세요.": {
+  "answer": 3,
+  "explain": "입력창에서 받은 질문(`prompt`)을 대화 기록 `st.session_state.messages`에 넣는 줄입니다. 위쪽 \"이전 대화 표시\" 코드가 이 기록을 읽어 `msg[\"role\"]` 쪽 말풍선에 `msg[\"content\"]`를 다시 그립니다. 아래 성공 기준은 세 곳을 모두 고른 뒤 앱을 띄워 질문을 세 번 이상 해 보며 한꺼번에 확인합니다.",
+  "fail_all": [
+   "두 번째 질문을 하자 브라우저에 빨간 오류 상자(`KeyError`)가 뜬다",
+   "앞의 질문 말풍선이 AI 쪽(왼쪽 아이콘이 AI)으로 옮겨 가 있다",
+   "세 번째 질문을 하면 첫 질문과 그 답이 화면에서 사라진다",
+   "새 질문을 할 때마다 앞의 질문 말풍선이 사라진다(아무 보기도 고르지 않았다)"
+  ],
+  "options": [
+   {
+    "lines": [
+     "st.session_state.messages.append({\"role\": \"assistant\", \"content\": prompt})"
+    ],
+    "note": "질문을 역할 assistant로 추가",
+    "why": "오류 없이 앱이 돌지만, 다음 질문 때 다시 그려진 앞의 질문이 AI 말풍선에 들어갑니다. `role`이 말풍선의 주인을 정하기 때문입니다."
+   },
+   {
+    "lines": [
+     "st.session_state.messages.append({\"role\": \"user\", \"text\": prompt})"
+    ],
+    "note": "질문을 text 키로 추가",
+    "why": "첫 질문은 잘 되지만, 두 번째 질문 때 이전 대화 표시 코드가 `msg[\"content\"]`를 찾지 못해 브라우저에 `KeyError: 'content'`가 뜹니다."
+   },
+   {
+    "lines": [
+     "st.session_state.messages.append({\"role\": \"user\", \"content\": prompt})"
+    ],
+    "note": "질문을 역할 user로 기록 끝에 추가",
+    "why": "이전 대화 표시 코드가 읽는 `role`, `content` 키로 기록 끝에 덧붙입니다. 질문을 세 번 해도 모든 질문과 답이 남습니다."
+   },
+   {
+    "lines": [
+     "st.session_state.messages = [{\"role\": \"user\", \"content\": prompt}]"
+    ],
+    "note": "기록을 이번 질문 하나로 새로 만듦",
+    "why": "덧붙이지 않고 기록을 새 목록으로 바꿉니다. 오류는 없고 두 번째 질문까지는 멀쩡해 보이지만, 세 번째 질문을 하면 첫 질문과 그 답이 사라지고 바로 앞 대화만 남습니다."
+   }
+  ]
+ },
+ "RAG 체인의 stream() 결과를 Streamlit에 출력해 주세요.": {
+  "answer": 1,
+  "explain": "RAG 체인에 질문을 넣고, 만들어지는 답변을 조각으로 받아 말풍선 안에 차례로 그리는 줄입니다. 다 그린 전체 답변은 변수 `response`에 담아 그 아래 답변 저장에서 씁니다.",
+  "fail_all": [
+   "질문하자 브라우저에 빨간 오류 상자(`TypeError: 'dict' object is not an instance of 'str'`)가 뜬다",
+   "답변 말풍선이 비어 있다가, 다음 질문을 해야 앞의 답이 나타난다",
+   "이전 답변 자리에 `None`이 보인다",
+   "브라우저에 `NameError: name 'response' is not defined`가 뜬다(이 자리의 보기를 고르지 않았다)"
+  ],
+  "options": [
+   {
+    "lines": [
+     "response = st.write_stream(rag_chain.stream(prompt))"
+    ],
+    "note": "stream 조각을 write_stream으로 그림",
+    "why": "`stream`이 내놓는 조각을 `st.write_stream`이 말풍선에 차례로 그리고, 다 그린 전체 답변 글자를 돌려줍니다. 그 글자가 `response`에 담깁니다."
+   },
+   {
+    "lines": [
+     "response = st.write(rag_chain.stream(prompt))"
+    ],
+    "note": "stream 조각을 write로 그림",
+    "why": "답변은 화면에 이어지며 나타나지만, `st.write`는 아무것도 돌려주지 않아 `response`가 `None`입니다. 오류 없이, 다음 질문을 하면 이전 답변 자리에 `None`이 보입니다."
+   },
+   {
+    "lines": [
+     "response = rag_chain.invoke(prompt)"
+    ],
+    "note": "invoke로 답변을 한 번에 받음",
+    "why": "답을 받기만 하고 화면에 그리지 않습니다. 오류 없이 답변 말풍선이 비어 있고, 다음 질문을 해야 기록에서 다시 그려진 앞의 답이 나타납니다."
+   },
+   {
+    "lines": [
+     "response = st.write_stream(rag_chain.stream({\"question\": prompt}))"
+    ],
+    "note": "질문을 question 키 딕셔너리로 넣음",
+    "why": "이 체인은 질문 글자 하나를 받아 검색과 `{question}`에 함께 넘깁니다. 딕셔너리를 넣으면 검색에서 막혀 첫 질문부터 브라우저에 `TypeError: 'dict' object is not an instance of 'str'`가 뜹니다."
+   }
+  ]
+ },
+ "AI 응답을 session_state에 저장해 주세요.": {
+  "answer": 4,
+  "explain": "화면에 다 그린 답변(`response`)을 대화 기록에 넣는 줄입니다. 그래야 다음 질문 때 스크립트가 다시 실행되어도 이 답변 말풍선이 다시 그려집니다.",
+  "fail_all": [
+   "다음 질문을 하자 이전 답변 자리에 답 대신 내 질문이 보인다",
+   "두 번째 질문을 하자 브라우저에 빨간 오류 상자(`TypeError: string indices must be integers`)가 뜬다",
+   "다음 질문을 하자 이전 답변이 사람 쪽 말풍선으로 옮겨 가 있다"
+  ],
+  "options": [
+   {
+    "lines": [
+     "st.session_state.messages.append({\"role\": \"assistant\", \"content\": prompt})"
+    ],
+    "note": "질문을 역할 assistant로 추가",
+    "why": "답변 대신 질문(`prompt`)을 저장합니다. 오류 없이, 다음 질문을 하면 이전 답변 말풍선에 내 질문이 그대로 보입니다."
+   },
+   {
+    "lines": [
+     "st.session_state.messages.append(response)"
+    ],
+    "note": "답변 글자만 추가",
+    "why": "역할·내용 딕셔너리가 아니라 글자만 넣었습니다. 두 번째 질문 때 이전 대화 표시 코드의 `msg[\"role\"]`에서 `TypeError: string indices must be integers, not 'str'`가 브라우저에 뜹니다."
+   },
+   {
+    "lines": [
+     "st.session_state.messages.append({\"role\": \"user\", \"content\": response})"
+    ],
+    "note": "답변을 역할 user로 추가",
+    "why": "오류 없이 돌지만, 다음 질문 때 다시 그려진 이전 답변이 사람 쪽 말풍선에 들어갑니다."
+   },
+   {
+    "lines": [
+     "st.session_state.messages.append({\"role\": \"assistant\", \"content\": response})"
+    ],
+    "note": "답변을 역할 assistant로 추가",
+    "why": "질문 저장과 같은 모양으로 답변을 AI 역할로 기록 끝에 덧붙입니다. 다음 질문 때 이 답변이 AI 말풍선으로 다시 그려집니다."
+   }
+  ]
+ }
+}
