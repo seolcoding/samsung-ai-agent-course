@@ -1,0 +1,280 @@
+{
+ "_about": "객관식판(build_lab.py --mc 01-mcp)의 보기. 형식은 04-langgraph.choices.json의 _about과 같다. why는 2026-10-13 사외(OpenAI) 실행 결과로 썼다(서버를 SSE로 띄우고 각 보기를 넣어 3.2~3.7 셀을 차례로 실행).",
+ "_text": {
+  "intro": "MCP 서버를 직접 만들어 터미널에 띄우고, 노트북의 Agent가 그 서버에 연결해 도구를 쓰게 합니다.\n\n- **2장 MCP 서버 만들고 띄우기**: 셀로 서버 파일을 쓰고, 터미널에서 서버를 띄웁니다. 도구 설명 한 줄을 바꿔 보고, AI에게 서버 구조를 묻습니다.\n- **3장 클라이언트로 연결하기**: 서버에 연결해 도구를 가져오는 두 곳과, 그 도구로 Agent 그래프를 만드는 네 곳에서 보기를 골라 코드를 완성합니다. 마지막에 연결 방식을 SSE에서 stdio로 한 줄 바꿔 비교합니다.\n\n셀은 위에서부터 차례로 실행합니다. 3장은 2장의 서버가 터미널에 켜져 있어야 동작합니다.",
+  "files": {
+   "02_mcp_client.py": {
+    "intro": "노트북에서 Agent(Host)를 만들고, 그 안의 Client로 2장의 서버에 연결합니다. 서버의 도구를 가져와 LLM에 넘기고, 과정 1에서 만든 것과 같은 모양의 LangGraph 그래프(agent ⇄ tools)로 질문에 답하게 합니다.\n\n보기를 고를 곳은 여섯 군데입니다.\n\n- **연결:** 클라이언트 만들기, 도구 목록 가져오기\n- **Agent 그래프:** LLM과 도구 노드에 도구 연결하기, agent 노드, 조건부 엣지, 컴파일\n\n서버와 주고받는 코드 앞에는 `await`가 붙습니다. 응답이 올 때까지 기다린다는 표시입니다. 노트북 셀에서는 `await`를 바로 쓸 수 있습니다.\n\n마지막 질문 셀은 여섯 곳에서 **모두 보기를 골라 실행한 뒤에** 동작합니다.\n\n**왜 배우나:** 도구를 서버에서 가져온다는 점만 다르고, 나머지는 과정 1의 `bind_tools`·ToolNode·조건부 엣지를 그대로 씁니다. 도구가 어디에 있든 Agent 쪽 코드는 같다는 것을 직접 확인합니다.",
+    "edits": [
+     {
+      "line": "TRANSPORT = \"sse\"",
+      "todo": "연결 방식을 \"sse\"에서 \"stdio\"로 바꿔 봅니다",
+      "explain": "처음에는 그대로(`\"sse\"`) 두고 3장 끝까지 실행합니다. 모두 동작하면 이 줄을 `\"stdio\"`로 바꾸고 이 셀부터 질문하기 셀까지 차례로 다시 실행합니다. SSE는 터미널에 켜 둔 서버에 주소로 접속하고, stdio는 노트북이 서버 파일을 직접 실행해 주고받습니다. Windows에서는 노트북이 서버 파일을 직접 실행하지 못해 도구 목록 가져오기 셀에서 오류가 납니다. 이 오류는 정상입니다. 비교가 끝나면(Windows는 오류를 확인하면) `\"sse\"`로 되돌립니다."
+     },
+     {
+      "line": "\"지금 몇 시야?\",",
+      "todo": "첫 질문을 도구가 필요 없는 질문으로 바꿔 봅니다",
+      "explain": "여섯 곳에서 보기를 모두 골라 세 질문의 답을 본 뒤에 합니다. `# ✍️ CHANGE_HERE:` 아래 따옴표 안 질문을 도구가 필요 없는 질문(예: \"MCP가 뭐야?\")으로 바꿔 이 셀을 다시 실행합니다. LLM이 도구를 호출하지 않기로 판단하면 조건부 엣지가 tools를 거치지 않고 바로 끝냅니다."
+     }
+    ],
+    "chunk_success": {
+     "연결 방식 고르기": {
+      "success": [
+       "셀이 오류 없이 끝난다(설정만 만들어 출력은 없다)",
+       "(Windows에서 \"stdio\"로 바꾼 뒤) 도구 목록 가져오기 셀이 `NotImplementedError`와 `UnsupportedOperation: fileno` 오류로 멈추면 정상입니다. `\"sse\"`로 되돌리고 넘어갑니다",
+       "(macOS·Linux에서 \"stdio\"로 바꾸고 다시 실행한 뒤) 서버 터미널을 Ctrl+C로 꺼 두어도 도구 목록에 같은 도구 5개가 나온다",
+       "(macOS·Linux에서 \"stdio\"로 바꾸고 다시 실행한 뒤) BMI 답은 SSE 때와 같지만, 할 일 질문에는 추가했는데 목록이 비어 있다는 식으로 답한다"
+      ],
+      "fail": [
+       "(macOS·Linux에서 \"stdio\"로 바꾼 뒤) 오류가 난다 → 이 PC에서 stdio 방식이 서버 프로그램을 띄우지 못한 것입니다. 오류를 AI에게 보여 원인을 물어보고, 풀리지 않으면 `\"sse\"`로 되돌려 넘어갑니다"
+      ]
+     },
+     "질문하기": {
+      "success": [
+       "(바꾼 뒤) 도구가 필요 없는 질문에는 시각 같은 도구 결과 없이 LLM이 바로 답한다"
+      ],
+      "fail": [
+       "(바꾼 뒤) 셀이 끝나지 않고 계속 돈다 → 셀 실행을 중지(■)하고 3.6에서 고른 조건부 엣지 보기를 다시 봅니다"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "MCP 설정으로 MultiServerMCPClient를 생성해 주세요.": {
+  "answer": 3,
+  "options": [
+   {
+    "lines": [
+     "client = MultiServerMCPClient(TRANSPORT)"
+    ],
+    "note": "연결 방식 글자를 넘김",
+    "why": "`TRANSPORT`는 `\"sse\"`라는 글자일 뿐입니다. 3.2는 통과하지만 3.3에서 도구를 가져올 때 `AttributeError: 'str' object has no attribute 'items'`가 납니다."
+   },
+   {
+    "lines": [
+     "client = await MultiServerMCPClient(MCP_CONFIG)"
+    ],
+    "note": "클라이언트 만들기를 기다림",
+    "why": "클라이언트를 만드는 일은 서버와 주고받지 않아 기다릴 것이 없습니다. 3.2에서 `TypeError: object MultiServerMCPClient can't be used in 'await' expression`이 납니다."
+   },
+   {
+    "lines": [
+     "client = MultiServerMCPClient(MCP_CONFIG)"
+    ],
+    "note": "서버 이름이 붙은 설정을 넘김",
+    "why": "`MCP_CONFIG`는 서버 이름(`tutorial`)과 그 연결 설정을 묶은 것입니다. 클라이언트는 이 설정을 들고 있다가 3.3에서 도구를 가져올 때 서버에 접속합니다."
+   },
+   {
+    "lines": [
+     "client = MultiServerMCPClient(MCP_CONFIG[\"tutorial\"])"
+    ],
+    "note": "서버 하나의 연결 설정만 넘김",
+    "why": "서버 이름 없이 연결 설정만 넘겨 `transport`·`url`을 서버 이름으로 읽습니다. 3.3에서 `ValueError: Configuration error: Missing 'transport' key in server configuration`이 납니다."
+   }
+  ],
+  "fail": [
+   "3.3에서 `AttributeError`나 `ValueError: Configuration error`가 보인다 → 클라이언트에 어떤 설정을 넘겼는지 봅니다",
+   "`TypeError: ... can't be used in 'await' expression`이 보인다 → 이 줄에 `await`가 필요한지 다시 봅니다"
+  ]
+ },
+ "MCP 서버에서 도구 목록을 가져와 주세요.": {
+  "answer": 1,
+  "options": [
+   {
+    "lines": [
+     "tools = await client.get_tools()"
+    ],
+    "note": "도구 목록을 받아 올 때까지 기다림",
+    "why": "서버에 접속해 도구 5개를 받아 옵니다. 서버와 주고받는 일이라 `await`로 응답을 기다립니다."
+   },
+   {
+    "lines": [
+     "tools = client.get_tools()"
+    ],
+    "note": "await 없이 부름",
+    "why": "응답을 기다리지 않아 도구 목록 대신 아직 실행되지 않은 작업(coroutine)이 담깁니다. 제목 줄만 나오고 `TypeError: 'coroutine' object is not iterable`이 납니다."
+   },
+   {
+    "lines": [
+     "tools = await client.get_tools"
+    ],
+    "note": "괄호 없이 기다림",
+    "why": "괄호가 없어 함수를 부르지 않고 함수 자체를 기다립니다. `TypeError: object method can't be used in 'await' expression`이 납니다."
+   },
+   {
+    "lines": [
+     "tools = await client.get_resources(\"tutorial\")"
+    ],
+    "note": "서버의 Resource를 가져옴",
+    "why": "도구가 아니라 Resource(`config://app-info`)를 가져옵니다. Resource는 데이터라서 도구 이름이 없습니다. 제목 줄만 나오고 `AttributeError: 'Blob' object has no attribute 'name'`이 납니다."
+   }
+  ],
+  "fail_all": [
+   "오류에 `ConnectError`나 `Connection refused`가 보인다 → 2장의 서버 터미널이 켜져 있는지 봅니다",
+   "`TypeError`가 보인다 → 괄호와 `await`를 어떻게 붙였는지 봅니다",
+   "`AttributeError: 'Blob' object has no attribute 'name'`이 보인다 → 도구가 아닌 것을 가져왔습니다. 다른 보기를 고릅니다"
+  ]
+ },
+ "가져온 MCP 도구를 LLM과 ToolNode에 연결해 주세요.": {
+  "answer": 4,
+  "options": [
+   {
+    "lines": [
+     "llm = get_llm()",
+     "tool_node = ToolNode(tools)"
+    ],
+    "note": "도구 노드만 만듦",
+    "why": "모델이 도구가 있는지 모릅니다. 오류 없이 3.7에서 시간은 \"확인할 수 없다\", BMI는 계산식만 답합니다. 할 일은 추가하지 않았는데 추가했다고 지어내 답하기도 합니다."
+   },
+   {
+    "lines": [
+     "llm = get_llm().bind_tools(tools)",
+     "tool_node = ToolNode"
+    ],
+    "note": "ToolNode를 도구 없이 그대로 씀",
+    "why": "`ToolNode`에 도구 목록을 넘기지 않아 노드가 만들어지지 않습니다. 3.7 첫 질문에서 `AttributeError: 'function' object has no attribute 'name'`이 납니다."
+   },
+   {
+    "lines": [
+     "llm = get_llm().bind_tools(tools)",
+     "tool_node = ToolNode([])"
+    ],
+    "note": "빈 목록으로 도구 노드를 만듦",
+    "why": "모델은 도구를 부르지만 도구 노드에 실행할 도구가 없습니다. 오류 없이 3.7에서 시간은 \"확인할 수 없다\", 할 일은 \"도구 오류가 발생했다\"고 답합니다."
+   },
+   {
+    "lines": [
+     "llm = get_llm().bind_tools(tools)",
+     "tool_node = ToolNode(tools)"
+    ],
+    "note": "모델과 도구 노드에 같은 도구를 줌",
+    "why": "모델은 어떤 도구를 부를 수 있는지 알고, 도구 노드는 그 도구를 실제로 실행합니다. 3.7에서 시각, BMI 22.9, 할 일 목록이 나옵니다."
+   }
+  ],
+  "fail": [
+   "3.7에서 `AttributeError`가 보인다 → `tool_node`를 무엇으로 만들었는지 봅니다",
+   "3.7에서 \"도구 오류가 발생했다\"는 식으로 답한다 → 도구 노드에 도구를 넘겼는지 봅니다"
+  ]
+ },
+ "State의 messages를 도구가 연결된 LLM에 전달해 주세요.": {
+  "answer": 2,
+  "rewrite": true,
+  "explain": "`agent_node`는 Agent가 한 번 생각하는 단계입니다. 두 줄입니다. 상태에 쌓인 메시지를 도구가 연결된 `llm`에 보내 응답을 받고, 그 응답을 `messages`에 더하도록 딕셔너리로 돌려줍니다.",
+  "options": [
+   {
+    "lines": [
+     "response = llm.invoke(state)",
+     "return {\"messages\": [response]}"
+    ],
+    "note": "State 전체를 LLM에 넘김",
+    "why": "State 딕셔너리를 통째로 넘깁니다. LLM은 메시지 목록을 받아야 해서 3.7에서 `ValueError: Invalid input type <class 'dict'>`가 납니다."
+   },
+   {
+    "lines": [
+     "response = llm.invoke(state[\"messages\"])",
+     "return {\"messages\": [response]}"
+    ],
+    "note": "메시지 목록을 넘기고 응답을 담음",
+    "why": "메시지 목록을 넘겨 응답을 받고, 대괄호로 감싸 `messages`에 담습니다. 응답에 도구 호출 요청이 들어 있으면 조건부 엣지가 tools로 보냅니다."
+   },
+   {
+    "lines": [
+     "response = llm.invoke(state[\"messages\"])",
+     "return state"
+    ],
+    "note": "받은 State를 그대로 돌려줌",
+    "why": "응답을 버리고 받은 State를 그대로 돌려줍니다. 오류 없이 3.7의 `A:` 뒤에 질문이 그대로 다시 나옵니다."
+   },
+   {
+    "lines": [
+     "response = llm.invoke(state[\"messages\"])",
+     "return {\"messages\": [response.content]}"
+    ],
+    "note": "응답의 글자만 담음",
+    "why": "응답의 글자만 담아 도구 호출 요청이 사라집니다. 도구를 부를 때는 글자가 비어 있어서, 오류 없이 3.7의 `A:` 뒤가 비어 있습니다."
+   }
+  ],
+  "fail_all": [
+   "3.7에서 `A:` 뒤에 질문이 그대로 다시 나온다 → 무엇을 돌려주는지 봅니다",
+   "3.7에서 `A:` 뒤가 비어 있다 → 응답 메시지 전체를 담았는지 봅니다",
+   "3.7에서 `ValueError: Invalid input type`이 보인다 → LLM에 무엇을 넘겼는지 봅니다"
+  ]
+ },
+ "tools_condition으로 도구 호출 여부를 분기하고 tools 이후 agent로 돌아오게 연결해 주세요.": {
+  "answer": 1,
+  "options": [
+   {
+    "lines": [
+     "builder.add_conditional_edges(\"agent\", tools_condition)",
+     "builder.add_edge(\"tools\", \"agent\")"
+    ],
+    "note": "agent 뒤 분기 + tools→agent",
+    "why": "agent 뒤에서 도구 호출이 있으면 tools로, 없으면 끝으로 갑니다. 도구를 실행한 뒤 agent로 돌아와 결과를 보고 답합니다."
+   },
+   {
+    "lines": [
+     "builder.add_conditional_edges(\"agent\", tools_condition)"
+    ],
+    "note": "agent 뒤 분기만 둠",
+    "why": "도구를 실행한 뒤 돌아올 길이 없어 그래프가 끝납니다. 오류 없이 3.7의 `A:` 뒤에 `[{'type': 'text', 'text': '{\"bmi\":22.9,...}'}]` 같은 도구 결과가 그대로 나옵니다."
+   },
+   {
+    "lines": [
+     "builder.add_conditional_edges(\"tools\", tools_condition)",
+     "builder.add_edge(\"tools\", \"agent\")"
+    ],
+    "note": "tools 뒤 분기 + tools→agent",
+    "why": "분기를 agent가 아니라 tools 뒤에 달아 agent 다음에 갈 곳이 없습니다. 도구를 부르기 전에 끝나서, 오류 없이 3.7의 `A:` 뒤가 비어 있습니다."
+   },
+   {
+    "lines": [
+     "builder.add_conditional_edges(\"agent\", tools_condition())",
+     "builder.add_edge(\"tools\", \"agent\")"
+    ],
+    "note": "tools_condition을 불러 그 결과로 분기",
+    "why": "`tools_condition`에는 함수 자체를 넘깁니다. 괄호를 붙이면 그 자리에서 불러 3.6에서 `TypeError: tools_condition() missing 1 required positional argument: 'state'`가 납니다."
+   }
+  ],
+  "fail": [
+   "3.6에서 `TypeError`가 보인다 → `tools_condition` 뒤에 괄호를 붙였는지 봅니다"
+  ]
+ },
+ "그래프를 컴파일해 주세요.": {
+  "answer": 3,
+  "options": [
+   {
+    "lines": [
+     "app = builder.compile"
+    ],
+    "note": "괄호 없이 compile을 담음",
+    "why": "괄호가 없어 컴파일하지 않고 `compile` 함수 자체를 담습니다. 3.7에서 `AttributeError: 'function' object has no attribute 'ainvoke'`가 납니다."
+   },
+   {
+    "lines": [
+     "app = await builder.compile()"
+    ],
+    "note": "컴파일을 기다림",
+    "why": "컴파일은 서버와 주고받지 않아 기다릴 것이 없습니다. 3.6에서 `TypeError: object CompiledStateGraph can't be used in 'await' expression`이 납니다."
+   },
+   {
+    "lines": [
+     "app = builder.compile()"
+    ],
+    "note": "조립한 builder를 컴파일",
+    "why": "노드와 엣지를 붙인 설계도(`builder`)를 실행할 수 있는 `app`으로 만듭니다. 3.7에서 `app.ainvoke(...)`로 실행합니다."
+   },
+   {
+    "lines": [
+     "app = StateGraph(State).compile()"
+    ],
+    "note": "새 그래프를 컴파일",
+    "why": "노드가 하나도 없는 새 그래프를 컴파일합니다. 3.6에서 `ValueError: Graph must have an entrypoint`가 납니다."
+   }
+  ],
+  "fail_all": [
+   "3.6에서 `ValueError: Graph must have an entrypoint`가 보인다 → 어떤 그래프를 컴파일했는지 봅니다",
+   "`TypeError`나 `AttributeError`가 보인다 → 괄호와 `await`를 봅니다"
+  ]
+ }
+}
