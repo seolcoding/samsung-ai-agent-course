@@ -13,7 +13,7 @@ package-dir = {"" = "course"}
 [project]
 name = "ai-agent-tutorial"
 version = "0.1.0"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"  # 강의장 PC와 같은 3.12로 고정(.python-version)
 dependencies = [
     "langchain>=1.3.4",
     "langchain-community>=0.3.0",
@@ -42,11 +42,11 @@ dependencies = [
     "mcp>=1.24,<2",
     "grandalf>=0.8",
     "pygraphviz>=2.0.3",
+    "ipykernel>=6.29,<8",  # VS Code 노트북 커널. uv sync만 해도 들어가게 기본 묶음에 둔다
 ]
 
 [project.optional-dependencies]
 notebooks = [
-    "ipykernel>=6.29,<8",
     "nbformat>=5.10,<6",
     "nbclient>=0.10,<1",
     "nbconvert>=7.16,<8",
