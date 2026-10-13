@@ -72,7 +72,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
 
 # PyBuilder
 .pybuilder/
@@ -197,3 +196,10 @@ course/Chapter01/notebooks/test.py
 course/Chapter02/notebooks/*.py
 course/Chapter02/notebooks/harness/
 course/Chapter02/capstone/solution.py
+
+# 강사 개인 공부용 노트북(따라치기·강사용). Git에 넣지 않는다.
+
+# Claude Code skill links (point to .agents/skills). Not committed.
+.claude/skills/
+# Link into .venv (comes with the streamlit package). Not committed.
+.agents/skills/developing-with-streamlit
