@@ -29,6 +29,7 @@
 ## 지킬 것
 
 - 모델은 `config.llm.get_llm()`, 임베딩은 `config.embeddings.get_embeddings()`로 부른다. 주소·모델 이름·키를 코드에 직접 쓰지 않는다.
+- 사내(삼성) LLM·임베딩으로 새 코드(셀, 캡스톤, 새 Agent)를 만들 때는 먼저 [agent_docs/samsung_api.md](agent_docs/samsung_api.md)를 읽는다. LangChain과 맞추는 법, 참조할 코드, 저장소 밖에서 쓰는 코드가 있다.
 - `.env`의 키와 토큰은 출력하거나 파일에 쓰지 않는다.
 - `code/`, `assets/`, `config/`의 파일은 고치지 않는다. `capstone/`은 고쳐도 된다.
 - 텍스트 파일을 읽고 쓰는 코드는 늘 `encoding="utf-8"`을 넣는다. 수강생 PC는 윈도우라 기본값(cp949)으로 열면 한글 파일이 깨진다.
@@ -40,6 +41,7 @@
 - 설치·커널·`.env`·모델 부르는 법: [agent_docs/setup.md](agent_docs/setup.md)
 - 파일을 못 찾을 때, 경로를 쓸 때: [agent_docs/paths.md](agent_docs/paths.md)
 - 오류 메시지별 원인과 해결: [agent_docs/troubleshooting.md](agent_docs/troubleshooting.md)
+- 사내 LLM·임베딩을 LangChain에서 쓰는 법과 참조 코드: [agent_docs/samsung_api.md](agent_docs/samsung_api.md)
 
 진단 순서:
 1. 저장소 맨 위에서 `uv run python -m config.check --json`을 실행한다(Langfuse 실습·캡스톤이면 `--langfuse`도 붙인다). 키·토큰 값은 나오지 않는다.
