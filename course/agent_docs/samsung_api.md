@@ -87,7 +87,7 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 ```
 
 - 같은 벡터 저장소에는 **같은 임베딩으로 만든 벡터만** 넣는다. 사외(OpenAI)로 만든 Chroma 폴더를 사내 임베딩으로 검색하면 차원이 달라 오류가 나거나 엉뚱한 결과가 나온다. `COURSE_ENV`를 바꿨으면 저장소를 다시 만든다.
-- 사내 RAGaaS는 서버가 임베딩까지 해 주므로 이 클래스가 필요 없다. `config.ragaas.post_ragaas()`를 쓴다.
+- 사내 RAGaaS는 서버가 임베딩까지 해 주므로 이 클래스가 필요 없다. `config.ragaas.post_ragaas()`를 쓴다(자세한 것은 [ragaas.md](ragaas.md)).
 
 ## 5. 이 저장소 밖(새 프로젝트)에서 쓸 때
 
