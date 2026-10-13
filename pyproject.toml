@@ -7,6 +7,7 @@ where = ["course"]
 include = ["config*"]
 
 [tool.setuptools]
+py-modules = ["draw"]  # course/draw.py: from draw import draw
 package-dir = {"" = "course"}
 
 [project]
@@ -39,6 +40,8 @@ dependencies = [
     "langfuse>=4.15.4,<5",
     "truststore>=0.10.4",
     "mcp>=1.24,<2",
+    "grandalf>=0.8",
+    "pygraphviz>=2.0.3",
 ]
 
 [project.optional-dependencies]

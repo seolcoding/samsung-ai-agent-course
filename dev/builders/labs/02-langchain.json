@@ -84,6 +84,16 @@
      "find": "# response = model.invoke()",
      "until": "# return response",
      "lines": []
+    },
+    {
+     "find": "chain = passthrough | prompt | model | StrOutputParser()",
+     "lines": [
+      "chain = passthrough | prompt | model | StrOutputParser()",
+      "",
+      "from draw import draw",
+      "",
+      "draw(chain)  # 체인 구조를 그림으로 봅니다"
+     ]
     }
    ],
    "split": [

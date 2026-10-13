@@ -66,7 +66,7 @@
 | 05 입력 반복 | 잘못된 값을 넣으면 같은 질문이 반복되고, 에이전트가 도구를 계속 부르면 루프가 길어진다 | q로 끝낼 수 있음을 셀 위에 적는다. 멈추면 커널 중단(■) |
 | 도구 호출 지원 | 03·04·05는 `bind_tools` 도구 호출이 필요하다. 사내 게이트웨이의 도구 호출 동작은 이 목차 작성 중 확인하지 않았다(`docs/VALIDATION.md`는 "Chapter01 LangGraph 정상 종료"만 기록, 환경 표기 없음) | 강의장 사전 확인 목록에 넣는다. 사외는 `openai`(`gpt-6-luna`는 `get_llm()`이 Chat Completions로 고정) |
 | 모델이 도구를 안 부름 | 04·05에서 모델이 도구 없이 답하면 `tool_calls`가 비어 1단계 출력이 빈다 | ⛔ 기준에 "대기 중인 도구 호출이 비었다 → 셀을 다시 실행"을 넣는다 |
-| Mermaid | `draw_mermaid()`는 글자 출력. 그림(`draw_mermaid_png`)은 외부 서비스를 부른다 | 글자 출력만 쓴다(사내망) |
+| 그래프 그림 | Mermaid(`draw_mermaid_png`)는 외부 서비스를 부른다 | `course/draw.py`의 `draw(app)`(`draw_png`, pygraphviz)로 PC 안에서 그린다. 원본 .py는 `draw_ascii()` |
 | 실행 순서 | 04는 같은 `thread_id`로 1단계 → 2단계를 이어 간다. 1단계 셀을 다시 실행하지 않고 2단계만 다시 실행하면 결과가 달라진다 | 셀 위에 "1단계부터 차례로 실행"을 적는다 |
 | 실행 시간 | 파일당 LLM 1~6회. 긴 실행 없음 | — |
 | 파일 쓰기 | 없음(`MemorySaver`는 메모리. `SqliteSaver`는 import만) | — |
