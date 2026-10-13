@@ -193,8 +193,12 @@ CROSS_REF = re.compile(r"강의 노트북|실습 노트북|강의에서 본|_LEC
 
 def written_files(nb):
     """노트북이 %%writefile로 직접 만드는 파일 이름(서버·앱·SKILL.md). 수강생 글에서 가리켜도 된다."""
-    return {ln.split()[-1] for c in nb.cells if c.cell_type == "code"
-            for ln in c.source.splitlines()[:1] if ln.startswith("%%writefile")}
+    own = {ln.split()[-1] for c in nb.cells if c.cell_type == "code"
+           for ln in c.source.splitlines()[:1] if ln.startswith("%%writefile")}
+    # 객관식판은 완성 서버 파일을 노트북 폴더에 미리 둔다. 터미널 실행 안내(uv run python …)에 나오는 파일도 이 노트북의 파일이다
+    own |= {m.group(1) for c in nb.cells if c.cell_type == "markdown"
+            for m in re.finditer(r"uv run python course/Chapter\d+/notebooks/(\S+\.py)", c.source)}
+    return own
 
 
 # 수강생이 직접 여는 곳이라 글에서 가리켜도 되는 경로: 캡스톤 프로젝트 폴더

@@ -110,6 +110,19 @@ uv run python {path}
 
 BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
 
+TERMINAL_NOTE_MC = """이 폴더에는 정답이 모두 들어간 서버 파일 `{file}`이 미리 들어 있습니다. {first}부터 위 셀들은 그 파일의 코드를 나눠 보여 주는 곳입니다. 셀을 실행해 오류가 없는지 확인합니다(보기가 있는 셀은 먼저 고릅니다). 셀이 파일을 고치지는 않습니다.
+
+서버는 터미널에서 이 완성 파일로 띄웁니다.
+
+1. VS Code 메뉴 **터미널 → 새 터미널**을 엽니다(저장소 맨 위 폴더에서 열립니다).
+2. 아래 명령을 붙여 넣고 실행합니다.
+
+```
+uv run python {path}
+```
+
+3. 서버 시작 문구가 나오고 명령이 끝나지 않고 기다리면 켜진 것입니다. 이 터미널은 닫지 말고 노트북으로 돌아옵니다. 서버를 끌 때는 터미널에서 **Ctrl + C**를 누릅니다."""
+
 # LangChain·LangGraph 코드를 쓰는 실습은 맨 위 설정에 디버그 모드 셀을 따로 둔다(기본 켜짐, 2026-10-13 결정)
 DEBUG_MD = "LangChain 디버그 모드를 켭니다. 체인과 그래프가 실행될 때 단계마다 입력과 출력이 셀 아래에 출력됩니다."
 DEBUG_CODE = """from langchain_core.globals import set_debug
@@ -348,6 +361,12 @@ def build(folder, mc=False):
         nb.md(f["intro"])
         nb.meta(f.get("intro__meta"))
         pos, sub, visible, first_wf = 0, 0, 0, None
+        # 객관식판의 서버(터미널에서 띄우는 여러 셀 파일): 셀이 파일을 이어 쓰지 않는다. 정답이 든 완성 파일을
+        # 노트북 폴더에 미리 둔다(수강생이 셀을 잘못 이어 써서 서버를 못 띄우는 일을 막는다, 2026-10-14 결정)
+        ready = bool(mc and wf and f.get("run") == "terminal" and wf.endswith(".py") and len(split) > 1)  # 여러 셀로 이어 쓰는 서버 파일만
+        if ready:
+            done = "\n".join(ln.replace("# TODO: ", "# ") for ln in raw) + "\n"
+            (COURSE / chapter / "notebooks" / wf).write_text(done, encoding="utf-8")
         for c, (title, body) in enumerate(_chunks(lines, split)):
             start, pos = pos, pos + len(body)
             while pos < len(lines) and not lines[pos].strip():
@@ -363,7 +382,14 @@ def build(folder, mc=False):
                 nb.h(3, f"{n}.{sub} 참고: {(f.get('titles') or {}).get(title or '', title) or '실행하지 않는 코드'}")
                 nb.md("실행되지 않는 참고 코드입니다. 읽어만 봅니다.\n\n```python\n" + (notes + "\n" if notes else "") + ref + "\n```")
                 continue
-            if wf:
+            tail = None
+            if ready:
+                if c == 0:
+                    first_wf = f"{n}.{sub + 1}"
+                if "if __name__ ==" in text:  # 서버를 띄우는 줄: 노트북 커널에서 돌면 셀이 끝나지 않으니 글로만 보인다
+                    head, main = text.split("if __name__ ==", 1)
+                    text, tail = head.rstrip(), "if __name__ ==" + main
+            elif wf:
                 if c == 0 and "/" in wf:  # %%writefile은 폴더를 만들지 않는다
                     folder_of = wf.rsplit("/", 1)[0]
                     nb.code(f"from pathlib import Path\n\nPath({folder_of!r}).mkdir(parents=True, exist_ok=True)", kind="")
@@ -396,7 +422,10 @@ def build(folder, mc=False):
                     nb.md(f"**프롬프트 힌트** {t['hint']}")
                 nb.md(_criteria_md(t.get("checks", []), [*t.get("fail", []), *choices.get(t["todo"], {}).get("fail", [])]))
                 nb.meta(t.get("look__meta"))
-            nb.code(text, visible=True, kind="" if mc else KIND_TASK if mine else KIND_EXAMPLE)  # 객관식판은 제목 옆 표시를 달지 않는다  # 수강생이 채우거나 바꿔서 실행하는 셀
+            if not tail or any(ln.strip() and not ln.strip().startswith("#") for ln in text.splitlines()):  # 서버 실행 줄만 떼고 주석만 남은 셀은 넣지 않는다
+                nb.code(text, visible=True, kind="" if mc else KIND_TASK if mine else KIND_EXAMPLE)  # 객관식판은 제목 옆 표시를 달지 않는다  # 수강생이 채우거나 바꿔서 실행하는 셀
+            if tail:
+                nb.md(f"아래는 서버를 터미널에서 띄울 때만 실행되는 부분입니다. 노트북에서는 실행하지 않고 읽어만 봅니다.\n\n```python\n{tail}\n```")
             if shown in f.get("no_auto_run", []):  # input()처럼 사람이 답해야 하는 셀: 자동 실행 검사에서 건너뛴다
                 nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")
             done = (f.get("chunk_success") or {}).get(shown)
@@ -411,7 +440,9 @@ def build(folder, mc=False):
                 ans = "\n\n".join("```python\n" + _answer_code("\n".join(todos[i].get("answer") or answers[i]), blank_indents[i]) + "\n```"
                                     for i in mine)
                 nb.md(f"<details><summary>정답 보기</summary>\n\n{ans}\n\n</details>")
-        if wf and f.get("run") == "terminal":  # 서버: 노트북 커널을 붙잡지 않도록 터미널에서 띄운다
+        if ready:
+            nb.md(TERMINAL_NOTE_MC.format(file=wf, path=f"course/{chapter}/notebooks/{wf}", first=first_wf))
+        elif wf and f.get("run") == "terminal":  # 서버: 노트북 커널을 붙잡지 않도록 터미널에서 띄운다
             many = split and first_wf  # 여러 셀로 나눠 쓴 파일
             nb.md(f.get("run_note") or TERMINAL_NOTE.format(
                 path=f"course/{chapter}/notebooks/{wf}",
