@@ -72,6 +72,7 @@ uv run python -m config.check --json    # AI 도우미용 JSON
 - 임베딩: `from config.embeddings import get_embeddings` → `get_embeddings()`
 - 주소·모델 이름·키를 코드에 직접 쓰지 않는다. 환경을 바꿀 때는 `.env`만 바꾼다.
 - 사내 모델의 속 구조(헤더, 임베딩 API 규칙)와 새 프로젝트에서 쓰는 코드는 [samsung_api.md](samsung_api.md)에 있다.
+- 사내 RAGaaS는 `from config.ragaas import post_ragaas`로 부른다. 쓰는 법은 [ragaas.md](ragaas.md)에 있다.
 
 ## 6. 원본 코드(.py)를 직접 실행할 때
 
