@@ -45,7 +45,7 @@ TODO_PLACEHOLDER = "작성 예정"
 def kind_of(path):
     """파일 이름 끝(_LEC/_LAB)으로 노트북 종류를 정한다."""
     stem = Path(path).stem
-    return "lecture" if stem.endswith("_LEC") else "lab" if stem.endswith("_LAB") else None
+    return "lecture" if stem.endswith("_LEC") else "lab" if stem.endswith(("_LAB", "_LAB_MC")) else None  # _LAB_MC: 객관식판
 
 
 def excerpt(text, n=60):
@@ -552,7 +552,7 @@ def qc(path, execute=False):
     nb = nbformat.read(path, as_version=4)
     kind = kind_of(path)
     if kind is None:
-        R("종류", "파일 이름이 _LEC 또는 _LAB으로 끝남", [(0, path.name)], warn=True)
+        R("종류", "파일 이름이 _LEC, _LAB, _LAB_MC로 끝남", [(0, path.name)], warn=True)
     if "course" in path.parts:  # 수강생본에는 강사용 메모가 없어야 한다(강사본은 dev/instructor/)
         R("구조", "수강생본에 강사용 메모 없음", [(i, "강사용 메모 상자") for i, c in enumerate(nb.cells) if c.cell_type == "markdown" and c.source.lstrip().startswith(BOX_HEAD)])
     quizzes = check_quiz(nb, path.parent, R)
