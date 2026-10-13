@@ -16,7 +16,7 @@ REV=$(git rev-parse --short HEAD)
 SRC_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 OUT_DIR="$HOME/800_Archives/830_Courses/samsung_ds_ai_developer"
 ZIP="$OUT_DIR/$(date +%F)_course_${VERSION}.zip"
-FILES=(course pyproject.toml uv.lock .env.sample .gitignore)
+FILES=(course pyproject.toml uv.lock .python-version .env.sample .gitignore)
 
 fail() { echo "✖ $1 | $2 | $3" >&2; exit 1; }
 

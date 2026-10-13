@@ -156,6 +156,12 @@ class Notebook:
                 toc.append("  " * (level - 2) + f"- {title}" + (f" {label}" if label else ""))
         cells.insert(1, nbf.v4.new_markdown_cell("**목차**\n\n" + "\n".join(toc)))
         out = Path(out)
+        if out.name.endswith("_LEC.ipynb"):  # 강의 노트북도 # · ## 제목을 접은 채로 연다(객관식판과 같음)
+            for cell in cells:
+                level = cell.metadata.get("heading", {}).get("level") or (1 if cell.cell_type == "markdown" and cell.source.startswith("# ") else None)
+                if level and level <= 2:
+                    cell.metadata["jp-MarkdownHeadingCollapsed"] = True
+                    cell.metadata["heading_collapsed"] = True
         # 강의 노트북은 코드 셀이 접혀 있고 저장된 출력이 없어, 실행 전에는 슬라이드·퀴즈가 보이지 않는다
         if out.name.endswith("_LEC.ipynb") and cells[0].source.startswith("# [LEC]") and LEC_RUN_NOTE not in cells[0].source:
             cells[0].source += "\n\n" + LEC_RUN_NOTE
