@@ -52,8 +52,8 @@ builder.add_edge('chatbot', END)
 app = builder.compile()
 
 
-# 그래프 구조 출력 (Mermaid 다이어그램)
-print(app.get_graph().draw_mermaid())
+# 그래프 구조 출력 (글자 그림. 노트북에서는 from draw import draw; draw(app)로 그림을 본다)
+print(app.get_graph().draw_ascii())
 print()
 
 result = app.invoke(

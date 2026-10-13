@@ -1,97 +1,54 @@
-# AI Agent 개발 프로젝트 교육 — 교안 저장소
+# AI Agent 개발 과정 — 수강생 자료
 
-삼성전자 DS부문 AX·PI센터 "AI Agent 개발 프로젝트 교육"(4일, 32시간)의 교안과 실습 자료입니다.
-이 문서는 저장소를 처음 받은 담당자를 위한 안내입니다. 무엇이 어디에 있는지, 수강생에게 무엇을 나눠 주는지, 새 판을 어떻게 만드는지를 설명합니다.
+수업은 `ChapterNN/notebooks/`의 노트북으로 진행합니다. 강의 노트북(`_LEC`)으로 개념을 보고, 실습 노트북(`_LAB_MC`)으로 직접 실행합니다. `_LAB_MC`는 보기를 골라 주석을 풀어 코드를 완성하는 실습입니다(`_LAB`은 같은 실습의 빈칸판입니다).
 
-## 한눈에 보기
-
-- 수업은 **주피터 노트북**으로 합니다. 개념은 강의 노트북(`_LEC`), 실습은 실습 노트북(`_LAB`)으로 진행합니다.
-- 실습은 수강생이 사내 Coding AI(CodeMate)에게 지시하고 결과를 검토하는 방식입니다. 강의·실습 내용은 받은 원본(컨플루언스 자료의 Python 코드·교안 PDF)을 그대로 두고, 전달 방식만 노트북으로 바꿨습니다.
-- 수강생에게 나눠 줄 자료는 **`study` 브랜치**(또는 같은 내용의 zip)입니다. 이 `main` 브랜치에는 강사용 자료까지 모두 들어 있습니다.
-
-## 과정 구성
-
-| 일차 | 노트북 | 주제 |
-| --- | --- | --- |
-| 1일차 | 1-1 ~ 1-3 | AI Agent Design Thinking, LLM API, LangChain |
-| 2일차 | 1-4 ~ 2-3 | RAG, LangGraph, Multi-Agent, Streamlit RAG 서비스 |
-| 3일차 | 3-1 ~ 3-4 | M1 복습, MCP, A2A, LangGraph 심화 |
-| 4일차 | 4-1 ~ 4-3 | Harness Engineering, Langfuse 관측·평가, 캡스톤 프로젝트 |
-
-1·2일차는 `course/Chapter01/`(M1), 3·4일차는 `course/Chapter02/`(M2)입니다. 모듈과 시간의 정본은 [커리큘럼](dev/docs/CURRICULUM.md)입니다.
-
-## 브랜치
-
-| 브랜치 | 들어 있는 것 | 누가 쓰나 |
-| --- | --- | --- |
-| `main` | 완성본 전체: 수강생 자료 + 강사용 자료(강사본 노트북, 빌더, 검사 도구, 문서) | 강사·담당자. 검사를 통과한 판만 합칩니다 |
-| `study` | 수강생 자료만: `course/`, 설치 파일, 수강생용 안내 | 수강생. 이 브랜치나 zip을 나눠 줍니다 |
-| `dev` | 앞으로 고칠 작업 | 강사·개발자 |
-
-고치는 흐름은 한 방향입니다.
-
-```text
-dev (고치고 검사) → main (합치기) → study (dev/release.sh가 main에서 만든다)
-```
-
-- `study`는 `main`과 이력이 섞이지 않는 별도 브랜치입니다. 강사용 자료는 `study`의 이력에도 들어가지 않습니다.
-- `study`에서 직접 고치지 않습니다. 고칠 것은 `dev`에서 고친 뒤 위 흐름을 다시 탑니다.
+**브랜치:** 이 저장소의 `main` 브랜치만 받아서 실습합니다. `dev` 브랜치는 강사용 자료라 받지 않습니다.
 
 ## 폴더
 
-| 위치 | 들어 있는 것 |
-| --- | --- |
-| `course/` | **수강생 자료**. `study` 브랜치로 나가는 부분입니다 |
-| `course/ChapterNN/notebooks/` | 수업 노트북(수강생본, 강사 메모 없음)과 실습 데이터 |
-| `course/Chapter02/capstone/` | 4일차 캡스톤 프로젝트 폴더 |
-| `course/ChapterNN/code/raw/`, `code/solution/` | 받은 원본 실습 코드와 정답 |
-| `course/ChapterNN/slides/` | 교안 PDF |
-| `course/config/` | 사내·사외 연결 설정(모델·임베딩·RAGaaS) |
-| `course/agent_docs/` | 설치·경로·오류 해결 안내 |
-| `dev/` | **강사·개발용**. 수강생에게 나가지 않습니다 |
-| `dev/instructor/` | 강사본 노트북(강사용 메모 포함) |
-| `dev/builders/`, `dev/qc/`, `dev/tests/` | 노트북을 만드는 빌더, 노트북 검사 도구, 테스트 |
-| `dev/release.sh` | `main`에서 `study` 브랜치와 전달용 zip을 만드는 스크립트 |
-| `dev/docs/` | 커리큘럼, 수강생 피드백 정리, 검증 기록 |
-| `pyproject.toml`, `uv.lock`, `.env.sample` | 설치 파일과 연결 설정 견본 |
-| `AGENTS.md` | 강사와 AI 도우미를 위한 작업 규칙·배경 |
+| 폴더 | 들어 있는 것 |
+|---|---|
+| `course/Chapter01/notebooks/` | 1부(1·2일차) 수업 노트북. `1-1_…_LEC.ipynb`부터 번호 순서대로 엽니다. `data/`는 실습 자료입니다 |
+| `course/Chapter02/notebooks/` | 2부(3·4일차) 수업 노트북. `3-1_…`부터 번호 순서대로 엽니다. MCP·A2A 실습은 서버를 VS Code 새 터미널에서 띄웁니다(노트북 안내를 따릅니다) |
+| `course/Chapter02/capstone/` | 4일차 캡스톤 프로젝트 폴더. AI와 함께 직접 고칩니다. 안내는 `4-3_capstone_LAB` 노트북과 이 폴더의 README.md |
+| `course/ChapterNN/code/raw/` | 받은 원본 실습 코드 |
+| `course/ChapterNN/code/solution/` | 원본 실습 코드의 정답 |
+| `course/ChapterNN/slides/` | 강의 슬라이드 PDF |
+| `course/ChapterNN/assets/` | 노트북 화면 도구(슬라이드 뷰어, 퀴즈) |
+| `course/config/` | 모델·임베딩 연결 설정. 노트북이 불러다 씁니다 |
+| `course/agent_docs/` | 설치·경로·오류 해결 안내. AI 도우미도 이 문서를 읽고 설정을 돕습니다 |
 
-## 강의장 PC 준비
+## 처음 한 번: 설치
 
-강의장 PC는 계정별로 초기화되므로 1일차에 수강생과 함께 설치합니다(1.5~2시간). 순서는 [수강생 안내](course/README.md)와 [설치 안내](course/agent_docs/setup.md)에 있습니다. 요약하면 다음과 같습니다.
+저장소 맨 위 폴더(이 `course/` 폴더의 위)에서 실행합니다.
 
-1. `uv` 설치 → 저장소 맨 위에서 `uv sync --extra notebooks`
-2. `.env.sample`을 복사해 `.env`를 만들고 `COURSE_ENV=samsung`(사내)과 사내 API 값을 채웁니다.
-3. `uv run python -m config.check`로 점검합니다. ⛔ 줄이 없으면 준비가 끝난 것입니다.
+1. `uv`를 설치합니다.
+2. 필요한 패키지를 설치합니다.
 
-## 새 판 만들기 (강사·관리자)
-
-1. `dev`에서 고칩니다. 노트북은 직접 고치지 않고 `dev/builders/`의 글·spec을 고친 뒤 다시 빌드합니다(방법은 [dev/AGENTS.md](dev/AGENTS.md)).
-2. 검사합니다.
-
-   ```bash
-   uv run --extra notebooks python -m unittest discover -s dev/tests -p 'test_*.py'
-   uv run python dev/qc/notebook_qc.py
+   ```
+   uv sync --extra notebooks
    ```
 
-3. `main`에 합치고 `study`와 zip을 만듭니다.
+3. `.env.sample`을 복사해 저장소 맨 위에 `.env`를 만들고, 강사가 알려 준 값을 채웁니다. `.env`의 키는 다른 사람에게 보이거나 파일로 올리지 않습니다.
 
-   ```bash
-   git switch main
-   git merge dev
-   bash dev/release.sh v6
-   git switch dev
+4. `.env` 맨 위 `COURSE_ENV`를 고릅니다. 강의장 PC는 `samsung`(사내), 사내망 밖은 `out`(사외)입니다.
+5. 설정을 점검합니다. "준비 완료"가 나오면 됩니다.
+
+   ```
+   uv run python -m config.check
    ```
 
-   zip은 `~/800_Archives/830_Courses/samsung_ds_ai_developer/`에 생깁니다.
+설치나 실행이 안 되면 `course/agent_docs/troubleshooting.md`를 봅니다.
 
-## 수업 전에 확인할 것
+## 수업 때
 
-- **사내 게이트웨이의 도구 호출과 구조화 출력:** 3·4일차(MCP, A2A, Harness, 캡스톤)는 모든 단계가 도구 호출에 기대는데, 사내 게이트웨이에서는 아직 확인하지 못했습니다. 강의장에서 가장 먼저 점검할 항목입니다.
-- **사내 패키지 미러:** `uv.lock`에 고정한 버전이 사내 미러에 있는지 확인합니다. 특히 하한을 올린 `a2a-sdk>=1.1.5`, `deepagents>=0.7.18`, `langfuse>=4.15.4`, `fastmcp>=3.4.7`입니다.
-- **Langfuse:** 4일차 관측 실습에 쓸 서버 주소와 프로젝트 키를 정합니다.
-- **Windows 강의장 PC에서 한 번 실행:** 이 교안은 macOS에서 만들고 Windows 조건(한국어 인코딩, 경로, 포트)을 코드로 흉내 내 점검했습니다. 실제 강의장 PC에서도 한 번 실행해 봅니다.
+1. VS Code에서 저장소 폴더를 엽니다.
+2. `course/Chapter01/notebooks/`(2부는 `course/Chapter02/notebooks/`)에서 노트북을 엽니다. 커널은 저장소의 `.venv`를 고릅니다.
+3. 셀은 위에서부터 차례로 실행합니다.
+4. 슬라이드가 보이지 않으면 바로 위 셀을 다시 실행합니다. 그래도 안 되면 맨 위 셀부터 다시 실행합니다.
 
-## 보안 주의
+## 실습 노트북 보는 법
 
-- `.env`에는 사내 키가 들어갑니다. Git에 올리지 않습니다(`.gitignore`에 들어 있습니다).
+- **(예제)** 완성된 코드를 함께 실행합니다. `# ✍️ CHANGE_HERE:` 바로 아래 줄의 값만 바꿔 다시 실행해 봅니다.
+- **(과제)** `# ✍️ WRITE_HERE:` 아래 `...` 빈칸을 AI와 함께 채웁니다. 프롬프트 힌트를 보고 지시를 직접 씁니다.
+- 실행한 뒤 성공 기준과 비교합니다. 🟢는 되어야 하는 것, ⛔는 다시 해야 하는 신호입니다. 그다음 접힌 "정답 보기"와 비교합니다.

@@ -65,8 +65,8 @@ builder.add_edge('chatbot', END)    # 챗봇이 생성한 결과를 출력
 app = builder.compile()
 
 
-# 그래프 구조 출력 (Mermaid 다이어그램)
-print(app.get_graph().draw_mermaid())
+# 그래프 구조 출력 (글자 그림. 노트북에서는 from draw import draw; draw(app)로 그림을 본다)
+print(app.get_graph().draw_ascii())
 print()
 
 result = app.invoke({'messages': [HumanMessage(content='LangGraph가 뭔지 두 문장으로 설명해줘.')]})

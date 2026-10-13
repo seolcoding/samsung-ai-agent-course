@@ -1,83 +1,58 @@
-# AGENTS.md — 삼성전자 DS AI Agent 개발 프로젝트 교육 (2026-AI-PD)
+# AGENTS.md — 수강생 자료 (AI 코딩 도우미용)
 
-이 리포지토리는 **강의용 실습 코드 + 교안**이다. 제품 코드가 아니다.
-모든 변경은 "수강생 앞에서 이게 어떻게 보이는가"를 기준으로 판단한다.
+이 폴더는 "AI Agent 개발" 과정의 수강생 자료입니다. 수강생은 코딩이 낯선 사람이 많습니다. 쉬운 말로 짧게 설명하고, 결과부터 말합니다.
 
-## 1. 실행 환경
+## 폴더 지도
 
-- **패키지**: `uv` + `pyproject.toml` (강의장 PC 기준 통일 설치, 셋팅에 1.5~2시간 소요)
-- **에디터**: VS Code
-- **Coding AI**: **CodeMate** — 삼성 사내 전용 LLM assistant, VS Code 확장으로 설치
-- **수강생 PC 사전 셋팅 불가** (계정별 로컬 PC 초기화 정책). 셋팅은 1일차 현장에서 다 같이 한다.
-- **LLM**: 기본 경로는 사내 게이트웨이(`LLM_PROVIDER=samsung`). 사내망에서만 동작한다.
-  사외 준비 시에는 `LLM_PROVIDER=openai` / `EMBED_PROVIDER=openai`로 바꿔서 작업한다.
+- `ChapterNN/notebooks/` 수업 노트북. `_LEC`는 강의(슬라이드·설명·퀴즈), `_LAB`은 실습. `data/`는 실습 자료.
+- `ChapterNN/code/raw/` 받은 원본 실습 코드, `ChapterNN/code/solution/` 그 정답. 참고용이며 수업은 노트북으로 한다.
+- `ChapterNN/slides/` 강의 슬라이드 PDF.
+- `ChapterNN/assets/` 그 챕터 노트북의 화면 도구(슬라이드 뷰어, 퀴즈).
+- `config/` 모델·임베딩·RAG 연결 설정(챕터 공통).
+- `Chapter02/capstone/` 4일차 캡스톤 프로젝트 폴더. 수강생이 AI와 함께 직접 고치는 곳이다(안내는 `4-3_capstone_LAB` 노트북과 이 폴더의 README.md).
 
-## 2. 리포지토리 구조
+## 실습 노트북에서 도울 때
+
+- `# ✍️ WRITE_HERE:` 아래 `...  # ✍️ 여기를 채웁니다` 줄(빈칸)만 채운다. 빈칸 밖의 줄은 고치지 않는다.
+- `# ✍️ CHANGE_HERE:` 바로 아래 줄은 값만 바꾼다.
+- 새 기능, 예외 처리, 재시도를 부탁받지 않았으면 더하지 않는다.
+- 코드를 준 뒤에는 각 줄이 하는 일을 짧게 설명한다. 오류가 나면 원인부터 설명한다.
+- 셀은 위에서부터 차례로 실행된다고 보고, 앞 셀에서 만든 이름을 그대로 쓴다.
+- `%%writefile`로 시작하는 셀은 서버·설정 파일을 노트북 폴더에 쓰는 셀이다. 첫 줄(`%%writefile …`)은 지우지 않는다.
+
+## 서버를 띄우는 실습 (Chapter02: MCP·A2A·캡스톤)
+
+- 서버는 VS Code **새 터미널**에서 저장소 맨 위 폴더 기준으로 띄운다. 예: `uv run python course/Chapter02/notebooks/mcp_server.py`. 노트북 셀에서 서버를 실행하지 않는다(커널이 멈춘다).
+- 서버 터미널은 켜 둔 채 노트북으로 돌아와 클라이언트 셀을 실행한다. 서버 파일을 고쳤으면 터미널에서 Ctrl+C로 끄고, 그 파일을 쓰는 셀들을 첫 셀(`%%writefile <파일>`)부터 마지막 이어 쓰기 셀(`%%writefile -a <파일>`)까지 차례로 모두 다시 실행한 뒤 다시 띄운다. 이어 쓰기 셀 하나만 다시 실행하면 파일 끝(서버 실행 줄 뒤)에 덧붙기만 해서 반영되지 않는다.
+- 포트: MCP 8000, A2A 8001, 캡스톤 MCP 서버 8001. `error while attempting to bind on address`(맥 `address already in use`, Windows `[Errno 10048]`)가 나오면 앞 서버 터미널을 Ctrl+C로 끈다.
+
+## 지킬 것
+
+- 모델은 `config.llm.get_llm()`, 임베딩은 `config.embeddings.get_embeddings()`로 부른다. 주소·모델 이름·키를 코드에 직접 쓰지 않는다.
+- `.env`의 키와 토큰은 출력하거나 파일에 쓰지 않는다.
+- `code/`, `assets/`, `config/`의 파일은 고치지 않는다. `capstone/`은 고쳐도 된다.
+- 텍스트 파일을 읽고 쓰는 코드는 늘 `encoding="utf-8"`을 넣는다. 수강생 PC는 윈도우라 기본값(cp949)으로 열면 한글 파일이 깨진다.
+
+## 문제가 생기면 (설치·경로·연결)
+
+아래 문서를 먼저 읽고, 그 순서대로 진단한 뒤 수강생 PC를 설정해 준다. 추측으로 코드를 고쳐 우회하지 않는다.
+
+- 설치·커널·`.env`·모델 부르는 법: [agent_docs/setup.md](course/agent_docs/setup.md)
+- 파일을 못 찾을 때, 경로를 쓸 때: [agent_docs/paths.md](course/agent_docs/paths.md)
+- 오류 메시지별 원인과 해결: [agent_docs/troubleshooting.md](course/agent_docs/troubleshooting.md)
+
+진단 순서:
+1. 저장소 맨 위에서 `uv run python -m config.check --json`을 실행한다(Langfuse 실습·캡스톤이면 `--langfuse`도 붙인다). 키·토큰 값은 나오지 않는다.
+2. ⛔ 항목마다 `fix` 안내대로 고친다. 설치 문제는 `uv sync --extra notebooks`, 연결 방식은 `.env`의 `COURSE_ENV`(사내 `samsung`, 사외 `out`), 빠진 이름은 `.env`에 채우도록 안내한다. `.env`의 값을 읽어 보여 주거나 대신 지어내지 않는다.
+3. 이름이 모두 🟢인데도 연결 오류가 나면, 수강생에게 알린 뒤 `--live`로 실제 호출을 한 번 해 본다.
+4. 그래도 안 되면 오류 마지막 줄로 troubleshooting.md를 찾는다. 파일을 못 찾는 문제는 paths.md를 본다.
+5. 고친 뒤 노트북은 맨 위 셀부터 다시 실행한다. Streamlit 앱을 띄우는 셀은 끝나지 않으니 ■로 멈추고 다음 셀로 넘어가게 하고, `input()` 셀에는 답을 입력하게 한다. 문서에 "확인되지 않음"으로 적힌 사내 기능 문제는 troubleshooting.md의 순서대로 먼저 확인하고, 풀리지 않으면 그 셀은 건너뛰고 다음 절을 진행하게 한 뒤 강사에게 보여 줄 내용(셀, 오류 마지막 줄)을 정리해 준다.
+
+점검 결과는 수강생에게 이렇게 짧게 보고한다.
 
 ```
-course/                    ← 수강생 전달본. 수강생에게 필요한 것만 둔다(dev/를 참조하지 않는다)
-  README.md, AGENTS.md     수강생용 설치·실행 안내, 수강생 쪽 AI 코딩 도우미용 맥락
-  agent_docs/              설치·경로·오류 해결 문서(setup.md, paths.md, troubleshooting.md). 환경 문제는 강사 PC에서도 이것부터 본다
-  Chapter01/
-    notebooks/             수업 노트북 13권(LEC/LAB, 강사용 메모 없는 수강생본) + data/
-    code/raw/, code/solution/  받은 원본 실습 코드와 정답(.py와 코드가 읽는 data·md)
-    slides/                교안 PDF 정본(day01/, day02/)과 커리큘럼 제안서 PDF
-    assets/                이 챕터 노트북의 도구(widgets.py, PDF.js, 퀴즈 파일). 챕터마다 따로 둔다
-  Chapter02/
-    notebooks/             M2 노트북 14권(3-1~4-3 LEC/LAB) + data/. MCP·A2A 서버는 LAB 셀이 %%writefile로 이 폴더에 쓰고 터미널에서 띄운다(쓴 .py는 git 제외)
-    capstone/              4-3 캡스톤 프로젝트 폴더(수강생이 AI와 함께 고침). starter.py, mcp_server.py, skills/, data/, README.md
-    code/raw/, code/solution/, slides/, assets/   Chapter01과 같은 역할
-  config/                  환경에 따른 LLM·임베딩·RAGaaS 공통 코드(패키지 `config`, 챕터 공통)
-dev/                       ← 강사·개발용. 전달하지 않는다
-  AGENTS.md                노트북 제작 규칙
-  builders/                노트북 빌더(build_lab.py, build_lecture_*.py, build_capstone_guide.py, nbkit.py)와 글·spec(labs/*.json, labs/Chapter02/*.json, *_cells*.json, *_outline.md)
-  qc/                      노트북 QC 하네스
-  instructor/ChapterNN/    강사본 노트북(강사용 메모 포함, 빌드 산출)
-  demos/                   교수법 데모 노트북과 그 자산
-  docs/                    CURRICULUM.md, 수강생 피드백 정리, VALIDATION, guides(받은 캡스톤 README), templates, PDF 해설 노트북(notebooks/)
-  archive/                 원본 .py 옆에 있던 .ipynb 변환본, main.py, 폴더 개편 전 안내 문서(docs/)
-  tests/                   환경 분기·실습 경로 검증
-  release.sh               main에서 수강생용 브랜치 study와 전달 zip 만들기
-  work/                    실습 작업 복사본(Git 제외, 필요할 때만 만든다)
-.env.sample, pyproject.toml, uv.lock   설치 파일(study에도 들어간다)
-README.md                  처음 받은 담당자용 안내
+설정 점검 결과: 준비 완료 / 고칠 곳 N개
+- 실행 환경: 사내(samsung) 또는 사외(out)
+- ⛔ <항목>: <무엇이 문제인지> → <할 일>
+- (--live를 했다면) LLM 호출 🟢/⛔, 임베딩 호출 🟢/⛔
 ```
-
-**중요**: 사내 GitHub 레포는 원래 *"TODO가 전부 정답으로 채워진 최종본"*이다.
-`course/Chapter01/code/raw/`가 정답과 거의 같은 것은 사고가 아니라 **의도된 배포 상태**다.
-차수별 브랜치(4종)는 이전 차수 강사가 임의 구성한 것이고 **강사별 재구성이 허용**된다.
-브랜치는 셋이다. `dev`에서 고치고 검사한 뒤 `main`(완성본 전체)에 합친다. 수강생용 `study`는 `main`에서 `dev/release.sh`로 만든다(`course/`와 설치 파일만, 이력이 섞이지 않는 별도 브랜치). `study`에서 직접 고치지 않는다. `main`을 깎지 않는다.
-`raw`는 원본 파일 형식인 `.py`와 PDF를 뜻한다. 변경 금지 아카이브라는 뜻은 아니다.
-수업은 노트북으로 한다. 교안 노트북은 `dev/builders/`의 빌더로 만들고 `dev/AGENTS.md`를 따른다. 설명·슬라이드·실습을 노트북 안에 인라인으로 넣고, 외부 CDN을 쓰지 않는다. 노트북을 직접 고치지 말고 빌더의 글·spec을 고쳐 다시 빌드한다.
-실행에 쓰는 `skills.md`, `SKILL.md`, `data/*.md`는 문서 형식이어도 코드가 읽으므로 `course/ChapterNN/code/`의 실습 폴더에 둔다. 그 밖의 안내 문서는 `dev/docs/`에 둔다.
-명령과 링크는 프로젝트 루트를 기준으로 적는다. 실행할 때는 `uv run --env-file .env`처럼 환경 파일을 명시한다.
-메일 원문, 첨부, 전달받은 ZIP, 지난 준비 기록은 저장소 밖의 강의 아카이브에 둔다. 정규 폴더에는 수업·강의 운영에 직접 필요한 자료만 둔다.
-
-## 3. 반드시 지킬 것
-
-1. **실습본(`code/raw/`)과 정답본(`code/solution/`)을 함께 고친다.** 한쪽만 고치면 정답지와 화면이 어긋난다.
-2. **슬라이드(`course/ChapterNN/slides/`)·교안 노트북(빌더 글·spec)을 함께 확인한다.** 코드만 고치면 강사가 슬라이드를 가리키며 다른 화면을 보게 된다.
-3. **데모가 조용히 틀리는 것을 최악으로 친다.** 에러가 나는 편이 낫다. 실습 코드를 고쳤으면 실제로 실행해 본다.
-4. **외부 API 키는 리포지토리에 쓰지 않는다.** `.env`는 `.gitignore` 대상이다.
-5. **RAGaaS 실습**은 `RAG_API_KEY` 전역변수와 `'api-key'` 요청 헤더 2가지가 없으면 인증 실패한다.
-6. **정본은 두 가지다.** 모듈·시간은 커리큘럼 제안서(2026-09-03판), 강의·실습 내용은 받은 컨플루언스 자료(`course/ChapterNN/code/raw/` Python, `course/ChapterNN/slides/` PDF)다.
-7. **YAGNI — 시킨 것만 만든다.** 요청하지 않은 기능·파일·설명·안내를 덧붙이지 않는다.
-   근거 없는 내용(수업 진행, 수강생 반응, 사내 환경 등)을 상상해서 쓰지 않는다. 필요해 보이면 먼저 묻는다.
-8. **`.env*` 파일의 주석은 영어(ASCII)로 쓴다.** 한글 주석이 있으면 강의장 윈도우 PC에서 옛 메모장 등이 cp949로 저장할 때 `import config`가 깨진다. ASCII만 담으면 어떤 방식으로 저장해도 바이트가 같다. 텍스트 파일을 읽고 쓰는 코드도 늘 `encoding="utf-8"`을 넣는다(윈도우 기본은 cp949). 둘 다 `dev/tests/test_encoding.py`가 검사한다.
-
-## 4. 알려진 결함
-
-2026-09-21 전수 감사 결과. 우선순위 높은 것만:
-
-- `course/Chapter01/code/raw/04-langgraph/04_human_in_the_loop.py` — "거부" 시나리오가 메일을 **실제로 전송**한다. `update_state` 누락.
-- `course/Chapter02/code/raw/01-mcp/` — 서버는 SSE, 클라이언트는 stdio. 슬라이드의 SSE 설정이 한 번도 실행되지 않는다.
-- `course/Chapter02/code/raw/03-langgraph-advanced/03_memory_store.py` — `compile()`에 checkpointer·store 누락. 슬라이드 3-4 p7과 화면이 다르다.
-- `course/Chapter02/code/raw/06-capstone/` — `mcp_server.py`와 `skills/`가 정답본에만 있다. 배점 20점이 배포본에서 불가능하다.
-- 기존 `course/Chapter02/code/solution/06-capstone/`에는 배점 대상인 Streamlit UI가 없다.
-- 원본 A2A 코드와 현재 SDK 1.x의 API가 다르다. 기존 raw/solution은 별도 이관 대상이다.
-- `course/Chapter02/code/solution/06-capstone/solution.py` — `skills=['skills/researcher/']`가 SKILL.md가 든 폴더를 가리켜 deepagents 0.7.18이 skill을 0개 찾는다. 오류 없이 돌지만 skill 양식을 따르지 않는다. 수강생용 `course/Chapter02/capstone/`에서는 skill 폴더를 한 단계 더 넣어 고쳤다(2026-09-28).
-- 사내 게이트웨이의 도구 호출(`bind_tools`)·구조화 출력이 확인되지 않았다. M2의 MCP·A2A·Harness(deepagents)·캡스톤은 모든 단계가 도구 호출이라 강의장 사전 점검 1순위다.
-
-## 5. 검증
-
-`uv sync --extra notebooks` 후 `uv run --extra notebooks python -m unittest discover -s dev/tests -p 'test_*.py'`로 환경 분기·실습 경로를 검사한다. 기본은 외부 API 없는 모드이며 실제 모델·Langfuse·사내 CodeMate 확인은 분리해 기록한다. 노트북의 키·출력은 커밋하지 않는다.
