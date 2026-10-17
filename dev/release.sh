@@ -5,7 +5,7 @@
 # 실행(프로젝트 루트, main에서): git switch main && git merge dev && bash dev/release.sh <버전>   예: v4
 # - study는 개발 이력과 섞이지 않는 별도 브랜치(orphan)다. dev/·materials·인수인계 자료가 이력에도 남지 않는다.
 # - 교안은 dev에서 고친다. study에서 직접 고치지 않는다.
-# - push하지 않는다.
+# - push하지 않는다. 끝나면 dev로 돌아와 `git push origin study dev`로 원격을 맞춘다(원격 study가 수강생 기본 브랜치, 2026-10-17).
 set -euo pipefail
 
 ROOT=$(git rev-parse --show-toplevel)
@@ -16,7 +16,7 @@ REV=$(git rev-parse --short HEAD)
 SRC_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 OUT_DIR="$HOME/800_Archives/830_Courses/samsung_ds_ai_developer"
 ZIP="$OUT_DIR/$(date +%F)_course_${VERSION}.zip"
-FILES=(course pyproject.toml uv.lock .python-version .env.sample .gitignore)
+FILES=(course pyproject.toml uv.lock .python-version .env.sample .gitignore agents_skills.zip)
 
 fail() { echo "✖ $1 | $2 | $3" >&2; exit 1; }
 

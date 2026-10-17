@@ -7,7 +7,7 @@
 
 - 수업은 **주피터 노트북**으로 합니다. 개념은 강의 노트북(`_LEC`), 실습은 실습 노트북(`_LAB`)으로 진행합니다.
 - 실습은 수강생이 사내 Coding AI(CodeMate)에게 지시하고 결과를 검토하는 방식입니다. 강의·실습 내용은 받은 원본(컨플루언스 자료의 Python 코드·교안 PDF)을 그대로 두고, 전달 방식만 노트북으로 바꿨습니다.
-- 수강생에게 나눠 줄 자료는 **공개 저장소(github.com/seolcoding/samsung-ai-agent-course)의 `main` 브랜치**입니다. 내용은 로컬 `study` 브랜치(`dev/release.sh`가 만듦, `course/`와 설치 파일만)와 같습니다. 강사용 자료까지 모두 든 브랜치는 공개 저장소의 `dev`입니다.
+- 수강생에게 나눠 줄 자료는 **공개 저장소(github.com/seolcoding/samsung-ai-agent-course)의 `study` 브랜치**(기본 브랜치)입니다. 로컬 `study` 브랜치(`dev/release.sh`가 만듦, `course/`와 설치 파일만)를 그대로 올립니다. 강사용 자료까지 모두 든 브랜치는 공개 저장소의 `dev`입니다.
 
 ## 과정 구성
 
@@ -55,6 +55,7 @@ dev (고치고 검사) → main (합치기) → study (dev/release.sh가 main에
 | `dev/docs/` | 커리큘럼, 수강생 피드백 정리, 검증 기록 |
 | `dev/materials/` | 커리큘럼 제안서, 인수인계서, 설문 원본 |
 | `pyproject.toml`, `uv.lock`, `.env.sample` | 설치 파일과 연결 설정 견본 |
+| `agents_skills.zip` | 수강생 AI 도우미용 스킬 묶음(`.agents/skills`를 윈도우에서 풀 수 있게 묶은 것) |
 | `AGENTS.md` | 강사와 AI 도우미를 위한 작업 규칙·배경 |
 
 ## 강의장 PC 준비
@@ -82,6 +83,7 @@ dev (고치고 검사) → main (합치기) → study (dev/release.sh가 main에
    git merge dev
    bash dev/release.sh v6
    git switch dev
+   git push origin study dev   # 공개 저장소에 올립니다. 수강생은 study를 받습니다
    ```
 
    zip은 `~/800_Archives/830_Courses/samsung_ds_ai_developer/`에 생깁니다.
