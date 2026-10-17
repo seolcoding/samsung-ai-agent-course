@@ -211,3 +211,8 @@ dev/self_study/
 .claude/skills/
 # Link into .venv (comes with the streamlit package). Not committed.
 .agents/skills/developing-with-streamlit
+
+# 정답 실행본(_ANS): 정답만 풀어 실행한 출력이 들어 있다. 강사 참고용으로 로컬에만 둔다.
+*_ANS.ipynb
+# CodeMate(Roo) 확장이 만드는 프로젝트 MCP 설정. .roo/의 다른 파일(규칙·스킬)은 커밋할 수 있게 둔다.
+.roo/mcp.json
