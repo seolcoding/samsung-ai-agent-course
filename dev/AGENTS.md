@@ -23,7 +23,16 @@
   - 제목·목차의 (예제)/(과제) 표시와 글 속 예제·과제 구분은 쓰지 않는다. 바꿔 쓸 글은 choices의 `_text`에 둔다.
 - LangChain·LangGraph를 쓰는 실습 노트북은 맨 위 설정(환경 점검 다음)에 디버그 모드 셀을 따로 둔다. 기본은 켜짐(`set_debug(True)`)이고, 출력이 길면 `False`로 바꾸라고 주석으로 안내한다. 빌더가 원본 코드의 import를 보고 자동으로 넣는다.
 - LangGraph 그래프는 이렇게 짠다(2026-10-17). 노드는 바뀐 키만 dict로 반환하고, 분기는 `add_conditional_edges`로 한다(`Command`로 바꾸지 않는다). 직접 만든 갈림길 함수에는 반환 타입 `Literal[...]`을 단다. 반환 타입도 경로 표(path_map)도 없으면 실행은 되지만 `draw(app)` 그림에서 갈래가 사라진다. 2-2의 `researcher_condition`은 원본 그대로 두고, 반환 타입을 단 줄을 주석으로 넣어 두 그림을 비교하게 했다.
-- 메시지 결과는 `pretty_print()`로 보여 준다(2026-10-17). 그래프·에이전트를 실행한 뒤에는 State에서 메시지 목록을 꺼내 `for m in result["messages"]: m.pretty_print()`로 출력한다. 마지막 답만 `print(...content)`로 찍으면 도구 호출과 중간 메시지가 보이지 않는다. 노드 안에서 값을 꺼내 쓰는 코드, 스트리밍 출력, Streamlit 화면은 그대로 둔다. 원본 `.py`는 고치지 않고 빌드 spec의 patch로 노트북에서만 바꾼다. 기존 노트북은 손볼 때 함께 바꾼다.
+- 메시지 결과는 `pretty_print()`로 보여 준다(2026-10-17). 그래프·에이전트를 실행한 뒤에는 State에서 메시지 목록을 `results`로 꺼내 하나씩 `pretty_print()`한다. 실행 결과를 받는 변수는 어느 그래프의 결과인지 이름으로 알 수 있게 짓는다(`result`가 아니라 `tool_graph_result`, `supervisor_result`처럼).
+
+  ```python
+  tool_graph_result = tool_graph.invoke({"messages": [HumanMessage(content="50유로는 몇 원이야?")]})
+  results = tool_graph_result["messages"]
+  for m in results:
+      m.pretty_print()
+  ```
+
+  마지막 답만 `print(...content)`로 찍으면 도구 호출과 중간 메시지가 보이지 않는다. 노드 안에서 값을 꺼내 쓰는 코드, 스트리밍 출력, Streamlit 화면은 그대로 둔다. 원본 `.py`는 고치지 않고 빌드 spec의 patch로 노트북에서만 바꾼다. 기존 노트북은 손볼 때 함께 바꾼다.
 - 막혔을 때 안내는 모든 실습·캡스톤 노트북에서 같다(2026-10-13): "스스로 먼저 확인" 점검 순서 대신 **막혔을 때 AI에게 도움받는 프롬프트 힌트** 한 줄만 둔다(`nbkit.SELF_HELP`). AI에게는 오류의 마지막 줄이 아니라 **오류 메시지 전체**를 붙여 넣게 한다.
 - 수강생 설명은 강의장 PC 기준인 **Windows로만** 쓴다(2026-10-13 결정). 단축키는 `Ctrl + /`처럼 Windows 키만 적고 맥 키(`Cmd`)를 함께 적지 않는다.
 - 노트북 안의 제목은 1부터 번호를 매긴다(`1.`, `1.1`, `1.1.1`). 챕터와 권은 폴더와 파일 이름으로 구분한다.
