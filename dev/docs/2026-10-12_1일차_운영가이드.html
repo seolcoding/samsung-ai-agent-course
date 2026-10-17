@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1일차 운영 가이드</title>
+<style>
+:root {
+  --bg: #f6f7fb; --panel: #ffffff; --ink: #172033; --muted: #5b6475; --line: #dfe3ee;
+  --navy: #2a3f8c; --blue: #446af3; --blue-soft: #eef2ff;
+  --green: #1a7f37; --green-soft: #e8f5ec; --red: #c0392b; --red-soft: #fdecec;
+  --amber: #9a6700; --amber-soft: #fff6dc; --code-bg: #0f172a; --code-ink: #e6edf7;
+  --side: 268px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1420; --panel: #161c2b; --ink: #e6e9f2; --muted: #9aa3b5; --line: #2a3346;
+    --navy: #9db1ff; --blue: #7c97ff; --blue-soft: #1d2645;
+    --green: #4cc38a; --green-soft: #13291f; --red: #ff7b72; --red-soft: #3a1d1d;
+    --amber: #e3b341; --amber-soft: #33290f; --code-bg: #0a0e17; --code-ink: #dbe3f2;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1420; --panel: #161c2b; --ink: #e6e9f2; --muted: #9aa3b5; --line: #2a3346;
+  --navy: #9db1ff; --blue: #7c97ff; --blue-soft: #1d2645;
+  --green: #4cc38a; --green-soft: #13291f; --red: #ff7b72; --red-soft: #3a1d1d;
+  --amber: #e3b341; --amber-soft: #33290f; --code-bg: #0a0e17; --code-ink: #dbe3f2;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.7 "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  word-break: keep-all; overflow-wrap: anywhere;
+}
+a { color: var(--blue); }
+code, pre, kbd { font-family: "D2Coding", Consolas, "SF Mono", Menlo, monospace; }
+:not(pre) > code { background: var(--blue-soft); color: var(--navy); padding: 1px 6px; border-radius: 5px; font-size: .9em; }
+
+/* layout */
+.side {
+  position: fixed; inset: 0 auto 0 0; width: var(--side); overflow-y: auto;
+  background: var(--panel); border-right: 1px solid var(--line); padding: 22px 16px 40px;
+}
+.brand { font-weight: 800; color: var(--navy); font-size: 17px; line-height: 1.35; }
+.brand small { display: block; color: var(--muted); font-weight: 500; font-size: 13px; margin-top: 4px; }
+.progress { margin: 16px 0 6px; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.progress > i { display: block; height: 100%; width: 0; background: var(--green); transition: width .2s; }
+.progress-label { font-size: 13px; color: var(--muted); }
+.toc { list-style: none; padding: 0; margin: 18px 0 0; }
+.toc a {
+  display: flex; gap: 8px; padding: 7px 10px; border-radius: 8px; color: var(--ink);
+  text-decoration: none; font-size: 15px; line-height: 1.4;
+}
+.toc a .n { color: var(--muted); min-width: 18px; font-variant-numeric: tabular-nums; }
+.toc a:hover { background: var(--blue-soft); }
+.toc a.on { background: var(--blue-soft); color: var(--navy); font-weight: 700; }
+.side .tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+main { margin-left: var(--side); padding: 36px 48px 120px; max-width: calc(var(--side) + 980px); }
+.topbar { display: none; }
+
+/* typography */
+h1 { font-size: 30px; line-height: 1.3; margin: 0 0 8px; color: var(--navy); }
+h2 { font-size: 24px; line-height: 1.35; margin: 0 0 4px; color: var(--navy); }
+h3 { font-size: 19px; margin: 30px 0 10px; }
+h4 { font-size: 16px; margin: 22px 0 8px; color: var(--muted); }
+.lead { color: var(--muted); font-size: 17px; margin: 0 0 20px; }
+section.chapter {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+  padding: 30px 34px; margin: 0 0 28px;
+}
+.chapter-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.chip { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 99px; background: var(--blue-soft); color: var(--navy); }
+.chip.time { background: var(--amber-soft); color: var(--amber); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+
+/* callouts */
+.callout { border-radius: 12px; padding: 14px 18px; margin: 16px 0; border: 1px solid; }
+.callout p { margin: 4px 0; }
+.callout b.t { display: block; margin-bottom: 4px; }
+.note { background: var(--blue-soft); border-color: color-mix(in srgb, var(--blue) 30%, transparent); }
+.warn { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
+.stop { background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 35%, transparent); }
+.ok { background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 35%, transparent); }
+.unk { display: inline-block; font-size: 12px; font-weight: 700; color: var(--amber); background: var(--amber-soft); border-radius: 6px; padding: 0 6px; margin-left: 4px; white-space: nowrap; }
+
+/* code */
+.code { position: relative; margin: 12px 0 16px; }
+.code pre {
+  margin: 0; background: var(--code-bg); color: var(--code-ink); border-radius: 10px;
+  padding: 14px 16px; overflow-x: auto; font-size: 14px; line-height: 1.6; white-space: pre;
+}
+.code .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.copy {
+  position: absolute; top: 8px; right: 8px; font-size: 12px; padding: 3px 10px; border-radius: 6px;
+  border: 1px solid #3a4560; background: #1d2638; color: #dbe3f2; cursor: pointer;
+}
+.code .label + pre + .copy, .code .label ~ .copy { top: 30px; }
+.copy.done { background: var(--green); border-color: var(--green); color: #fff; }
+details.fold { margin: 12px 0; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; }
+details.fold > summary { cursor: pointer; font-weight: 700; }
+
+/* tables */
+.tbl { overflow-x: auto; margin: 12px 0 18px; border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--blue-soft); color: var(--navy); font-size: 14px; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+
+/* steps */
+ol.steps { list-style: none; counter-reset: s; padding: 0; }
+ol.steps > li { counter-increment: s; position: relative; padding: 2px 0 12px 44px; margin: 0; }
+ol.steps > li::before {
+  content: counter(s); position: absolute; left: 0; top: 2px; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--navy); color: var(--panel); font-weight: 800; display: grid; place-items: center; font-size: 15px;
+}
+
+/* checklist */
+.check { list-style: none; padding: 0; }
+.check li { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
+.check input { width: 20px; height: 20px; margin-top: 4px; flex: none; accent-color: var(--green); }
+.check li.done > span { color: var(--muted); text-decoration: line-through; }
+
+/* result rows */
+.result td:nth-child(3) { width: 120px; }
+.result select, .result input[type=text] {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; padding: 4px 6px; width: 100%;
+}
+.result select.pass { background: var(--green-soft); border-color: var(--green); }
+.result select.fail { background: var(--red-soft); border-color: var(--red); }
+.result select.skip { background: var(--amber-soft); border-color: var(--amber); }
+
+/* timeline */
+.timeline { position: relative; margin: 10px 0; padding-left: 26px; border-left: 3px solid var(--line); }
+.tl { position: relative; margin: 0 0 18px; }
+.tl::before { content: ""; position: absolute; left: -34px; top: 6px; width: 13px; height: 13px; border-radius: 50%; background: var(--blue); border: 3px solid var(--panel); }
+.tl .when { font-weight: 800; color: var(--navy); }
+.tl .what { margin: 2px 0; }
+.tl.lunch::before { background: var(--amber); }
+.tl.after::before { background: var(--muted); }
+
+.btn {
+  font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+}
+.btn:hover { border-color: var(--blue); }
+.btn.primary { background: var(--navy); color: var(--panel); border-color: var(--navy); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.card { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--panel); }
+.card h4 { margin: 0 0 6px; color: var(--navy); }
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--navy); color: var(--panel); padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+.scrim { display: none; }
+main { min-width: 0; }
+
+/* 휴대폰·태블릿: 위쪽 막대 + 서랍 목차, 표는 카드처럼 */
+@media (max-width: 900px) {
+  html { scroll-padding-top: 64px; }
+  body { font-size: 15px; line-height: 1.65; }
+  .topbar {
+    display: flex; position: sticky; top: 0; z-index: 20; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--panel); border-bottom: 1px solid var(--line);
+  }
+  .topbar .t { flex: 1; min-width: 0; font-weight: 800; color: var(--navy); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar .mini { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .side {
+    width: min(84vw, 320px); transform: translateX(-105%); transition: transform .2s ease;
+    z-index: 30; box-shadow: 4px 0 24px rgba(0,0,0,.18);
+  }
+  body.nav-open .side { transform: none; }
+  body.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 25; }
+  body.nav-open { overflow: hidden; }
+  .toc a { padding: 10px 10px; font-size: 16px; }
+  main { margin-left: 0; padding: 14px 12px 80px; }
+  section.chapter { padding: 18px 14px; border-radius: 12px; margin-bottom: 18px; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  h3 { font-size: 17px; margin-top: 24px; }
+  .lead { font-size: 15px; }
+  .grid2 { grid-template-columns: 1fr; }
+  .callout { padding: 12px 14px; }
+  .code pre { font-size: 12.5px; padding: 36px 12px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .copy { padding: 5px 12px; font-size: 13px; }
+  th, td { padding: 8px 9px; font-size: 14px; }
+  ol { padding-left: 18px; }
+  ol.steps > li { padding-left: 38px; }
+  ol.steps > li::before { width: 28px; height: 28px; font-size: 14px; }
+  .check input { width: 22px; height: 22px; }
+  .timeline { padding-left: 20px; }
+  .tl::before { left: -28px; }
+  /* 결과표는 줄마다 카드로 쌓는다(입력칸이 좁아지지 않게) */
+  table.result, table.result tbody, table.result tr, table.result td { display: block; width: 100%; }
+  table.result tr:first-child { display: none; }
+  table.result tr { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  table.result td { border: 0; padding: 2px 0; }
+  table.result td:nth-child(1) { font-weight: 700; }
+  table.result td:nth-child(2) { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+  .result td:nth-child(3) { width: auto; }
+  .result select, .result input[type=text] { font-size: 16px; padding: 8px; margin-top: 4px; }
+}
+@media print {
+  .side, .copy, .btn, .toast { display: none !important; }
+  main { margin: 0; padding: 0; max-width: none; }
+  section.chapter { break-inside: auto; border: 0; padding: 0 0 20px; }
+  .code pre { white-space: pre-wrap; background: #f3f4f6; color: #111; }
+  body { background: #fff; color: #000; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="btn" id="menu" aria-label="목차 열기" aria-expanded="false">☰ 목차</button>
+  <span class="t">1일차 운영 가이드</span>
+  <span class="mini" id="barMini"></span>
+</header>
+<div class="scrim" id="scrim"></div>
+<nav class="side" id="side" aria-label="목차">
+  <div class="brand">1일차 운영 가이드<small>13차수 · 2026-10-12(월) · 동탄DS큐브 23F</small></div>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  <div class="progress-label" id="barLabel">체크 0 / 0</div>
+  <ol class="toc" id="toc">
+    <li><a href="#overview"><span class="n">0</span>한눈에 보기</a></li>
+    <li><a href="#morning"><span class="n">1</span>수업 전 인프라 테스트</a></li>
+    <li><a href="#setup"><span class="n">2</span>첫 시간: 환경 구성</a></li>
+    <li><a href="#envguide" style="padding-left:36px;font-size:14px">.env 채우기 가이드</a></li>
+    <li><a href="#mismatch" style="padding-left:36px;font-size:14px">컨플루언스와 다를 때</a></li>
+    <li><a href="#trouble"><span class="n">3</span>트러블슈팅</a></li>
+    <li><a href="#prompts"><span class="n">4</span>AI 프롬프트</a></li>
+    <li><a href="#lunch"><span class="n">5</span>점심: RAGaaS 확인</a></li>
+    <li><a href="#flow"><span class="n">6</span>진행 순서</a></li>
+    <li><a href="#after"><span class="n">7</span>수업 후</a></li>
+    <li><a href="#tips"><span class="n">8</span>꿀팁: 디버그·그래프</a></li>
+    <li><a href="#results"><span class="n">9</span>결과표 내보내기</a></li>
+  </ol>
+  <div class="tools">
+    <button class="btn" id="theme">화면 밝기 전환</button>
+    <button class="btn" id="reset">체크 지우기</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- 0 -->
+<section class="chapter" id="overview">
+  <h1>1일차 운영 가이드</h1>
+  <p class="lead">아침 인프라 테스트 → 첫 시간 환경 구성 → 점심 RAGaaS 확인 → 수업 진행 → 수업 후 점검. 체크 표시와 결과 칸은 이 브라우저에 저장됩니다.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>오늘 다루는 것 (커리큘럼 0903 정본)</h4>
+      <ul>
+        <li><b>1.1</b> AI Agent Design Thinking · 3.0H<br><span style="color:var(--muted)">과정 소개 + 환경 구성 + 1-1 강의</span></li>
+        <li><b>1.2</b> LLM 작동 원리와 개발 환경 준비 · 3.0H<br><span style="color:var(--muted)">1-2 강의 → 1-2 실습</span></li>
+        <li><b>1.3</b> LangChain 프레임워크 깊이 학습 · 2.0H<br><span style="color:var(--muted)">1-3 강의 → 1-3 실습</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>오늘 할 수도 있는 것: 1-4 RAG·RAGaaS</h4>
+      <ul>
+        <li>정본 일정상 <b>1-4 RAG</b>는 2일차 첫 블록(2.1, 3.0H)이지만, <b>오늘 RAGaaS까지 갈 수도 있습니다.</b></li>
+        <li>그래서 연결은 <b>LLM·임베딩·RAGaaS 모두</b> 오늘 아침에 확인하고(<a href="#rag-morning">인프라 테스트 1-4</a>), 수강생도 첫 시간에 <b>값 10개를 한 번에</b> 채웁니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <b class="t">아직 확인되지 않은 사내 기능 (오늘 아침에 확인)</b>
+    <p>SDK의 <code>client.responses</code>(1-2 실습 3장) · 도구 호출 <code>bind_tools</code>(1-3 실습 3장) · 구조화 출력 <code>with_structured_output</code>(1-3 실습 4.3). 1장 인프라 테스트에서 프로브(도구 호출·구조화 출력)와 <code>02_openai.py</code>(Responses API)로 미리 봅니다.</p>
+  </div>
+</section>
+
+<!-- 1 -->
+<section class="chapter" id="morning">
+  <div class="chapter-head"><h2>1. 수업 전 인프라 테스트</h2><span class="chip">강사 PC · 강의장</span><span class="chip time">약 45분</span></div>
+  <p class="lead">오늘 수업이 사내망·Windows에서 도는지 먼저 확인합니다. 코드는 고치지 않습니다. 확인하고 기록만 합니다.</p>
+
+  <div class="callout note">
+    <p>명령은 모두 VS Code 터미널에서, 저장소 맨 위 폴더(<code>pyproject.toml</code>이 있는 곳)에서 실행합니다. <code>.env</code>는 <code>COURSE_ENV=samsung</code>이어야 합니다. 오류 줄을 옮겨 적을 때 키 값이 섞이지 않았는지 봅니다.</p>
+  </div>
+
+  <h3>1-1. 기본 점검 <span class="chip time">10분</span></h3>
+  <div class="code"><pre>uv --version
+uv sync --extra notebooks
+uv run python -m config.check --live</pre></div>
+  <ul class="check" data-group="morning">
+    <li><input type="checkbox" id="m1"><span><code>uv --version</code>이 버전을 출력한다</span></li>
+    <li><input type="checkbox" id="m2"><span><code>uv sync</code>가 오류 없이 끝나고 저장소 맨 위에 <code>.venv/</code>가 있다</span></li>
+    <li><input type="checkbox" id="m3"><span>🟢 "LLM 호출"이 🟢이다</span></li>
+    <li><input type="checkbox" id="m4"><span>🟢 임베딩·RAGaaS 이름까지 🟢이고 끝줄이 "준비 완료"다 (값을 다 채운 경우)</span></li>
+  </ul>
+  <div class="callout warn">
+    <b class="t">명령 점검은 LLM·임베딩·RAGaaS를 모두 봅니다</b>
+    <p><code>uv run python -m config.check</code>는 세 연결을 다 검사합니다(<code>check.py</code>). 값 10개를 다 채워야 "준비 완료"가 나옵니다. 오늘 RAGaaS까지 갈 수 있으니 수강생도 첫 시간에 <b>10개를 다 채우게</b> 합니다. 값이 아직 없는 칸이 있으면 그 줄만 ⛔로 남습니다. 실습 노트북 맨 위 <b>환경 점검 셀</b>(<code>check_env()</code>)은 LLM만 봅니다. 이 파일(<code>course/config/check.py</code>)은 수강생 배포본(study v5)에도 똑같이 들어 있습니다.</p>
+  </div>
+  <p>⛔ 이면: 401은 키·티켓 값, 404는 모델 이름, 연결 오류는 사내망 문제입니다. <a href="#trouble">3장 트러블슈팅</a>을 봅니다.</p>
+
+  <h3>1-2. 게이트웨이 기능 프로브 <span class="chip time">10분</span></h3>
+  <ol class="steps">
+    <li><code>course/Chapter01/notebooks/</code>에 새 노트북 <code>probe.ipynb</code>를 만듭니다.</li>
+    <li>커널을 저장소의 <code>.venv</code>로 고릅니다.</li>
+    <li>아래 코드를 한 셀에 붙여 실행합니다. 10줄이 ✔/✖로 나오고, 걸린 시간이 함께 나옵니다. 키 값은 출력하지 않습니다.</li>
+  </ol>
+  <details class="fold">
+    <summary>프로브 코드 펼치기 (사외 맥에서 10줄 모두 ✔ 확인한 코드)</summary>
+    <div class="code"><pre>import os
+import time
+
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.tools import tool
+from pydantic import BaseModel, Field
+
+import config  # noqa: F401  .env를 읽고 COURSE_ENV에 맞춰 연결 방식을 정한다
+from config.check import _mask  # 오류 문구 속 키처럼 보이는 값을 가린다
+from config.embeddings import get_embeddings
+from config.llm import get_llm
+from config.ragaas import post_ragaas
+
+
+def step(name, fn):
+    t = time.time()
+    try:
+        detail = fn()
+        print(f"✔ {name} ({time.time() - t:.1f}초) {detail}")
+    except Exception as e:  # noqa: BLE001
+        print(f"✖ {name} ({time.time() - t:.1f}초) {type(e).__name__}: {_mask(e)[:200]}")
+
+
+@tool
+def get_weather(city: str) -&gt; str:
+    """지정한 도시의 현재 날씨를 조회한다."""
+    return "맑음, 기온 22°C"
+
+
+class Route(BaseModel):
+    next: str = Field(description="다음 차례. researcher, writer, FINISH 중 하나")
+
+
+llm = get_llm()
+llm_tools = llm.bind_tools([get_weather])
+
+
+def tool_call():
+    calls = llm_tools.invoke("서울 날씨 알려줘").tool_calls
+    assert calls, "tool_calls가 비어 있음(모델이 도구를 고르지 않음)"
+    return calls[0]["name"], calls[0]["args"]
+
+
+def tool_round_trip():
+    msgs = [HumanMessage(content="서울 날씨 알려줘")]
+    first = llm_tools.invoke(msgs)
+    assert first.tool_calls, "tool_calls가 비어 있음"
+    msgs += [first, ToolMessage(content="맑음, 기온 22°C", tool_call_id=first.tool_calls[0]["id"])]
+    return llm_tools.invoke(msgs).content[:40]
+
+
+def structured(method=None):
+    kw = {"method": method} if method else {}
+    r = llm.with_structured_output(Route, **kw).invoke("다음 차례는 writer야. next에 writer를 넣어 줘.")
+    assert isinstance(r, Route), f"Route가 아님: {type(r).__name__}"
+    return r
+
+
+def ragaas():
+    payload = {
+        "index_name": os.getenv("index_name", "mock-index"),
+        "permission_groups": ["rag-public"],
+        "query_text": "펫보험 보장 내용이 뭐야?",
+        "num_result_doc": 3,
+        "fields_exclude": ["v_merge_title_content"],
+    }
+    hits = post_ragaas("retrieve-rrf", payload).json()["hits"]["hits"]
+    assert hits, "검색 결과 0건"
+    return f"{len(hits)}건, 첫 글 {hits[0]['_source']['merge_title_content'][:30]}"
+
+
+def langfuse():
+    from langfuse import get_client
+
+    assert get_client().auth_check(), "auth_check가 False(키·주소 확인)"
+    return os.getenv("LANGFUSE_BASE_URL") or os.getenv("LANGFUSE_HOST")
+
+
+print("연결 방식:", {k: os.getenv(k) for k in ("LLM_PROVIDER", "EMBED_PROVIDER", "RAG_PROVIDER")})
+step("1 기본 호출", lambda: f"{len(llm.invoke('한 단어로만 답하세요: 안녕').content)}자")
+step("2 스트리밍", lambda: f"조각 {sum(1 for _ in llm.stream('1부터 5까지 세 줘'))}개")
+step("3 도구 고르기 bind_tools", tool_call)
+step("4 도구 결과 되돌리기 ToolMessage", tool_round_trip)
+step("5 구조화 출력 기본", structured)
+step("6 구조화 출력 function_calling", lambda: structured("function_calling"))
+step("7 임베딩 1개", lambda: f"{len(get_embeddings().embed_query('테스트'))}차원")
+step("8 임베딩 12개(10개씩 나눠 요청)", lambda: f"{len(get_embeddings().embed_documents([f'문장 {i}' for i in range(12)]))}개")
+step("9 RAGaaS 검색", ragaas)
+step("10 Langfuse 인증", langfuse)</pre></div>
+  </details>
+
+  <h4>결과 읽는 법 (오늘 필요한 줄)</h4>
+  <div class="tbl"><table>
+    <tr><th>번호</th><th>오늘 쓰는 곳</th><th>✖이면</th></tr>
+    <tr><td>1·2</td><td>1-2·1-3 실습 전부</td><td>1-1 기본 점검으로 돌아가 원인부터 찾습니다</td></tr>
+    <tr><td>3·4 도구 호출</td><td>1-3 실습 3장</td><td>3장은 코드 구조만 읽고 넘어갑니다. 2일차 이후(2-1, 2-2, M2 대부분)도 막히니 그날 고객사 담당자에게 알리고 대안을 정합니다</td></tr>
+    <tr><td>5만 ✖, 6은 ✔</td><td>1-3 실습 4.3</td><td>4.3 셀에 <code>method="function_calling"</code>을 넣어 실행하게 안내합니다(1-3 실습 4.3 강사 메모)</td></tr>
+    <tr><td>5·6 둘 다 ✖</td><td>1-3 실습 4.3</td><td>4.3은 방법 1(PydanticOutputParser)만 보고 넘어갑니다. 2일차 2-2 Supervisor도 영향이 있어 대안을 정해야 합니다</td></tr>
+    <tr><td>7·8 임베딩, 9 RAGaaS</td><td>1-4 실습 (오늘 갈 수도 있음)</td><td>아래 <a href="#rag-morning">인프라 테스트 1-4</a>에서 원인을 보고, 9번만 ✖이면 <code>RAG_PROVIDER=mock</code>으로 진행할지 정합니다</td></tr>
+    <tr><td>10</td><td>오늘은 안 씀 (4일차)</td><td>✖여도 오늘 수업과 무관합니다</td></tr>
+  </table></div>
+  <p class="callout note" style="display:block">프로브에 SDK의 <code>client.responses</code>는 없습니다. 1-2 실습 3장은 아래 1-3의 <code>02_openai.py</code>로 봅니다. 걸린 시간도 적어 둡니다. 다만 혼자 부른 속도라서 수강생 전원이 동시에 부를 때의 속도나 429(요청 몰림)는 알 수 없습니다.</p>
+
+  <h3>1-3. 오늘 실습 경로 <span class="chip time">15분</span></h3>
+  <p>과제 빈칸을 채울 필요 없이 정답 <code>.py</code>로 돌립니다. 노트북과 같은 <code>get_llm()</code>을 씁니다. 명령 앞에 <code>uv run python </code>을 붙입니다.</p>
+  <div class="tbl"><table>
+    <tr><th>파일 (<code>course/Chapter01/code/solution/</code> 아래)</th><th>🟢 되어야 하는 것</th><th>실습</th></tr>
+    <tr><td><code>01-llm-api/01_requests.py</code></td><td><code>### 응답 Json</code>과 <code>### 결과 메시지</code> 아래 답이 나온다</td><td>1-2 실습 2장</td></tr>
+    <tr><td><code>01-llm-api/02_openai.py</code></td><td>한 번 묻기 → 이어 묻기 → 조각으로 받기가 끝까지 나온다 <span class="unk">Responses API 사내 미확인</span></td><td>1-2 실습 3장</td></tr>
+    <tr><td><code>01-llm-api/03_langchain.py</code></td><td>역할 메시지로 받은 답과 조각 출력이 나온다</td><td>1-2 실습 4장</td></tr>
+    <tr><td><code>02-langchain/01_lcel_runnable.py</code></td><td><code>----</code>로 나뉜 결과, <code>pros</code>·<code>cons</code> 목록이 나온다</td><td>1-3 실습 2장</td></tr>
+    <tr><td><code>02-langchain/02_tool_calling.py</code></td><td><code>=== 날씨 질문 ===</code> · <code>=== 수학 계산 ===</code> · <code>=== 복합 질문 ===</code>에 도구 호출 줄과 답이 나온다</td><td>1-3 실습 3장</td></tr>
+    <tr><td><code>02-langchain/03_output_parser.py</code></td><td><code>=== 방법 1 ===</code>, <code>=== 방법 2: with_structured_output() ===</code> 둘 다 영화 정보가 나온다</td><td>1-3 실습 4장</td></tr>
+    <tr><td><code>02-langchain/04_memory_runnable.py</code></td><td>세션 A는 이름을 기억하고, 세션 B는 모른다</td><td>1-3 실습 5장</td></tr>
+    <tr><td><code>02-langchain/05_memory_langgraph.py</code></td><td>스레드 A는 이름을 기억하고, 스레드 B는 모르고, 스냅샷이 나온다</td><td>1-3 실습 6장</td></tr>
+  </table></div>
+  <div class="code"><div class="label">한 번에 차례로 돌리기 (PowerShell·macOS 공통, 한 줄씩 붙여 넣기)</div><pre>uv run python course/Chapter01/code/solution/01-llm-api/01_requests.py
+uv run python course/Chapter01/code/solution/01-llm-api/02_openai.py
+uv run python course/Chapter01/code/solution/01-llm-api/03_langchain.py
+uv run python course/Chapter01/code/solution/02-langchain/01_lcel_runnable.py
+uv run python course/Chapter01/code/solution/02-langchain/02_tool_calling.py
+uv run python course/Chapter01/code/solution/02-langchain/03_output_parser.py
+uv run python course/Chapter01/code/solution/02-langchain/04_memory_runnable.py
+uv run python course/Chapter01/code/solution/02-langchain/05_memory_langgraph.py</pre></div>
+
+  <h3 id="rag-morning">1-4. RAG·RAGaaS 경로 (오늘 1-4까지 갈 경우) <span class="chip time">15분</span></h3>
+  <p>강사 PC <code>.env</code>에 임베딩 2개와 RAGaaS 3개(<code>search_url</code>, <code>rag_credential_key</code>, <code>rag_api_key</code>)가 있고, <code>index_name=rp-aicoa-meritz-pet</code>인지 먼저 봅니다. RAGaaS는 <b><code>x-dep-ticket</code>과 <code>api-key</code> 두 인증값이 다 있어야</b> 됩니다.</p>
+  <div class="tbl"><table>
+    <tr><th>명령 (<code>uv run python course/Chapter01/code/solution/03-rag/</code> 뒤에)</th><th>🟢 되어야 하는 것</th><th>실습</th></tr>
+    <tr><td><code>02_embeddings.py</code></td><td><code>=== 벡터 기본 정보 ===</code>에 벡터 차원 수, <code>=== 문장 간 유사도 ===</code>가 나온다. <b>차원 수를 적어 둡니다</b>(사내 임베딩 차원은 미확인)</td><td>1-4 실습 3장</td></tr>
+    <tr><td><code>04_langchain_rag.py</code></td><td><code>RAG ready</code>가 나오고 <code>prompt:</code>에 질문을 넣으면 답이 조각으로 나온다. Ctrl+C로 끝냄. <code>RAG ready</code>까지 걸린 시간을 적음(임베딩 속도)</td><td>1-4 실습 2~5장</td></tr>
+    <tr><td><code>05_ragaas.py</code></td><td><code>=== 문서 업로드 ===</code> → <code>=== 문서 검색 (RRF: 하이브리드) ===</code> → 지우기가 오류 없이 끝난다. 넣기는 <b>최대 300초</b>까지 걸릴 수 있음</td><td>1-4 실습 6장</td></tr>
+  </table></div>
+  <ul class="check" data-group="morning">
+    <li><input type="checkbox" id="m11"><span>인덱스 <code>rp-aicoa-meritz-pet</code>로 검색 결과가 나온다(권한 그룹 <code>rag-public</code>)</span></li>
+    <li><input type="checkbox" id="m12"><span>RAGaaS가 막히면 대응을 정했다: 수강생 <code>.env</code>에 <code>RAG_PROVIDER=mock</code> 한 줄 → 모의 응답으로 진행</span></li>
+  </ul>
+
+  <h3>1-5. 화면 점검 <span class="chip time">10분</span></h3>
+  <ul class="check" data-group="morning">
+    <li><input type="checkbox" id="m5"><span>VS Code에서 <code>course/Chapter01/notebooks/1-1_design_thinking_LEC.ipynb</code>를 열고 위에서부터 실행하면 슬라이드가 그려진다 (커리큘럼 슬라이드 포함)</span></li>
+    <li><input type="checkbox" id="m6"><span>퀴즈 선택지를 누르면 정답·오답 색이 바뀐다</span></li>
+    <li><input type="checkbox" id="m7"><span>1-2 실습 노트북 맨 위 환경 점검 셀이 "준비 완료"다</span></li>
+    <li><input type="checkbox" id="m8"><span>프로젝터에서 뒷자리까지 코드가 읽힌다 (VS Code 확대 <kbd>Ctrl</kbd>+<kbd>=</kbd>)</span></li>
+  </ul>
+
+  <h3>1-6. 정리 <span class="chip time">2분</span></h3>
+  <ul class="check" data-group="morning">
+    <li><input type="checkbox" id="m9"><span><code>probe.ipynb</code>를 지운다 (이 PC를 수강생이 쓴다면)</span></li>
+    <li><input type="checkbox" id="m10"><span>아래 결과표를 채우고, <a href="#results">9장</a>에서 복사해 둔다</span></li>
+  </ul>
+
+  <h4>결과표</h4>
+  <div class="tbl"><table class="result" id="resultMorning">
+    <tr><th>항목</th><th>오늘 영향</th><th>결과</th><th>시간·오류 마지막 줄·대응</th></tr>
+    <tr data-k="a1"><td>기본 점검 (LLM 호출)</td><td>전부</td><td></td><td></td></tr>
+    <tr data-k="a2"><td>프로브 1 기본 호출</td><td>전부</td><td></td><td></td></tr>
+    <tr data-k="a3"><td>프로브 2 스트리밍</td><td>1-2 3·4장, 1-3 2장</td><td></td><td></td></tr>
+    <tr data-k="a4"><td>프로브 3 도구 고르기</td><td>1-3 3장</td><td></td><td></td></tr>
+    <tr data-k="a5"><td>프로브 4 도구 결과 되돌리기</td><td>1-3 3장</td><td></td><td></td></tr>
+    <tr data-k="a6"><td>프로브 5 구조화 출력 기본</td><td>1-3 4.3</td><td></td><td></td></tr>
+    <tr data-k="a7"><td>프로브 6 구조화 출력 function_calling</td><td>1-3 4.3 대안</td><td></td><td></td></tr>
+    <tr data-k="a8"><td>01_requests (직접 요청)</td><td>1-2 2장</td><td></td><td></td></tr>
+    <tr data-k="a9"><td>02_openai (Responses API)</td><td>1-2 3장</td><td></td><td></td></tr>
+    <tr data-k="a10"><td>03_langchain</td><td>1-2 4장</td><td></td><td></td></tr>
+    <tr data-k="a11"><td>01_lcel_runnable</td><td>1-3 2장</td><td></td><td></td></tr>
+    <tr data-k="a12"><td>02_tool_calling</td><td>1-3 3장</td><td></td><td></td></tr>
+    <tr data-k="a13"><td>03_output_parser</td><td>1-3 4장</td><td></td><td></td></tr>
+    <tr data-k="a14"><td>04_memory_runnable</td><td>1-3 5장</td><td></td><td></td></tr>
+    <tr data-k="a15"><td>05_memory_langgraph</td><td>1-3 6장</td><td></td><td></td></tr>
+    <tr data-k="a16"><td>슬라이드·퀴즈 화면</td><td>1-1~1-3 강의</td><td></td><td></td></tr>
+    <tr data-k="a17"><td>02_embeddings (임베딩·차원 수)</td><td>1-4 3장</td><td></td><td></td></tr>
+    <tr data-k="a18"><td>04_langchain_rag (RAG ready 시간)</td><td>1-4 2~5장</td><td></td><td></td></tr>
+    <tr data-k="a19"><td>05_ragaas 넣기·검색·지우기</td><td>1-4 6장</td><td></td><td></td></tr>
+  </table></div>
+</section>
+
+<!-- 2 -->
+<section class="chapter" id="setup">
+  <div class="chapter-head"><h2>2. 첫 시간: 환경 구성 진행</h2><span class="chip">1.1 블록 안</span><span class="chip time">약 1.5~2시간</span></div>
+  <p class="lead">강의장 PC 기준으로 다 같이 설치합니다. 수강생 PC는 미리 셋팅할 수 없습니다(계정별 초기화 정책).</p>
+
+  <div class="callout note">
+    <b class="t">시작할 때 말할 것</b>
+    <p>① 직접 셋팅하는 이유: 업무에 돌아가서도 같은 순서로 설치할 수 있게 하려는 것입니다. ② 막히면 바로 손을 듭니다. ③ 업무 PC용 가이드는 따로 없습니다.</p>
+  </div>
+
+  <h3>수강생 진행 순서</h3>
+  <p>명령은 모두 <b>저장소 맨 위 폴더</b>(<code>pyproject.toml</code>이 있는 곳, <code>course/</code>의 위)에서 실행합니다.</p>
+  <ol class="steps">
+    <li><b>VS Code로 저장소 폴더를 엽니다.</b></li>
+    <li><b>uv를 설치합니다.</b> <span class="unk">사내 PC 설치 방법 미확인</span> 터미널을 새로 열고 <code>uv --version</code>을 확인합니다.</li>
+    <li><b>패키지를 설치합니다.</b>
+      <div class="code"><pre>uv sync --extra notebooks</pre></div>
+      저장소 맨 위에 <code>.venv/</code>가 생깁니다.</li>
+    <li><b><code>.env.sample</code>을 같은 자리에 <code>.env</code>로 복사합니다.</b>
+      <ul>
+        <li>탐색기가 확장자를 숨겨 <code>.env.txt</code>가 되는 경우가 있습니다.</li>
+        <li>VS Code로 만들고 고칩니다. 옛 메모장 저장, PowerShell의 <code>&gt;</code>로 파일 만들기는 하지 않습니다(인코딩이 깨집니다).</li>
+      </ul></li>
+    <li><b><code>.env</code> 맨 위 <code>COURSE_ENV=samsung</code>을 확인합니다.</b> 견본의 기본값입니다. 나머지 연결 방식은 <code>config</code>가 자동으로 맞춥니다.</li>
+    <li><b>(2) 사내 값을 채웁니다.</b> 아래 표. 값은 사내 교육 페이지(컨플루언스 "1. 입과자 실습환경 가이드")의 환경·API 키 안내 또는 강사가 줍니다.</li>
+    <li><b>VS Code 커널을 저장소의 <code>.venv</code>로 고르고</b>, 1-2 실습 노트북 맨 위 환경 점검 셀을 실행합니다. "준비 완료"면 끝입니다.</li>
+    <li><b>CodeMate를 설치하고 로그인합니다.</b> 컨플루언스 가이드를 따릅니다. <span class="unk">사내 확장 실제 화면 미확인</span></li>
+  </ol>
+
+  <h3><code>.env</code>에 채울 값</h3>
+  <div class="tbl"><table>
+    <tr><th>이름</th><th>뜻</th><th>언제 필요</th></tr>
+    <tr><td><code>api_base_url</code></td><td>사내 LLM 게이트웨이 주소. 끝에 <code>/chat/completions</code>를 붙이지 않습니다</td><td rowspan="5"><b>오늘</b> (1-2, 1-3)</td></tr>
+    <tr><td><code>credential_key</code></td><td>게이트웨이 인증값(<code>x-dep-ticket</code> 헤더). 비밀</td></tr>
+    <tr><td><code>send_system_name</code></td><td>결재 문서에 적은 시스템 이름</td></tr>
+    <tr><td><code>model</code></td><td>요청할 모델 이름. 교육 페이지 값을 씁니다</td></tr>
+    <tr><td><code>user_id</code></td><td>본인 AD ID</td></tr>
+    <tr><td><code>embedding_api_url</code>, <code>embedding_x_dep_ticket</code></td><td>사내 임베딩 주소·인증값. 주소 끝에 <code>/v1/embeddings</code>를 붙이지 않습니다</td><td>1-4 RAG부터 (<b>오늘일 수도 있음</b> → 첫 시간에 함께 채움)</td></tr>
+    <tr><td><code>search_url</code>, <code>rag_credential_key</code>, <code>rag_api_key</code></td><td>RAGaaS 주소, <code>x-dep-ticket</code>, <code>api-key</code>. <b>두 인증값이 다 있어야</b> 인증됩니다</td><td>1-4 실습 6장 (<b>오늘일 수도 있음</b>)</td></tr>
+    <tr><td><code>index_name</code></td><td>견본 값 <code>rp-aicoa-meritz-pet</code> 그대로</td><td>1-4 실습 6장</td></tr>
+  </table></div>
+
+  <h3 id="envguide">컨플루언스 가이드 + <code>.env</code> 주석으로 채우는 법</h3>
+  <p><code>.env.sample</code>에는 이름마다 바로 윗줄에 <b>무엇인지, 요청의 어느 헤더로 가는지, 형식 주의</b>가 영어 주석으로 적혀 있습니다. 컨플루언스 가이드는 <b>값</b>을 줍니다. 둘을 나란히 놓고 이름을 짝지어 값을 붙여 넣으면 됩니다.</p>
+  <div class="callout ok">
+    <b class="t">이름은 받은 원본 코드와 같습니다</b>
+    <p>아래 11개 이름과 각 이름이 들어가는 헤더·주소 끝부분은 받은 원본 코드(git <code>addae97</code>)와 <b>모두 같습니다.</b> 원본은 사내에서 이 이름으로 썼으므로, 컨플루언스 항목도 <b>대부분 같은 이름이거나 같은 헤더 이름</b>으로 적혀 있을 것입니다(추정). 그러면 이름 그대로 옮기면 끝입니다. 이름이 다를 때만 아래 표의 세 번째 칸(헤더 이름)을 단서로 짝짓습니다.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <tr><th><code>.env</code> 이름</th><th>주석에 적힌 뜻</th><th>요청에 들어가는 곳 (짝짓기 단서)</th><th>형식 주의</th></tr>
+    <tr><td><code>api_base_url</code></td><td>사내 OpenAI 호환 LLM 게이트웨이 기본 주소</td><td>주소. 코드가 뒤에 <code>/chat/completions</code>를 붙임</td><td>끝에 <code>/chat/completions</code>를 붙이지 않음. 앞의 <code>/v1</code> 같은 부분은 그대로 둠 (예: <code>…/gw/llm/v1/chat/completions</code> → <code>…/gw/llm/v1</code>). 끝 <code>/</code>는 괜찮음</td></tr>
+    <tr><td><code>credential_key</code></td><td>게이트웨이 인증값</td><td><code>x-dep-ticket</code> 헤더</td><td>비밀. 따옴표·공백 없이</td></tr>
+    <tr><td><code>send_system_name</code></td><td>결재 문서에 적은 시스템 이름</td><td><code>Send-System-Name</code> 헤더</td><td>위키에 없으면 지어내지 말고 바로 강사에게 (비우면 LLM 호출 전체가 멈춤)</td></tr>
+    <tr><td><code>model</code></td><td>요청할 모델 이름</td><td>요청 본문의 모델</td><td>위키 값으로 바꿉니다. 교육 페이지 값이 우선 (원래 코드 값: <code>private-model.1-260330</code>)</td></tr>
+    <tr><td><code>user_id</code></td><td>본인 AD ID</td><td><code>User-Id</code> 헤더 (<code>User-Type: AD_ID</code>와 함께)</td><td>위키 예시 ID가 아니라 <b>본인 AD ID</b>. 모르면 비워 두지 말고 강사에게 물음 (비우면 LLM 호출 전체가 멈춤)</td></tr>
+    <tr><td><code>embedding_api_url</code></td><td>사내 임베딩 API 기본 주소</td><td>주소. 코드가 뒤에 <code>/v1/embeddings</code>를 붙임</td><td>끝에 <code>/v1/embeddings</code>를 붙이지 않음</td></tr>
+    <tr><td><code>embedding_x_dep_ticket</code></td><td>임베딩 API 인증값</td><td><code>x-dep-ticket</code> 헤더</td><td>비밀. LLM의 <code>credential_key</code>와 따로 적는 칸</td></tr>
+    <tr><td><code>search_url</code></td><td>RAGaaS 기본 주소</td><td>주소. 코드가 뒤에 <code>/dsllmrag/elastic/v2/&lt;endpoint&gt;</code>를 붙임</td><td>끝부분을 붙이지 않음</td></tr>
+    <tr><td><code>rag_credential_key</code></td><td>RAGaaS 인증값</td><td><code>x-dep-ticket</code> 헤더</td><td>비밀. <code>rag_api_key</code>와 <b>둘 다</b> 필요</td></tr>
+    <tr><td><code>rag_api_key</code></td><td>RAGaaS API 키</td><td><code>api-key</code> 헤더</td><td>비밀</td></tr>
+    <tr><td><code>index_name</code></td><td>검색할 RAGaaS 인덱스</td><td>요청 본문의 인덱스</td><td>견본 값 <code>rp-aicoa-meritz-pet</code> 그대로 두고 <b>지우지 않음</b>. 위키가 다른 인덱스를 주면 강사 확인 뒤 바꿈</td></tr>
+    <tr><td><code>LANGFUSE_*</code> 3개</td><td>Langfuse 키·주소 (4일차)</td><td>Langfuse SDK가 직접 읽음</td><td>오늘은 안 씀. 위키에 키가 있으면 넣어 둬도 됨. <code>LANGFUSE_BASE_URL</code>은 위키에 주소가 없으면 견본 기본값을 지우지 않음</td></tr>
+  </table></div>
+  <div class="callout warn"><p><b>견본에서 시작합니다.</b> <code>.env.sample</code>을 복사한 파일에서 <b>값만 채웁니다.</b> 설정 파일을 새로 쓰거나 줄을 지우면 견본에 미리 들어 있던 기본값(<code>index_name</code>, <code>LANGFUSE_BASE_URL</code>)이 빠집니다. 위키에 없는 엉뚱한 항목(프록시, 웹 채팅 화면 주소 등)은 넣지 않습니다.</p></div>
+  <p style="color:var(--muted);font-size:14px">컨플루언스에 헤더 이름(<code>x-dep-ticket</code>, <code>Send-System-Name</code>, <code>api-key</code> 등)으로 적혀 있으면 세 번째 칸으로 짝짓습니다. <code>x-dep-ticket</code>은 LLM·임베딩·RAGaaS가 <b>모두</b> 쓰는 헤더라 이름만으로는 구분되지 않습니다. 그 티켓이 적힌 <b>구역 제목</b>이나 <b>함께 적힌 주소</b>(예: <code>/gw/llm</code>은 LLM, <code>/gw/emb</code>는 임베딩, <code>/dsllmrag</code>·Search는 RAGaaS)로 어느 칸인지 정합니다.</p>
+
+  <h4>수강생 순서</h4>
+  <ol class="steps">
+    <li>VS Code에서 저장소 맨 위 <code>.env</code>(<code>.env.sample</code>을 복사한 것)를 열고, 브라우저에 컨플루언스 가이드를 옆에 띄웁니다. 파일을 새로 쓰지 않고 이 파일의 빈 값만 채웁니다.</li>
+    <li>맨 위 <code>COURSE_ENV=samsung</code>인지 확인합니다(견본 기본값).</li>
+    <li><code>.env</code>에서 이름 바로 윗줄 주석을 읽고, 위 표로 컨플루언스의 값과 짝짓습니다.</li>
+    <li>값을 <b>직접</b> 복사해 <code>이름=</code> 바로 뒤에 붙여 넣습니다. 따옴표·앞뒤 공백·뒤에 붙는 주석 없이 <code>KEY=값</code>만 둡니다.</li>
+    <li>저장합니다. VS Code 오른쪽 아래 인코딩이 <code>UTF-8</code>인지 봅니다.</li>
+    <li>커널을 다시 시작하고 실습 노트북 맨 위 환경 점검 셀을 실행합니다. "준비 완료"면 끝입니다.</li>
+  </ol>
+
+  <h4>AI에게 짝짓기를 맡길 때 (값은 주지 않음)</h4>
+  <p>AI에게는 <b>항목 이름만</b> 줍니다. 값은 사람이 직접 붙여 넣습니다. <code>.env.sample</code> 맨 위의 "NOTES FOR AI ASSISTANTS"에 AI가 값을 출력·인용하지 말라는 규칙이 적혀 있습니다. <span class="unk">사내 CodeMate 동작 미확인</span></p>
+  <div class="code"><pre>저장소 맨 위 AGENTS.md와 .env.sample의 주석을 읽고 도와줘.
+나는 사내망(COURSE_ENV=samsung) 강의장 PC야.
+아래는 사내 교육 페이지에 있는 항목 이름 목록이야(값은 빼고 이름만 붙였어).
+각 항목이 .env의 어느 이름에 들어가는지 표로 알려줘. 형식 주의(주소 끝부분, 따옴표 등)도 같이 알려줘.
+값은 내가 직접 붙여 넣을 거야. .env 파일은 열거나 출력하지 마.
+&lt;컨플루언스 항목 이름만 붙여 넣기&gt;</pre></div>
+  <div class="code"><pre>저장소 맨 위 AGENTS.md를 읽고 도와줘.
+.env를 채웠어. uv run python -m config.check --json 을 실행해서 ⛔ 항목이 있으면 무엇을 고칠지 알려줘. 키 값은 보여 주지 마.
+(아직 값을 못 받은 칸이 있으면 그 줄의 ⛔는 값을 받을 때까지 그대로 둬도 된다고 알려줘.)</pre></div>
+
+  <h3 id="mismatch">예상과 컨플루언스가 다를 때: 탐색 절차</h3>
+  <div class="callout note">
+    <b class="t">기준</b>
+    <p><b>우리 코드 = 받은 원본 코드 = 사내에서 쓰던 규격입니다</b>(요청 모양 대조로 확인). 그래서 컨플루언스와 다르게 보이면 대부분은 <b>표기 차이</b>(사다리 1~3단계)입니다. 진짜 규격 차이(5단계)는 원본 코드 이후 사내 게이트웨이 규격이 바뀐 경우에만 생깁니다.</p>
+    <p>비교할 때는 "우리 코드가 보내는 요청"과 "컨플루언스의 예시 요청"을 나란히 놓고 <b>이름과 모양만</b> 봅니다. 키·티켓 값은 비교하지 않습니다. 고칠 때는 작은 해결부터 하나씩 바꾸고 바로 확인합니다.</p>
+  </div>
+
+  <h4>① 우리 코드가 보내는 요청 (비교 기준)</h4>
+  <p style="color:var(--muted);font-size:14px">출처: <code>course/config/samsung.py</code>, <code>course/config/llm.py</code>, 1-2 실습 2장 직접 요청 코드. <b>받은 원본 코드(git <code>addae97</code>)와 대조해 헤더 이름, 주소 끝부분, 본문 옵션, <code>.env</code> 이름이 모두 같음을 확인했습니다.</b> 즉 이 표는 원본 코드가 사내에서 보내던 요청 모양입니다.</p>
+  <div class="tbl"><table>
+    <tr><th>API</th><th>주소 (코드가 붙이는 끝부분)</th><th>헤더 이름</th><th>본문에 더하는 것</th></tr>
+    <tr><td>LLM</td><td><code>{api_base_url}</code> + <code>/chat/completions</code></td><td><code>x-dep-ticket</code>, <code>Send-System-Name</code>, <code>User-Id</code>, <code>User-Type: AD_ID</code>, <code>Prompt-Msg-Id</code>·<code>Completion-Msg-Id</code>(호출마다 자동 생성)</td><td><code>get_llm()</code>: <code>chat_template_kwargs.enable_thinking=false</code><br>1-2 실습 2장 직접 요청: <code>include_reasoning=false</code></td></tr>
+    <tr><td>임베딩</td><td><code>{embedding_api_url}</code> + <code>/v1/embeddings</code></td><td><code>x-dep-ticket</code></td><td>문장을 10개씩 나눠 보냄</td></tr>
+    <tr><td>RAGaaS</td><td><code>{search_url}</code> + <code>/dsllmrag/elastic/v2/</code> + <code>insert-doc</code>·<code>retrieve-rrf</code>·<code>delete-doc</code></td><td><code>x-dep-ticket</code>, <code>api-key</code></td><td><code>index_name</code>, <code>permission_groups: ["rag-public"]</code>(검색 예)</td></tr>
+  </table></div>
+
+  <h4>② 다른 곳 찾기: 차이 표 만들기</h4>
+  <ol class="steps">
+    <li>컨플루언스에서 <b>예시 요청</b>(curl·파이썬 코드)과 <b>항목 표</b>를 찾습니다.</li>
+    <li>위 ① 표와 줄마다 비교해 <b>같음 / 다름 / 우리에게만 있음 / 컨플루언스에만 있음</b>으로 나눕니다. 주소 끝부분, 헤더 이름, 인증 방식, 본문 옵션, 모델 이름을 봅니다.</li>
+    <li>차이마다 아래 ③ 사다리에서 가장 낮은 칸의 해결을 고릅니다.</li>
+    <li><b>한 번에 하나만</b> 바꾸고 <code>uv run python -m config.check --live</code>로 확인합니다. 무엇을 바꿔 무엇이 됐는지 1장 결과표 메모에 적습니다.</li>
+  </ol>
+
+  <h4>③ 해결 사다리 (작은 것부터)</h4>
+  <div class="tbl"><table>
+    <tr><th>단계</th><th>이런 차이</th><th>해결</th><th>누가</th></tr>
+    <tr><td><b>1</b> 이름만 다름</td><td>컨플루언스 항목 이름이 <code>.env</code> 이름과 다름</td><td>뜻·헤더 이름으로 짝지어 <code>.env</code>에 넣기 (위 짝짓기 표)</td><td>수강생</td></tr>
+    <tr><td><b>2</b> 값의 모양이 다름</td><td>주소가 <code>/chat/completions</code>·<code>/v1/embeddings</code>까지 붙은 전체 경로로 적혀 있음, 값에 따옴표가 붙어 있음</td><td>코드가 붙이는 끝부분과 따옴표를 빼고 <code>.env</code>에 넣기 (예: <code>…/gw/emb/v1/embeddings</code> → <code>…/gw/emb</code>)</td><td>수강생</td></tr>
+    <tr><td><b>3</b> 모델·인덱스가 다름</td><td>모델 이름이나 인덱스 이름이 견본과 다름</td><td><b>모델</b>: 위키 값으로 바로 바꿈. <b>인덱스</b>: 강사 확인 뒤 바꿈 (그전까지 견본 값 유지)</td><td>모델은 수강생, 인덱스는 강사</td></tr>
+    <tr><td><b>4</b> 값이 없음</td><td>컨플루언스에 어떤 값(예: <code>send_system_name</code>)이 없음</td><td>값을 지어내지 않고 빈 칸으로 둔 채 강사·운영 측에 문의. LLM 값 5개 중 하나라도 비면 1-2·1-3 실습이 모두 멈추므로 <b>바로</b> 알립니다. 임베딩·RAGaaS 값은 1-4 실습 전까지 받아야 합니다(오늘일 수도 있음). RAGaaS만 끝내 없으면 <code>RAG_PROVIDER=mock</code>으로 진행합니다. 빈 칸은 <code>uv run python -m config.check</code>의 해당 줄 ⛔로 보입니다(<code>--live</code>는 RAGaaS를 부르지 않음)</td><td>강사</td></tr>
+    <tr><td><b>5</b> 요청 규격이 다름<br><small style="color:var(--muted)">원본 이후 사내 규격이 바뀐 경우</small></td><td>헤더 이름이 다름, 컨플루언스에만 있는 필수 헤더, 인증 방식이 다름(예: <code>Authorization: Bearer &lt;티켓&gt;</code>), 코드가 붙이는 경로·본문 옵션이 다름</td><td><code>.env</code>로는 못 고칩니다. 값에 <code>Bearer </code>를 붙이는 식의 우회도 하지 않습니다. 수강생은 <code>config/</code>를 고치지 않습니다. 강사가 <code>course/config/samsung.py</code>·<code>llm.py</code> 한 곳을 고쳐 다 같이 받게 하거나, 그 기능을 건너뜁니다</td><td>강사</td></tr>
+    <tr><td><b>6</b> 규격은 같은데 실패</td><td>401·404·연결 오류·429 (오류 문구가 값이 틀렸다고만 말함)</td><td><a href="#trouble">3장 트러블슈팅</a></td><td>수강생 → 강사</td></tr>
+  </table></div>
+  <div class="callout stop">
+    <b class="t">401이 나오면 5단계인지 6단계인지 먼저 가립니다</b>
+    <p>• 오류 문구가 <b>헤더 이름</b>을 말하거나(예: <code>invalid header Authorization</code>, <code>missing header X-…</code>), 위키 예시가 우리 코드와 다른 헤더를 쓰면 <b>5단계</b>입니다. 값을 바꿔 봐도 그대로입니다.</p>
+    <p>• 헤더는 같고 값만 틀렸다는 문구면 <b>6단계</b>입니다. 값을 다시 복사합니다.</p>
+    <p>• 알아 둘 것: <code>get_llm()</code>은 OpenAI SDK를 쓰기 때문에 모든 LLM 요청에 <code>Authorization: Bearer samsung-gateway</code>가 <b>자동으로</b> 붙습니다(<code>course/config/llm.py</code> 40번째 줄). 받은 원본 코드도 같았습니다: 가짜 키로 <code>Authorization</code>이 붙은 채 사내 게이트웨이를 불렀습니다(원본 <code>02_openai.py</code>의 <code>OPENAI_API_KEY='api_key'</code>). 원본이 사내에서 돌았다면 게이트웨이는 <code>Authorization</code>을 보지 않는 것으로 보입니다. 그래도 401 문구에 <code>Authorization</code>이 나오면 5단계입니다.</p>
+  </div>
+  <div class="callout warn">
+    <b class="t">5단계일 때 수업 진행</b>
+    <p>• <b>기본 호출이 되고 일부 기능만 막힘</b>: 막힌 셀만 건너뛰고 진행합니다.</p>
+    <p>• <b>LLM 기본 호출부터 막힘</b>: 1-2·1-3 실습 대부분이 영향을 받습니다. 강의는 그대로 하고, 실습은 코드 읽기·리뷰로 진행하면서 강사 PC에서 미리 실행한 결과 화면을 보여 줍니다. 쉬는 시간에 <code>config</code>를 고치고 <code>--live</code>로 확인한 뒤 다 같이 받게 합니다.</p>
+    <p>• <code>COURSE_ENV=out</code>(OpenAI) 전환은 개인 키가 있어야 해서 강사가 판단할 일입니다. 고친 내용은 2~4일차에도 영향을 주니 결과표에 남깁니다.</p>
+  </div>
+
+  <h4>④ AI에게 탐색을 맡길 때</h4>
+  <p>컨플루언스 예시를 붙여 넣기 전에 <b>키·티켓 값은 <code>&lt;값&gt;</code>으로 직접 가립니다.</b> AI에게는 비교와 제안만 시키고, 코드 수정이 필요한 경우는 위치만 알려 달라고 합니다. <span class="unk">사내 CodeMate 동작 미확인</span></p>
+  <div class="code"><div class="label">강사용: 규격 비교</div><pre>저장소 맨 위 AGENTS.md를 읽고 도와줘.
+1) course/config/samsung.py와 course/config/llm.py가 사내 LLM·임베딩·RAGaaS에 보내는 요청 모양을 표로 정리해줘.
+   주소에 코드가 붙이는 끝부분, 헤더 이름, 본문에 더하는 옵션만. 값은 쓰지 마.
+   이 요청 모양은 예전 차수에 사내에서 쓰던 원본 코드와 같아. 이걸 기준으로 삼아.
+2) 아래 컨플루언스 예시 요청과 비교해서 같음 / 다름 / 우리 코드에만 있음 / 컨플루언스에만 있음으로 나눠줘.
+   다름이 있으면 표기만 다른 것(이름·주소 끝부분·따옴표)인지, 규격 자체가 바뀐 것(헤더·인증 방식·경로)인지 구분해줘.
+3) 차이마다 해결을 작은 것부터 제안해줘:
+   ① .env 값만 바꾸기 ② .env에 설정 한 줄 더하기 ③ 코드 수정이 필요하면 어느 파일 몇 번째 줄인지만 알려주고 고치지는 마.
+4) 무엇부터 하나씩 바꿔서 uv run python -m config.check --live 로 확인하면 되는지 순서를 알려줘.
+예시 속 키·티켓은 내가 &lt;값&gt;으로 가려 놨어. .env 파일은 열거나 출력하지 마.
+&lt;컨플루언스 예시 요청 붙여 넣기&gt;</pre></div>
+  <div class="code"><div class="label">수강생용: 이름이 안 맞을 때</div><pre>저장소 맨 위 AGENTS.md와 .env.sample의 주석을 읽고 도와줘.
+사내 교육 페이지의 항목 이름이 .env.sample의 이름과 달라서 어디에 넣을지 모르겠어.
+아래 항목 이름과 설명(값은 뺐어)을 보고, 각각 .env의 어느 이름에 넣는지, 값의 모양을 어떻게 바꿔야 하는지(주소 끝부분, 따옴표, Bearer 같은 접두어) 알려줘.
+어디에도 맞지 않는 항목이 있으면 억지로 짝짓지 말고 "강사에게 확인"이라고 표시해줘.
+.env.sample에 이미 들어 있는 기본값(index_name, LANGFUSE_BASE_URL)은 지우지 말라고 알려줘. user_id는 예시 ID가 아니라 내 AD ID라는 것도.
+.env 파일은 열거나 출력하지 마.
+&lt;항목 이름과 설명 붙여 넣기&gt;</pre></div>
+
+  <div class="callout stop">
+    <b class="t">수강생에게 꼭 말할 것</b>
+    <p>• <code>.env</code>의 키는 화면에 출력하거나, 채팅·파일에 붙여 넣거나, 남에게 보여 주지 않습니다.</p>
+    <p>• 값 뒤에 <code># 설명</code>을 붙이지 않습니다. 빈 값 뒤의 주석은 값으로 읽힙니다. 설명은 윗줄에 씁니다.</p>
+    <p>• <code>.env</code>를 고친 뒤에는 커널을 다시 시작하고 맨 위 셀부터 실행합니다.</p>
+  </div>
+
+  <h3>진행 체크</h3>
+  <ul class="check" data-group="setup">
+    <li><input type="checkbox" id="s1"><span>셋팅 목적·손들기 안내를 했다</span></li>
+    <li><input type="checkbox" id="s2"><span>전원 <code>uv sync</code> 완료</span></li>
+    <li><input type="checkbox" id="s3"><span>전원 <code>.env</code> 생성, <code>COURSE_ENV=samsung</code></span></li>
+    <li><input type="checkbox" id="s4"><span>전원 값 10개 입력 (LLM 5 · 임베딩 2 · RAGaaS 3)</span></li>
+    <li><input type="checkbox" id="s5"><span>전원 커널 <code>.venv</code> 선택, 환경 점검 셀 "준비 완료"</span></li>
+    <li><input type="checkbox" id="s6"><span>전원 CodeMate 로그인</span></li>
+  </ul>
+</section>
+
+<!-- 3 -->
+<section class="chapter" id="trouble">
+  <div class="chapter-head"><h2>3. 트러블슈팅</h2></div>
+  <p class="lead">먼저 <code>uv run python -m config.check</code>를 실행해 ⛔ 줄부터 고칩니다. 그다음 오류의 <b>마지막 줄</b>로 아래 표를 찾습니다. 고친 뒤에는 맨 위 셀부터 다시 실행합니다.</p>
+
+  <h3>설치·커널</h3>
+  <div class="tbl"><table>
+    <tr><th>증상</th><th>원인</th><th>조치</th></tr>
+    <tr><td><code>No module named 'config'</code> (또는 <code>dotenv</code>, <code>langchain_…</code>, <code>openai</code>)</td><td>저장소 <code>.venv</code>가 아닌 커널, 또는 설치 안 함</td><td>커널을 <code>.venv</code>로. 그래도 나오면 <code>uv sync --extra notebooks</code></td></tr>
+    <tr><td><code>No module named 'jupyterquiz'</code></td><td><code>notebooks</code> 묶음 없이 설치</td><td><code>uv sync --extra notebooks</code></td></tr>
+    <tr><td><code>No module named 'assets'</code></td><td>준비 셀을 건너뜀, 다른 폴더에서 실행</td><td>맨 위 준비 셀부터 실행</td></tr>
+    <tr><td><code>uv: command not found</code></td><td>uv 미설치, PATH 없음</td><td>uv 설치 후 터미널을 새로 엶</td></tr>
+  </table></div>
+
+  <h3>화면(슬라이드·퀴즈)</h3>
+  <div class="tbl"><table>
+    <tr><th>증상</th><th>조치</th></tr>
+    <tr><td>슬라이드 자리에 "⛔ 슬라이드가 보이지 않으면" 안내만 보임</td><td>① 바로 위 셀 다시 실행 ② 안 되면 맨 위 셀부터 다시 실행</td></tr>
+    <tr><td>퀴즈·버튼이 눌리지 않음</td><td>그 셀을 다시 실행</td></tr>
+    <tr><td><code>FileNotFoundError: …/assets/quizzes/…</code></td><td>노트북 폴더가 아닌 곳에서 실행됨. 노트북을 <code>course/Chapter01/notebooks/</code>에서 엶</td></tr>
+  </table></div>
+
+  <h3>연결 설정(<code>.env</code>)</h3>
+  <div class="tbl"><table>
+    <tr><th>증상</th><th>원인</th><th>조치</th></tr>
+    <tr><td>"준비가 덜 되었습니다. 빠진 설정 N개"</td><td>필요한 이름이 없음</td><td>괄호 안 이름을 <code>.env</code>에 채움. 명령 점검이면 임베딩·RAGaaS까지 보는 것인지 확인(<a href="#morning">1-1</a>)</td></tr>
+    <tr><td><code>RuntimeError: 사내 API 설정이 부족합니다: [...]</code></td><td>사내 값 없음</td><td>강사가 준 사내 값을 채움</td></tr>
+    <tr><td><code>.env</code>를 고쳤는데 그대로</td><td>커널이 예전 값을 기억</td><td>커널 재시작 후 맨 위부터</td></tr>
+    <tr><td>주소·모델 이름이 <code>#…</code>로 들어감</td><td><code>KEY=   # 설명</code></td><td>설명을 윗줄로, <code>KEY=값</code>만 남김</td></tr>
+    <tr><td><code>.env</code>를 못 찾음</td><td><code>.env.txt</code> 등 이름이 다르거나 위치가 다름</td><td>저장소 맨 위에 정확히 <code>.env</code></td></tr>
+    <tr><td>cp949 안내, "…를 읽을 수 없습니다(UTF-8도 cp949도 아님)"</td><td>옛 메모장 저장 또는 <code>&gt;</code>로 만들어 UTF-16</td><td>VS Code 오른쪽 아래 인코딩 → "인코딩으로 저장" → UTF-8 → 커널 재시작</td></tr>
+    <tr><td><code>UnicodeDecodeError: 'cp949' codec…</code></td><td>윈도우 기본 인코딩으로 한글 파일을 읽음</td><td>코드의 <code>open()</code>·<code>read_text()</code>에 <code>encoding="utf-8"</code></td></tr>
+  </table></div>
+
+  <h3>LLM 호출</h3>
+  <div class="tbl"><table>
+    <tr><th>증상</th><th>원인</th><th>조치</th></tr>
+    <tr><td><code>AuthenticationError</code> / 401</td><td>키가 틀리거나 만료</td><td>교육 페이지 값을 다시 복사(앞뒤 공백·따옴표 확인). 출력해서 확인하지 않음. 오류 문구가 헤더 이름을 말하면 값 문제가 아니라 규격 차이입니다(<a href="#mismatch">2장 "컨플루언스와 다를 때"</a> 5단계)</td></tr>
+    <tr><td><code>NotFoundError</code> / 404, "model … does not exist"</td><td>모델 이름</td><td><code>model</code> 값 확인</td></tr>
+    <tr><td><code>APIConnectionError</code>, 시간 초과</td><td>사내망</td><td>네트워크 확인</td></tr>
+    <tr><td><code>RateLimitError</code> / 429</td><td>요청이 몰림</td><td>잠시 뒤 다시 실행</td></tr>
+  </table></div>
+
+  <h3>오늘 기능별 대응 (사내 지원 미확인 항목)</h3>
+  <div class="callout warn"><p>공통: <code>uv run python -m config.check --live</code>로 기본 호출이 되는지 먼저 봅니다. 기본 호출이 되면 그 기능만 막힌 것입니다. <b>코드를 바꿔 우회하지 않습니다.</b> 그 셀은 건너뛰고 다음 절로 갑니다.</p></div>
+  <div class="tbl"><table>
+    <tr><th>실패하는 곳</th><th>수업 중 대응</th></tr>
+    <tr><td>1-2 실습 3장 SDK <code>client.responses</code></td><td>코드 구조(한 번 묻기 → 이어 묻기 → 조각으로 받기)만 읽고 4장으로 넘어갑니다</td></tr>
+    <tr><td>1-3 실습 3장 도구 호출 <code>bind_tools</code></td><td>도구 정의·이름표·루프 구조를 읽고 넘어갑니다. 2일차 이후 영향이 커서 고객사 담당자에게 알립니다</td></tr>
+    <tr><td>1-3 실습 4.3 <code>with_structured_output</code></td><td><code>method="function_calling"</code>을 넣어 다시 실행. 그래도 안 되면 방법 1만 봅니다</td></tr>
+  </table></div>
+
+  <h3>그래도 안 되면 (수강생 자가 점검 순서)</h3>
+  <ol class="steps">
+    <li>오류 마지막 줄을 AI에게 붙여 넣고 원인과 고칠 곳을 묻습니다(<a href="#prompts">4장 프롬프트</a>).</li>
+    <li>설정 문제로 보이면 환경 점검 셀을 다시 실행하고 ⛔ 줄의 → 안내대로 고칩니다.</li>
+    <li>커널을 다시 시작하고 맨 위 셀부터 다시 실행합니다.</li>
+    <li>옆 사람 화면과 비교합니다.</li>
+    <li>그래도 안 되면 오류 화면을 그대로 두고 강사를 부릅니다. 그동안 그 셀은 건너뛰고 다음 절을 진행합니다.</li>
+  </ol>
+</section>
+
+<!-- 4 -->
+<section class="chapter" id="prompts">
+  <div class="chapter-head"><h2>4. AI 프롬프트</h2><span class="chip">수강생용 · 복사해서 칠판·채팅에</span></div>
+  <p class="lead">저장소 맨 위 <code>AGENTS.md</code>(수강생 배포본에 들어 있음)에 진단 순서와 보고 형식이 적혀 있습니다. 프롬프트는 AI가 그 순서대로 돕게 합니다. <span class="unk">사내 CodeMate 동작 미확인</span></p>
+
+  <h3>오류가 났을 때</h3>
+  <div class="code"><pre>저장소 맨 위 AGENTS.md를 읽고 도와줘.
+아래는 &lt;셀 제목&gt; 셀의 오류 마지막 줄이야. 원인과 고칠 곳을 알려줘. .env의 값은 출력하지 마.
+&lt;오류 마지막 줄 붙여 넣기&gt;</pre></div>
+
+  <h3>설정 점검이 ⛔일 때</h3>
+  <div class="code"><pre>저장소 맨 위 AGENTS.md를 읽고 도와줘.
+uv run python -m config.check --json 결과에서 ⛔ 항목을 하나씩 어떻게 고치는지 알려줘. 키 값은 보여 주지 마.</pre></div>
+
+  <h3>환경 점검 셀 출력을 그대로 물을 때</h3>
+  <div class="code"><pre>저장소 맨 위 AGENTS.md를 읽고 도와줘.
+아래는 노트북 환경 점검 셀의 출력이야. ⛔ 줄을 고치려면 .env에서 무엇을 바꿔야 하는지 알려줘.
+&lt;환경 점검 셀 출력 붙여 넣기&gt;</pre></div>
+
+  <div class="callout note"><p>AI가 보고하는 모양(<code>AGENTS.md</code>에 정해 둔 것): "설정 점검 결과: 준비 완료 / 고칠 곳 N개 · 실행 환경 · ⛔ 항목 → 할 일".</p></div>
+</section>
+
+<!-- 5 -->
+<section class="chapter" id="lunch">
+  <div class="chapter-head"><h2>5. 점심: RAGaaS 확인</h2><span class="chip">1-4 실습 6장 대비</span><span class="chip time">약 15분</span></div>
+  <p class="lead">RAGaaS는 1-4 RAG(오늘 갈 수도 있음)와 4일차 캡스톤에서 씁니다. 아침 <a href="#rag-morning">인프라 테스트 1-4</a>에서 못 봤거나 막혔으면 점심에 다시 확인하고, 오후 1-4 진행 방식을 정합니다.</p>
+
+  <ol class="steps">
+    <li><b>강사 PC <code>.env</code>에 값이 있는지 봅니다.</b> <code>search_url</code>, <code>rag_credential_key</code>(<code>x-dep-ticket</code>), <code>rag_api_key</code>(<code>api-key</code>), <code>index_name=rp-aicoa-meritz-pet</code>. 두 인증값이 다 있어야 합니다.</li>
+    <li><b>임베딩도 봅니다.</b> 1-4 실습은 임베딩도 씁니다.
+      <div class="code"><pre>uv run python -m config.check --live</pre></div>
+      "임베딩 호출"이 🟢인지 봅니다. 아침 프로브를 다시 돌려 7·8·9번을 봐도 됩니다.</li>
+    <li><b>넣기 → 검색 → 지우기를 실제로 돌립니다.</b>
+      <div class="code"><pre>uv run python course/Chapter01/code/solution/03-rag/05_ragaas.py</pre></div>
+      🟢 문서 넣기 → 검색 결과 → 지우기가 오류 없이 끝납니다. 넣기는 <b>최대 300초</b>까지 걸릴 수 있습니다. 걸린 시간을 적습니다.</li>
+    <li><b>미확인 세 가지를 이참에 확인합니다.</b> 인덱스 <code>rp-aicoa-meritz-pet</code>이 있는지 · 권한 그룹 <code>rag-public</code>으로 검색되는지 · 사내 임베딩의 차원 수(프로브 7번 결과).</li>
+  </ol>
+
+  <div class="callout stop">
+    <b class="t">실패하면</b>
+    <p>오류 마지막 줄을 적습니다(키 값이 섞이지 않았는지 확인). 수강생 <code>.env</code>에 <code>RAG_PROVIDER=mock</code> 한 줄을 넣으면 모의 응답으로 진행됩니다. 결과를 보고 1-4 실습 6장 안내를 정합니다: 사내 RAGaaS 값으로 할지, mock으로 갈지.</p>
+  </div>
+
+  <div class="tbl"><table class="result" id="resultLunch">
+    <tr><th>항목</th><th>영향</th><th>결과</th><th>시간·오류 마지막 줄·대응</th></tr>
+    <tr data-k="b1"><td>임베딩 호출 (<code>--live</code>)</td><td>1-4 실습 2~5장</td><td></td><td></td></tr>
+    <tr data-k="b2"><td>임베딩 차원 수 (프로브 7)</td><td>1-4 실습</td><td></td><td></td></tr>
+    <tr data-k="b3"><td>RAGaaS 검색 (프로브 9)</td><td>1-4 실습 6장</td><td></td><td></td></tr>
+    <tr data-k="b4"><td>05_ragaas 넣기·검색·지우기</td><td>1-4 실습 6장</td><td></td><td></td></tr>
+    <tr data-k="b5"><td>1-4 RAGaaS 진행 방식 결정</td><td>사내 값 / mock</td><td></td><td></td></tr>
+  </table></div>
+</section>
+
+<!-- 6 -->
+<section class="chapter" id="flow">
+  <div class="chapter-head"><h2>6. 진행 순서</h2><span class="chip time">08:30–17:30</span></div>
+  <p class="lead">블록 시간은 0903 정본, 블록 안 배분은 목차를 만들 때 잡은 초안입니다. 점심 시각은 자료에 없습니다.</p>
+
+  <div class="timeline">
+    <div class="tl">
+      <div class="when">수업 전</div>
+      <div class="what">강사 PC 인프라 테스트 (<a href="#morning">1장</a>)</div>
+    </div>
+    <div class="tl">
+      <div class="when">1.1 블록 · 3.0H</div>
+      <div class="what">① 강사 소개 → <b>과정 커리큘럼 소개</b>(30분 이내). 1-1 강의 노트북 1.1의 커리큘럼 슬라이드를 쓰고, 컨플루언스 "2. 커리큘럼"에서 언제든 볼 수 있다고 알립니다.</div>
+      <div class="what">② <b>환경 구성</b>(약 1.5~2시간, <a href="#setup">2장</a>)</div>
+      <div class="what">③ <b>1-1 강의</b>(약 40~60분). 끝에서 "코딩은 AI가 해도 왜 코드를 보는가"를 말합니다: 설계는 사람이 한다 / 오류 원인을 빨리 찾는다 / 구조를 알고 지시하면 결과가 좋고 토큰 낭비가 준다.</div>
+    </div>
+    <div class="tl lunch">
+      <div class="when">점심</div>
+      <div class="what">RAGaaS 확인 (<a href="#lunch">5장</a>)</div>
+    </div>
+    <div class="tl">
+      <div class="when">1.2 블록 · 3.0H</div>
+      <div class="what"><b>1-2 강의 → 1-2 실습</b> (계획상 약 170분)</div>
+      <div class="what">Context Window는 "정의 → 왜 중요한가 → 어디에 연결되는가" 순서로: 한 번 요청에서 읽는 토큰 범위 → 모델은 매번 대화를 통째로 다시 읽어 넘치면 앞을 잃고 길수록 비용이 커진다 → 요약, RAG(2일차), LangGraph state 설계로 이어진다.</div>
+      <div class="what">📝 3장(<code>client.responses</code>) 결과 메모</div>
+    </div>
+    <div class="tl">
+      <div class="when">1.3 블록 · 2.0H</div>
+      <div class="what"><b>1-3 강의</b>(40분) → <b>1-3 실습</b>(70분) → 정리(10분)</div>
+      <div class="what">Tool Calling은 도구 등록 방법보다 "모델이 어떻게 고르고 호출이 어떻게 반복되는가"를 구조로 설명합니다.</div>
+      <div class="what">📝 3장 도구 호출, 4.3 <code>with_structured_output</code> 결과 메모 (실패 시 <code>method="function_calling"</code>)</div>
+    </div>
+    <div class="tl">
+      <div class="when">진도에 따라 · 1-4 RAG</div>
+      <div class="what">1-3이 일찍 끝나면 <b>1-4 강의 → 1-4 실습</b>으로 넘어갑니다(정본 일정은 2일차 첫 블록). RAGaaS(실습 6장)는 아침 <a href="#rag-morning">인프라 테스트 1-4</a>·점심 확인 결과대로 사내 값 또는 <code>RAG_PROVIDER=mock</code>으로 진행합니다.</div>
+    </div>
+    <div class="tl after">
+      <div class="when">수업 후</div>
+      <div class="what">2~4일차 인프라 테스트 (<a href="#after">7장</a>)</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h4>수업 내내</h4>
+      <ul>
+        <li>실습을 시작할 때 "이 내용은 O일차 X 블록에서 다뤘다"고 앞 내용을 짚습니다.</li>
+        <li>코드 화면은 뒷자리에서도 읽히게 확대합니다.</li>
+        <li>코드 작성은 CodeMate에 맡기고, 강사는 개념의 이유와 코드 리뷰에 시간을 씁니다.</li>
+      </ul></div>
+    <div class="card"><h4>일찍 끝낸 수강생</h4>
+      <ul>
+        <li>캡스톤 아이디어 구상으로 넘깁니다.</li>
+        <li>실습 중에도 정답 코드·해설을 볼 수 있다고 알립니다(노트북의 "정답 보기").</li>
+      </ul></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="chapter" id="after">
+  <div class="chapter-head"><h2>7. 수업 후</h2><span class="chip time">약 2시간 40분</span></div>
+  <p>2~4일차 실습이 사내망·Windows에서 도는지 확인하는 별도 가이드(<code>2026-10-12_인프라_테스트_가이드.md</code>)를 따릅니다. 오늘 아침 프로브 결과(1~6번)와 수업 중 📝 메모 세 곳이 그 가이드 2단계의 답이 됩니다.</p>
+  <div class="callout warn"><p>그 가이드 파일은 지금 <code>~/000_Inbox/090_To_Delete/samsung_ds_uncommitted_20261011/dev/docs/</code>에 있습니다(커밋 안 한 변경을 정리할 때 함께 옮겨짐). 강의장 PC로 가져갈 수 있게 미리 꺼내 둡니다.</p></div>
+  <ul class="check" data-group="after">
+    <li><input type="checkbox" id="z1"><span>테스트로 만든 파일(<code>probe.ipynb</code> 등)을 지웠다</span></li>
+    <li><input type="checkbox" id="z2"><span>서버 터미널이 모두 꺼졌다</span></li>
+    <li><input type="checkbox" id="z3"><span>RAGaaS 진행 방식(사내 값 / mock)을 정했다 (오늘 1-4를 못 갔으면 내일 아침 안내)</span></li>
+  </ul>
+</section>
+
+<!-- 8 -->
+<section class="chapter" id="tips">
+  <div class="chapter-head"><h2>8. 꿀팁: 디버그·그래프</h2><span class="chip">강사 시연용</span></div>
+  <p class="lead">코드가 "안에서 무엇을 하는지" 화면에 보여 줄 때 쓰는 한두 줄입니다. 아래 코드는 이 저장소의 설치 버전(langchain 1.4.2)에서 실행해 확인했습니다. 모델 대신 가짜 응답으로 확인했으니 사내 모델에서의 출력 길이는 다를 수 있습니다.</p>
+
+  <h3 id="langchain-tips">8-1. 1-3 실습 2장 시연: 다이어그램 → 디버그 로그</h3>
+  <p><b>1-3 실습 2장</b>에서 체인을 그림으로 보고, 각 단계에 어떤 값이 들어가는지 로그로 확인합니다. 먼저 <code>chain = prompt | model | parser</code>를 만드는 셀을 실행한 뒤, 새 코드 셀에 아래 코드를 넣고 <b>Shift + Enter</b>로 실행합니다.</p>
+
+  <h4>다이어그램을 노트북 출력에 표시하기</h4>
+  <div class="code"><div class="label">기본 체인: 프롬프트 → 모델 → 문자열 파서</div><pre>from draw import draw
+
+draw(chain)</pre></div>
+  <p><code>draw()</code>는 <code>course/draw.py</code>에 있는 도우미입니다. 안에서 <code>chain.get_graph().draw_png()</code>로 PNG를 만들어 노트북에 보여 줍니다. 그림을 못 만들면 글자 그림(<code>draw_ascii()</code>)을 대신 보여 줍니다.</p>
+  <div class="code"><div class="label">병렬 체인: RunnableParallel을 만든 셀을 실행한 뒤</div><pre>draw(runnable)</pre></div>
+  <p>장점(<code>pros</code>)·단점(<code>cons</code>)으로 갈라졌다가 결과를 모으는 구조를 보여 줍니다. 다이어그램은 연결 구조를 보여 주며, 실제 입력·출력과 오류는 아래 디버그 로그에서 확인합니다.</p>
+  <div class="callout warn"><p><b>Mermaid는 쓰지 않습니다:</b> <code>draw_mermaid_png()</code>는 그래프를 외부 <code>mermaid.ink</code> 서버로 보내 그림을 받아 오므로 사내망에서는 되지 않습니다. 그래서 PC 안에서 그리는 <code>draw_png()</code>(pygraphviz)로 PNG를 만듭니다. pygraphviz 2.0부터는 Graphviz가 패키지 안에 들어 있어 따로 설치할 것이 없습니다.</p></div>
+
+  <h4>LangChain 디버그 모드 켜기</h4>
+  <div class="code"><div class="label">체인을 실행하기 전에 켜기</div><pre>from langchain_core.globals import set_debug
+
+set_debug(True)
+answer = chain.invoke({"topic": "Computer Vision"})
+print(answer)</pre></div>
+  <p>노트북 출력에 <code>[chain/start]</code>·<code>[llm/start]</code>·<code>[chain/end]</code> 같은 로그와 단계별 입력·출력, 실행 시간이 나옵니다. <b>그림으로 순서를 짚고 → 로그에서 실제 값을 확인</b>하는 순서로 보여 줍니다.</p>
+  <div class="code"><div class="label">확인이 끝나면 끄기</div><pre>set_debug(False)</pre></div>
+  <p>디버그 설정은 같은 커널의 이후 실행에도 적용됩니다. 로그가 너무 길어지면 위 코드를 실행해 끕니다.</p>
+
+  <h3>8-2. <code>set_debug</code> 더 알기</h3>
+  <div class="code"><pre>from langchain_core.globals import set_debug
+
+set_debug(True)    # 켜기: 이 아래 실행부터 단계마다 입력·출력이 찍힘
+answer = chain.invoke({"topic": "LLM"})
+set_debug(False)   # 끄기: 시연이 끝나면 바로 끈다</pre></div>
+  <ul>
+    <li><b>보이는 것</b>: <code>[chain/start] [chain:RunnableSequence &gt; prompt:ChatPromptTemplate] Entering …</code>처럼 체인의 <b>각 단계</b>(프롬프트 → 모델 → 파서)가 들어가고 나가는 순서, 입력·출력 값, 걸린 시간(ms).</li>
+    <li><b>쓰기 좋은 곳</b>
+      <ul>
+        <li>1-3 실습 2장: <code>prompt | model | parser</code>에서 <code>|</code>가 "앞 단계 출력을 다음 단계 입력으로 넘긴다"는 것을 눈으로 보여 줌</li>
+        <li>1-3 실습 3장: 모델이 도구 호출 정보를 내는 단계와, 코드가 도구를 실행하는 단계가 따로 찍힘</li>
+        <li>1-4 RAG 체인: 검색된 문서가 프롬프트 안으로 들어가는 모습</li>
+      </ul></li>
+    <li><b>주의</b>
+      <ul>
+        <li>출력이 <b>매우 깁니다</b>. 시연할 셀에서만 켜고 바로 끕니다. 한 번 켜면 커널을 다시 시작할 때까지 <b>모든 셀</b>에 적용됩니다.</li>
+        <li>프롬프트 내용이 전부 화면에 나옵니다. 키 값은 나오지 않지만, 화면 공유 중이면 내용을 한 번 보고 켭니다.</li>
+        <li>지금 작업 폴더의 1-3 실습 노트북에는 준비 셀에 <code>set_debug(True)</code>가 들어가 있습니다(직접 고친 것, 커밋 안 됨). 그대로 두면 2장부터 6장 앞까지 계속 켜져 있습니다.</li>
+      </ul></li>
+  </ul>
+
+  <h3>8-3. 사내망에서 구조 그리기: <code>get_graph()</code></h3>
+  <div class="code"><div class="label">LangChain 체인 (1-3)</div><pre>from draw import draw
+draw(chain)                         # PNG 그림 (1-3 실습 2장에 들어 있음)
+chain.get_graph().print_ascii()     # 터미널 글자 그림</pre></div>
+  <div class="code"><div class="label">LangGraph 앱 (2-1 이후)</div><pre>draw(app)                           # PNG 그림 (2-1 실습 2.3에 들어 있음)
+draw(app, xray=True)                # 그래프 안의 하위 그래프까지 펼쳐 그림
+app.get_graph().print_ascii()</pre></div>
+  <div class="tbl"><table>
+    <tr><th>방법</th><th>사내망</th><th>필요한 것</th></tr>
+    <tr><td><code>draw()</code> = <code>draw_png()</code></td><td>🟢 인터넷 불필요</td><td><code>pygraphviz</code> 패키지(의존성에 추가). <b>기본으로 쓰는 방법</b>입니다</td></tr>
+    <tr><td><code>print_ascii()</code> / <code>draw_ascii()</code></td><td>🟢 인터넷 불필요</td><td><code>grandalf</code> 패키지(의존성에 추가). 원본 <code>.py</code>를 터미널에서 돌릴 때 씁니다</td></tr>
+    <tr><td><code>draw_mermaid_png()</code></td><td>⛔ 사내망에서 안 됨</td><td>그림을 <b>외부 사이트(mermaid.ink)</b>에 보내 받아 옵니다. 그래서 쓰지 않고 PNG(<code>draw_png()</code>)로 바꿨습니다</td></tr>
+  </table></div>
+
+  <h3>8-4. LangGraph를 한 단계씩 보기</h3>
+  <div class="code"><pre># 노드가 하나 끝날 때마다 그 노드가 바꾼 값만 출력
+for event in app.stream(inputs, config, stream_mode="updates"):
+    print(event)          # 예: {'chatbot': {'messages': [AIMessage(...)]}}
+
+# 체크포인터가 있을 때: 지금 저장된 상태와 다음에 실행될 노드
+state = app.get_state(config)
+print(state.next)         # 사람 승인으로 멈췄으면 ('tools',) 같은 값, 끝났으면 ()
+state.values["messages"][-1].pretty_print()   # 마지막 메시지를 보기 좋게</pre></div>
+  <ul>
+    <li><b>쓰기 좋은 곳</b>: 2-1 실습 3장(조건부 엣지로 어느 노드에 갔는지), 4장(도구 노드와 에이전트 노드가 번갈아 도는 모습), 5장(사람 승인에서 멈췄을 때 <code>state.next</code>로 확인). 1-3 실습 6장의 스냅샷도 같은 <code>get_state</code>입니다.</li>
+    <li><code>stream_mode="updates"</code>는 <code>set_debug</code>보다 훨씬 짧아서 화면 시연에 알맞습니다.</li>
+  </ul>
+</section>
+
+<!-- 9 -->
+<section class="chapter" id="results">
+  <div class="chapter-head"><h2>9. 결과표 내보내기</h2></div>
+  <p>1장·5장 결과표를 마크다운 표로 복사합니다. 메모나 메일에 붙여 넣으세요. 키 값이 들어가지 않았는지 한 번 더 봅니다.</p>
+  <button class="btn primary" id="export">결과표 복사</button>
+  <div class="code" style="margin-top:12px"><pre id="exportBox">(아직 복사하지 않았습니다)</pre></div>
+</section>
+
+</main>
+
+<div class="toast" id="toast">복사했습니다</div>
+
+<script>
+(() => {
+  const KEY = "ops-day1-2026-10-12";
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 저장 안 돼도 화면은 동작 */ } };
+  const toast = msg => { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1200); };
+
+  // 체크리스트
+  const boxes = [...document.querySelectorAll('.check input[type="checkbox"]')];
+  const progress = () => {
+    const done = boxes.filter(b => b.checked).length;
+    document.getElementById("bar").style.width = (boxes.length ? done / boxes.length * 100 : 0) + "%";
+    document.getElementById("barLabel").textContent = `체크 ${done} / ${boxes.length}`;
+    document.getElementById("barMini").textContent = `${done}/${boxes.length}`;
+  };
+
+  // 휴대폰: 목차 서랍 열고 닫기
+  const menu = document.getElementById("menu");
+  const setNav = open => { document.body.classList.toggle("nav-open", open); menu.setAttribute("aria-expanded", open); };
+  menu.addEventListener("click", () => setNav(!document.body.classList.contains("nav-open")));
+  document.getElementById("scrim").addEventListener("click", () => setNav(false));
+  document.querySelectorAll("#side a").forEach(a => a.addEventListener("click", () => setNav(false)));
+  document.addEventListener("keydown", e => { if (e.key === "Escape") setNav(false); });
+  boxes.forEach(b => {
+    b.checked = !!state[b.id];
+    b.closest("li").classList.toggle("done", b.checked);
+    b.addEventListener("change", () => { state[b.id] = b.checked; b.closest("li").classList.toggle("done", b.checked); save(); progress(); });
+  });
+  progress();
+
+  // 결과표: 결과 선택 + 메모
+  const opts = [["", "—"], ["pass", "✔ 됨"], ["fail", "✖ 안 됨"], ["skip", "△ 건너뜀"]];
+  document.querySelectorAll("table.result tr[data-k]").forEach(tr => {
+    const k = tr.dataset.k, cells = tr.children;
+    const sel = document.createElement("select");
+    opts.forEach(([v, t]) => { const o = document.createElement("option"); o.value = v; o.textContent = t; sel.append(o); });
+    sel.value = state["r_" + k] || ""; sel.className = sel.value;
+    sel.addEventListener("change", () => { state["r_" + k] = sel.value; sel.className = sel.value; save(); });
+    const inp = document.createElement("input"); inp.type = "text"; inp.placeholder = "예) 2.1초 / 401 / 4.3 건너뜀";
+    inp.value = state["n_" + k] || "";
+    inp.addEventListener("input", () => { state["n_" + k] = inp.value; save(); });
+    cells[2].append(sel); cells[3].append(inp);
+  });
+
+  // 코드 복사 버튼
+  const copyText = async (text) => {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (e) {
+      const ta = document.createElement("textarea"); ta.value = text; document.body.append(ta); ta.select();
+      let ok = false; try { ok = document.execCommand("copy"); } catch (_) {} ta.remove(); return ok;
+    }
+  };
+  document.querySelectorAll(".code").forEach(box => {
+    const pre = box.querySelector("pre"); if (!pre || pre.id === "exportBox") return;
+    const b = document.createElement("button"); b.className = "copy"; b.textContent = "복사";
+    b.addEventListener("click", async () => {
+      if (await copyText(pre.innerText)) { b.textContent = "복사됨"; b.classList.add("done"); setTimeout(() => { b.textContent = "복사"; b.classList.remove("done"); }, 1200); }
+    });
+    box.append(b);
+  });
+
+  // 결과표 내보내기
+  document.getElementById("export").addEventListener("click", async () => {
+    const label = { pass: "✔", fail: "✖", skip: "△", "": "" };
+    const lines = ["# 1일차 인프라 점검 결과 (2026-10-12)", ""];
+    [["수업 전", "resultMorning"], ["점심 RAGaaS", "resultLunch"]].forEach(([title, id]) => {
+      lines.push(`## ${title}`, "", "| 항목 | 영향 | 결과 | 메모 |", "|---|---|---|---|");
+      document.querySelectorAll(`#${id} tr[data-k]`).forEach(tr => {
+        const k = tr.dataset.k, c = tr.children;
+        const memo = (state["n_" + k] || "").replace(/\|/g, "\\|");
+        lines.push(`| ${c[0].innerText.trim()} | ${c[1].innerText.trim()} | ${label[state["r_" + k] || ""]} | ${memo} |`);
+      });
+      lines.push("");
+    });
+    const text = lines.join("\n");
+    document.getElementById("exportBox").textContent = text;
+    toast(await copyText(text) ? "결과표를 복사했습니다" : "아래 상자에서 직접 복사하세요");
+  });
+
+  // 초기화
+  document.getElementById("reset").addEventListener("click", () => {
+    if (!confirm("체크 표시와 결과 칸을 모두 지울까요?")) return;
+    state = {}; save(); location.reload();
+  });
+
+  // 밝기 전환
+  const root = document.documentElement;
+  const savedTheme = state.theme; if (savedTheme) root.dataset.theme = savedTheme;
+  document.getElementById("theme").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark"; state.theme = root.dataset.theme; save();
+  });
+
+  // 목차 현재 위치
+  const links = [...document.querySelectorAll("#toc a")];
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) links.forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id));
+    });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  document.querySelectorAll("section.chapter").forEach(s => io.observe(s));
+})();
+</script>
+</body>
+</html>
