@@ -11,6 +11,19 @@
    "setup_note": "준비 코드입니다. 필요한 도구를 불러오고 `llm = get_llm()`으로 모델을 준비합니다. 접혀 있으니 펼치지 않아도 되고, 실행만 합니다.",
    "patch": [
     {
+     "find": "from typing import Annotated",
+     "lines": [
+      "from typing import Annotated, Literal"
+     ]
+    },
+    {
+     "find": "def researcher_condition(state: State):",
+     "lines": [
+      "# def researcher_condition(state: State) -> Literal[\"researcher_tools\", \"writer\"]:  # 반환 타입 있음",
+      "def researcher_condition(state: State):  # 반환 타입 없음(지금)"
+     ]
+    },
+    {
      "find": "# Human, AI, System, Tool Message들이 쌓이는 것은 맞는데...",
      "until": "# 찾아와야하는 번거로움이 있을 수 있다.",
      "lines": []
@@ -50,7 +63,12 @@
      "find": "print(result[\"draft\"])",
      "until": "\"\"\"",
      "lines": [
-      "print(result[\"draft\"])"
+      "print(result[\"draft\"])",
+      "",
+      "# 그래프 구조를 그림으로 출력",
+      "from draw import draw",
+      "",
+      "draw(app)"
      ]
     }
    ],
