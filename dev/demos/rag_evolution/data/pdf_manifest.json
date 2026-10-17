@@ -1,0 +1,11 @@
+{
+  "source_path": "course/Chapter01/code/raw/03-rag/data/meritz_pet_insurance.pdf",
+  "app_path": "dev/demos/rag_evolution/data/meritz_pet_insurance.pdf",
+  "source_sha256": "7139df1cb9f0746bd5044ab2457032aac0ebf3ddf7e039d1e23b8cc8031b53f4",
+  "app_sha256": "7139df1cb9f0746bd5044ab2457032aac0ebf3ddf7e039d1e23b8cc8031b53f4",
+  "hashes_match": true,
+  "document_year": 2024,
+  "physical_page_count": 28,
+  "page_numbering": "1-based physical PDF pages; not printed folio numbers",
+  "notice": "2024년 제공 문서 기준. 현재 판매 상품이나 개인별 보험료를 확인한 자료가 아닙니다."
+}
