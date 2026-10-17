@@ -232,7 +232,7 @@
      "llm = get_llm()"
     ],
     "note": "도구 목록 + 모델만 준비",
-    "why": "오류 없이 실행되지만 LLM이 도구를 모릅니다. 4.4에서 `[ToolMessage]` 없이 바로 답이 나옵니다."
+    "why": "오류 없이 실행되지만 LLM이 도구를 모릅니다. 4.4에서 `Tool Message` 칸 없이 바로 답이 나옵니다."
    }
   ]
  },
@@ -246,7 +246,7 @@
      "return {\"messages\": [response]}"
     ],
     "note": "새로 만든 모델에 메시지를 넘김",
-    "why": "도구가 연결되지 않은 새 모델이라 도구를 부르지 않습니다. 오류 없이 4.4에 `[ToolMessage]`가 없습니다."
+    "why": "도구가 연결되지 않은 새 모델이라 도구를 부르지 않습니다. 오류 없이 4.4에 `Tool Message` 칸이 없습니다."
    },
    {
     "lines": [
@@ -270,7 +270,7 @@
      "return response"
     ],
     "note": "답 메시지를 그대로 돌려줌",
-    "why": "딕셔너리가 아니라서 State가 바뀌지 않습니다. 4.4에서 `[HumanMessage]` 한 줄만 나오고 끝납니다."
+    "why": "딕셔너리가 아니라서 State가 바뀌지 않습니다. 4.4에서 `Human Message` 칸 하나만 나오고 끝납니다."
    }
   ]
  },
@@ -284,7 +284,7 @@
      "builder.add_edge(\"agent\", \"tools\")"
     ],
     "note": "agent → tools 엣지",
-    "why": "화살표 방향이 반대입니다. 도구를 실행한 뒤 agent로 돌아가지 않아 `[ToolMessage]`에서 끝납니다."
+    "why": "화살표 방향이 반대입니다. 도구를 실행한 뒤 agent로 돌아가지 않아 `Tool Message` 칸에서 끝납니다."
    },
    {
     "lines": [
@@ -311,7 +311,7 @@
      "builder.add_edge(\"tools\", END)"
     ],
     "note": "tools → END 엣지",
-    "why": "도구를 실행하고 바로 끝납니다. 모델이 도구 결과를 보고 답을 쓸 기회가 없어 `[ToolMessage]`에서 끝납니다."
+    "why": "도구를 실행하고 바로 끝납니다. 모델이 도구 결과를 보고 답을 쓸 기회가 없어 `Tool Message` 칸에서 끝납니다."
    }
   ]
  },

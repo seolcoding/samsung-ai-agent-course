@@ -558,7 +558,7 @@
    "source": "solution",
    "title": "상태 안에 담는 메모리",
    "intro": "같은 일을 LangGraph로 합니다. 대화 기록을 그래프의 State(그래프가 들고 다니는 정보 묶음) 안 `messages`에 두고, `MemorySaver`(스레드별 State를 저장해 두는 장치)가 스레드(대화방)별로 저장합니다. 5장과 이 장은 모두 대화를 그대로 쌓아 다시 넣는 Buffer 방식입니다. 다른 점은 기록을 두는 곳입니다.\n\nLangGraph는 2일차에 자세히 배우므로 이 장은 모두 예제입니다. 완성된 코드를 실행하고 5장과 비교합니다. 6.1의 `chatbot` 노드는 system 메시지와 State의 `messages`를 함께 모델에 보내고 답을 `messages`에 더합니다. 6.2는 그 노드 하나를 시작(START)과 끝(END) 사이에 두고 `MemorySaver`와 함께 그래프를 만듭니다.\n\n**왜 배우나:** Agent를 만들 때는 대화 기록뿐 아니라 도구 결과, 분기 같은 흐름도 함께 관리해야 합니다. State 안에 기록을 두면 이것들을 한곳에서 다룰 수 있습니다.",
-   "intro__meta": "- 원본: `src/solution/Chapter01/02-langchain/05_memory_langgraph.py`(raw는 TODO 3곳이 빈 상태: `return {'messages': []}`, `checkpointer = None`, `app = None`). LangGraph는 2-1에서 배우므로 예제로 실행만 합니다(목차 결정). 노트북에서만 손본 것: 끝의 ASCII 비교 표를 빼고 장 끝 \"볼 지점\"의 표로 옮김, docstring의 실행 경로 삭제.\n- 같은 커널에서 6.3을 다시 실행하면 스레드 A 기록이 계속 쌓입니다. 처음 상태로 보려면 6.2부터 다시 실행합니다(`MemorySaver`를 새로 만듦).",
+   "intro__meta": "- 원본: `src/solution/Chapter01/02-langchain/05_memory_langgraph.py`(raw는 TODO 3곳이 빈 상태: `return {'messages': []}`, `checkpointer = None`, `app = None`). LangGraph는 2-1에서 배우므로 예제로 실행만 합니다(목차 결정). 노트북에서만 손본 것: 끝의 ASCII 비교 표를 빼고 장 끝 \"볼 지점\"의 표로 옮김, docstring의 실행 경로 삭제.\n- 같은 커널에서 6.3을 다시 실행하면 스레드 A 기록이 계속 쌓입니다. 처음 상태로 보려면 6.2부터 다시 실행합니다(`MemorySaver`를 새로 만듦).\n- 원본은 마지막 답만 `print(...content)`로, 스냅샷은 `[사람]`·`[ AI ]` 한 줄씩 출력합니다. 노트북은 결과 변수를 `memory_graph_result_a`, `memory_graph_result_b`로 바꾸고, 메시지 목록을 `results`로 꺼내 `pretty_print()`로 출력합니다(2026-10-17 규칙, dev/AGENTS.md).",
    "setup_note": "준비 코드입니다. LangGraph 도구와 메시지 종류를 불러오고 모델을 준비합니다. 이 셀도 실행을 잊지 않습니다.",
    "patch": [
     {
@@ -570,6 +570,36 @@
      "find": "# ── LangGraph vs LangChain 방식 비교",
      "until": "\"\"\")",
      "lines": []
+    },
+    {
+     "find": "result = app.invoke(",
+     "until": "print(result[\"messages\"][-1].content)",
+     "lines": [
+      "memory_graph_result_a = app.invoke({\"messages\": [HumanMessage(content=\"내 이름이 뭐야?\")]}, config=config_a)",
+      "results = memory_graph_result_a[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
+     ]
+    },
+    {
+     "find": "result_b = app.invoke(",
+     "until": "print(result_b[\"messages\"][-1].content)",
+     "lines": [
+      "# B는 A 대화를 모름",
+      "memory_graph_result_b = app.invoke({\"messages\": [HumanMessage(content=\"내 이름이 뭐야?\")]}, config=config_b)",
+      "results = memory_graph_result_b[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
+     ]
+    },
+    {
+     "find": "for msg in snapshot.values[\"messages\"]:",
+     "until": "print(f\"[{role}] {msg.content}\")",
+     "lines": [
+      "results = snapshot.values[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
+     ]
     }
    ],
    "split": [
@@ -593,7 +623,7 @@
     "스레드 A·B와 스냅샷": [
      "바꾸기 전: 스레드 A는 이름(홍길동)을 기억하고, 스레드 B는 모른다",
      "`thread_A`로 바꾸면 \"스레드 B\" 아래 답도 홍길동을 안다",
-     "스냅샷 아래에 [사람]과 [ AI ] 줄이 출력되고, 마지막 줄이 `다음 실행 노드: ()`다"
+     "스냅샷 아래에 `Human Message`와 `Ai Message` 칸이 번갈아 출력되고, 마지막 줄이 `다음 실행 노드: ()`다"
     ]
    },
    "look": "**볼 지점**\n- `add_messages`는 새 메시지를 덮어쓰지 않고 `messages` 뒤에 붙입니다. 그래서 대화가 State 안에 쌓입니다.\n- 같은 `thread_id`로 호출하면 `MemorySaver`가 저장해 둔 State를 이어 씁니다. 그래서 스레드 A는 이름을 기억합니다.\n- `app.get_state(config_a)`로 스레드 A의 State를 꺼내 저장된 대화를 볼 수 있습니다. `다음 실행 노드: ()`는 그래프 실행이 끝났다는 뜻입니다.\n\n5장 방식과 비교하면 다음과 같습니다.\n\n| | LangChain (RunnableWithMessageHistory) | LangGraph (MemorySaver) |\n|---|---|---|\n| 히스토리 위치 | 체인 외부 (session_store) | State 내부 (messages 필드) |\n| 도구 결과 통합 | 수동 처리 필요 | 자동 (ToolMessage로 축적) |\n| 분기/반복 | 구현 복잡 | 그래프 구조로 자연스럽게 표현 |\n| 영속성 | 별도 저장소 연결 필요 | checkpointer 교체만으로 전환 |\n| 권장 시나리오 | 단순 Q&A 챗봇 | Agent, 복잡한 대화 흐름 |",

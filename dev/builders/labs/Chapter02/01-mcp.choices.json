@@ -208,7 +208,7 @@
      "return state"
     ],
     "note": "받은 State를 그대로 돌려줌",
-    "why": "응답을 버리고 받은 State를 그대로 돌려줍니다. 오류 없이 3.7의 `A:` 뒤에 질문이 그대로 다시 나옵니다."
+    "why": "응답을 버리고 받은 State를 그대로 돌려줍니다. 오류 없이 3.7에 `Ai Message` 칸 없이 질문(`Human Message`)만 나옵니다."
    },
    {
     "lines": [
@@ -216,12 +216,12 @@
      "return {\"messages\": [response.content]}"
     ],
     "note": "응답의 글자만 담음",
-    "why": "응답의 글자만 담아 도구 호출 요청이 사라집니다. 도구를 부를 때는 글자가 비어 있어서, 오류 없이 3.7의 `A:` 뒤가 비어 있습니다."
+    "why": "응답의 글자만 담아 도구 호출 요청이 사라집니다. 글자만 담으면 `Human Message`로 쌓이고, 도구를 부를 때는 그 글자가 비어 있어서 오류 없이 3.7에 빈 `Human Message` 칸이 나오고 끝납니다."
    }
   ],
   "fail_all": [
-   "3.7에서 `A:` 뒤에 질문이 그대로 다시 나온다 → 무엇을 돌려주는지 봅니다",
-   "3.7에서 `A:` 뒤가 비어 있다 → 응답 메시지 전체를 담았는지 봅니다",
+   "3.7에서 `Ai Message` 칸 없이 질문(`Human Message`)만 나온다 → 무엇을 돌려주는지 봅니다",
+   "3.7에서 `Ai Message` 칸 대신 빈 `Human Message` 칸이 나온다 → 응답 메시지 전체를 담았는지 봅니다",
    "3.7에서 `ValueError: Invalid input type`이 보인다 → LLM에 무엇을 넘겼는지 봅니다"
   ]
  },
@@ -241,7 +241,7 @@
      "builder.add_conditional_edges(\"agent\", tools_condition)"
     ],
     "note": "agent 뒤 분기만 둠",
-    "why": "도구를 실행한 뒤 돌아올 길이 없어 그래프가 끝납니다. 오류 없이 3.7의 `A:` 뒤에 `[{'type': 'text', 'text': '{\"bmi\":22.9,...}'}]` 같은 도구 결과가 그대로 나옵니다."
+    "why": "도구를 실행한 뒤 돌아올 길이 없어 그래프가 끝납니다. 오류 없이 3.7이 `[{'type': 'text', 'text': '{\"bmi\":22.9,...}'}]` 같은 도구 결과가 든 `Tool Message` 칸에서 끝납니다."
    },
    {
     "lines": [
@@ -249,7 +249,7 @@
      "builder.add_edge(\"tools\", \"agent\")"
     ],
     "note": "tools 뒤 분기 + tools→agent",
-    "why": "분기를 agent가 아니라 tools 뒤에 달아 agent 다음에 갈 곳이 없습니다. 도구를 부르기 전에 끝나서, 오류 없이 3.7의 `A:` 뒤가 비어 있습니다."
+    "why": "분기를 agent가 아니라 tools 뒤에 달아 agent 다음에 갈 곳이 없습니다. 도구를 부르기 전에 끝나서, 오류 없이 3.7이 도구 호출(`Tool Calls:`)이 든 `Ai Message` 칸에서 끝납니다."
    },
    {
     "lines": [

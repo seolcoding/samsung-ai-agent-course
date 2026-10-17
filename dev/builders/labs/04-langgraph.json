@@ -45,6 +45,16 @@
       "",
       "draw(app)"
      ]
+    },
+    {
+     "find": "result = app.invoke(",
+     "until": "print(result[\"messages\"][-1].content)",
+     "lines": [
+      "basic_graph_result = app.invoke({\"messages\": [HumanMessage(content=\"LangGraph가 뭔지 두 문장으로 설명해줘.\")]})",
+      "results = basic_graph_result[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
+     ]
     }
    ],
    "split": [
@@ -68,10 +78,10 @@
      "hint": "빈칸에 State의 메시지 목록을 `llm`에 넘기고, 받은 응답을 대괄호로 감싸 `messages` 키에 담아 돌려주는 코드를 써 달라고 합니다. 빈칸 밖의 줄은 고치지 말라고 적습니다.",
      "checks": [
       "셀이 오류 없이 실행된다(함수만 정의하므로 출력은 없습니다)",
-      "2.3을 실행하면 마지막 줄에 LangGraph를 설명하는 답변이 출력된다"
+      "2.3을 실행하면 `Ai Message` 칸에 LangGraph를 설명하는 답변이 출력된다"
      ],
      "fail": [
-      "2.3의 마지막 줄에 답변 대신 질문이 그대로 다시 출력된다 → 노드가 LLM의 응답을 돌려주는지 확인합니다",
+      "2.3에 질문(`Human Message`)만 출력되고 `Ai Message` 칸이 없다 → 노드가 LLM의 응답을 돌려주는지 확인합니다",
       "`SyntaxError`나 `IndentationError`가 난다 → 채운 줄이 함수 안쪽(4칸 들여쓰기)에 있는지 확인합니다"
      ]
     },
@@ -100,15 +110,15 @@
      "hint": "빈칸에 `builder`를 컴파일해 `app`이라는 이름에 담는 한 줄을 써 달라고 합니다. 아래 실행 코드는 그대로 두라고 적습니다.",
      "checks": [
       "그래프 그림에 `__start__` → `chatbot` → `__end__`가 이어져 보인다",
-      "마지막 줄에 LangGraph 설명이 두 문장 안팎으로 출력된다"
+      "`Ai Message` 칸에 LangGraph 설명이 두 문장 안팎으로 출력된다"
      ],
      "fail": [
       "`NameError: name 'app' is not defined`가 난다 → 컴파일 결과를 `app`에 담았는지 확인합니다"
      ]
     }
    ],
-   "look": "**볼 지점**\n- 그래프 그림의 `__start__`와 `__end__`는 LangGraph가 붙이는 시작점과 끝점입니다. 그 사이에 추가한 `chatbot` 노드가 있습니다.\n- 마지막 줄이 LLM의 답변 텍스트입니다. `result[\"messages\"]`에는 질문과 답이 차례로 쌓여 있고, 코드는 그중 마지막(`[-1]`)을 꺼냈습니다.",
-   "look__meta": "- 그래프 구조는 `course/draw.py`의 `draw(app)`로 그립니다. `get_graph().draw_png()`(pygraphviz)가 PC 안에서 그려 사내망에서도 됩니다. Mermaid(`draw_mermaid_png()`)는 외부 서비스를 호출하므로 쓰지 않습니다. 원본 .py는 터미널용으로 `draw_ascii()` 글자 그림을 출력합니다.\n- 원본 22~33줄(State 위아래 메모), 39~47줄(docstring과 LCEL 메모), 56~61줄(add_node·간선 설명 메모), 62~63줄 줄 끝 주석은 이전 강사 메모라 셀에서 뺐습니다. 요지: State의 messages는 모든 노드가 함께 쓰는 대화 맥락이고, 노드 안에서 필요하면 LCEL 체인을 직접 만들어도 된다. `add_node(이름, 함수)`, `add_edge(출발, 도착)`.\n- 솔루션은 질문이 \"내 이름은 홍길동이야.\"이고 후속 질문이 주석으로 남아 있습니다. 메모리 없는 그래프라 기억하지 못함을 보이려던 것으로 보이나 실행되지 않으므로 원본 질문을 씁니다.\n- LLM 호출 1회."
+   "look": "**볼 지점**\n- 그래프 그림의 `__start__`와 `__end__`는 LangGraph가 붙이는 시작점과 끝점입니다. 그 사이에 추가한 `chatbot` 노드가 있습니다.\n- 실행 결과의 `messages`에는 질문과 답이 차례로 쌓여 있습니다. 코드는 이 목록을 `results`로 꺼내 `pretty_print()`로 하나씩 보여 줍니다. `Human Message`가 질문, `Ai Message`가 LLM의 답입니다.",
+   "look__meta": "- 그래프 구조는 `course/draw.py`의 `draw(app)`로 그립니다. `get_graph().draw_png()`(pygraphviz)가 PC 안에서 그려 사내망에서도 됩니다. Mermaid(`draw_mermaid_png()`)는 외부 서비스를 호출하므로 쓰지 않습니다. 원본 .py는 터미널용으로 `draw_ascii()` 글자 그림을 출력합니다.\n- 원본 22~33줄(State 위아래 메모), 39~47줄(docstring과 LCEL 메모), 56~61줄(add_node·간선 설명 메모), 62~63줄 줄 끝 주석은 이전 강사 메모라 셀에서 뺐습니다. 요지: State의 messages는 모든 노드가 함께 쓰는 대화 맥락이고, 노드 안에서 필요하면 LCEL 체인을 직접 만들어도 된다. `add_node(이름, 함수)`, `add_edge(출발, 도착)`.\n- 솔루션은 질문이 \"내 이름은 홍길동이야.\"이고 후속 질문이 주석으로 남아 있습니다. 메모리 없는 그래프라 기억하지 못함을 보이려던 것으로 보이나 실행되지 않으므로 원본 질문을 씁니다.\n- LLM 호출 1회.\n- 원본은 마지막 답만 `print(...content)`로 출력합니다. 노트북은 결과 변수를 그래프가 드러나는 이름(`basic_graph_result`)으로 바꾸고, 메시지 목록을 `results`로 꺼내 `pretty_print()`로 출력합니다(2026-10-17 규칙, dev/AGENTS.md)."
   },
   {
    "name": "02_conditional_edge.py",
@@ -135,6 +145,17 @@
      "find": "# 병렬처리",
      "until": "# builder.add_edge('detect_language', 'english_response')",
      "lines": []
+    },
+    {
+     "find": "result = app.invoke({\"messages\": [HumanMessage(content=question)], \"language\": \"\"})",
+     "until": "print(f'감지 언어: {result[\"language\"]}')",
+     "lines": [
+      "    language_graph_result = app.invoke({\"messages\": [HumanMessage(content=question)], \"language\": \"\"})",
+      "    results = language_graph_result[\"messages\"]",
+      "    for m in results:",
+      "        m.pretty_print()",
+      "    print(f\"감지 언어: {language_graph_result['language']}\")"
+     ]
     }
    ],
    "split": [
@@ -176,10 +197,10 @@
      "hint": "빈칸에 `detect_language` 노드가 끝나면 `route_by_language` 함수의 결과에 따라 다음 노드로 가는 조건부 엣지를 추가하는 한 줄을 써 달라고 합니다. `add_edge`로 두 응답 노드에 직접 잇지 말고 `add_conditional_edges` 한 줄만 쓰라고 적습니다.",
      "checks": [
       "셀이 오류 없이 실행된다(그래프를 조립만 합니다)",
-      "3.4에서 질문마다 답(`A:`)이 하나씩, 질문과 같은 언어로 출력된다"
+      "3.4에서 질문마다 `Ai Message` 칸이 하나씩, 질문과 같은 언어로 출력된다"
      ],
      "fail": [
-      "3.4에서 `A:` 뒤에 답 대신 질문이 그대로 출력된다 → detect_language 뒤에 이어지는 엣지가 없는 것입니다. 조건부 엣지의 출발 노드 이름을 확인합니다"
+      "3.4에서 `Human Message`(질문)만 나오고 `Ai Message` 칸이 없다 → detect_language 뒤에 이어지는 엣지가 없는 것입니다. 조건부 엣지의 출발 노드 이름을 확인합니다"
      ]
     }
    ],
@@ -192,12 +213,12 @@
    ],
    "chunk_success": {
     "질문 넣어 실행하기": [
-     "질문마다 `Q:`, `A:`, `감지 언어:`가 한 번씩 출력된다",
+     "질문마다 `Human Message`, `Ai Message`, `감지 언어:`가 한 번씩 출력된다",
      "바꾼 질문에도 `감지 언어:`는 `ko`나 `en` 중 하나로만 출력되고, 답도 그 언어로 나온다(이 그래프의 갈래는 두 개뿐입니다)"
     ]
    },
    "look": "**볼 지점**\n- `감지 언어:` 줄이 라우팅 함수가 본 값입니다. `ko`면 한국어 답변 노드, 아니면 영어 답변 노드로 갔습니다.\n- 두 답변 노드는 system 메시지만 다릅니다. 같은 메시지 목록 앞에 \"한국어로만\" 또는 \"English only\" 지시를 붙여 LLM을 호출합니다.",
-   "look__meta": "- 원본 25~26줄, 54줄(오타 \"반한값\"), 68~71줄 메모와 74~76줄의 주석 처리된 \"병렬처리\" 코드는 셀에서 뺐습니다. 병렬처리 두 줄은 detect_language에서 두 답변 노드로 동시에 가는 일반 엣지 예시로, 조건부 엣지와 대비하려던 것입니다. 수강생이 물으면 \"두 노드가 모두 실행되어 답이 두 개 쌓인다\"고 설명합니다(실행해 확인하지 않음, 미확인).\n- 솔루션은 프롬프트 따옴표·어미만 다르고 쓰지 않는 `import re`가 있어 원본을 씁니다.\n- 일본어 질문은 감지 프롬프트가 ko/en만 허용하므로 보통 `en`으로 갑니다. 모델 답에 `ko`가 섞이면 `ko`로 갈 수도 있습니다(모델마다 다름).\n- LLM 호출 4회(질문당 감지 1회 + 답변 1회)."
+   "look__meta": "- 원본 25~26줄, 54줄(오타 \"반한값\"), 68~71줄 메모와 74~76줄의 주석 처리된 \"병렬처리\" 코드는 셀에서 뺐습니다. 병렬처리 두 줄은 detect_language에서 두 답변 노드로 동시에 가는 일반 엣지 예시로, 조건부 엣지와 대비하려던 것입니다. 수강생이 물으면 \"두 노드가 모두 실행되어 답이 두 개 쌓인다\"고 설명합니다(실행해 확인하지 않음, 미확인).\n- 솔루션은 프롬프트 따옴표·어미만 다르고 쓰지 않는 `import re`가 있어 원본을 씁니다.\n- 일본어 질문은 감지 프롬프트가 ko/en만 허용하므로 보통 `en`으로 갑니다. 모델 답에 `ko`가 섞이면 `ko`로 갈 수도 있습니다(모델마다 다름).\n- LLM 호출 4회(질문당 감지 1회 + 답변 1회).\n- 원본은 마지막 답만 `print(...content)`로 출력합니다. 노트북은 결과 변수를 그래프가 드러나는 이름(`language_graph_result`)으로 바꾸고, 메시지 목록을 `results`로 꺼내 `pretty_print()`로 출력합니다(2026-10-17 규칙, dev/AGENTS.md)."
   },
   {
    "name": "03_tool_node.py",
@@ -241,6 +262,26 @@
     {
      "find": "print(result2)",
      "lines": []
+    },
+    {
+     "find": "result = app.invoke(",
+     "until": "print(f\"  [{role}] {content}\")",
+     "lines": [
+      "tool_graph_result = app.invoke({\"messages\": [HumanMessage(content=\"100달러를 원화로 환산하면 얼마야?\")]})",
+      "results = tool_graph_result[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
+     ]
+    },
+    {
+     "find": "result2 = agent.invoke({\"messages\": [HumanMessage(content=\"50유로는",
+     "until": "print(result2[\"messages\"][-1].content)",
+     "lines": [
+      "agent_result = agent.invoke({\"messages\": [HumanMessage(content=\"50유로는 몇 원이야?\")]})",
+      "results = agent_result[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
+     ]
     }
    ],
    "split": [
@@ -268,10 +309,10 @@
      "hint": "빈칸에 위에서 정의한 두 도구를 담은 목록 `tools`를 만들고, `get_llm()`으로 받은 모델에 `bind_tools()`로 이 목록을 연결해 `llm`에 담는 코드를 써 달라고 합니다. 이름 `tools`와 `llm`은 아래 셀에서 쓰므로 바꾸지 말라고 적습니다.",
      "checks": [
       "셀이 오류 없이 실행된다(도구를 연결만 합니다)",
-      "4.4 실행 결과의 `[AIMessage]` 줄에 `get_exchange_rate` 호출이 보인다"
+      "4.4 실행 결과의 `Ai Message` 칸 `Tool Calls:` 아래에 `get_exchange_rate`가 보인다"
      ],
      "fail": [
-      "4.4에서 `[ToolMessage]` 줄 없이 바로 최종 답이 나온다 → 도구를 LLM에 연결했는지 확인합니다"
+      "4.4에서 `Tool Message` 칸 없이 바로 최종 답이 나온다 → 도구를 LLM에 연결했는지 확인합니다"
      ]
     },
     {
@@ -283,10 +324,10 @@
      "hint": "빈칸에 State의 메시지 목록을 도구가 연결된 `llm`에 넘기고, 응답을 `messages` 키의 목록에 담아 돌려주는 한 줄을 써 달라고 합니다. 함수 이름과 들여쓰기는 그대로 두라고 적습니다.",
      "checks": [
       "셀이 오류 없이 실행된다(agent 노드 함수만 정의합니다)",
-      "4.4 실행 결과에 `[HumanMessage]`, `[AIMessage]`, `[ToolMessage]`가 차례로 보인다"
+      "4.4 실행 결과에 `Human Message`, `Ai Message`, `Tool Message` 칸이 차례로 보인다"
      ],
      "fail": [
-      "4.4에서 `[HumanMessage]` 한 줄만 출력되고 끝난다 → 노드가 LLM의 응답을 돌려주는지 확인합니다"
+      "4.4에서 `Human Message` 칸 하나만 출력되고 끝난다 → 노드가 LLM의 응답을 돌려주는지 확인합니다"
      ]
     },
     {
@@ -298,11 +339,11 @@
      "explain": "ToolNode는 AI 메시지의 도구 호출을 읽어 해당 도구를 실행하고, 결과를 ToolMessage(도구 결과 메시지)로 돌려주는 미리 만들어진 노드입니다. `tools_condition`은 마지막 메시지에 도구 호출이 있으면 `\"tools\"` 노드로, 없으면 끝으로 보냅니다. 도구를 실행한 뒤 agent로 돌아가는 엣지가 있어야 모델이 도구 결과를 보고 답을 이어 씁니다. 이 되돌아가는 엣지가 순환 그래프의 고리입니다.",
      "hint": "빈칸에 `tools` 목록으로 ToolNode를 만들어 `\"tools\"`라는 이름의 노드로 추가하고, `\"tools\"`에서 `\"agent\"`로 돌아가는 엣지를 잇는 코드를 써 달라고 합니다. 노드 이름은 `tools_condition`이 찾는 `\"tools\"` 그대로 쓰라고 적습니다.",
      "checks": [
-      "메시지 목록이 `[HumanMessage]` → `[AIMessage]`(도구 호출) → `[ToolMessage]` → … → `[AIMessage]`(최종 답) 순서로 출력된다",
+      "메시지가 `Human Message` → `Ai Message`(도구 호출) → `Tool Message` → … → `Ai Message`(최종 답) 순서로 출력된다",
       "최종 답의 금액이 도구의 환율로 계산한 값(100 × 1350 = 135,000원)과 맞는다"
      ],
      "fail": [
-      "`[ToolMessage]` 뒤에서 끝나고 최종 답이 없다 → tools에서 agent로 돌아가는 엣지를 확인합니다",
+      "`Tool Message` 칸에서 끝나고 최종 답이 없다 → tools에서 agent로 돌아가는 엣지를 확인합니다",
       "`tools`라는 노드를 찾을 수 없다는 오류가 난다 → 노드 이름이 `\"tools\"`인지 확인합니다"
      ]
     }
@@ -319,8 +360,8 @@
      "환율을 바꾸고 4.4까지 다시 실행하면 최종 답의 금액도 바꾼 환율로 계산한 값으로 바뀐다(모델이 도구 결과를 보고 답했다는 뜻입니다)"
     ]
    },
-   "look": "**볼 지점**\n- 4.4의 출력에서 `[AIMessage]` 줄이 두 번 이상 나옵니다. 앞의 것은 도구 호출이고, 마지막 것이 최종 답입니다. 도구 결과가 `[ToolMessage]`로 들어온 뒤 agent가 다시 실행된 것입니다.\n- 4.5의 `create_agent`는 4.4에서 직접 조립한 agent 노드, tools 노드, 돌아가는 엣지를 한 번에 만들어 줍니다. 노드를 더하거나 흐름을 바꿔야 할 때는 4.4처럼 직접 조립합니다.",
-   "look__meta": "- 원본 17~19줄(이전 실습 파일 경로를 가리키는 주석)은 셀에서 뺐습니다. 요지: 1-3의 도구 호출 실습에서는 도구 실행 뒤 LLM을 다시 호출하는 루프를 직접 짰고, 여기서는 ToolNode + tools_condition이 그 반복을 맡는다(장 소개 글에 반영).\n- 원본 59~69줄(ToolNode 메모와 메시지 목록 모양을 적은 문자열), 78줄(reason -> tool -> observe 메모), 마지막 `print(result2)`(상태 전체 출력, 솔루션도 뺌)는 셀에서 뺐습니다.\n- TODO 다섯 개를 빈칸 세 개로 묶었습니다(2026-09-28 결정). 묶으려고 `tool_node = ToolNode(tools)`와 `builder.add_node(\"tools\", tool_node)`를 조건부 엣지 아래로 옮겼습니다. 컴파일 전에 노드·엣지를 더하는 순서는 결과에 영향이 없습니다.\n- 환율은 원본 1350.0을 씁니다(솔루션 1540.0). 솔루션은 루프 안에서 `pprint(msg)`로 메시지 전체를 출력하지만 화면이 길어져 원본의 한 줄 출력을 씁니다.\n- 모델에 따라 `calculate` 도구까지 호출하기도 하고, 환율만 받고 직접 계산하기도 합니다.\n- LLM 호출 4~6회."
+   "look": "**볼 지점**\n- 4.4의 출력에서 `Ai Message` 칸이 두 번 이상 나옵니다. 앞의 것은 도구 호출(`Tool Calls:`)이고, 마지막 것이 최종 답입니다. 도구 결과가 `Tool Message`로 들어온 뒤 agent가 다시 실행된 것입니다.\n- 4.5의 `create_agent`는 4.4에서 직접 조립한 agent 노드, tools 노드, 돌아가는 엣지를 한 번에 만들어 줍니다. 노드를 더하거나 흐름을 바꿔야 할 때는 4.4처럼 직접 조립합니다.",
+   "look__meta": "- 원본 17~19줄(이전 실습 파일 경로를 가리키는 주석)은 셀에서 뺐습니다. 요지: 1-3의 도구 호출 실습에서는 도구 실행 뒤 LLM을 다시 호출하는 루프를 직접 짰고, 여기서는 ToolNode + tools_condition이 그 반복을 맡는다(장 소개 글에 반영).\n- 원본 59~69줄(ToolNode 메모와 메시지 목록 모양을 적은 문자열), 78줄(reason -> tool -> observe 메모), 마지막 `print(result2)`(상태 전체 출력, 솔루션도 뺌)는 셀에서 뺐습니다.\n- TODO 다섯 개를 빈칸 세 개로 묶었습니다(2026-09-28 결정). 묶으려고 `tool_node = ToolNode(tools)`와 `builder.add_node(\"tools\", tool_node)`를 조건부 엣지 아래로 옮겼습니다. 컴파일 전에 노드·엣지를 더하는 순서는 결과에 영향이 없습니다.\n- 환율은 원본 1350.0을 씁니다(솔루션 1540.0). 원본은 메시지마다 `[클래스 이름] 내용` 한 줄을, 솔루션은 `pprint(msg)`로 메시지 객체 전체를 출력합니다. 노트북은 둘 다 쓰지 않고 `pretty_print()`로 출력합니다.\n- 모델에 따라 `calculate` 도구까지 호출하기도 하고, 환율만 받고 직접 계산하기도 합니다.\n- LLM 호출 4~6회.\n- 원본은 마지막 답만 `print(...content)`로 출력합니다. 노트북은 결과 변수를 그래프가 드러나는 이름(`tool_graph_result`, `agent_result`)으로 바꾸고, 메시지 목록을 `results`로 꺼내 `pretty_print()`로 출력합니다(2026-10-17 규칙, dev/AGENTS.md)."
   },
   {
    "name": "04_human_in_the_loop.py",
@@ -344,7 +385,21 @@
      "find": "result2 = app.invoke(None, config=config2)",
      "lines": [
       "app.update_state(config2, {\"messages\": rejection_messages}, as_node=\"tools\")",
-      "result2 = app.invoke(None, config=config2)"
+      "hitl_reject_result = app.invoke(None, config=config2)",
+      "results = hitl_reject_result[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
+     ],
+     "until": "print(result2[\"messages\"][-1].content)"
+    },
+    {
+     "find": "result = app.invoke(None, config=config)",
+     "until": "print(result[\"messages\"][-1].content)",
+     "lines": [
+      "hitl_approve_result = app.invoke(None, config=config)",
+      "results = hitl_approve_result[\"messages\"]",
+      "for m in results:",
+      "    m.pretty_print()"
      ]
     }
    ],
@@ -402,7 +457,7 @@
     ]
    },
    "look": "**볼 지점**\n- 승인 흐름에서는 1단계 뒤에 멈췄다가 `app.invoke(None, ...)`로 멈춘 곳부터 이어 갔습니다.\n- 거부 흐름에서는 `app.update_state(...)`가 거부 메시지를 도구 결과처럼 State에 넣은 뒤 이어 갔습니다. 그래서 `send_email`이 실행되지 않았습니다.\n\n---\n\n**AI에게 물어보기** 5.5의 `app.update_state` 줄이 무엇을 막는지 AI에게 리뷰를 받습니다.\n\n**프롬프트 힌트** 5.5 셀을 붙여 넣고, `app.update_state` 줄이 없으면 이어서 실행할 때 무슨 일이 생기는지, 출력의 어느 줄로 알 수 있는지 설명해 달라고 합니다. 코드는 고치지 말라고 적습니다.\n\n**성공 기준**\n- 🟢 그 줄이 없으면 멈춘 지점부터 그대로 이어져 `send_email`이 실행되고 `[실제 전송] boss@example.com`이 출력된다고 짚었다\n- 🟢 거부 메시지를 만들기만 해서는 State에 들어가지 않는다고 설명했다\n- ⛔ \"거부 메시지를 만들었으니 보내지 않는다\"고 답했다 → `rejection_messages`가 어디에 쓰이는지 다시 묻습니다",
-   "look__meta": "- **원본 결함(2026-09-21 감사):** 받은 원본은 `rejection_messages`를 만들기만 하고 State에 넣지 않습니다. 그래서 `app.invoke(None, config=config2)`가 멈춘 지점(tools 직전)부터 그대로 재개해 `send_email`이 실행되고 `[실제 전송] boss@example.com`이 출력됩니다. \"거부\"인데 도구가 실행되는, 조용히 틀리는 데모입니다.\n- 노트북에는 솔루션의 `app.update_state(config2, {\"messages\": rejection_messages}, as_node=\"tools\")` 줄을 넣어 실제로 막고, 원본에서 빠진 줄은 \"AI에게 물어보기\"로 리뷰합니다(2026-09-28 결정). 원본 파일은 고치지 않았습니다.\n- `as_node=\"tools\"`는 \"tools 노드가 이 메시지를 돌려준 것처럼\" 기록한다는 뜻입니다. 그래서 재개하면 tools 다음인 agent부터 실행됩니다.\n- 원본의 쓰지 않는 `SqliteSaver` import와 `search_web` 도구는 셀에서 뺐습니다(솔루션도 없음).\n- 이 장은 TODO가 있어 빌더가 \"AI에게 물어보기\" 절을 만들지 않습니다. 그래서 볼 지점 글 아래에 붙였습니다.\n- LLM 호출 4회."
+   "look__meta": "- **원본 결함(2026-09-21 감사):** 받은 원본은 `rejection_messages`를 만들기만 하고 State에 넣지 않습니다. 그래서 `app.invoke(None, config=config2)`가 멈춘 지점(tools 직전)부터 그대로 재개해 `send_email`이 실행되고 `[실제 전송] boss@example.com`이 출력됩니다. \"거부\"인데 도구가 실행되는, 조용히 틀리는 데모입니다.\n- 노트북에는 솔루션의 `app.update_state(config2, {\"messages\": rejection_messages}, as_node=\"tools\")` 줄을 넣어 실제로 막고, 원본에서 빠진 줄은 \"AI에게 물어보기\"로 리뷰합니다(2026-09-28 결정). 원본 파일은 고치지 않았습니다.\n- `as_node=\"tools\"`는 \"tools 노드가 이 메시지를 돌려준 것처럼\" 기록한다는 뜻입니다. 그래서 재개하면 tools 다음인 agent부터 실행됩니다.\n- 원본의 쓰지 않는 `SqliteSaver` import와 `search_web` 도구는 셀에서 뺐습니다(솔루션도 없음).\n- 이 장은 TODO가 있어 빌더가 \"AI에게 물어보기\" 절을 만들지 않습니다. 그래서 볼 지점 글 아래에 붙였습니다.\n- LLM 호출 4회.\n- 원본은 마지막 답만 `print(...content)`로 출력합니다. 노트북은 결과 변수를 그래프가 드러나는 이름(`hitl_approve_result`, `hitl_reject_result`)으로 바꾸고, 메시지 목록을 `results`로 꺼내 `pretty_print()`로 출력합니다(2026-10-17 규칙, dev/AGENTS.md)."
   },
   {
    "name": "05_hitl_interactive.py",
