@@ -25,7 +25,7 @@
 1. 저장소를 받습니다. 아래 명령부터는 받은 폴더 `samsung-ai-agent-course`(저장소 맨 위, 이 `course/` 폴더의 위)에서 실행합니다.
 
    ```
-   git clone -b study https://github.com/seolcoding/samsung-ai-agent-course.git
+   git clone -b study --single-branch https://github.com/seolcoding/samsung-ai-agent-course.git
    cd samsung-ai-agent-course
    ```
 
