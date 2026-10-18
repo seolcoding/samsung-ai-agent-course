@@ -4,10 +4,10 @@
   uv run python dev/builders/build_lab.py 01-llm-api        # 실습 폴더 하나
   uv run python dev/builders/build_lab.py                   # labs/*.json 전부
   uv run python dev/builders/build_lab.py --scaffold        # 아직 없는 실습 폴더의 뼈대 JSON 만들기
-  uv run python dev/builders/build_lab.py --mc               # 객관식판 전부(labs/<폴더>.choices.json, 파일 이름 끝 _LAB_MC)
+  uv run python dev/builders/build_lab.py --mc               # 위와 같다(객관식판). 실습 노트북은 객관식판 하나이고 이름은 _LAB이다(2026-10-18)
 
 입력: dev/builders/labs/<실습 폴더>.json
-출력: course/Chapter01/notebooks/<번호>_<이름>_LAB.ipynb (출력 없음)
+출력: course/ChapterNN/notebooks/<번호>_<이름>_LAB.ipynb (객관식판, 출력 없음)
 
 수강생에게는 노트북만 보인다(.py 실습 파일은 주지 않는다). 그래서 원본 코드를 빌드할 때 셀로 옮겨 넣는다.
 정본은 계속 course/Chapter01/code/raw이고, 원본이 바뀌면 다시 빌드한다.
@@ -265,68 +265,20 @@ def _mark(lines, edits):
     return out, at
 
 
-SKILL_REFS = ROOT / ".agents" / "skills" / "grade-task" / "references"  # 채점 스킬이 읽는 과제별 기준(빌드 산출)
-TASK_RUN = {
-    "python": "uv run --env-file .env python {path}",
-    "streamlit": "uv run --env-file .env streamlit run {path}",
-}
+def _task_section(nb, task, chapter, n):
+    """노트북 맨 끝(정리 앞)의 과제 안내(2026-10-18 재설계). 과제 파일과 안내는 노트북 밖 폴더(chatbot/, tasks/<번호>/)에 있다.
 
-
-def _task_file(unit):
-    return f"{unit}_task.py"
-
-
-def _task_starter(task, unit):
-    """과제 시작 파일 내용: 설정을 불러오는 줄만 들어 있다."""
-    return "\n".join([f'"""{unit} 과제: {task["title"]}"""', "", *task["imports"], "", "", "# 아래에 AI와 함께 코드를 작성합니다", ""])
-
-
-def _task_section(nb, task, unit, chapter, n):
-    """노트북 맨 끝(정리 앞)의 바이브 코딩 과제. 과제 파일만 노트북 옆에 만들고, 실행·채점은 터미널과 AI가 한다."""
-    name, path = _task_file(unit), f"course/{chapter}/notebooks/{_task_file(unit)}"
-    run = TASK_RUN[task.get("run", "python")].format(path=path)
-    nb.h(2, f"{n}. 바이브 코딩 과제: {task['title']}")
-    nb.md(f"위에서 배운 것을 조합해 새 프로그램을 AI와 함께 만듭니다. 노트북이 아니라 따로 만든 과제 파일 `{name}`에 작성하고, 터미널에서 실행합니다.\n\n"
-          f"**목표** {task['goal']}\n\n**들어갈 것**\n\n" + "\n".join(f"- {x}" for x in task["steps"])
-          + "\n\n**성공 기준**\n\n" + "\n".join(f"- 🟢 {c['ok']}" for c in task["checks"]))
-    nb.md(f"**프롬프트 힌트** {task['hint']}")
-    nb.h(3, f"{n}.1 과제 파일 만들기")
-    nb.md(f"아래 셀을 실행하면 이 노트북 옆에 `{name}` 파일이 만들어집니다. 모델을 불러오는 줄은 미리 들어 있습니다. 파일이 이미 있으면 덮어쓰지 않으니 다시 실행해도 작업한 내용이 지워지지 않습니다.")
-    starter = _task_starter(task, unit)
-    assert "'''" not in starter and "\\" not in starter, f"{unit}: 시작 파일에 따옴표 세 개나 역슬래시가 있으면 셀 문자열이 깨진다"
-    nb.code(f"from pathlib import Path\n\ntask_file = Path({name!r})\nstarter = '''\\\n{starter}'''\n\n"
-            "# 이미 있으면 덮어쓰지 않습니다(작업한 내용이 지워지지 않게)\n"
-            "if task_file.exists():\n    print(f\"이미 있습니다. 그대로 둡니다: {task_file.resolve()}\")\n"
-            "else:\n    task_file.write_text(starter, encoding=\"utf-8\")\n    print(f\"만들었습니다: {task_file.resolve()}\")",
-            visible=True, kind="")
-    nb.h(3, f"{n}.2 AI와 함께 만들고 실행하기")
-    app = task.get("run") == "streamlit"
-    nb.md(f"1. VS Code 탐색기에서 `{path}`를 엽니다.\n"
-          "2. AI에게 목표와 들어갈 것을 주고 이 파일에 작성해 달라고 합니다. AI가 만든 코드를 읽어 보고, 성공 기준과 다르면 다시 지시합니다.\n"
-          "3. VS Code 메뉴 **터미널 → 새 터미널**을 열고(저장소 맨 위 폴더에서 열립니다) 아래 명령으로 실행합니다.\n\n"
-          f"```\n{run}\n```\n\n"
-          + ("4. 브라우저에 앱이 열립니다. 질문해 보고 성공 기준과 비교합니다. 파일을 고쳤으면 브라우저에서 새로 고침합니다. 앱을 끌 때는 터미널에서 **Ctrl + C**를 누릅니다.\n" if app else
-             "4. 출력을 성공 기준과 비교합니다. 오류가 나면 오류 메시지 전체를 AI에게 붙여 넣고 고쳐 달라고 합니다.\n"))
-    nb.h(3, f"{n}.3 채점받기")
-    nb.md(f"다 됐으면 AI에게 **\"{unit} 과제 채점해 줘\"**라고 말합니다. AI가 과제 파일을 직접 실행해 성공 기준마다 🟢 통과 / ⛔ 수정 필요 / ❔ 확인 불가를 알려 주고, 다음에 할 일 하나와 확인 질문 하나를 냅니다.")
-
-
-def _task_reference(task, unit, chapter):
-    """채점 스킬이 읽는 과제 기준 파일을 쓴다. 노트북과 같은 spec에서 만들어 서로 어긋나지 않게 한다."""
-    path = f"course/{chapter}/notebooks/{_task_file(unit)}"
-    q = task["quiz"]
-    lines = [f"# {unit} 과제: {task['title']}", "", "빌드 산출물이다(dev/builders/build_lab.py). 직접 고치지 않는다.", "",
-             f"- 과제 파일: `{path}`",
-             f"- 실행 명령(저장소 맨 위에서): `{TASK_RUN[task.get('run', 'python')].format(path=path)}`", "",
-             "## 목표", "", task["goal"], "", "## 들어갈 것", "", *[f"- {x}" for x in task["steps"]], "",
-             "## 성공 기준과 확인 방법", "", *[f"{k}. 🟢 {c['ok']}\n   - 확인: {c['how']}" for k, c in enumerate(task["checks"], 1)], ""]
-    if task.get("run") == "streamlit":
-        lines += ["## 앱 확인 방법", "", "브라우저 대신 스킬의 `scripts/check_streamlit.py`로 확인한다(질문 두 개를 보내고, 사이드바 버튼을 누른 뒤의 채팅 메시지 수를 출력한다).", "",
-                  f"`uv run --env-file .env python .agents/skills/grade-task/scripts/check_streamlit.py {path}`", ""]
-    lines += ["## 확인 질문", "", q["question"], "", *[f"{k}. {o}" for k, o in enumerate(q["options"], 1)], "",
-              f"정답: {q['answer']}", "", "해설:", *[f"- {k}: {w}" for k, w in enumerate(q["why"], 1)], ""]
-    SKILL_REFS.mkdir(parents=True, exist_ok=True)
-    (SKILL_REFS / f"{unit}.md").write_text("\n".join(lines), encoding="utf-8")
+    task: {title, objectives: [학습 목표], parts: [{what, readme, run, grade}]}. 목표 하나가 채점 기준 하나다.
+    """
+    nb.h(2, f"{n}. 과제: {task['title']}")
+    nb.md("이 장의 학습 목표를 코드로 구현해 봅니다. 과제 파일과 자세한 안내(할 일, 프롬프트 힌트, 실행 방법)는 노트북 밖 폴더에 있습니다.\n\n"
+          "**학습 목표**\n\n" + "\n".join(f"- {x}" for x in task["objectives"]))
+    for part in task["parts"]:
+        nb.md(f"**{part['what']}**\n\n"
+              f"1. VS Code 탐색기에서 `course/{chapter}/{part['readme']}`를 열고 안내대로 AI와 함께 작성합니다.\n"
+              "2. VS Code 메뉴 **터미널 → 새 터미널**을 열고(저장소 맨 위 폴더에서 열립니다) 아래 명령으로 실행합니다.\n\n"
+              f"```\n{part['run']}\n```\n\n"
+              f"3. 다 됐으면 AI에게 **\"{part['grade']}\"**라고 말합니다. 학습 목표마다 🟢 통과 / ⛔ 수정 필요 / ❔ 확인 불가와 다음 할 일이 나옵니다.")
 
 
 def build(folder, mc=False):
@@ -544,9 +496,8 @@ def build(folder, mc=False):
             nb.md(_criteria_md([], ask.get("fail", []), ask.get("success", [])))
 
     last = len(spec["files"]) + 2
-    if spec.get("task"):  # 바이브 코딩 과제: 배운 것을 조합해 별도 파일에 AI와 함께 만든다(2026-10-18)
-        _task_section(nb, spec["task"], unit, chapter, last)
-        _task_reference(spec["task"], unit, chapter)
+    if spec.get("task"):  # 과제 안내: 학습 목표와 과제 폴더(2026-10-18)
+        _task_section(nb, spec["task"], chapter, last)
         last += 1
     nb.h(2, f"{last}. 정리")
     nb.md(spec["closing"])
@@ -557,7 +508,7 @@ def build(folder, mc=False):
             if level and level <= 2:
                 cell.metadata["jp-MarkdownHeadingCollapsed"] = True
                 cell.metadata["heading_collapsed"] = True
-    nb.finish(COURSE / chapter / "notebooks" / f"{unit}_{slug}_LAB{'_MC' if mc else ''}.ipynb")
+    nb.finish(COURSE / chapter / "notebooks" / f"{unit}_{slug}_LAB.ipynb")  # 실습 노트북은 객관식판 하나(2026-10-18, 옛 빈칸판은 만들지 않는다)
 
 
 def _sections(lines):
@@ -652,12 +603,12 @@ if __name__ == "__main__":
         for folder in args[1:] or UNITS:
             scaffold(folder)
             check_blanks(folder)
-    elif args[:1] == ["--mc"]:  # 객관식판: labs/<폴더>.choices.json의 보기로 <번호>_<이름>_LAB_MC.ipynb를 만든다
+    elif args[:1] == ["--mc"]:  # 객관식판: labs/<폴더>.choices.json의 보기로 <번호>_<이름>_LAB.ipynb를 만든다
         for folder in args[1:] or sorted(p.stem for p in LABS.glob("**/*.json") if p.stem in UNITS):
             build(folder, mc=True)
     elif args[:1] == ["--check"]:
         for folder in args[1:] or UNITS:
             check_blanks(folder)
-    else:
+    else:  # 기본도 객관식판이다(2026-10-18 통일)
         for folder in args or sorted(p.stem for p in LABS.glob("**/*.json") if p.stem in UNITS):
-            build(folder)
+            build(folder, mc=True)

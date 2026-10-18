@@ -361,54 +361,19 @@
  ],
  "closing": "A2A로 Agent 사이에 일을 나눴습니다.\n\n| 쪽 | 한 일 | 쓴 것 |\n|---|---|---|\n| 서버 (Researcher) | 요청을 받아 내부 LangGraph Agent를 실행하고 결과를 돌려줌 | AgentExecutor, Agent Card, RequestHandler |\n| 클라이언트 (이 노트북) | 카드를 읽고, 조사를 맡기고, 받은 결과로 글을 씀 | A2ACardResolver, SendMessageRequest |\n\n맡기는 쪽은 Researcher의 내부 구현을 몰라도 카드와 메시지 형식만 맞추면 일을 맡길 수 있습니다.\n\n**실습을 마치면 서버 터미널에서 Ctrl+C로 서버를 끕니다.** 같은 8001 포트를 쓰는 다른 서버를 띄울 때 부딪히지 않게 하기 위해서입니다.",
  "task": {
-  "title": "번역 Agent를 A2A로 띄우고 불러 보기",
-  "goal": "한국어 문장을 영어로 옮기는 Translator Agent를 A2A 서버로 만들고, 같은 파일의 클라이언트가 Agent Card를 읽은 뒤 번역을 한 번 맡깁니다. 서버는 과제 파일이 8011 포트에 잠깐 띄웠다가 끝나면 직접 끕니다.",
-  "steps": [
-   "서버: 받은 글을 `llm`으로 영어로 번역해 `t.Message`로 EventQueue에 발행하는 `AgentExecutor`를 만듭니다(그래프 없이 `llm`을 바로 불러도 됩니다)",
-   "이름이 `Translator Agent`이고 번역 Skill 하나를 가진 Agent Card를 만들고, RequestHandler와 카드 조회·JSON-RPC 라우트로 Starlette 앱을 조립합니다",
-   "같은 파일에서 `uvicorn.Server`로 앱을 `127.0.0.1`의 **8011** 포트에 띄웁니다(`asyncio.create_task(server.serve())`로 띄우고 `server.started`가 될 때까지 기다립니다)",
-   "클라이언트: `A2ACardResolver`로 카드를 읽어 이름과 스킬 이름을 출력하고, `SendMessageRequest`로 \"오늘 회의는 오후 3시에 시작합니다.\"를 한 번 보내 응답 `parts`의 글을 출력합니다",
-   "`try`/`finally`에서 `server.should_exit = True`로 서버를 끄고 끝날 때까지 기다려, 명령이 스스로 끝나게 합니다"
+  "title": "A2A로 Agent 부르기",
+  "objectives": [
+   "`t.AgentCard`와 `t.AgentSkill`로 Agent Card를 만들 수 있다",
+   "`AgentExecutor`에서 Agent 결과를 `t.Message`로 `EventQueue`에 내보내는 서버를 Starlette 앱으로 조립할 수 있다",
+   "`A2ACardResolver`로 카드를 읽고 메시지를 보내 응답 텍스트를 출력할 수 있다"
   ],
-  "checks": [
+  "parts": [
    {
-    "ok": "카드에서 읽은 이름 `Translator Agent`와 번역 스킬 이름이 출력된다",
-    "how": "출력에 카드 조회 결과(이름, 스킬 이름)가 있고, 코드에서 그 값을 `A2ACardResolver`(또는 `/.well-known/agent-card.json` 요청)로 읽은 카드에서 꺼낸다. 코드의 `t.AgentCard`에 `t.AgentSkill`이 하나 있다"
-   },
-   {
-    "ok": "보낸 한국어 문장의 영어 번역이 출력된다",
-    "how": "출력에 회의가 오후 3시에 시작한다는 뜻의 영어 문장이 있다. 코드에서 이 글은 `client.send_message(...)` 응답의 `parts`에서 꺼낸 것이다(클라이언트 쪽에서 `llm`을 직접 불러 번역하면 ⛔). a2a 라이브러리의 `Dispatcher task is not running`, `queue_manager … DeprecationWarning` 경고 줄과 uvicorn의 `INFO:` 줄은 정상이다"
-   },
-   {
-    "ok": "명령이 기다리지 않고 스스로 끝나고, 끝난 뒤 8011 포트에 서버가 남아 있지 않다",
-    "how": "실행 명령이 Ctrl+C 없이 끝난다. 60초가 지나도 끝나지 않으면 프로그램을 멈추고 이 기준은 ⛔로 판정한다(서버를 끄지 않아 기다리는 상태다. 출력이 버퍼에 남아 1·2번 출력이 안 보일 수 있으니, 그때 1·2번은 코드로 판정하고 다음 할 일은 서버 끄기로 준다). 끝난 직후 `uv run python -c \"import socket; print(socket.socket().connect_ex(('127.0.0.1', 8011)))\"`가 0이 아닌 값을 출력한다(0이면 서버가 남아 있다). 코드에 `port=8011`과 `should_exit = True`(또는 같은 정리)가 있고 실습 포트 8000·8001을 쓰지 않는다"
+    "what": "터미널 과제",
+    "readme": "tasks/3-3/README.md",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/3-3/task.py",
+    "grade": "3-3 과제 채점해 줘"
    }
-  ],
-  "hint": "목표와 들어갈 것을 그대로 AI에게 주고, 과제 파일에만 작성해 달라고 합니다. 서버와 클라이언트는 이 노트북의 A2A 코드와 같은 a2a-sdk 1.x 방식으로 쓰라고 하고, 서버 셀과 `call_researcher` 셀을 함께 붙여 넣습니다.",
-  "imports": [
-   "from dotenv import load_dotenv",
-   "",
-   "from config.llm import get_llm",
-   "",
-   "load_dotenv()",
-   "",
-   "llm = get_llm()"
-  ],
-  "quiz": {
-   "question": "Translator Agent의 안쪽을 `llm` 한 번 호출에서 LangGraph 그래프로 바꿨습니다. 카드와 메시지 형식은 그대로입니다. 클라이언트 코드는 어떻게 해야 하나요?",
-   "options": [
-    "그래프를 부르도록 클라이언트도 고쳐야 합니다",
-    "카드의 Skill 이름을 그래프 노드 이름으로 바꿔야 합니다",
-    "고치지 않아도 됩니다. 카드와 메시지 형식만 맞으면 그대로 맡길 수 있습니다",
-    "서버 포트를 바꿔야 새 그래프가 연결됩니다"
-   ],
-   "answer": 3,
-   "why": [
-    "클라이언트는 서버 안을 부르지 않고 A2A 메시지만 보냅니다.",
-    "카드에는 내부 구현을 적지 않습니다. 노드 이름은 밖에서 몰라도 됩니다.",
-    "맡기는 쪽은 상대의 내부 구현을 몰라도 됩니다. 바뀐 것은 AgentExecutor 안쪽뿐입니다.",
-    "포트는 연결 주소일 뿐입니다. 안쪽 구현이 바뀌어도 주소는 그대로 써도 됩니다."
-   ]
-  }
+  ]
  }
 }

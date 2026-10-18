@@ -324,53 +324,20 @@
  ],
  "closing": "Agent를 나누고, 다음 차례를 정하는 방법을 세 가지로 보았습니다.\n\n| 장 | 다음 차례를 정하는 것 | 확인한 것 |\n|---|---|---|\n| 2. Researcher와 Writer 나누기 | 조건 함수(코드)가 `tool_calls`를 보고 정함 | Researcher만 도구를 쓰고, 조사 결과를 Writer가 받아 글을 씀 |\n| 3. Supervisor가 다음 차례 정하기 | Supervisor 모델이 정해진 형식(`next`)으로 고름 | 모델의 선택은 흔들릴 수 있고, Researcher의 출력 형식을 정하면 흐름이 안정됨 |\n| 4. Critic 더하기 (선택) | Supervisor 모델이 Critic 판정을 보고 고름 | 반복을 끝내는 조건이 코드가 아니라 프롬프트에만 있음 |\n\n역할을 나눌 때는 Agent마다 받을 입력과 돌려줄 출력의 형식을 정해야 합니다. 형식이 흐리면 Supervisor처럼 다음 차례를 정하는 쪽도 판단을 잘못할 수 있습니다.\n\n값을 바꿔 다시 실행하고, 결과를 성공 기준(🟢/⛔)과 비교해 스스로 판단했습니다.",
  "task": {
-  "title": "기획자와 검토자 두 Agent",
-  "goal": "기획자(planner)가 행사 계획을 쓰고 검토자(reviewer)가 \"승인\" 또는 \"수정\"을 판단하는 두 Agent 그래프를 만듭니다. 수정이면 기획자에게 돌아가고, 승인이거나 두 번 고쳤으면 끝냅니다.",
-  "steps": [
-   "State에 `messages`, `plan`(계획), `review`(검토 의견), `rounds`(고친 횟수)를 둡니다",
-   "planner 노드는 계획을 3줄로 쓰고(검토 의견이 있으면 반영), reviewer 노드는 \"승인\" 또는 \"수정: 이유\"로 답합니다",
-   "reviewer 뒤의 갈림길 함수는 반환 타입 `Literal[\"planner\", \"__end__\"]`을 달고 `add_conditional_edges`로 잇습니다. \"수정\"이면 planner로 돌아가고, 승인이거나 이미 2번 고쳤으면 끝냅니다(planner는 처음 1번 + 고치기 최대 2번)",
-   "주제 하나(예: 신입사원 환영 행사)로 실행하고 단계마다 누가 무엇을 썼는지와 최종 계획을 출력합니다"
+  "title": "역할을 나눈 Agent 팀",
+  "objectives": [
+   "Researcher와 Writer 노드를 만들고 `research_result`·`draft` 키로 결과를 넘길 수 있다",
+   "Researcher에게만 검색 도구를 줘 `Tool Message`가 Researcher 단계에만 나오게 할 수 있다",
+   "Supervisor가 구조화 출력(`Literal['researcher', 'writer', 'FINISH']`)으로 다음 차례를 고르고 그 흐름을 출력할 수 있다",
+   "Reviewer가 \"통과/수정\"을 내고 수정이면 정한 횟수만 다시 쓰고 멈추게 할 수 있다"
   ],
-  "checks": [
+  "parts": [
    {
-    "ok": "출력에 planner와 reviewer의 차례가 순서대로 보인다",
-    "how": "출력에 planner 계획 → reviewer 판단 순서가 한 번 이상 있다"
-   },
-   {
-    "ok": "검토가 \"수정\"이면 planner로 돌아가고, 고친 횟수는 2번을 넘지 않는다",
-    "how": "코드의 갈림길 함수가 \"수정\"이면 planner, 승인이거나 `rounds`가 2 이상이면 끝으로 보낸다. 출력에서 reviewer가 \"수정\"이라고 한 뒤 planner가 다시 나오고(고칠 횟수가 남았을 때), planner는 3번을 넘지 않는다"
-   },
-   {
-    "ok": "마지막에 마지막 planner가 쓴 최종 계획이 출력된다",
-    "how": "출력 끝의 최종 계획이 마지막 planner 단계에서 쓴 계획과 같다"
+    "what": "터미널 과제",
+    "readme": "tasks/2-2/README.md",
+    "run": "uv run --env-file .env python course/Chapter01/tasks/2-2/task.py",
+    "grade": "2-2 과제 채점해 줘"
    }
-  ],
-  "hint": "목표와 들어갈 것을 그대로 AI에게 주고, 과제 파일에만 작성해 달라고 합니다. 반복이 끝나지 않으면 고친 횟수로 멈추는 조건을 확인해 달라고 합니다.",
-  "imports": [
-   "from dotenv import load_dotenv",
-   "",
-   "from config.llm import get_llm",
-   "",
-   "load_dotenv()",
-   "",
-   "llm = get_llm()"
-  ],
-  "quiz": {
-   "question": "검토자가 계속 \"수정\"만 답하면 그래프는 어떻게 되나요?",
-   "options": [
-    "LangGraph가 알아서 한 번 돌고 멈춘다",
-    "검토자가 자동으로 승인으로 바뀐다",
-    "멈추는 조건이 없으면 반복 한도(recursion limit)에 걸려 오류가 난다",
-    "기획자 노드가 건너뛰어진다"
-   ],
-   "answer": 3,
-   "why": [
-    "알아서 멈추지 않습니다. 멈추는 조건은 직접 짭니다.",
-    "검토자의 답은 모델이 정합니다. 저절로 바뀌지 않습니다.",
-    "멈추는 조건이 없으면 `GraphRecursionError`가 납니다. 그래서 고친 횟수로 끝내는 조건을 둡니다.",
-    "갈림길이 planner로 보내므로 건너뛰지 않습니다."
-   ]
-  }
+  ]
  }
 }

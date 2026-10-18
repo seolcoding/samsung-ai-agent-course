@@ -486,57 +486,20 @@
  ],
  "closing": "실행 기록(Trace)을 남기는 방법 세 가지와 점수(Score)를 남기는 방법 네 가지를 보았습니다.\n\n| 장 | 방법 | Langfuse 화면에서 확인한 것 |\n|---|---|---|\n| 2. 체인 실행 기록하기 | `invoke`에 `callbacks`로 핸들러 넘기기 | `RunnableSequence` trace 세 개, 프롬프트 → 모델 → 파서 단계 |\n| 3. 그래프 실행 기록하기 | `with_config`로 그래프에 핸들러 붙이기 | `LangGraph` trace, agent → tools → agent 노드 순서 |\n| 4. 체인 밖 함수 기록하기 | `@observe(name=…)` | `rag-pipeline` 아래 검색·정리·체인 트리 |\n| 5. 규칙으로 채점하기 | 코드로 판단(`has-example`) | 빠르고 재현성이 높지만 규칙이 느슨할 수 있음 |\n| 6. LLM이 채점하기 | LLM Judge(`llm-judge-quality`) | 평가 기준이 흐리면 점수 근거도 흐림 |\n| 7. 사용자 피드백 기록하기 | 사람의 좋아요·싫어요(`user-feedback`) | Scores 화면의 세 점수 |\n| 8. RAG 답변을 세 기준으로 채점하기 | 정확성·관련성·완성도 | 어느 기준이 부족한지 나눠 보기 |\n\n내 trace는 이름, 시각, 입력으로 찾았습니다. 기록은 몇 초 늦게 도착하므로 `flush()` 뒤 화면을 새로고침합니다.",
  "task": {
-  "title": "기록과 점수가 남는 질문 답변기",
-  "goal": "질문에 답하는 체인 실행을 `@observe` 함수로 묶어 Langfuse에 trace 하나로 기록하고, 그 trace에 규칙 점수와 LLM 채점 점수를 하나씩 남깁니다. 질문 두 개를 실행하고, 질문마다 trace ID와 두 점수를 출력합니다.",
-  "steps": [
-   "질문에 3문장 이내로 답하는 체인(프롬프트 → `llm` → `StrOutputParser()`)을 만듭니다. 기록 도구 `handler = CallbackHandler()`는 함수 밖에서 한 번 만듭니다",
-   "`@observe(name=\"qa-task\")`를 붙인 함수가 질문 하나를 받아 체인을 `config={\"callbacks\": [handler]}`로 실행하고 답을 돌려줍니다. 함수를 호출한 뒤 `handler.last_trace_id`를 `trace id: …`로 출력합니다",
-   "규칙 점수 `short-answer`(답이 200자 이하면 1.0, 아니면 0.0)와 LLM 채점 점수 `llm-judge`(\"질문에 직접 답했는가\"를 0.0~1.0 숫자 하나로)를 `langfuse.create_score`로 그 trace ID에 남기고, 두 점수를 출력합니다",
-   "질문 `Langfuse의 Trace가 뭐야?`와 `RAG를 한 문장으로 설명해줘`를 차례로 실행하고, 파일 맨 끝에서 `langfuse.flush()`를 호출합니다"
+  "title": "기록과 점수가 남는 Agent",
+  "objectives": [
+   "`CallbackHandler`를 config로 넘겨 체인 실행을 trace로 기록하고 trace ID를 출력할 수 있다",
+   "`@observe(name=...)`로 일반 함수를 한 trace 아래 중첩 span으로 기록할 수 있다",
+   "규칙 점수와 LLM 채점 점수(0~1)를 `create_score`로 남기고 `flush()`할 수 있다",
+   "LangGraph 그래프에 `CallbackHandler`를 붙여 노드별 실행을 trace로 기록할 수 있다"
   ],
-  "checks": [
+  "parts": [
    {
-    "ok": "질문마다 답과 `trace id:` 줄이 출력되고, 두 질문의 trace ID가 서로 다르다",
-    "how": "출력에 질문마다 답과 `trace id:` 줄이 있고, 값이 `None`이 아닌 32자리 16진수이며 두 값이 다르다"
-   },
-   {
-    "ok": "질문마다 `short-answer`와 `llm-judge` 점수가 0.0~1.0 숫자로 출력된다",
-    "how": "출력에 질문마다 두 점수 이름과 0.0~1.0 숫자가 있고, `short-answer` 값이 그 답의 길이(200자 기준)와 맞는다. 코드에서 `create_score`가 `trace_id`와 함께 두 이름으로 호출된다"
-   },
-   {
-    "ok": "Langfuse에 `qa-task` trace가 질문마다 생기고, 각 trace에 점수 두 개가 붙는다",
-    "how": "코드에 `@observe(name=\"qa-task\")`, 체인 실행의 `config={\"callbacks\": [handler]}`, 파일 끝의 `langfuse.flush()`가 있다. 실행이 끝난 뒤, 출력된 trace ID마다 저장소 맨 위에서 `uv run --env-file .env python -c \"from langfuse import get_client; a = get_client().api; t = '<trace id>'; print([o.name for o in a.observations.get_many(trace_id=t, is_root_observation=True).data], sorted(s.name for s in a.scores_v3.get_many_v3(trace_id=t).data))\"`를 실행한다. `['qa-task'] ['llm-judge', 'short-answer']`가 나오면 🟢, 맨 앞 이름이 `qa-task`가 아니거나 점수 이름이 빠졌으면 ⛔. 점수는 1분쯤 늦게 보일 수 있으니, 목록이 비어 있으면 30초 간격으로 두 번 더 조회한다. 조회가 오류(연결·권한, 이 주소가 없는 Langfuse 버전)로 안 되거나 다시 조회해도 비어 있으면 ❔로 두고 이유를 적는다"
+    "what": "터미널 과제",
+    "readme": "tasks/4-2/README.md",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/4-2/task.py",
+    "grade": "4-2 과제 채점해 줘"
    }
-  ],
-  "hint": "목표와 들어갈 것을 그대로 AI에게 주고, 과제 파일에만 작성해 달라고 합니다. 점수는 `create_score`에 trace ID를 주어 남기고, 파일 맨 끝에서 `flush()`를 호출하라고 적습니다.",
-  "imports": [
-   "import truststore",
-   "from dotenv import load_dotenv",
-   "from langfuse import get_client",
-   "",
-   "from config.llm import get_llm",
-   "",
-   "truststore.inject_into_ssl()  # PC에 등록된 인증서(회사 인증서 포함)로 Langfuse에 연결합니다",
-   "load_dotenv()",
-   "",
-   "langfuse = get_client()",
-   "llm = get_llm()"
-  ],
-  "quiz": {
-   "question": "`langfuse.create_score`로 점수를 남길 때 `trace_id`를 함께 넘기는 까닭은?",
-   "options": [
-    "점수를 더 빨리 서버로 보내려고",
-    "trace_id가 없으면 점수가 0으로 기록되어서",
-    "점수를 어느 실행 기록(trace)에 붙일지 정하려고",
-    "LLM이 trace를 읽고 점수를 계산하게 하려고"
-   ],
-   "answer": 3,
-   "why": [
-    "보내는 속도와는 관계가 없습니다. 모아 둔 기록을 바로 보내는 것은 `flush()`입니다.",
-    "점수 값은 코드가 넘긴 숫자 그대로입니다. trace_id는 붙일 곳을 정합니다.",
-    "trace ID로 점수가 붙을 trace를 정합니다. 그래서 화면에서 그 답의 실행 기록과 점수를 함께 봅니다.",
-    "점수는 코드나 Judge가 미리 계산해 넘깁니다. `create_score`는 계산하지 않습니다."
-   ]
-  }
+  ]
  }
 }

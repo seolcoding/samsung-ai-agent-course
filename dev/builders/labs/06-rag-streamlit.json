@@ -149,57 +149,17 @@
   "EMBED_PROVIDER"
  ],
  "task": {
-  "title": "역할을 고르는 Streamlit 챗봇",
-  "goal": "사이드바에서 답변 역할을 고르는 Streamlit 챗봇을 만듭니다. 대화 기록은 `st.session_state`에 쌓아 화면에 남기고, 답은 글자가 이어지며 나오게 하고, 사이드바 버튼으로 대화를 지웁니다.",
-  "steps": [
-   "사이드바 `st.selectbox`로 역할(\"친절한 선생님\", \"간결한 비서\")을 고르고, 고른 역할을 system 메시지로 넣습니다",
-   "대화 기록을 `st.session_state`에 쌓고, 화면을 다시 그릴 때마다 `st.chat_message`로 모두 보여 줍니다",
-   "질문은 `st.chat_input`으로 받고, 답은 `llm.stream()`을 `st.write_stream`으로 흘려 보여 준 뒤 기록에 저장합니다",
-   "사이드바 \"대화 지우기\" 버튼을 누르면 기록을 비웁니다"
+  "title": "챗봇 완성",
+  "objectives": [
+   "일반 질문·약관 질문·기억 질문이 한 화면에서 모두 동작하는 최종 챗봇을 완성할 수 있다"
   ],
-  "checks": [
+  "parts": [
    {
-    "ok": "질문을 두 번 하면 두 질문과 두 답이 모두 화면에 남는다",
-    "how": "앱 테스트에서 질문 두 개를 보낸 뒤 채팅 메시지가 4개(사람 2, AI 2)이다"
-   },
-   {
-    "ok": "답이 고른 역할의 말투로 나온다",
-    "how": "코드가 사이드바에서 고른 역할을 system 메시지로 모델에 넣는다"
-   },
-   {
-    "ok": "\"대화 지우기\"를 누르면 기록이 사라진다",
-    "how": "앱 테스트에서 질문 두 개 뒤 채팅 메시지가 4개였다가, 버튼을 누른 뒤 0개이다(누르기 전이 0개면 이 기준은 확인 불가)"
+    "what": "챗봇 5단계",
+    "readme": "chatbot/README.md",
+    "run": "uv run --env-file .env streamlit run course/Chapter01/chatbot/stage5.py",
+    "grade": "챗봇 5단계 채점해 줘"
    }
-  ],
-  "hint": "목표와 들어갈 것을 그대로 AI에게 주고, 과제 파일에만 작성해 달라고 합니다. 앱은 터미널에서 띄우고, 고친 뒤에는 브라우저에서 새로 고침하면 된다고 알려 줍니다.",
-  "imports": [
-   "import streamlit as st",
-   "from dotenv import load_dotenv",
-   "",
-   "from config.llm import get_llm",
-   "",
-   "load_dotenv()",
-   "",
-   "llm = get_llm()",
-   "",
-   "st.title(\"역할 챗봇\")"
-  ],
-  "run": "streamlit",
-  "quiz": {
-   "question": "대화 기록을 보통 변수(`messages = []`)에 담으면 어떻게 되나요?",
-   "options": [
-    "기록이 잘 남는다",
-    "질문할 때마다 스크립트가 처음부터 다시 실행되어 기록이 비워진다",
-    "앱이 바로 오류를 내고 멈춘다",
-    "AI 답만 남고 질문은 사라진다"
-   ],
-   "answer": 2,
-   "why": [
-    "보통 변수는 다시 실행될 때마다 새로 만들어집니다.",
-    "Streamlit은 입력이 있을 때마다 스크립트를 위에서부터 다시 실행합니다. 남겨야 하는 값은 `st.session_state`에 둡니다.",
-    "오류는 나지 않습니다. 기록이 조용히 사라집니다.",
-    "질문과 답이 모두 사라집니다."
-   ]
-  }
+  ]
  }
 }
