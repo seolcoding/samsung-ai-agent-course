@@ -43,6 +43,7 @@ dependencies = [
     "grandalf>=0.8",
     "pygraphviz>=2.0.3",
     "ipykernel>=6.29,<8",  # VS Code 노트북 커널. uv sync만 해도 들어가게 기본 묶음에 둔다
+    "jupyterquiz>=2.9.6.4",  # 교안 노트북의 퀴즈(course/ChapterNN/assets/widgets.py show_quiz). uv sync만 해도 들어가게 기본 묶음에 둔다
 ]
 
 [project.optional-dependencies]
@@ -50,7 +51,6 @@ notebooks = [
     "nbformat>=5.10,<6",
     "nbclient>=0.10,<1",
     "nbconvert>=7.16,<8",
-    "jupyterquiz>=2.9.6.4",  # 교안 노트북의 퀴즈(course/ChapterNN/assets/widgets.py show_quiz)
 ]
 dev = [
     "pytest>=8.0.0",

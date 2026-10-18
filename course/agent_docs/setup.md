@@ -13,7 +13,7 @@
 
    - 저장소 맨 위에 `.venv/`가 생긴다. 파이썬 버전은 3.12로 고정돼 있다(`.python-version`, `pyproject.toml`의 `requires-python`). PC에 3.12가 없으면 uv가 받아서 쓴다.
    - `config` 패키지(`course/config/`)도 이때 함께 설치된다. 그래서 노트북 어디서든 `import config.llm`이 된다.
-   - 노트북 커널(`ipykernel`)은 기본 묶음에, 퀴즈(`jupyterquiz`)는 `notebooks` 묶음에 들어 있다.
+   - 노트북 커널(`ipykernel`)과 퀴즈(`jupyterquiz`)는 기본 묶음에 들어 있어 `uv sync`만 해도 설치된다. `notebooks` 묶음은 노트북 자동 실행 도구다.
 3. 설치를 확인한다.
 
    ```
