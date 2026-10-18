@@ -453,18 +453,16 @@
  ],
  "closing": "실행 기록(Trace)을 남기는 방법 세 가지와 점수(Score)를 남기는 방법 네 가지를 보았습니다.\n\n| 장 | 방법 | Langfuse 화면에서 확인한 것 |\n|---|---|---|\n| 2. 체인 실행 기록하기 | `invoke`에 `callbacks`로 핸들러 넘기기 | `RunnableSequence` trace 세 개, 프롬프트 → 모델 → 파서 단계 |\n| 3. 그래프 실행 기록하기 | `with_config`로 그래프에 핸들러 붙이기 | `LangGraph` trace, agent → tools → agent 노드 순서 |\n| 4. 체인 밖 함수 기록하기 | `@observe(name=…)` | `rag-pipeline` 아래 검색·정리·체인 트리 |\n| 5. 규칙으로 채점하기 | 코드로 판단(`has-example`) | 빠르고 재현성이 높지만 규칙이 느슨할 수 있음 |\n| 6. LLM이 채점하기 | LLM Judge(`llm-judge-quality`) | 평가 기준이 흐리면 점수 근거도 흐림 |\n| 7. 사용자 피드백 기록하기 | 사람의 좋아요·싫어요(`user-feedback`) | Scores 화면의 세 점수 |\n| 8. RAG 답변을 세 기준으로 채점하기 | 정확성·관련성·완성도 | 어느 기준이 부족한지 나눠 보기 |\n\n내 trace는 이름, 시각, 입력으로 찾았습니다. 기록은 몇 초 늦게 도착하므로 `flush()` 뒤 화면을 새로고침합니다.",
  "task": {
-  "title": "기록과 점수가 남는 Agent",
+  "title": "기록과 점수가 남는 체인",
   "objectives": [
    "`CallbackHandler`를 config로 넘겨 체인 실행을 trace로 기록하고 trace ID를 출력할 수 있다",
-   "`@observe(name=...)`로 일반 함수를 한 trace 아래 중첩 span으로 기록할 수 있다",
-   "규칙 점수와 LLM 채점 점수(0~1)를 `create_score`로 남기고 `flush()`할 수 있다",
-   "LangGraph 그래프에 `CallbackHandler`를 붙여 노드별 실행을 trace로 기록할 수 있다"
+   "규칙 점수와 LLM 채점 점수(0~1)를 `create_score`로 trace에 남길 수 있다"
   ],
   "parts": [
    {
     "what": "터미널 과제",
-    "readme": "tasks/4-2/README.md",
-    "run": "uv run --env-file .env python course/Chapter02/tasks/4-2/4-2_task.py",
+    "file": "tasks/4-2_task.py",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/4-2_task.py",
     "grade": "4-2 과제 채점해 줘"
    }
   ]

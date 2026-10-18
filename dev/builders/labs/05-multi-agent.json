@@ -315,16 +315,14 @@
  "task": {
   "title": "역할을 나눈 Agent 팀",
   "objectives": [
-   "Researcher와 Writer 노드를 만들고 `research_result`·`draft` 키로 결과를 넘길 수 있다",
-   "Researcher에게만 검색 도구를 줘 `Tool Message`가 Researcher 단계에만 나오게 할 수 있다",
-   "Supervisor가 구조화 출력(`Literal['researcher', 'writer', 'FINISH']`)으로 다음 차례를 고르고 그 흐름을 출력할 수 있다",
-   "Reviewer가 \"통과/수정\"을 내고 수정이면 정한 횟수만 다시 쓰고 멈추게 할 수 있다"
+   "Researcher와 Writer 두 노드를 만들고 `research_result`·`draft` 키로 결과를 넘길 수 있다",
+   "Researcher에게만 검색 도구를 줘 `Tool Message`가 Researcher 단계에만 나오게 할 수 있다"
   ],
   "parts": [
    {
     "what": "터미널 과제",
-    "readme": "tasks/2-2/README.md",
-    "run": "uv run --env-file .env python course/Chapter01/tasks/2-2/2-2_task.py",
+    "file": "tasks/2-2_task.py",
+    "run": "uv run --env-file .env python course/Chapter01/tasks/2-2_task.py",
     "grade": "2-2 과제 채점해 줘"
    }
   ]

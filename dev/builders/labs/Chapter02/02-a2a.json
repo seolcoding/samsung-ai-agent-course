@@ -343,14 +343,13 @@
   "title": "A2A로 Agent 부르기",
   "objectives": [
    "`t.AgentCard`와 `t.AgentSkill`로 Agent Card를 만들 수 있다",
-   "`AgentExecutor`에서 Agent 결과를 `t.Message`로 `EventQueue`에 내보내는 서버를 Starlette 앱으로 조립할 수 있다",
    "`A2ACardResolver`로 카드를 읽고 메시지를 보내 응답 텍스트를 출력할 수 있다"
   ],
   "parts": [
    {
     "what": "터미널 과제",
-    "readme": "tasks/3-3/README.md",
-    "run": "uv run --env-file .env python course/Chapter02/tasks/3-3/3-3_task.py",
+    "file": "tasks/3-3_task.py",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/3-3_task.py",
     "grade": "3-3 과제 채점해 줘"
    }
   ]

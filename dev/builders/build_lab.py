@@ -311,16 +311,18 @@ def _mark(lines, edits):
 
 
 def _task_section(nb, task, chapter, n):
-    """노트북 맨 끝(정리 앞)의 과제 안내(2026-10-18 재설계). 과제 파일과 안내는 노트북 밖 폴더(chatbot/, tasks/<번호>/)에 있다.
+    """노트북 맨 끝(정리 앞)의 과제 안내(2026-10-18 재설계). 과제 파일은 노트북 밖 course/ChapterNN/tasks/<번호>_task.py 하나다.
 
-    task: {title, objectives: [학습 목표], parts: [{what, readme, run, grade}]}. 목표 하나가 채점 기준 하나다.
+    task: {title, objectives: [학습 목표], parts: [{what, file, run, grade}]}. 목표 하나가 채점 기준 하나다.
+    과제 파일은 tasks/<번호>_task.py 하나이고, 안내(🎯 목표, 📝 할 일, ✨ 프롬프트 힌트, ▶️ 실행)는 그 파일 맨 위 주석에 있다(2026-10-19).
     """
     nb.h(2, f"{n}. 과제: {task['title']}")
-    nb.md("이 장의 학습 목표를 코드로 구현해 봅니다. 과제 파일과 자세한 안내(할 일, 프롬프트 힌트, 실행 방법)는 노트북 밖 폴더에 있습니다.\n\n"
+    nb.md("이 장의 학습 목표를 코드로 구현해 봅니다. 과제 파일은 노트북 밖에 있고, 할 일과 ✨ 프롬프트 힌트는 그 파일 맨 위 주석에 있습니다.\n\n"
           "**학습 목표**\n\n" + "\n".join(f"- {x}" for x in task["objectives"]))
     for part in task["parts"]:
+        where = part.get("file") or part["readme"]
         nb.md(f"**{part['what']}**\n\n"
-              f"1. VS Code 탐색기에서 `course/{chapter}/{part['readme']}`를 열고 안내대로 AI와 함께 작성합니다.\n"
+              f"1. VS Code 탐색기에서 `course/{chapter}/{where}`를 열고, 맨 위 주석의 안내대로 AI와 함께 작성합니다.\n"
               "2. VS Code 메뉴 **터미널 → 새 터미널**을 열고(저장소 맨 위 폴더에서 열립니다) 아래 명령으로 실행합니다.\n\n"
               f"```\n{part['run']}\n```\n\n"
               f"3. 다 됐으면 AI에게 **\"{part['grade']}\"**라고 말합니다. 학습 목표마다 🟢 통과 / ⛔ 수정 필요 / ❔ 확인 불가와 다음 할 일이 나옵니다.")
@@ -586,9 +588,7 @@ def build(folder, mode="mc"):
         nb.meta(f.get("look__meta"))  # 장 끝 "AI에게 물어보기" 절은 두지 않는다(2026-10-18). spec에 ask를 넣지 않는다
 
     last = len(spec["files"]) + 2
-    if spec.get("task"):  # 과제 안내: 학습 목표와 과제 폴더(2026-10-18)
-        _task_section(nb, spec["task"], chapter, last)
-        last += 1
+    # 과제 안내 절은 두지 않는다(2026-10-19, 과제는 tasks/<번호>_task.py 파일로 충분하다). spec의 task는 기록용으로만 남는다
     nb.h(2, f"{last}. 정리")
     nb.md(spec["closing"])
     if mc:  # 객관식판은 # · ## 제목을 접은 채로 연다(JupyterLab·classic 메타데이터. VS Code 반영은 미확인)

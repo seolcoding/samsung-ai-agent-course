@@ -1,58 +1,29 @@
-"""4-1 과제: 회의록 요약 스킬을 쓰는 Deep Agent
+"""4-1 과제 · 회의록 요약 스킬을 쓰는 Deep Agent
 
-실행(저장소 맨 위에서):
-    uv run --env-file .env python course/Chapter02/tasks/4-1/4-1_task.py
-
-강사용 정답. 이 파일은 course/Chapter02/tasks/4-1/4-1_task.py 자리에, 정답 SKILL.md(dev/solutions/tasks/4-1_skills/meeting-summary/SKILL.md)는
-course/Chapter02/tasks/4-1/skills/meeting-summary/SKILL.md 자리에 놓고 실행한다(TASK_DIR가 이 파일의 폴더다).
+▶️ 실행   uv run --env-file .env python course/Chapter02/tasks/4-1_task.py
+✅ 확인   실행하면 맨 끝에 🟢/⛔가 나옵니다
+🆘 막히면 오류 메시지 전체를 AI에게 붙여 넣기
 """
 
-import atexit
-import shutil
-import tempfile
 from pathlib import Path
 
-from deepagents import create_deep_agent  # noqa: F401 — 목표 1에서 씁니다
-from deepagents.backends import FilesystemBackend  # noqa: F401
+from deepagents import create_deep_agent
+from deepagents.backends import FilesystemBackend
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage  # noqa: F401
-from langchain_core.tools import tool  # noqa: F401
-from langgraph.checkpoint.memory import MemorySaver  # noqa: F401
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.tools import tool
+from langgraph.checkpoint.memory import MemorySaver
 
 from config.llm import get_llm
 
 load_dotenv()
-
 llm = get_llm()
 
-# Agent의 작업 공간: 이 과제 폴더. 그 안의 skills/ 아래에 스킬 폴더(meeting-summary/)가 있습니다.
-TASK_DIR = Path(__file__).resolve().parent
-
-REQUEST_1 = "주간 회의 회의록을 가져와서 요약해 줘."
-REQUEST_2 = "파이썬으로 피보나치 코드를 짜 줘."
+TASK_DIR = Path(__file__).resolve().parent  # Agent의 작업 공간. 스킬은 그 안의 4-1_skills/ 아래에 있습니다
+SKILL_MD = TASK_DIR / "4-1_skills" / "meeting-summary" / "SKILL.md"
+SYSTEM_PROMPT = "회의록 요약만 돕는다. 회의록 요약과 무관한 요청은 정중히 거절한다."
 
 
-def copy_skills_with_one_line_changed(old_line: str, new_line: str) -> Path:
-    """skills 폴더를 임시 폴더에 복사하고, 사본 SKILL.md에서 한 줄만 바꿉니다(목표 4에서 씁니다).
-
-    돌려주는 값은 사본 작업 공간 폴더입니다(그 안에 skills/가 있습니다).
-    원본 SKILL.md와 저장소는 그대로이고, 사본은 실행이 끝나면 지워집니다. 이 함수는 고치지 않습니다.
-    """
-    work_dir = Path(tempfile.mkdtemp(prefix="skill_after_"))
-    atexit.register(shutil.rmtree, work_dir, ignore_errors=True)
-    shutil.copytree(TASK_DIR / "skills", work_dir / "skills")
-    copy_file = work_dir / "skills" / "meeting-summary" / "SKILL.md"
-    lines = copy_file.read_text(encoding="utf-8").splitlines()
-    found = [i for i, line in enumerate(lines) if line.strip() == old_line.strip()]
-    if len(found) != 1:
-        raise ValueError(f"SKILL.md에 이 줄이 정확히 한 번 있어야 합니다(지금 {len(found)}번): {old_line!r}")
-    lines[found[0]] = new_line
-    copy_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"\n바꾼 줄(사본 SKILL.md, 원본은 그대로):\n- {old_line.strip()}\n+ {new_line.strip()}")
-    return work_dir
-
-
-# 목표 1: 회의록 도구와 Agent를 만드는 함수
 @tool
 def get_meeting_notes(meeting_name: str) -> str:
     """회의 이름으로 회의록을 가져온다."""
@@ -64,56 +35,57 @@ def get_meeting_notes(meeting_name: str) -> str:
     )
 
 
-SYSTEM_PROMPT = "회의록 요약만 돕는다. 코드 작성, 수학 계산 등 회의록 요약과 무관한 요청은 정중히 거절한다."
-
-
-def build_agent(root_dir: Path):
-    """root_dir를 작업 공간으로 쓰는 Deep Agent를 만든다. 스킬은 root_dir/skills/ 아래에서 찾는다."""
-    backend = FilesystemBackend(root_dir=str(root_dir), virtual_mode=True)
+def build_agent():
+    # ✍️ 1. Deep Agent 만들기
+    # ✨ create_deep_agent · model=llm · tools=[get_meeting_notes] · FilesystemBackend(root_dir=TASK_DIR, virtual_mode=True) · skills=["4-1_skills/"] · system_prompt=SYSTEM_PROMPT · MemorySaver()
     return create_deep_agent(
         model=llm,
         tools=[get_meeting_notes],
-        backend=backend,
-        skills=["skills/"],  # 스킬 폴더들을 담은 상위 폴더
+        backend=FilesystemBackend(root_dir=str(TASK_DIR), virtual_mode=True),
+        skills=["4-1_skills/"],  # 스킬 폴더들을 담은 상위 폴더
         system_prompt=SYSTEM_PROMPT,
         checkpointer=MemorySaver(),
     )
 
 
-def run(agent, thread_id: str, question: str) -> str:
-    """요청 하나를 실행해 메시지를 모두 출력하고 마지막 답을 돌려준다."""
-    print(f"\n=== {question} ===")
+agent = build_agent()
+
+# ✍️ 2. 요약 양식 스킬 쓰기 → 4-1_skills/meeting-summary/SKILL.md
+# ✨ description: 언제 쓰는지 · 본문: get_meeting_notes 먼저 → 첫 줄 [회의 요약] → 결정 사항 → 할 일(담당자)
+if "✍️" in SKILL_MD.read_text(encoding="utf-8"):
+    print("(2. 아직 작성하지 않았습니다)")
+
+results = []
+if agent is not None:
     deep_agent_result = agent.invoke(
-        {"messages": [HumanMessage(content=question)]},
-        config={"configurable": {"thread_id": thread_id}},
+        {"messages": [HumanMessage(content="주간 회의 회의록을 가져와서 요약해 줘.")]},
+        config={"configurable": {"thread_id": "request_1"}},
     )
     results = deep_agent_result["messages"]
     for m in results:
         m.pretty_print()
-    return results[-1].content
 
 
-agent = build_agent(TASK_DIR)
-
-
-# 목표 2: 스킬을 읽고 양식대로 답하는 요청 1
-answer_1 = run(agent, "request_1", REQUEST_1)
-
-
-# 목표 3: 범위 밖 요청 2를 다른 thread_id로 실행하고 비교
-answer_2 = run(agent, "request_2", REQUEST_2)
-print("\n=== 요청 1과 요청 2 비교 ===")
-print(f"[요청 1] {REQUEST_1}\n{answer_1}\n")
-print(f"[요청 2] {REQUEST_2}\n{answer_2}")
-
-
-# 목표 4: SKILL.md 한 줄만 바꾼 사본으로 같은 요청을 다시 실행
-after_dir = copy_skills_with_one_line_changed(
-    "[회의 요약]",
-    "[주간 회의 요약]",
-)
-after_agent = build_agent(after_dir)
-answer_after = run(after_agent, "request_1_after", REQUEST_1)
-print("\n=== SKILL.md 한 줄 전후 비교 ===")
-print(f"[바꾸기 전]\n{answer_1}\n")
-print(f"[바꾼 후]\n{answer_after}")
+# ── ✅ 확인 (바꾸지 않습니다) ──
+print("\n✅ 확인")
+tool_msgs = [m for m in results if isinstance(m, ToolMessage)]
+if agent is None:
+    print("⛔ 1. 아직 작성하지 않았습니다")
+elif not any(m.name == "get_meeting_notes" for m in tool_msgs):
+    print("⛔ 1. Agent가 get_meeting_notes 도구를 부르지 않았습니다")
+else:
+    print("🟢 1. Deep Agent가 회의록 도구를 불러 썼습니다")
+skill = SKILL_MD.read_text(encoding="utf-8")
+final = str(results[-1].content).strip() if results else ""
+if "✍️" in skill:
+    print("⛔ 2. 아직 작성하지 않았습니다")
+elif "name: meeting-summary" not in skill or "description:" not in skill:
+    print("⛔ 2. SKILL.md 머리말에 name과 description이 있어야 합니다")
+elif agent is None:
+    print("⛔ 2. 1의 Agent가 있어야 확인합니다")
+elif not any(m.name == "read_file" and "meeting-summary" in str(m.content) for m in tool_msgs):
+    print("⛔ 2. Agent가 SKILL.md를 읽지 않았습니다(description, skills 경로를 확인합니다)")
+elif not final.startswith("[회의 요약]") or "김민수" not in final:
+    print("⛔ 2. 답의 첫 줄이 [회의 요약]이 아니거나 담당자(김민수)가 빠졌습니다")
+else:
+    print("🟢 2. 스킬을 읽고 그 양식대로 답했습니다")

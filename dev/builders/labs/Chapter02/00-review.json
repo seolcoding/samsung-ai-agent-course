@@ -244,16 +244,14 @@
  "task": {
   "title": "약관 검색 도구 Agent",
   "objectives": [
-   "`config.check`로 설정을 점검하고 ⛔ 항목을 고쳐 모델 호출까지 통과시킬 수 있다",
-   "`get_embeddings()`와 Chroma로 검색기를 만들고 `@tool search_policy`로 감쌀 수 있다",
-   "`tools_condition`과 `add_edge(\"tools\", \"agent\")`로 도구를 반복해 호출하는 그래프를 만들 수 있다",
-   "약관 질문에서만 도구를 호출하고 인사에는 호출하지 않는 것을 `pretty_print`로 보여 줄 수 있다"
+   "검색기를 `@tool search_policy`로 감싸 약관 검색 도구를 만들 수 있다",
+   "`tools_condition`과 `add_edge(\"tools\", \"agent\")`로 도구를 반복해 부르는 그래프를 만들 수 있다"
   ],
   "parts": [
    {
     "what": "터미널 과제",
-    "readme": "tasks/3-1/README.md",
-    "run": "uv run --env-file .env python course/Chapter02/tasks/3-1/3-1_task.py",
+    "file": "tasks/3-1_task.py",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/3-1_task.py",
     "grade": "3-1 과제 채점해 줘"
    }
   ]

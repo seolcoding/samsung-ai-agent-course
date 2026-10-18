@@ -604,19 +604,17 @@
   "RAG_PROVIDER"
  ],
  "task": {
-  "title": "약관 RAG 챗봇",
+  "title": "약관으로만 답하는 RAG 챗봇",
   "objectives": [
-   "PDF 읽기·분할·`get_embeddings()`·Chroma 저장을 `@st.cache_resource`로 한 번만 만들 수 있다",
-   "`as_retriever(search_kwargs={\"k\": 3})`로 찾은 청크를 context로 넣어 답하고 근거를 보여 줄 수 있다",
-   "맥락에 없는 질문에는 \"문서에서 확인할 수 없습니다\"라고 답하게 할 수 있다",
-   "검색 방식(로컬 Chroma / 사내 RAGaaS)을 골라 두 검색 결과를 비교할 수 있다(사내망)"
+   "검색한 약관 청크를 context로 넣어 답할 수 있다",
+   "문서에 없는 질문에는 \"문서에서 확인할 수 없습니다\"라고 답하게 할 수 있다"
   ],
   "parts": [
    {
-    "what": "챗봇 3단계",
-    "readme": "chatbot/README.md",
-    "run": "uv run --env-file .env streamlit run course/Chapter01/chatbot/stage3.py",
-    "grade": "챗봇 3단계 채점해 줘"
+    "what": "챗봇 앱 과제",
+    "file": "tasks/1-4_task.py",
+    "run": "uv run --env-file .env python course/Chapter01/tasks/1-4_task.py",
+    "grade": "1-4 과제 채점해 줘"
    }
   ]
  }

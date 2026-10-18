@@ -140,16 +140,17 @@
   "EMBED_PROVIDER"
  ],
  "task": {
-  "title": "챗봇 완성",
+  "title": "대화 기록이 남는 Streamlit 약관 챗봇",
   "objectives": [
-   "일반 질문·약관 질문·기억 질문이 한 화면에서 모두 동작하는 최종 챗봇을 완성할 수 있다"
+   "`st.session_state`에 대화 기록을 남겨, 질문할 때마다 파일이 다시 실행되어도 지난 대화가 화면에 남게 할 수 있다",
+   "`st.write_stream`으로 RAG 체인의 답을 조각 단위로 그리고, 다 붙은 답을 대화 기록에 남길 수 있다"
   ],
   "parts": [
    {
-    "what": "챗봇 5단계",
-    "readme": "chatbot/README.md",
-    "run": "uv run --env-file .env streamlit run course/Chapter01/chatbot/stage5.py",
-    "grade": "챗봇 5단계 채점해 줘"
+    "what": "챗봇 앱 과제",
+    "file": "tasks/2-3_task.py",
+    "run": "uv run --env-file .env python course/Chapter01/tasks/2-3_task.py",
+    "grade": "2-3 과제 채점해 줘"
    }
   ]
  }

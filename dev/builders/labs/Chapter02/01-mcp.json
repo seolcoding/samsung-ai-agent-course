@@ -317,15 +317,13 @@
   "title": "MCP 서버를 직접 띄우는 Agent",
   "objectives": [
    "FastMCP `@mcp.tool()`로 함수 2개를 MCP 도구로 등록할 수 있다",
-   "`MultiServerMCPClient`를 stdio로 연결해 `get_tools()`로 도구 목록을 받을 수 있다",
-   "받은 MCP 도구를 LangGraph Agent에 붙여 질문에 도구로 답하게 할 수 있다",
-   "`@mcp.resource()`와 `@mcp.prompt()`를 정의하고 읽어 올 수 있다"
+   "받은 MCP 도구를 LangGraph Agent에 붙여 질문에 도구로 답하게 할 수 있다"
   ],
   "parts": [
    {
     "what": "터미널 과제",
-    "readme": "tasks/3-2/README.md",
-    "run": "uv run --env-file .env python course/Chapter02/tasks/3-2/3-2_task.py",
+    "file": "tasks/3-2_task.py",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/3-2_task.py",
     "grade": "3-2 과제 채점해 줘"
    }
   ]
