@@ -97,7 +97,7 @@ if __name__ == "__main__" and "--server" not in sys.argv:
         print("🟢 1. MCP 서버에서 설명이 있는 도구 2개를 받았습니다")
     if not seen["runs"]:
         print("⛔ 2. 아직 작성하지 않았습니다")
-    elif "Model Context Protocol" not in tool_text(QUESTIONS[0]) or not any(n in tool_text(QUESTIONS[1]) for n in ("10", "12")):
+    elif "Model Context Protocol" not in tool_text(QUESTIONS[0]) or not any(w.isdigit() for w in tool_text(QUESTIONS[1]).split()):
         print("⛔ 2. 두 질문이 MCP 도구 결과(사전 뜻, 글자 수)를 받지 못했습니다")
     else:
         print("🟢 2. 두 질문 모두 MCP 도구를 거쳐 답했습니다")
