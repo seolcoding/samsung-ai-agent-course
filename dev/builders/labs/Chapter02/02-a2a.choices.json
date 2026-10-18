@@ -10,7 +10,7 @@
      {
       "line": "description=\"주어진 주제를 웹에서 조사하고 요약 정보를 제공합니다.\",",
       "todo": "Agent Card의 설명 문구를 바꿔 봅니다",
-      "explain": "Agent Card는 다른 Agent가 가장 먼저 읽는 자기소개입니다. 처음에는 그대로 두고 끝까지 진행합니다. 서버는 이 셀이 아니라 폴더의 `a2a_server.py` 파일로 돌기 때문에, 3장까지 해 본 뒤 그 파일을 고칩니다. VS Code 왼쪽 탐색기에서 노트북과 같은 폴더의 `a2a_server.py`를 열고 `description=` 줄의 따옴표 안 문구를 바꿔(예: \"주제를 조사해 핵심만 세 줄로 정리합니다.\") 저장합니다(`Ctrl + S`). 서버 터미널에서 **Ctrl + C**로 끈 뒤 다시 띄우고, 3장의 Agent Card 확인 셀을 다시 실행합니다."
+      "explain": "Agent Card는 다른 Agent가 가장 먼저 읽는 자기소개입니다. 처음에는 그대로 두고 끝까지 진행합니다. 서버는 이 셀이 아니라 폴더의 `a2a_server.py` 파일로 돌기 때문에, 3장까지 해 본 뒤 그 파일을 고칩니다. VS Code 왼쪽 탐색기에서 노트북과 같은 폴더의 `a2a_server.py`를 열고 `name=\"Researcher Agent\"` 바로 아래 `description=` 줄(파일에 `description=`이 두 번 나오니 첫 번째)의 따옴표 안 문구를 바꿔(예: \"주제를 조사해 핵심만 세 줄로 정리합니다.\") 저장합니다(`Ctrl + S`). 서버 터미널에서 **Ctrl + C**로 끈 뒤 다시 띄우고, 3장의 Agent Card 확인 셀을 다시 실행합니다."
      }
     ],
     "chunk_success": {

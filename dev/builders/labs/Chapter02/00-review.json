@@ -144,7 +144,8 @@
      ]
     }
    },
-   "look": "**볼 지점**\n- 흐름은 researcher → researcher_tools → researcher → writer 순서입니다. Researcher가 도구 결과를 보고 한 번 더 판단한 뒤, 조건 함수가 writer로 보냅니다.\n- 검색 도구는 어떤 주제든 정해 둔 같은 모양의 결과를 돌려줍니다. Writer는 이 조사 결과를 받아 쓰지만, 모델이 알고 있는 내용도 더하므로 글이 조사 결과보다 훨씬 깁니다.",
+   "look": "**볼 지점**\n- 기본 흐름은 researcher → researcher_tools → researcher → writer 순서입니다. Researcher가 도구 결과를 보고 한 번 더 판단한 뒤, 조건 함수가 writer로 보냅니다. 모델이 검색을 더 하겠다고 하면 researcher_tools → researcher가 되풀이되며, 몇 번 도는지는 실행마다 다릅니다.\n- 검색 도구는 어떤 주제든 정해 둔 같은 모양의 결과를 돌려줍니다. Writer는 이 조사 결과를 받아 쓰지만, 모델이 알고 있는 내용도 더하므로 글이 조사 결과보다 훨씬 깁니다.",
+   "look__meta": "- 사외 실측(2026-10-19, `COURSE_ENV=out`, 3회): 도구 라운드가 1·2·9번으로 달랐고 셀은 45~50초 걸렸습니다. 검색 도구가 늘 같은 결과를 돌려줘도 모델이 더 찾아보겠다고 합니다. 그래서 글에 흐름이 고정이라고 쓰지 않았습니다.",
    "patch": [
     {
      "find": "result = app.invoke(",

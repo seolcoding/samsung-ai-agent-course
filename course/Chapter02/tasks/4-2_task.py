@@ -59,7 +59,7 @@ print("\n✅ 확인")
 tid = globals().get("trace_id")
 todo_2 = 'print("(2. 아직 작성하지 않았습니다)")' in [line.strip() for line in Path(__file__).read_text(encoding="utf-8").splitlines()]
 names, scores, error = [], [], ""
-for _ in range(6 if isinstance(tid, str) else 0):  # 기록은 몇 초 늦게 도착합니다(최대 30초 기다림)
+for _ in range(12 if isinstance(tid, str) else 0):  # 기록은 늦게 도착합니다(최대 60초 기다림)
     try:
         names = [o.name for o in langfuse.api.observations.get_many(trace_id=tid, limit=50).data]
         scores = [s for s in langfuse.api.scores_v3.get_many_v3(trace_id=tid).data if 0 <= s.value <= 1]
@@ -72,7 +72,7 @@ for _ in range(6 if isinstance(tid, str) else 0):  # 기록은 몇 초 늦게 �
 if not isinstance(tid, str):
     print("⛔ 1. 아직 작성하지 않았습니다")
 elif not names:
-    print(f"❔ 1. Langfuse에서 trace {tid}를 찾지 못했습니다({error or '30초 안에 도착하지 않음'})")
+    print(f"❔ 1. Langfuse에서 trace {tid}를 찾지 못했습니다({error or '60초 안에 도착하지 않음'})")
 else:
     print("🟢 1. 체인 실행이 trace로 남았습니다" if "RunnableSequence" in names else "⛔ 1. trace에 체인 실행이 없습니다(callbacks를 확인합니다)")
 if todo_2 or not isinstance(tid, str):
