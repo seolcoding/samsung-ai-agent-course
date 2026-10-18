@@ -83,8 +83,8 @@ fi
 if git ls-tree -r --name-only "$BRANCH" | grep -q "^dev/"; then
   fail "수강생용 브랜치에 dev/가 있음" "복사 대상이 잘못됨" "FILES 목록 확인"
 fi
-if git grep -q -I -E "(^|[^A-Za-z0-9.])dev/" "$BRANCH" -- . ':!uv.lock'; then
-  git grep -n -I -E "(^|[^A-Za-z0-9.])dev/" "$BRANCH" -- . ':!uv.lock' >&2
+if git grep -q -I -E "(^|[^A-Za-z0-9./])dev/" "$BRANCH" -- . ':!uv.lock'; then
+  git grep -n -I -E "(^|[^A-Za-z0-9./])dev/" "$BRANCH" -- . ':!uv.lock' >&2
   fail "수강생용 파일이 dev/를 가리킴" "위 줄" "dev에서 그 문구를 고친 뒤 다시 실행"
 fi
 echo "✔ [4/5] 수강생용 브랜치에 dev/ 폴더도, dev/를 가리키는 글도 없음"

@@ -22,25 +22,32 @@
 
 ## 처음 한 번: 설치
 
-저장소 맨 위 폴더(이 `course/` 폴더의 위)에서 실행합니다.
+1. 저장소를 받습니다. 아래 명령부터는 받은 폴더 `samsung-ai-agent-course`(저장소 맨 위, 이 `course/` 폴더의 위)에서 실행합니다.
 
-1. `uv`를 설치합니다.
-2. 필요한 패키지를 설치합니다.
+   ```
+   git clone -b study https://github.com/seolcoding/samsung-ai-agent-course.git
+   cd samsung-ai-agent-course
+   ```
+
+2. `uv`를 설치합니다.
+3. 필요한 패키지를 설치합니다.
 
    ```
    uv sync --extra notebooks
    ```
 
-3. `.env.sample`을 복사해 저장소 맨 위에 `.env`를 만들고, 강사가 알려 준 값을 채웁니다. `.env`의 키는 다른 사람에게 보이거나 파일로 올리지 않습니다.
+4. `.env.sample`을 복사해 저장소 맨 위에 `.env`를 만들고, 강사가 알려 준 값을 채웁니다. `.env`의 키는 다른 사람에게 보이거나 파일로 올리지 않습니다.
 
-4. `.env` 맨 위 `COURSE_ENV`를 고릅니다. 강의장 PC는 `samsung`(사내), 사내망 밖은 `out`(사외)입니다.
-5. 설정을 점검합니다. "준비 완료"가 나오면 됩니다.
+5. `.env` 맨 위 `COURSE_ENV`를 고릅니다. 강의장 PC는 `samsung`(사내), 사내망 밖은 `out`(사외)입니다.
+6. 설정을 점검합니다. "준비 완료"가 나오면 됩니다.
 
    ```
    uv run python -m config.check
    ```
 
 설치나 실행이 안 되면 `agent_docs/troubleshooting.md`를 봅니다.
+
+**새 판 받기:** 강사가 새 판을 알리면 저장소 맨 위에서 `git pull`을 합니다. 노트북을 저장해 충돌이 나면 `git stash`로 내 변경을 치워 두고 다시 `git pull`합니다.
 
 ## 수업 때
 
