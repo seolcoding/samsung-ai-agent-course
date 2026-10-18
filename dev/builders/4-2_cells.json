@@ -6,84 +6,84 @@
  "p4": "Langfuse는 LLM 애플리케이션을 관찰하고 평가하기 위한 오픈소스 Observability 플랫폼입니다.\n프롬프트, 모델 호출, 도구 호출, 지연시간, 비용, 오류를 Trace 단위로 기록합니다.\nLangChain, LangGraph, OpenAI SDK, Python SDK와 연동해 실행 흐름을 추적할 수 있고, 기록된 Trace로 디버깅, 비용 분석, 사용자 피드백, 품질 평가를 합니다.\n클라우드로 쓸 수도 있고, Docker Compose로 자체 서버에 설치할 수도 있습니다.",
  "p4__meta": "- 받은 코드 주석과 `.env.sample`은 클라우드 주소(`jp.cloud.langfuse.com`)입니다. 강사 맥에는 self-host(`infra/langfuse/`)도 있습니다. 강의장에서 어느 주소·계정을 쓸지는 미정입니다.\n- 설치 버전은 langfuse 4.15.4입니다.",
  "q11": {
-  "question": "Langfuse가 Trace 단위로 기록하는 것이 **아닌** 것은?",
+  "question": "회사 규정상 Agent의 실행 기록을 외부 클라우드 서비스로 보낼 수 없습니다. 그래도 Langfuse로 Trace를 남기려면 어떻게 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "프롬프트와 모델 호출",
+    "answer": "Langfuse는 클라우드에서만 동작하므로 쓸 수 없다",
     "correct": false,
-    "feedback": "프롬프트와 모델 호출은 Langfuse가 기록하는 대표 항목입니다."
+    "feedback": "Langfuse는 오픈소스라 클라우드 말고 자체 서버에 설치해 쓸 수도 있습니다."
    },
    {
-    "answer": "도구 호출과 오류",
+    "answer": "Trace 대신 print로 출력만 남긴다",
     "correct": false,
-    "feedback": "도구 호출과 오류도 Trace에 기록됩니다."
+    "feedback": "print는 화면에만 남습니다. 단계별 입력·출력·지연시간을 모아 다시 볼 수 없습니다."
    },
    {
-    "answer": "지연시간과 비용",
-    "correct": false,
-    "feedback": "지연시간과 비용도 기록합니다. 어느 단계에서 시간과 돈이 들었는지 볼 수 있습니다."
-   },
-   {
-    "answer": "실행한 PC의 CPU·메모리 사양",
+    "answer": "Docker Compose로 사내 서버에 Langfuse를 설치하고 그 주소로 기록을 보낸다",
     "correct": true,
-    "feedback": "Langfuse는 LLM 애플리케이션의 실행 흐름을 기록합니다. PC 사양은 기록 대상이 아닙니다."
+    "feedback": "Langfuse는 자체 서버에 설치할 수 있습니다. 기록이 회사 밖으로 나가지 않습니다."
+   },
+   {
+    "answer": "OpenAI SDK를 쓰는 코드만 기록되게 바꾼다",
+    "correct": false,
+    "feedback": "어떤 SDK와 연동하는지는 기록이 어디로 가는지와 상관없습니다. 문제는 기록을 받는 서버의 위치입니다."
    }
   ]
  },
  "sum11": "**정리:** Langfuse는 LLM 애플리케이션의 실행을 Trace로 기록하고, 그 기록으로 디버깅·비용 분석·품질 평가를 하는 도구입니다.",
  "p5": "LLM 애플리케이션은 같은 입력처럼 보여도 내부 실행 경로가 달라질 수 있습니다. 그래서 다음을 확인해야 합니다.\n\n- 어떤 프롬프트가 실제로 모델에 전달되었는지\n- 어떤 도구가 어떤 입력으로 호출되었는지\n- 어느 단계에서 지연시간과 비용이 생겼는지\n- 실패한 응답이 모델 문제인지, 컨텍스트 문제인지, 도구 문제인지\n\nTrace는 \"무엇이 잘못됐는가\"를 감으로 추측하지 않고 실행 기록으로 확인하게 합니다.\n\n**왜 배우나:** Agent는 모델 호출, 도구 호출, 노드 실행이 여러 번 이어진 결과를 돌려줍니다. 최종 답변만 출력해서는 답이 틀렸을 때 어느 단계 탓인지 가를 수 없습니다.",
  "q12": {
-  "question": "실패한 응답의 원인을 Trace로 가를 때, 슬라이드가 든 구분이 **아닌** 것은?",
+  "question": "사내 규정을 묻는 질문에 Agent가 틀린 답을 했습니다. Trace에서 모델 호출 단계를 열어 보니, 함께 넣어야 할 규정 문서가 빠진 채 질문만 모델에 전달되었습니다. 원인은 어느 쪽인가요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "모델 문제",
-    "correct": false,
-    "feedback": "모델이 잘못 답한 경우입니다. 슬라이드가 든 세 구분 중 하나입니다."
-   },
-   {
-    "answer": "컨텍스트 문제",
-    "correct": false,
-    "feedback": "모델에 어떤 내용이 전달되었는지 Trace로 확인해 가려냅니다."
-   },
-   {
-    "answer": "도구 문제",
-    "correct": false,
-    "feedback": "어떤 도구가 어떤 입력으로 호출되었는지 Trace로 확인해 가려냅니다."
-   },
-   {
-    "answer": "사용자의 인터넷 속도 문제",
+    "answer": "컨텍스트 문제: 모델에 필요한 내용이 전달되지 않았다",
     "correct": true,
-    "feedback": "슬라이드는 실패 원인을 모델·컨텍스트·도구로 나눕니다. 인터넷 속도는 들지 않았습니다."
+    "feedback": "모델은 받은 것만으로 답했습니다. 고칠 곳은 모델에 무엇을 넘기는지입니다."
+   },
+   {
+    "answer": "모델 문제: 더 큰 모델로 바꿔야 한다",
+    "correct": false,
+    "feedback": "모델을 바꿔도 규정 문서를 받지 못하면 같은 실수를 하기 쉽습니다."
+   },
+   {
+    "answer": "도구 문제: 도구가 잘못된 입력으로 호출되었다",
+    "correct": false,
+    "feedback": "이 Trace에는 도구 호출이 보이지 않습니다. 문제는 모델에 전달된 내용입니다."
+   },
+   {
+    "answer": "알 수 없다: 답변을 보고 감으로 정한다",
+    "correct": false,
+    "feedback": "Trace가 있으면 감이 아니라 모델에 실제로 간 내용으로 원인을 가릅니다."
    }
   ]
  },
  "sum12": "**정리:** 같은 입력이라도 내부 경로가 다를 수 있습니다. Trace로 실제 프롬프트, 도구 호출, 지연·비용, 실패 원인을 확인합니다.",
  "p6": "Trace는 LLM 애플리케이션의 실행 과정을 단계별로 기록한 데이터입니다.\n프롬프트 입력, 모델 호출, 도구 호출, LangGraph 노드 실행, 그리고 각 단계의 입력·출력·지연시간·오류가 담깁니다.\nTrace를 보면 사용자 요청 하나가 내부에서 어떤 흐름으로 처리되었는지 다시 그려 볼 수 있습니다.",
  "q13": {
-  "question": "Trace 하나를 열어 보면 알 수 있는 것으로 가장 알맞은 것은?",
+  "question": "사용자가 \"답이 나오는 데 15초나 걸렸다\"고 알려 왔습니다. 어느 단계가 느렸는지 알려면 무엇을 보나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "요청 하나가 어떤 단계를 거쳐 처리되었고, 단계마다 입력·출력·지연시간이 어땠는지",
-    "correct": true,
-    "feedback": "Trace는 요청 하나의 실행 흐름을 단계별로 재구성하게 해 줍니다."
+    "answer": "그 답변에 붙은 Score",
+    "correct": false,
+    "feedback": "Score는 결과 품질 점수입니다. 시간이 어디서 걸렸는지는 담지 않습니다."
    },
    {
-    "answer": "답변이 좋은지 나쁜지에 대한 점수",
+    "answer": "같은 질문을 다시 실행해 전체 걸린 시간을 잰다",
     "correct": false,
-    "feedback": "품질 점수는 Trace만으로 알 수 없습니다. 뒤에서 볼 Evaluation이 점수를 남깁니다."
-   },
-   {
-    "answer": "다음 요청에서 모델이 어떤 답을 할지",
-    "correct": false,
-    "feedback": "Trace는 이미 일어난 실행의 기록입니다. 앞으로의 답을 알려 주지 않습니다."
+    "feedback": "전체 시간만 알 뿐 어느 단계가 느렸는지는 모릅니다. 다시 실행하면 실행 경로가 달라질 수도 있습니다."
    },
    {
     "answer": "모델이 학습한 데이터 목록",
     "correct": false,
-    "feedback": "Trace는 내 애플리케이션의 실행 기록입니다. 모델의 학습 데이터는 담기지 않습니다."
+    "feedback": "Langfuse는 내 애플리케이션의 실행을 기록합니다. 모델의 학습 데이터는 담기지 않습니다."
+   },
+   {
+    "answer": "그 요청의 Trace에 남은 단계별 지연시간",
+    "correct": true,
+    "feedback": "Trace는 단계마다 입력·출력·지연시간을 남깁니다. 오래 걸린 단계를 바로 찾을 수 있습니다."
    }
   ]
  },
@@ -91,28 +91,28 @@
  "p7": "CallbackHandler는 LangChain과 LangGraph의 실행 이벤트를 Langfuse Trace로 보내는 연결 지점입니다.\nChain, Runnable, Tool, LLM 호출 이벤트를 자동으로 모읍니다.\n붙이는 방법은 두 가지입니다. 실행할 때 `config`의 `callbacks`로 넘기거나, `with_config`로 기본 설정을 만들어 두면 이후 실행마다 적용됩니다.",
  "p7__meta": "- 슬라이드의 `\"Langfuse가 뭐야?\"` 예시는 요약 예시입니다. 실습 코드의 질문은 다릅니다. 실습 첫 두 장의 빈칸이 이 두 방법(`config={'callbacks': [...]}`, `with_config`)입니다.",
  "q14": {
-  "question": "체인을 실행할 때 CallbackHandler를 넘기는 방법으로 알맞은 것은?",
+  "question": "`langfuse_handler = CallbackHandler()`로 핸들러를 만들고 `chain.invoke({\"question\": q})`를 실행했습니다. 답은 잘 나오는데 Langfuse에 Trace가 없습니다. 어떻게 고치나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "`chain.invoke(입력, config={\"callbacks\": [langfuse_handler]})`",
+    "answer": "핸들러를 한 번 더 만든다",
+    "correct": false,
+    "feedback": "만들기만 해서는 체인과 연결되지 않습니다. 몇 번을 만들어도 같습니다."
+   },
+   {
+    "answer": "`chain.invoke({\"question\": q}, config={\"callbacks\": [langfuse_handler]})`로 실행한다",
     "correct": true,
-    "feedback": "슬라이드의 방법입니다. `config`의 `callbacks` 목록에 핸들러를 넣습니다."
+    "feedback": "핸들러를 `config`의 `callbacks` 목록에 넣어 넘겨야 그 실행이 기록됩니다."
    },
    {
-    "answer": "`chain.invoke(입력, langfuse_handler)`",
+    "answer": "`print(langfuse_handler)`로 핸들러를 확인한다",
     "correct": false,
-    "feedback": "핸들러는 두 번째 인자로 바로 넘기지 않습니다. `config`의 `callbacks`로 넘깁니다."
+    "feedback": "출력해 보는 것은 연결이 아닙니다. 실행할 때 핸들러를 넘겨야 합니다."
    },
    {
-    "answer": "`print(langfuse_handler)`",
+    "answer": "`chain.invoke(langfuse_handler)`처럼 질문 자리에 핸들러를 넣는다",
     "correct": false,
-    "feedback": "출력은 연결이 아닙니다. 실행할 때 핸들러를 넘겨야 기록됩니다."
-   },
-   {
-    "answer": "핸들러를 만들기만 하면 모든 체인이 자동으로 기록된다",
-    "correct": false,
-    "feedback": "만들기만 해서는 연결되지 않습니다. `callbacks`로 넘기거나 `with_config`로 붙여야 합니다."
+    "feedback": "첫 번째 자리는 체인의 입력입니다. 질문이 전달되지 않습니다. 기록 도구는 입력이 아니라 설정으로 넘깁니다."
    }
   ]
  },
@@ -147,28 +147,28 @@
  "sum15": "**정리:** 체인·그래프 실행은 CallbackHandler로, 체인 밖의 일반 함수는 @observe로 기록합니다.",
  "p10": "Evaluation은 응답이 좋은지 나쁜지를 점수로 남기는 과정입니다.\n트레이싱만으로는 답변 품질을 알 수 없습니다. Score를 남기면 품질 추세를 숫자로 볼 수 있고, 규칙 기반 평가와 LLM 평가를 함께 쓸 수 있습니다.\n\nObservability가 실행 기록을 남긴다면, Evaluation은 그 실행 결과의 품질을 수치와 근거로 남깁니다.",
  "q21": {
-  "question": "Observability와 Evaluation의 차이를 바르게 말한 것은?",
+  "question": "프롬프트를 고친 뒤 답변이 정말 좋아졌는지 확인하고 싶습니다. Langfuse에는 지금 Trace만 쌓여 있습니다. 무엇을 더해야 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "둘 다 답변 품질을 점수로 남긴다",
-    "correct": false,
-    "feedback": "점수를 남기는 것은 Evaluation입니다. Observability는 실행 기록을 남깁니다."
-   },
-   {
-    "answer": "Observability는 실행 기록을, Evaluation은 결과 품질을 수치와 근거로 남긴다",
+    "answer": "답변마다 품질 점수(Score)를 남겨 고치기 전과 후를 비교한다",
     "correct": true,
-    "feedback": "슬라이드의 한 줄 정리 그대로입니다."
+    "feedback": "Trace는 무슨 일이 있었는지만 남깁니다. 점수를 남겨야 품질 변화를 숫자로 비교할 수 있습니다."
    },
    {
-    "answer": "Observability는 사람이, Evaluation은 LLM만 한다",
+    "answer": "Trace를 더 많이 쌓는다",
     "correct": false,
-    "feedback": "Evaluation은 규칙 기반과 LLM 평가를 함께 쓸 수 있습니다. 사람이 하는지로 나누지 않습니다."
+    "feedback": "Trace가 많아져도 답이 좋은지는 알 수 없습니다. 품질은 점수로 남겨야 합니다."
    },
    {
-    "answer": "Evaluation을 하면 Trace가 필요 없다",
+    "answer": "모든 함수에 @observe를 붙인다",
     "correct": false,
-    "feedback": "점수는 실행 기록(Trace)에 붙여 남깁니다. 둘은 함께 씁니다."
+    "feedback": "@observe는 실행 기록을 늘릴 뿐 품질을 판단하지 않습니다."
+   },
+   {
+    "answer": "지연시간이 줄었으면 좋아진 것으로 본다",
+    "correct": false,
+    "feedback": "빨라진 것과 답이 좋아진 것은 다릅니다. 품질은 따로 채점해야 합니다."
    }
   ]
  },
@@ -176,28 +176,28 @@
  "p11": "Rule-based Evaluation은 코드로 명확히 판단할 수 있는 조건을 평가합니다. 예를 들어 예시 포함 여부, 특정 키워드 포함 여부, 답변 길이입니다.\n단순하지만 안정적입니다. 빠르고 저렴하며, 같은 답에는 늘 같은 점수가 나와 재현성이 높습니다.\n다만 설명이 얼마나 쉬운지 같은 정성적 품질은 판단하기 어렵습니다.",
  "p11__meta": "- 슬라이드의 `has_sources`(\"출처\"·\"http\" 포함 여부)는 요약 예시입니다. 실습 코드의 규칙은 예시 포함 여부(`has_example`, 키워드 목록)입니다.",
  "q22": {
-  "question": "규칙 기반 평가의 한계로 알맞은 것은?",
+  "question": "규칙 `has_sources`는 답변에 \"출처\"나 \"http\"가 들어 있으면 1.0, 없으면 0.0을 줍니다. 실제 근거는 없이 끝에 \"출처: 인터넷\" 한 줄만 붙은 답변은 몇 점을 받나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "실행할 때마다 점수가 크게 달라진다",
+    "answer": "0.0",
     "correct": false,
-    "feedback": "규칙 기반 평가는 재현성이 높습니다. 같은 답에는 같은 점수가 나옵니다."
+    "feedback": "규칙은 근거가 실제로 있는지 보지 않습니다. \"출처\"라는 글자만 찾습니다."
    },
    {
-    "answer": "평가할 때마다 비용이 많이 든다",
+    "answer": "0.5",
     "correct": false,
-    "feedback": "규칙 기반 평가는 빠르고 저렴합니다."
+    "feedback": "이 규칙은 1.0과 0.0 두 가지 점수만 돌려줍니다."
    },
    {
-    "answer": "설명이 얼마나 알기 쉬운지 같은 정성적 품질은 판단하기 어렵다",
+    "answer": "1.0",
     "correct": true,
-    "feedback": "슬라이드가 든 한계입니다. 이런 품질은 LLM-as-a-Judge로 봅니다."
+    "feedback": "규칙은 글자가 있는지만 봅니다. 근거가 진짜인지 같은 정성적 판단은 하지 못합니다. 그런 판단은 LLM Judge에 맡깁니다."
    },
    {
-    "answer": "키워드 포함 여부를 확인할 수 없다",
+    "answer": "실행할 때마다 다르다",
     "correct": false,
-    "feedback": "키워드 포함 여부는 규칙 기반 평가의 대표 예입니다."
+    "feedback": "규칙은 같은 답변에 늘 같은 점수를 줍니다. 재현성이 높은 대신 느슨할 수 있습니다."
    }
   ]
  },
@@ -205,108 +205,108 @@
  "p13": "LLM-as-a-Judge는 별도 LLM이 응답 품질을 평가하는 방식입니다.\n답변의 유용성, 질문과의 관련성, 근거 충실성, 설명의 완성도처럼 규칙으로 판단하기 어려운 정성적 품질에 씁니다.\n\n쓸 때는 평가 기준을 분명히 적어야 합니다.\n\n- 평가 기준을 구체적으로 씁니다.\n- 점수 범위를 고정해 근거 없는 높은 점수를 막습니다.\n- 가능하면 규칙 기반 평가와 함께 씁니다.\n\n**왜 배우나:** 캡스톤에서도 최종 보고서를 LLM Judge로 평가하고 점수를 Langfuse에 기록합니다. 평가 기준을 어떻게 쓰느냐에 따라 점수가 달라집니다.",
  "p13__meta": "- 캡스톤 연결 근거: 커리큘럼 4.3 \"최종 보고서 자동 평가(LLM Judge)와 Langfuse 점수 기록\".",
  "q23": {
-  "question": "LLM Judge를 쓸 때 슬라이드가 권하는 것이 **아닌** 것은?",
+  "question": "LLM Judge의 프롬프트가 \"답변의 품질을 평가해 줘\" 한 줄뿐입니다. 같은 답변인데 점수가 0.9, 0.4로 흔들리고, 왜 그 점수인지도 알 수 없습니다. 먼저 무엇을 고치나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "평가 기준을 구체적으로 쓴다",
+    "answer": "Judge를 여러 번 호출해 가장 높은 점수를 쓴다",
     "correct": false,
-    "feedback": "기준이 구체적이어야 Judge의 점수가 덜 흔들립니다. 권하는 것입니다."
+    "feedback": "높은 점수만 고르면 근거 없는 높은 점수가 남습니다. 흔들리는 원인은 기준이 없는 프롬프트입니다."
    },
    {
-    "answer": "점수 범위를 고정한다",
-    "correct": false,
-    "feedback": "범위를 고정하면 근거 없는 높은 점수를 막을 수 있습니다."
-   },
-   {
-    "answer": "가능하면 규칙 기반 평가와 함께 쓴다",
-    "correct": false,
-    "feedback": "규칙으로 판단할 수 있는 조건은 규칙으로, 나머지는 Judge로 나눠 봅니다."
-   },
-   {
-    "answer": "Judge가 자유롭게 판단하도록 평가 기준을 적지 않는다",
+    "answer": "평가 기준을 구체적으로 적고 점수 범위를 고정한다",
     "correct": true,
-    "feedback": "슬라이드는 반대로 평가 기준을 명확하고 구체적으로 쓰라고 합니다."
+    "feedback": "무엇을 보고 몇 점을 줄지 정해 주면 점수가 덜 흔들리고 근거도 읽을 수 있습니다."
+   },
+   {
+    "answer": "Judge를 빼고 Trace만 본다",
+    "correct": false,
+    "feedback": "Trace는 실행 기록이라 품질 점수를 대신하지 못합니다."
+   },
+   {
+    "answer": "기준을 적지 않아야 Judge가 공정하게 채점한다",
+    "correct": false,
+    "feedback": "기준이 없으면 Judge가 매번 다른 기준으로 채점합니다. 그래서 점수가 흔들립니다."
    }
   ]
  },
  "sum23": "**정리:** LLM Judge는 정성적 품질을 평가합니다. 기준을 구체적으로, 점수 범위를 고정해서, 가능하면 규칙 기반과 함께 씁니다.",
  "final": [
   {
-   "question": "RAG 파이프라인에서 체인 밖에 직접 만든 검색 함수가 있습니다. 이 함수의 실행을 LLM 호출과 같은 Trace에 넣으려면?",
+   "question": "LangGraph 그래프 `app`을 코드 여러 곳에서 `invoke`합니다. 매번 `config`에 핸들러를 넣다가 한 곳을 빠뜨려 그 실행만 기록이 없었습니다. 빠뜨리지 않으려면?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "검색 함수에 @observe를 붙인다",
+     "answer": "`builder.compile(callbacks=[langfuse_handler])`로 컴파일한다",
+     "correct": false,
+     "feedback": "`compile`은 핸들러를 받지 않아 오류가 납니다."
+    },
+    {
+     "answer": "핸들러를 파일 맨 위에 만들어 두기만 한다",
+     "correct": false,
+     "feedback": "만들어 두기만 해서는 그래프와 연결되지 않습니다."
+    },
+    {
+     "answer": "`invoke`할 때마다 핸들러를 넘겼는지 눈으로 확인한다",
+     "correct": false,
+     "feedback": "확인을 늘려도 빠뜨리는 일은 생깁니다. 기본 설정으로 붙이면 넘길 필요가 없습니다."
+    },
+    {
+     "answer": "`app = builder.compile().with_config({\"callbacks\": [langfuse_handler]})`로 붙여 둔다",
      "correct": true,
-     "feedback": "체인 밖의 일반 Python 함수는 @observe로 기록합니다."
-    },
-    {
-     "answer": "체인에 CallbackHandler를 넘긴다",
-     "correct": false,
-     "feedback": "CallbackHandler는 체인 안의 실행만 모읍니다. 체인 밖의 검색 함수는 보이지 않습니다."
-    },
-    {
-     "answer": "검색 결과를 print로 출력한다",
-     "correct": false,
-     "feedback": "print는 화면에만 나옵니다. Trace에는 남지 않습니다."
-    },
-    {
-     "answer": "LLM-as-a-Judge로 검색 결과를 평가한다",
-     "correct": false,
-     "feedback": "Judge는 품질 점수를 매기는 방법입니다. 실행을 기록하는 도구가 아닙니다."
+     "feedback": "`with_config`로 기본 설정을 만들어 두면 이후 `invoke`에 아무것도 넘기지 않아도 모든 실행이 기록됩니다."
     }
    ]
   },
   {
-   "question": "\"답변에 예시가 들어 있는가\"를 매번 같은 기준으로, 빠르고 싸게 평가하려면?",
+   "question": "답변을 두 가지로 채점하려 합니다. ① 출처 줄이 들어 있는가 ② 질문에 맞는 내용인가. 어떻게 나누는 것이 알맞나요?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "LLM-as-a-Judge",
-     "correct": false,
-     "feedback": "Judge도 할 수 있지만 호출마다 비용이 들고 점수가 흔들릴 수 있습니다. 키워드로 판단할 수 있는 조건은 규칙이 알맞습니다."
-    },
-    {
-     "answer": "Rule-based Evaluation",
+     "answer": "①은 규칙으로, ②는 LLM Judge로",
      "correct": true,
-     "feedback": "코드로 명확히 판단할 수 있는 조건이라 규칙 기반 평가가 알맞습니다. 빠르고 저렴하며 재현성이 높습니다."
+     "feedback": "글자가 있는지는 코드로 빠르고 늘 같게 판단합니다. 질문에 맞는지는 정성적 판단이라 Judge에 맡깁니다."
     },
     {
-     "answer": "Trace만 확인한다",
+     "answer": "둘 다 LLM Judge로",
      "correct": false,
-     "feedback": "Trace만으로는 품질을 알 수 없습니다. 점수를 남겨야 합니다."
+     "feedback": "②에는 맞지만, ①까지 Judge로 하면 호출마다 비용이 들고 점수가 흔들릴 수 있습니다."
     },
     {
-     "answer": "@observe를 붙인다",
+     "answer": "둘 다 규칙으로",
      "correct": false,
-     "feedback": "@observe는 실행을 기록합니다. 품질을 평가하지 않습니다."
+     "feedback": "②는 키워드로 판단하기 어렵습니다. 낱말이 겹쳐도 엉뚱한 답일 수 있습니다."
+    },
+    {
+     "answer": "①은 LLM Judge로, ②는 규칙으로",
+     "correct": false,
+     "feedback": "반대로 나눴습니다. 코드로 판단할 수 있는 쪽이 ①입니다."
     }
    ]
   },
   {
-   "question": "Trace와 Score가 각각 남기는 것을 바르게 짝지은 것은?",
+   "question": "Langfuse Scores 화면에서 `user-feedback`이 0.0(싫어요)인 답변을 찾았습니다. 왜 나쁜 답이 나왔는지 알려면 다음에 무엇을 하나요?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "Trace: 답변 품질 점수 / Score: 실행 단계 기록",
+     "answer": "점수를 1.0으로 고쳐 다시 남긴다",
      "correct": false,
-     "feedback": "반대입니다."
+     "feedback": "점수를 바꿔도 나쁜 답이 나온 원인은 그대로입니다."
     },
     {
-     "answer": "Trace: 모델의 학습 데이터 / Score: 모델 크기",
+     "answer": "같은 질문을 다시 물어 보고 답이 괜찮으면 넘어간다",
      "correct": false,
-     "feedback": "둘 다 모델 자체가 아니라 내 애플리케이션의 실행과 결과에 대한 기록입니다."
+     "feedback": "다시 실행하면 경로가 달라질 수 있어, 그때 무슨 일이 있었는지 알 수 없습니다."
     },
     {
-     "answer": "Trace: 실행 과정의 단계별 기록 / Score: 그 실행 결과의 품질 점수",
+     "answer": "그 점수가 붙은 Trace를 열어 단계별 입력·출력을 따라간다",
      "correct": true,
-     "feedback": "Observability는 실행 기록을, Evaluation은 결과 품질을 남깁니다."
+     "feedback": "점수는 실행 기록(Trace)에 붙어 있습니다. 그 실행의 프롬프트, 검색 결과, 도구 호출을 차례로 보면 원인을 가를 수 있습니다."
     },
     {
-     "answer": "Trace와 Score는 같은 것이다",
+     "answer": "LLM Judge 점수를 하나 더 남긴다",
      "correct": false,
-     "feedback": "Trace는 실행 기록, Score는 품질 점수입니다. 점수는 Trace에 붙여 남깁니다."
+     "feedback": "점수가 늘어도 원인은 보이지 않습니다. 원인은 실행 기록에 있습니다."
     }
    ]
   }

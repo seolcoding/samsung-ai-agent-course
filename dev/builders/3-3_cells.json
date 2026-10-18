@@ -25,93 +25,93 @@
  "p15": "`SendMessageRequest`는 사용자 요청을 A2A Message로 감싸 원격 Agent에게 보내는 요청 객체입니다.\n\n- 사용자 입력은 `t.Message`의 `parts`에 텍스트로 담습니다.\n- `client.send_message(req)`는 응답을 하나씩 흘려보내는 스트림을 돌려줍니다.\n- 응답 메시지의 `parts`에서 Agent가 만든 텍스트를 꺼냅니다.\n\n서버가 결과를 `t.Message`로 발행했듯이, 클라이언트도 요청을 `t.Message`로 보냅니다. 주고받는 형식이 같습니다.",
  "sum42": "**정리:** 요청은 `t.Message`의 `parts`에 담아 보내고, 답도 응답 메시지의 `parts`에서 꺼냅니다.",
  "q11": {
-  "question": "A2A로 다른 Agent에게 일을 맡길 때, 요청하는 Agent가 상대 Agent에 대해 몰라도 되는 것은?",
+  "question": "배달앱 Agent가 가게 주문 관리 Agent에게 주문 접수를 맡기려 합니다. 가게 Agent는 다른 팀이 다른 프레임워크로 만들었습니다. 어떻게 해야 하나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "상대 Agent의 내부 구현", "correct": true, "feedback": "요청하는 Agent는 상대가 어떤 프레임워크로 어떻게 만들어졌는지 몰라도 일을 맡길 수 있습니다."},
-   {"answer": "상대 Agent의 연결 주소", "correct": false, "feedback": "주소를 모르면 요청을 보낼 수 없습니다. 몰라도 되는 것은 상대의 내부 구현입니다."},
-   {"answer": "상대 Agent가 할 수 있는 일", "correct": false, "feedback": "무엇을 할 수 있는지는 알아야 맡길 수 있습니다. 그래서 Agent Card로 능력을 알립니다."},
-   {"answer": "맡길 작업의 내용", "correct": false, "feedback": "무엇을 맡길지는 요청하는 쪽이 정해 보냅니다. 몰라도 되는 것은 상대의 내부 구현입니다."}
+   {"answer": "가게 Agent를 배달앱과 같은 프레임워크로 다시 만듭니다", "correct": false, "feedback": "프레임워크가 달라도 됩니다. A2A는 서로 다르게 만든 Agent끼리 협업하려고 나온 표준입니다."},
+   {"answer": "가게 Agent가 A2A로 공개한 카드와 메시지 형식에 맞춰 요청을 보냅니다", "correct": true, "feedback": "요청하는 쪽은 상대의 내부 구현을 몰라도 됩니다. 공개된 약속(카드, 메시지 형식)만 맞추면 일을 맡길 수 있습니다."},
+   {"answer": "가게 Agent의 소스 코드를 받아 배달앱 안에서 직접 import합니다", "correct": false, "feedback": "코드를 가져와 합치면 따로 떨어진 Agent에게 맡기는 것이 아닙니다. A2A에서는 내부 코드를 몰라도 됩니다."},
+   {"answer": "가게 Agent의 프롬프트를 배달앱 Agent에 그대로 복사합니다", "correct": false, "feedback": "프롬프트를 복사해도 상대 Agent가 일을 하지는 않습니다. 요청을 보내 맡겨야 합니다."}
   ]
  },
  "q12": {
-  "question": "MCP와 비교할 때 A2A의 핵심으로 알맞은 것은?",
+  "question": "가게 Agent가 개인 Agent에게서 주문을 받고, 재고를 확인하려고 재고 서비스를 불러야 합니다. 두 연결에 쓸 표준으로 알맞은 것은?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "도구 사용", "correct": false, "feedback": "도구 사용은 MCP의 핵심입니다. MCP는 Agent와 Tool·데이터 소스를 연결합니다."},
-   {"answer": "데이터 소스 연결", "correct": false, "feedback": "데이터 소스 연결은 MCP가 맡습니다. A2A는 Agent와 Agent를 연결합니다."},
-   {"answer": "작업 위임과 협업", "correct": true, "feedback": "A2A는 Agent끼리 작업을 맡기고 협업하는 연결 표준입니다."},
-   {"answer": "화면 표시", "correct": false, "feedback": "화면 표시는 두 표준 어느 쪽의 핵심도 아닙니다. A2A의 핵심은 작업 위임과 협업입니다."}
+   {"answer": "둘 다 MCP", "correct": false, "feedback": "주문을 맡기는 쪽은 도구가 아니라 다른 Agent입니다. Agent끼리의 위임에는 A2A를 씁니다."},
+   {"answer": "둘 다 A2A", "correct": false, "feedback": "재고 서비스는 Agent가 아니라 Agent가 쓰는 도구·데이터 소스입니다. 이쪽은 MCP가 맡습니다."},
+   {"answer": "주문 받기는 MCP, 재고 확인은 A2A", "correct": false, "feedback": "거꾸로입니다. Agent와 Agent는 A2A, Agent와 도구는 MCP로 잇습니다."},
+   {"answer": "주문 받기는 A2A, 재고 확인은 MCP", "correct": true, "feedback": "다른 Agent에게서 일을 받는 것은 A2A, 자기 도구를 쓰는 것은 MCP입니다. 한 Agent가 두 표준을 함께 씁니다."}
   ]
  },
  "q21": {
-  "question": "Agent Card에 담는 내용이 아닌 것은?",
+  "question": "Writer Agent가 Researcher Agent에게 번역도 맡길 수 있는지 알고 싶습니다. Researcher의 Agent Card에서 무엇을 보면 되나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Agent의 이름과 설명", "correct": false, "feedback": "이름과 설명은 Agent Card의 기본 내용입니다."},
-   {"answer": "제공하는 Skill", "correct": false, "feedback": "Skill은 Agent가 제공하는 대표 기능으로, 카드에 담습니다."},
-   {"answer": "입출력 모드와 연결 정보", "correct": false, "feedback": "입출력 모드와 연결 정보도 카드에 함께 적습니다."},
-   {"answer": "내부 LangGraph 코드", "correct": true, "feedback": "카드는 밖에서 보는 자기소개입니다. 내부 구현은 담지 않고, 상대도 몰라도 됩니다."}
+   {"answer": "skills에 적힌 기능 목록", "correct": true, "feedback": "skills에는 Agent가 제공하는 대표 기능이 적혀 있습니다. 번역 기능이 없으면 맡길 상대가 아닙니다."},
+   {"answer": "version 값", "correct": false, "feedback": "version은 카드의 버전입니다. 무엇을 할 수 있는지는 알려 주지 않습니다."},
+   {"answer": "연결 주소(supported_interfaces)", "correct": false, "feedback": "주소는 어디로 보낼지를 알려 줍니다. 무엇을 맡길 수 있는지는 skills를 봅니다."},
+   {"answer": "Researcher 안에서 쓰는 LangGraph 노드 이름", "correct": false, "feedback": "카드에는 내부 구현을 담지 않습니다. 밖에서 보는 자기소개라 노드 이름은 없습니다."}
   ]
  },
  "q22": {
-  "question": "보고서, 코드, 파일처럼 Agent가 만들어 낸 산출물을 가리키는 것은?",
+  "question": "Agent에게 \"월간 보고서 작성\"을 맡겼습니다. 중간에 Agent가 \"몇 월 보고서인가요?\"라고 되묻고, 마지막에 보고서 파일을 돌려줬습니다. 보고서 파일은 무엇에 해당하나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Task", "correct": false, "feedback": "Task는 Agent에게 위임되는 작업의 단위입니다."},
-   {"answer": "Message", "correct": false, "feedback": "Message는 요청, 질문, 중간 응답을 주고받는 말입니다."},
-   {"answer": "Artifact", "correct": true, "feedback": "Artifact는 최종 또는 중간 산출물입니다."},
-   {"answer": "Agent Card", "correct": false, "feedback": "Agent Card는 Agent가 누구이고 무엇을 할 수 있는지 알리는 메타데이터입니다."}
+   {"answer": "Task", "correct": false, "feedback": "Task는 맡긴 일 자체(\"월간 보고서 작성\")입니다. 일의 결과물은 따로 부릅니다."},
+   {"answer": "Message", "correct": false, "feedback": "\"몇 월 보고서인가요?\" 같은 질문과 답이 Message입니다. 결과물인 파일은 Message가 아닙니다."},
+   {"answer": "Artifact", "correct": true, "feedback": "보고서, 코드, 파일처럼 Agent가 만들어 낸 산출물이 Artifact입니다."},
+   {"answer": "Agent Card", "correct": false, "feedback": "Agent Card는 일을 맡기기 전에 읽는 자기소개입니다. 작업 결과와는 관계가 없습니다."}
   ]
  },
  "q31": {
-  "question": "AgentExecutor가 내부 Agent를 실행한 뒤 결과를 발행하는 곳은?",
+  "question": "`execute` 안에서 내부 Agent를 실행해 답 글 `answer`를 만들었습니다. 이 답이 클라이언트에게 가려면 어떻게 해야 하나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "RequestContext", "correct": false, "feedback": "RequestContext는 사용자 입력과 task/context id를 읽어 오는 곳입니다."},
-   {"answer": "EventQueue", "correct": true, "feedback": "결과를 t.Message로 감싸 EventQueue에 발행합니다."},
-   {"answer": "Agent Card", "correct": false, "feedback": "Agent Card는 Agent를 소개하는 정보입니다. 실행 결과를 담지 않습니다."},
-   {"answer": "task_store", "correct": false, "feedback": "task_store는 RequestHandler가 작업 상태를 관리할 때 씁니다. AgentExecutor는 결과를 EventQueue에 발행합니다."}
+   {"answer": "`return answer`로 돌려줍니다", "correct": false, "feedback": "`execute`가 돌려주는 값은 클라이언트에게 가지 않습니다. 결과는 EventQueue에 발행합니다."},
+   {"answer": "`print(answer)`로 출력합니다", "correct": false, "feedback": "print는 서버 터미널에만 찍힙니다. 클라이언트는 받지 못합니다."},
+   {"answer": "`t.Message`로 감싸 `event_queue`에 발행합니다", "correct": true, "feedback": "AgentExecutor는 결과를 `t.Message`에 담아 EventQueue에 발행하고, 그 메시지가 클라이언트에게 갑니다."},
+   {"answer": "Agent Card의 description에 넣습니다", "correct": false, "feedback": "카드는 Agent를 소개하는 정보라 요청마다 바뀌는 답을 담지 않습니다."}
   ]
  },
  "q32": {
-  "question": "클라이언트가 Agent의 능력과 연결 정보를 알아내려고 읽는 주소는?",
+  "question": "Researcher 서버를 8001 포트로 띄웠습니다. Agent Card가 제대로 공개되었는지 브라우저로 확인하려면 어느 주소를 여나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "/.well-known/agent-card.json", "correct": true, "feedback": "Agent Card는 이 주소에서 JSON으로 공개됩니다."},
-   {"answer": "/agent/execute", "correct": false, "feedback": "슬라이드에 없는 주소입니다. Agent Card는 /.well-known/agent-card.json에서 공개됩니다."},
-   {"answer": "/skills", "correct": false, "feedback": "Skill은 카드 안의 한 항목입니다. 카드 전체는 /.well-known/agent-card.json에서 읽습니다."},
-   {"answer": "/message/send", "correct": false, "feedback": "메시지를 보내는 주소가 아니라 카드를 읽는 주소를 묻습니다. 답은 /.well-known/agent-card.json입니다."}
+   {"answer": "`http://127.0.0.1:8001/.well-known/agent-card.json`", "correct": true, "feedback": "Agent Card는 정해진 주소 `/.well-known/agent-card.json`에 JSON으로 공개됩니다. 클라이언트도 이 주소를 먼저 읽습니다."},
+   {"answer": "`http://127.0.0.1:8001/`", "correct": false, "feedback": "`/`는 작업 요청을 받는 JSON-RPC 주소입니다. 카드는 따로 정해진 주소에 있습니다."},
+   {"answer": "`http://127.0.0.1:8001/skills`", "correct": false, "feedback": "Skill은 카드 안의 한 항목입니다. 카드 전체를 읽는 주소가 따로 있습니다."},
+   {"answer": "`http://127.0.0.1:8001/agent_card`", "correct": false, "feedback": "변수 이름을 주소로 쓰지 않습니다. 카드 주소는 A2A가 정해 둔 `/.well-known/` 아래에 있습니다."}
   ]
  },
  "q33": {
-  "question": "RequestHandler에 연결하는 task_store와 queue_manager가 맡는 일은?",
+  "question": "Researcher 서버를 고쳐 글쓰기를 하는 `WriterExecutor` 클래스를 새로 만들었습니다. 서버가 요청을 받을 때 이 클래스를 실행하게 하려면 어디를 바꾸나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Agent Card를 JSON으로 공개하기", "correct": false, "feedback": "카드 공개는 Agent Card 조회 라우트가 맡습니다."},
-   {"answer": "작업 상태와 이벤트 관리", "correct": true, "feedback": "task_store는 작업 상태를, queue_manager는 이벤트를 관리합니다."},
-   {"answer": "내부 LangGraph Agent 실행", "correct": false, "feedback": "실제 실행은 agent_executor에 연결한 AgentExecutor가 맡습니다."},
-   {"answer": "사용자 입력을 t.Message로 감싸 보내기", "correct": false, "feedback": "요청을 t.Message로 감싸 보내는 일은 클라이언트가 합니다."}
+   {"answer": "Agent Card의 name을 \"Writer Agent\"로 바꿉니다", "correct": false, "feedback": "이름만 바뀌고 실행되는 코드는 그대로입니다. 실행 로직은 RequestHandler에 연결합니다."},
+   {"answer": "RequestHandler의 `agent_executor`를 `WriterExecutor()`로 바꿉니다", "correct": true, "feedback": "RequestHandler가 라우트로 들어온 요청을 `agent_executor`에 연결한 실행 로직에 넘깁니다."},
+   {"answer": "`create_agent_card_routes`에 `WriterExecutor()`를 넘깁니다", "correct": false, "feedback": "이 라우트는 카드 조회만 맡습니다. 작업 요청은 JSON-RPC 라우트와 RequestHandler를 거칩니다."},
+   {"answer": "JSON-RPC 라우트의 `rpc_url`을 바꿉니다", "correct": false, "feedback": "주소만 바뀌고 실행되는 클래스는 그대로입니다."}
   ]
  },
  "q41": {
-  "question": "A2A 클라이언트가 메시지를 보내기 전에 먼저 하는 일은?",
+  "question": "클라이언트 코드에서 Agent Card는 잘 읽었는데, 메시지를 보내자 서버가 예전 버전 요청으로 보고 거부합니다. 무엇을 확인하나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "상대 Agent의 내부 코드 내려받기", "correct": false, "feedback": "내부 코드는 몰라도 됩니다. 클라이언트는 공개된 Agent Card만 읽습니다."},
-   {"answer": "Agent Card 조회", "correct": true, "feedback": "A2ACardResolver로 카드를 읽어 URL, 기능, 입출력 모드를 확인한 뒤 Client를 만듭니다."},
-   {"answer": "EventQueue에 결과 발행", "correct": false, "feedback": "EventQueue에 발행하는 것은 서버의 AgentExecutor입니다."},
-   {"answer": "task_store 만들기", "correct": false, "feedback": "task_store는 서버의 RequestHandler에 연결하는 것입니다."}
+   {"answer": "httpx의 timeout을 늘렸는지", "correct": false, "feedback": "시간 초과가 아니라 버전 문제입니다. 기다리는 시간을 늘려도 거부는 그대로입니다."},
+   {"answer": "Agent Card를 한 번 더 읽었는지", "correct": false, "feedback": "카드는 이미 잘 읽었습니다. 다시 읽어도 요청의 버전 표시는 바뀌지 않습니다."},
+   {"answer": "서버 포트를 다른 번호로 바꿨는지", "correct": false, "feedback": "포트는 연결 주소일 뿐입니다. 버전을 밝히는 것과 관계가 없습니다."},
+   {"answer": "요청에 `A2A-Version` 헤더를 넣었는지", "correct": true, "feedback": "클라이언트는 `A2A-Version` 헤더로 SDK 1.x 요청임을 밝힙니다. 헤더가 없으면 서버가 예전(0.3) 버전으로 여겨 거부합니다."}
   ]
  },
  "q42": {
-  "question": "SendMessageRequest에서 사용자 입력 텍스트를 담는 곳은?",
+  "question": "Researcher에게 \"반도체 공정의 AI 활용 사례\"라는 질문을 보내고 답을 받으려 합니다. 질문 글은 어디에 담고, 답 글은 어디서 꺼내나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Agent Card의 description", "correct": false, "feedback": "description은 서버가 자기 Agent를 설명하는 글입니다. 요청 내용이 아닙니다."},
-   {"answer": "A2A-Version 헤더", "correct": false, "feedback": "헤더에는 SDK 1.x 요청이라는 버전 정보를 담습니다."},
-   {"answer": "t.Message의 parts", "correct": true, "feedback": "입력은 t.Message의 parts에 텍스트로 담고, 답도 응답 메시지의 parts에서 꺼냅니다."},
-   {"answer": "EventQueue", "correct": false, "feedback": "EventQueue는 서버가 결과를 발행하는 곳입니다."}
+   {"answer": "질문은 `t.Message`의 `parts`에 담고, 답은 응답 메시지의 `parts`에서 꺼냅니다", "correct": true, "feedback": "요청과 응답이 같은 `t.Message` 형식이라, 글은 양쪽 모두 `parts`에 텍스트로 들어 있습니다."},
+   {"answer": "질문은 `A2A-Version` 헤더에 담고, 답은 Agent Card에서 꺼냅니다", "correct": false, "feedback": "헤더에는 버전 정보만 담고, 카드는 Agent 소개입니다. 질문과 답은 메시지에 있습니다."},
+   {"answer": "질문은 Agent Card의 description에 담고, 답은 `parts`에서 꺼냅니다", "correct": false, "feedback": "description은 서버가 자기 Agent를 설명하는 글이라 클라이언트가 쓰지 않습니다."},
+   {"answer": "질문은 `parts`에 담고, 답은 서버 터미널의 출력에서 꺼냅니다", "correct": false, "feedback": "서버 터미널은 서버를 띄운 사람만 봅니다. 클라이언트는 응답 메시지에서 답을 받습니다."}
   ]
  },
  "final": [
@@ -126,23 +126,23 @@
    ]
   },
   {
-   "question": "A2A 서버의 요소 중 요청을 실제 Agent 실행으로 잇는 것은?",
+   "question": "이미 만든 LangGraph Agent를 A2A 서버로 내놓으려 합니다. 요청 글을 읽어 그 Agent를 `ainvoke`로 실행하는 코드는 어디에 쓰나요?",
    "type": "multiple_choice",
    "answers": [
-    {"answer": "AgentCard", "correct": false, "feedback": "AgentCard는 Agent의 능력과 연결 정보를 알리는 메타데이터입니다."},
-    {"answer": "RequestHandler", "correct": false, "feedback": "RequestHandler는 라우팅 계층과 실행 계층을 잇습니다. 실제 실행은 여기에 연결한 AgentExecutor가 합니다."},
-    {"answer": "AgentExecutor", "correct": true, "feedback": "입력을 읽고, 내부 LangGraph Agent를 실행하고, 결과를 발행합니다."},
-    {"answer": "A2ACardResolver", "correct": false, "feedback": "A2ACardResolver는 클라이언트 쪽에서 Agent Card를 읽는 도구입니다."}
+    {"answer": "AgentExecutor의 `execute`", "correct": true, "feedback": "AgentExecutor가 요청을 실제 Agent 실행으로 잇습니다. 입력을 읽고, Agent를 실행하고, 결과를 발행합니다."},
+    {"answer": "AgentCard", "correct": false, "feedback": "AgentCard는 이름·설명·Skill을 알리는 정보입니다. 코드를 실행하지 않습니다."},
+    {"answer": "RequestHandler", "correct": false, "feedback": "RequestHandler는 요청을 받아 AgentExecutor에게 넘깁니다. 실행 코드는 넘겨받는 쪽에 씁니다."},
+    {"answer": "A2ACardResolver", "correct": false, "feedback": "A2ACardResolver는 클라이언트 쪽에서 카드를 읽는 도구라 서버 코드에 쓰지 않습니다."}
    ]
   },
   {
-   "question": "A2A 클라이언트가 일하는 순서로 알맞은 것은?",
+   "question": "클라이언트 코드에서 `client = BaseClient(card, ...)` 줄이 `card = await resolver.get_agent_card()` 줄보다 위에 있습니다. 실행하면 어떻게 되나요?",
    "type": "multiple_choice",
    "answers": [
-    {"answer": "메시지 전송 → Agent Card 조회 → Client 생성", "correct": false, "feedback": "메시지를 보내려면 Client가 먼저 있어야 하고, Client는 Card를 읽어야 만들 수 있습니다."},
-    {"answer": "Client 생성 → 메시지 전송 → Agent Card 조회", "correct": false, "feedback": "Client는 Card를 바탕으로 만듭니다. Card 조회가 먼저입니다."},
-    {"answer": "Agent Card 조회 → Client 생성 → 메시지 전송", "correct": true, "feedback": "Card를 읽고, 그 정보로 transport와 Client를 만든 뒤, SendMessageRequest를 보냅니다."},
-    {"answer": "Agent Card 조회 → 메시지 전송 → Client 생성", "correct": false, "feedback": "메시지는 Client로 보냅니다. Client를 먼저 만들어야 합니다."}
+    {"answer": "문제없이 메시지가 보내집니다", "correct": false, "feedback": "Client는 카드에 적힌 정보로 만듭니다. 순서가 바뀌면 그대로 돌지 않습니다."},
+    {"answer": "카드를 아직 읽지 않아 Client를 만드는 줄에서 오류가 납니다", "correct": true, "feedback": "클라이언트는 Agent Card 조회 → Client 생성 → 메시지 전송 순서로 일합니다. 카드 없이 Client를 만들 수 없습니다."},
+    {"answer": "서버가 카드를 알아서 먼저 보내 주므로 괜찮습니다", "correct": false, "feedback": "서버는 요청을 받을 때만 응답합니다. 카드는 클라이언트가 먼저 읽으러 가야 합니다."},
+    {"answer": "메시지는 먼저 가고, 카드는 나중에 읽힙니다", "correct": false, "feedback": "Client가 없으면 메시지를 보낼 수 없습니다. 위에서부터 차례로 실행되다가 Client 줄에서 멈춥니다."}
    ]
   }
  ],

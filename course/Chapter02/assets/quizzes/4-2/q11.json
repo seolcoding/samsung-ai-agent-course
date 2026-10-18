@@ -1,27 +1,27 @@
 [
  {
-  "question": "Langfuse가 Trace 단위로 기록하는 것이 **아닌** 것은?",
+  "question": "회사 규정상 Agent의 실행 기록을 외부 클라우드 서비스로 보낼 수 없습니다. 그래도 Langfuse로 Trace를 남기려면 어떻게 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "프롬프트와 모델 호출",
+    "answer": "Langfuse는 클라우드에서만 동작하므로 쓸 수 없다",
     "correct": false,
-    "feedback": "프롬프트와 모델 호출은 Langfuse가 기록하는 대표 항목입니다."
+    "feedback": "Langfuse는 오픈소스라 클라우드 말고 자체 서버에 설치해 쓸 수도 있습니다."
    },
    {
-    "answer": "도구 호출과 오류",
+    "answer": "Trace 대신 print로 출력만 남긴다",
     "correct": false,
-    "feedback": "도구 호출과 오류도 Trace에 기록됩니다."
+    "feedback": "print는 화면에만 남습니다. 단계별 입력·출력·지연시간을 모아 다시 볼 수 없습니다."
    },
    {
-    "answer": "지연시간과 비용",
-    "correct": false,
-    "feedback": "지연시간과 비용도 기록합니다. 어느 단계에서 시간과 돈이 들었는지 볼 수 있습니다."
-   },
-   {
-    "answer": "실행한 PC의 CPU·메모리 사양",
+    "answer": "Docker Compose로 사내 서버에 Langfuse를 설치하고 그 주소로 기록을 보낸다",
     "correct": true,
-    "feedback": "Langfuse는 LLM 애플리케이션의 실행 흐름을 기록합니다. PC 사양은 기록 대상이 아닙니다."
+    "feedback": "Langfuse는 자체 서버에 설치할 수 있습니다. 기록이 회사 밖으로 나가지 않습니다."
+   },
+   {
+    "answer": "OpenAI SDK를 쓰는 코드만 기록되게 바꾼다",
+    "correct": false,
+    "feedback": "어떤 SDK와 연동하는지는 기록이 어디로 가는지와 상관없습니다. 문제는 기록을 받는 서버의 위치입니다."
    }
   ]
  }

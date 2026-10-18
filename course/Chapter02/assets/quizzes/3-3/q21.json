@@ -1,27 +1,27 @@
 [
  {
-  "question": "Agent Card에 담는 내용이 아닌 것은?",
+  "question": "Writer Agent가 Researcher Agent에게 번역도 맡길 수 있는지 알고 싶습니다. Researcher의 Agent Card에서 무엇을 보면 되나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Agent의 이름과 설명",
-    "correct": false,
-    "feedback": "이름과 설명은 Agent Card의 기본 내용입니다."
-   },
-   {
-    "answer": "제공하는 Skill",
-    "correct": false,
-    "feedback": "Skill은 Agent가 제공하는 대표 기능으로, 카드에 담습니다."
-   },
-   {
-    "answer": "입출력 모드와 연결 정보",
-    "correct": false,
-    "feedback": "입출력 모드와 연결 정보도 카드에 함께 적습니다."
-   },
-   {
-    "answer": "내부 LangGraph 코드",
+    "answer": "skills에 적힌 기능 목록",
     "correct": true,
-    "feedback": "카드는 밖에서 보는 자기소개입니다. 내부 구현은 담지 않고, 상대도 몰라도 됩니다."
+    "feedback": "skills에는 Agent가 제공하는 대표 기능이 적혀 있습니다. 번역 기능이 없으면 맡길 상대가 아닙니다."
+   },
+   {
+    "answer": "version 값",
+    "correct": false,
+    "feedback": "version은 카드의 버전입니다. 무엇을 할 수 있는지는 알려 주지 않습니다."
+   },
+   {
+    "answer": "연결 주소(supported_interfaces)",
+    "correct": false,
+    "feedback": "주소는 어디로 보낼지를 알려 줍니다. 무엇을 맡길 수 있는지는 skills를 봅니다."
+   },
+   {
+    "answer": "Researcher 안에서 쓰는 LangGraph 노드 이름",
+    "correct": false,
+    "feedback": "카드에는 내부 구현을 담지 않습니다. 밖에서 보는 자기소개라 노드 이름은 없습니다."
    }
   ]
  }

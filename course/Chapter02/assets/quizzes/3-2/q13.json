@@ -1,27 +1,27 @@
 [
  {
-  "question": "\"Host 안에서 MCP Server와 통신하는 연결 계층\"은 무엇인가요?",
+  "question": "실습에서 노트북의 Agent가 `MultiServerMCPClient` 객체로 터미널에 켜 둔 서버에 접속합니다. 이 객체는 Server, Host, Client 중 무엇인가요?",
   "type": "multiple_choice",
   "answers": [
    {
+    "answer": "Client",
+    "correct": true,
+    "feedback": "Host(노트북의 Agent) 안에서 Server와 주고받는 연결 계층이 Client입니다. 연결 오류가 나면 이 객체의 설정과 서버가 켜져 있는지를 봅니다."
+   },
+   {
     "answer": "Server",
     "correct": false,
-    "feedback": "Server는 도구, 데이터, 프롬프트를 MCP 형태로 제공하는 쪽입니다."
+    "feedback": "Server는 터미널에 켜 둔 프로그램입니다. 도구를 제공하는 쪽이고, 이 객체는 그 서버에 접속하는 쪽입니다."
    },
    {
     "answer": "Host",
     "correct": false,
-    "feedback": "Host는 사용자가 실제로 쓰는 LLM 애플리케이션입니다. 연결 계층은 그 안에 있습니다."
+    "feedback": "Host는 사용자가 쓰는 LLM 애플리케이션, 여기서는 노트북에서 만든 Agent 전체입니다. 이 객체는 그 안에 들어 있는 한 부분입니다."
    },
    {
-    "answer": "Prompt",
+    "answer": "Tool",
     "correct": false,
-    "feedback": "Prompt는 Server가 제공하는 기능(Primitive) 중 하나입니다."
-   },
-   {
-    "answer": "Client",
-    "correct": true,
-    "feedback": "Client는 Host 안에 있으면서 Server와 통신합니다."
+    "feedback": "Tool은 서버가 제공하는 기능 하나입니다. 이 객체는 도구를 가져오는 연결 통로입니다."
    }
   ]
  }

@@ -1,27 +1,27 @@
 [
  {
-  "question": "SKILL.md에서 \"품질 기준과 확인 방법\"을 적는 항목은?",
+  "question": "SKILL.md에 \"보고서가 [SDS-AI-RPT v2.1] 헤더로 시작하고 요약이 세 줄인지 확인한다\"를 넣으려 합니다. 어느 항목에 적나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Verification",
-    "correct": true,
-    "feedback": "수행 정보의 Verification에 품질 기준과 확인 방법을 적습니다."
-   },
-   {
-    "answer": "Description",
+    "answer": "Workflow",
     "correct": false,
-    "feedback": "Description은 해결하는 문제와 범위를 적습니다."
+    "feedback": "Workflow는 실제 작업 순서입니다. 다 쓴 결과를 판단하는 기준은 따로 둡니다."
    },
    {
     "answer": "Constraints",
     "correct": false,
-    "feedback": "Constraints는 금지 행동과 안전 규칙을 적습니다."
+    "feedback": "Constraints는 금지 행동과 안전 규칙입니다."
+   },
+   {
+    "answer": "Verification",
+    "correct": true,
+    "feedback": "결과가 맞는지 판단할 품질 기준과 확인 방법은 Verification에 적습니다."
    },
    {
     "answer": "Examples",
     "correct": false,
-    "feedback": "Examples는 입력과 기대 결과를 적습니다."
+    "feedback": "Examples는 입력과 기대 결과의 예시입니다. 확인 기준 자체는 아닙니다."
    }
   ]
  }

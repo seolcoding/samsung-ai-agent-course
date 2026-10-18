@@ -1,79 +1,79 @@
 [
  {
-  "question": "\"모델이 참고할 정보, 규칙, 예시, 이전 상태를 구성한다\"는 어느 엔지니어링의 초점인가요?",
+  "question": "단일 Agent로 만든 보고서 봇이 가끔 출처를 지어냅니다. 다음 단계로 알맞은 것은?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Context Engineering",
+    "answer": "Agent를 세 개로 늘려 서로 검토하게 한다",
+    "correct": false,
+    "feedback": "원인을 보기 전에 구조부터 늘리면 비용만 늘고 나아졌는지 알기 어렵습니다."
+   },
+   {
+    "answer": "실행 기록을 보고 어느 단계에서 지어내는지 찾은 뒤, 그 지점에 검증을 더한다",
     "correct": true,
-    "feedback": "정보 설계입니다."
+    "feedback": "단순한 구조로 시작하고, 실패 지점을 관찰하며 필요한 만큼만 넓힙니다."
    },
    {
-    "answer": "Prompt Engineering",
+    "answer": "새 프레임워크로 처음부터 다시 만든다",
     "correct": false,
-    "feedback": "Prompt Engineering은 질문을 어떤 표현으로 던질지 설계합니다."
+    "feedback": "실패 지점을 모르면 새로 만들어도 같은 문제가 남을 수 있습니다."
    },
    {
-    "answer": "Harness Engineering",
+    "answer": "지어내지 말라는 문장을 프롬프트에 여러 번 반복한다",
     "correct": false,
-    "feedback": "Harness Engineering은 AI가 목표를 수행하고 검증하며 상태를 이어 가는 실행 환경을 만듭니다."
-   },
-   {
-    "answer": "Data Engineering",
-    "correct": false,
-    "feedback": "슬라이드의 세 가지 엔지니어링에 없습니다."
+    "feedback": "부탁을 되풀이해도 확인하는 단계가 생기지 않습니다."
    }
   ]
  },
  {
-  "question": "여러 자료를 탐색하며 새 정보에 따라 계획을 바꿔야 하는 리서치에 알맞은 구조와 그 이유는?",
+  "question": "SKILL.md를 붙인 보고서 Agent가 \"파이썬으로 퀵소트 코드를 짜줘\" 요청에도 코드를 써 줍니다. 무엇을 고치나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Agent. 다음 행동을 미리 알기 어렵고 관찰 결과에 따라 계획을 바꿔야 한다",
+    "answer": "`checkpointer`를 다른 것으로 바꾼다",
+    "correct": false,
+    "feedback": "`checkpointer`는 대화 상태를 기억할 뿐 요청을 막지 않습니다."
+   },
+   {
+    "answer": "`tools`에서 검색 도구를 뺀다",
+    "correct": false,
+    "feedback": "코드는 도구 없이도 쓸 수 있습니다. 범위 밖 요청을 막는 규칙이 필요합니다."
+   },
+   {
+    "answer": "SKILL.md 본문에 보고서 양식을 더 자세히 적는다",
+    "correct": false,
+    "feedback": "스킬은 보고서 요청을 어떻게 처리할지만 알려 줍니다. 관계없는 요청은 막지 않습니다."
+   },
+   {
+    "answer": "`system_prompt`에 보고서 범위 밖 요청은 거절하라고 적는다",
     "correct": true,
-    "feedback": "실행 경로를 모델이 상황에 따라 정하는 Agent가 알맞습니다."
-   },
-   {
-    "answer": "Workflow. 실행 순서가 분명하다",
-    "correct": false,
-    "feedback": "탐색하는 리서치는 순서를 미리 정하기 어렵습니다."
-   },
-   {
-    "answer": "Workflow. 재현성과 테스트 가능성이 가장 중요하다",
-    "correct": false,
-    "feedback": "재현성이 중요한 일은 Workflow에 맞지만, 이 일은 계획을 바꿔야 한다는 점이 핵심입니다."
-   },
-   {
-    "answer": "Agent. 구조가 복잡할수록 결과가 좋다",
-    "correct": false,
-    "feedback": "Agent를 고르는 이유가 틀렸습니다. 하네스는 복잡해야 좋은 것이 아니라 충분해야 좋습니다."
+    "feedback": "목표와 금지 행동은 시스템 프롬프트로 정합니다. Skill은 특정 작업의 절차일 뿐입니다."
    }
   ]
  },
  {
-  "question": "SKILL.md의 \"When to use\"에 적는 것은?",
+  "question": "SKILL.md에 \"완성한 요약을 저장한다\"라고만 적었더니 Agent가 실행할 때마다 다른 곳에 다른 이름으로 저장합니다. 어떻게 고치나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "이 Skill을 적용해야 하는 상황",
+    "answer": "저장할 폴더와 파일 이름을 구체적으로 적는다",
     "correct": true,
-    "feedback": "상단 정보의 When to use입니다. 작성 순서의 \"조건\" 단계에서 쓰지 않을 때도 함께 나눕니다."
+    "feedback": "필요한 파일, 도구, 명령, 출력 위치를 분명히 적어야 Agent가 매번 같은 곳에 결과를 냅니다."
    },
    {
-    "answer": "실제 작업 순서",
+    "answer": "description을 더 넓게 적는다",
     "correct": false,
-    "feedback": "작업 순서는 Workflow에 적습니다."
+    "feedback": "description은 언제 쓰는지를 정합니다. 저장 위치 문제와 관계가 없습니다."
    },
    {
-    "answer": "금지 행동과 안전 규칙",
+    "answer": "저장하지 말라고 적는다",
     "correct": false,
-    "feedback": "금지 행동은 Constraints에 적습니다."
+    "feedback": "결과를 남겨야 하는 일이라면 저장을 막는 것이 아니라 위치를 정해 줍니다."
    },
    {
-    "answer": "입력과 기대 결과",
+    "answer": "Examples에 요약 예시를 하나 더 넣는다",
     "correct": false,
-    "feedback": "입력과 기대 결과는 Examples에 적습니다."
+    "feedback": "예시가 늘어도 저장 위치를 적지 않으면 Agent가 매번 따로 정합니다."
    }
   ]
  }

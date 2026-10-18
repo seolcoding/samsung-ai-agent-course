@@ -1,79 +1,79 @@
 [
  {
-  "question": "RAG 파이프라인에서 체인 밖에 직접 만든 검색 함수가 있습니다. 이 함수의 실행을 LLM 호출과 같은 Trace에 넣으려면?",
+  "question": "LangGraph 그래프 `app`을 코드 여러 곳에서 `invoke`합니다. 매번 `config`에 핸들러를 넣다가 한 곳을 빠뜨려 그 실행만 기록이 없었습니다. 빠뜨리지 않으려면?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "검색 함수에 @observe를 붙인다",
+    "answer": "`builder.compile(callbacks=[langfuse_handler])`로 컴파일한다",
+    "correct": false,
+    "feedback": "`compile`은 핸들러를 받지 않아 오류가 납니다."
+   },
+   {
+    "answer": "핸들러를 파일 맨 위에 만들어 두기만 한다",
+    "correct": false,
+    "feedback": "만들어 두기만 해서는 그래프와 연결되지 않습니다."
+   },
+   {
+    "answer": "`invoke`할 때마다 핸들러를 넘겼는지 눈으로 확인한다",
+    "correct": false,
+    "feedback": "확인을 늘려도 빠뜨리는 일은 생깁니다. 기본 설정으로 붙이면 넘길 필요가 없습니다."
+   },
+   {
+    "answer": "`app = builder.compile().with_config({\"callbacks\": [langfuse_handler]})`로 붙여 둔다",
     "correct": true,
-    "feedback": "체인 밖의 일반 Python 함수는 @observe로 기록합니다."
-   },
-   {
-    "answer": "체인에 CallbackHandler를 넘긴다",
-    "correct": false,
-    "feedback": "CallbackHandler는 체인 안의 실행만 모읍니다. 체인 밖의 검색 함수는 보이지 않습니다."
-   },
-   {
-    "answer": "검색 결과를 print로 출력한다",
-    "correct": false,
-    "feedback": "print는 화면에만 나옵니다. Trace에는 남지 않습니다."
-   },
-   {
-    "answer": "LLM-as-a-Judge로 검색 결과를 평가한다",
-    "correct": false,
-    "feedback": "Judge는 품질 점수를 매기는 방법입니다. 실행을 기록하는 도구가 아닙니다."
+    "feedback": "`with_config`로 기본 설정을 만들어 두면 이후 `invoke`에 아무것도 넘기지 않아도 모든 실행이 기록됩니다."
    }
   ]
  },
  {
-  "question": "\"답변에 예시가 들어 있는가\"를 매번 같은 기준으로, 빠르고 싸게 평가하려면?",
+  "question": "답변을 두 가지로 채점하려 합니다. ① 출처 줄이 들어 있는가 ② 질문에 맞는 내용인가. 어떻게 나누는 것이 알맞나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "LLM-as-a-Judge",
-    "correct": false,
-    "feedback": "Judge도 할 수 있지만 호출마다 비용이 들고 점수가 흔들릴 수 있습니다. 키워드로 판단할 수 있는 조건은 규칙이 알맞습니다."
-   },
-   {
-    "answer": "Rule-based Evaluation",
+    "answer": "①은 규칙으로, ②는 LLM Judge로",
     "correct": true,
-    "feedback": "코드로 명확히 판단할 수 있는 조건이라 규칙 기반 평가가 알맞습니다. 빠르고 저렴하며 재현성이 높습니다."
+    "feedback": "글자가 있는지는 코드로 빠르고 늘 같게 판단합니다. 질문에 맞는지는 정성적 판단이라 Judge에 맡깁니다."
    },
    {
-    "answer": "Trace만 확인한다",
+    "answer": "둘 다 LLM Judge로",
     "correct": false,
-    "feedback": "Trace만으로는 품질을 알 수 없습니다. 점수를 남겨야 합니다."
+    "feedback": "②에는 맞지만, ①까지 Judge로 하면 호출마다 비용이 들고 점수가 흔들릴 수 있습니다."
    },
    {
-    "answer": "@observe를 붙인다",
+    "answer": "둘 다 규칙으로",
     "correct": false,
-    "feedback": "@observe는 실행을 기록합니다. 품질을 평가하지 않습니다."
+    "feedback": "②는 키워드로 판단하기 어렵습니다. 낱말이 겹쳐도 엉뚱한 답일 수 있습니다."
+   },
+   {
+    "answer": "①은 LLM Judge로, ②는 규칙으로",
+    "correct": false,
+    "feedback": "반대로 나눴습니다. 코드로 판단할 수 있는 쪽이 ①입니다."
    }
   ]
  },
  {
-  "question": "Trace와 Score가 각각 남기는 것을 바르게 짝지은 것은?",
+  "question": "Langfuse Scores 화면에서 `user-feedback`이 0.0(싫어요)인 답변을 찾았습니다. 왜 나쁜 답이 나왔는지 알려면 다음에 무엇을 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Trace: 답변 품질 점수 / Score: 실행 단계 기록",
+    "answer": "점수를 1.0으로 고쳐 다시 남긴다",
     "correct": false,
-    "feedback": "반대입니다."
+    "feedback": "점수를 바꿔도 나쁜 답이 나온 원인은 그대로입니다."
    },
    {
-    "answer": "Trace: 모델의 학습 데이터 / Score: 모델 크기",
+    "answer": "같은 질문을 다시 물어 보고 답이 괜찮으면 넘어간다",
     "correct": false,
-    "feedback": "둘 다 모델 자체가 아니라 내 애플리케이션의 실행과 결과에 대한 기록입니다."
+    "feedback": "다시 실행하면 경로가 달라질 수 있어, 그때 무슨 일이 있었는지 알 수 없습니다."
    },
    {
-    "answer": "Trace: 실행 과정의 단계별 기록 / Score: 그 실행 결과의 품질 점수",
+    "answer": "그 점수가 붙은 Trace를 열어 단계별 입력·출력을 따라간다",
     "correct": true,
-    "feedback": "Observability는 실행 기록을, Evaluation은 결과 품질을 남깁니다."
+    "feedback": "점수는 실행 기록(Trace)에 붙어 있습니다. 그 실행의 프롬프트, 검색 결과, 도구 호출을 차례로 보면 원인을 가를 수 있습니다."
    },
    {
-    "answer": "Trace와 Score는 같은 것이다",
+    "answer": "LLM Judge 점수를 하나 더 남긴다",
     "correct": false,
-    "feedback": "Trace는 실행 기록, Score는 품질 점수입니다. 점수는 Trace에 붙여 남깁니다."
+    "feedback": "점수가 늘어도 원인은 보이지 않습니다. 원인은 실행 기록에 있습니다."
    }
   ]
  }

@@ -1,27 +1,27 @@
 [
  {
-  "question": "AgentExecutor가 내부 Agent를 실행한 뒤 결과를 발행하는 곳은?",
+  "question": "`execute` 안에서 내부 Agent를 실행해 답 글 `answer`를 만들었습니다. 이 답이 클라이언트에게 가려면 어떻게 해야 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "RequestContext",
+    "answer": "`return answer`로 돌려줍니다",
     "correct": false,
-    "feedback": "RequestContext는 사용자 입력과 task/context id를 읽어 오는 곳입니다."
+    "feedback": "`execute`가 돌려주는 값은 클라이언트에게 가지 않습니다. 결과는 EventQueue에 발행합니다."
    },
    {
-    "answer": "EventQueue",
+    "answer": "`print(answer)`로 출력합니다",
+    "correct": false,
+    "feedback": "print는 서버 터미널에만 찍힙니다. 클라이언트는 받지 못합니다."
+   },
+   {
+    "answer": "`t.Message`로 감싸 `event_queue`에 발행합니다",
     "correct": true,
-    "feedback": "결과를 t.Message로 감싸 EventQueue에 발행합니다."
+    "feedback": "AgentExecutor는 결과를 `t.Message`에 담아 EventQueue에 발행하고, 그 메시지가 클라이언트에게 갑니다."
    },
    {
-    "answer": "Agent Card",
+    "answer": "Agent Card의 description에 넣습니다",
     "correct": false,
-    "feedback": "Agent Card는 Agent를 소개하는 정보입니다. 실행 결과를 담지 않습니다."
-   },
-   {
-    "answer": "task_store",
-    "correct": false,
-    "feedback": "task_store는 RequestHandler가 작업 상태를 관리할 때 씁니다. AgentExecutor는 결과를 EventQueue에 발행합니다."
+    "feedback": "카드는 Agent를 소개하는 정보라 요청마다 바뀌는 답을 담지 않습니다."
    }
   ]
  }

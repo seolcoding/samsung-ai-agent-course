@@ -1,27 +1,27 @@
 [
  {
-  "question": "LLM Judge의 평가 점수는 어디에 저장하나요?",
+  "question": "보고서는 나왔는데 Researcher가 어떤 도구를 몇 번 썼는지, 어느 단계에서 오래 걸렸는지 알고 싶습니다. 어디를 보나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Writer의 Skill 파일",
+    "answer": "최종 보고서 본문",
     "correct": false,
-    "feedback": "Skill 파일은 Writer가 읽는 규칙 문서입니다. 점수를 저장하지 않습니다."
+    "feedback": "보고서는 결과만 담습니다. 실행 과정은 보이지 않습니다."
    },
    {
-    "answer": "MCP 서버의 `data` 경로",
+    "answer": "LLM Judge의 평균 점수",
     "correct": false,
-    "feedback": "`data` 경로는 Researcher가 읽는 문서가 있는 곳입니다."
+    "feedback": "점수는 품질을 알려 줄 뿐 실행 과정은 담지 않습니다."
    },
    {
-    "answer": "Langfuse Score",
+    "answer": "Langfuse에 남은 Researcher 실행 Trace",
     "correct": true,
-    "feedback": "평가 점수를 Langfuse Score로 저장하고, 평가 과정은 별도 Trace로 남깁니다."
+    "feedback": "Trace에는 모델·도구 호출이 단계별로 남아 도구 호출 횟수와 단계별 시간을 볼 수 있습니다."
    },
    {
-    "answer": "MemorySaver",
+    "answer": "Researcher Skill 파일",
     "correct": false,
-    "feedback": "MemorySaver는 Agent별 실행 상태를 유지합니다. 평가 점수는 Langfuse Score에 저장합니다."
+    "feedback": "Skill 파일은 도구를 쓰는 순서를 정한 규칙입니다. 실제로 어떻게 실행되었는지는 실행 기록이 보여 줍니다."
    }
   ]
  }

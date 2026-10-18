@@ -1,27 +1,27 @@
 [
  {
-  "question": "응답 품질을 수치로 나타내는 것은?",
+  "question": "프롬프트를 고친 뒤 답이 정말 나아졌는지 질문 20개로 비교하려 합니다. 무엇을 남겨 비교하나요?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "Trace",
     "correct": false,
-    "feedback": "Trace는 모델 호출·도구 실행·체인 흐름을 확인하는 기록입니다."
+    "feedback": "Trace는 실행 과정을 보여 주지만, 품질을 숫자로 비교하려면 따로 매긴 값이 필요합니다."
    },
    {
-    "answer": "Score",
-    "correct": true,
-    "feedback": "Score가 응답 품질을 수치로 나타냅니다."
-   },
-   {
-    "answer": "Subgraph",
+    "answer": "Persistence",
     "correct": false,
-    "feedback": "Subgraph는 LangGraph에서 그래프를 모듈로 나누는 기능입니다."
+    "feedback": "Persistence는 그래프 상태를 저장하는 기능입니다. 품질을 재지 않습니다."
    },
    {
     "answer": "Memory Store",
     "correct": false,
-    "feedback": "Memory Store는 장기 기억을 관리하는 기능입니다."
+    "feedback": "Memory Store는 장기 기억을 두는 곳입니다. 응답 평가와는 관계없습니다."
+   },
+   {
+    "answer": "Score",
+    "correct": true,
+    "feedback": "응답마다 품질 점수를 매겨 두면 고치기 전과 후를 숫자로 비교할 수 있습니다."
    }
   ]
  }

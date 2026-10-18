@@ -1,27 +1,27 @@
 [
  {
-  "question": "캡스톤에서 `FilesystemBackend`가 맡는 역할은?",
+  "question": "Researcher Skill 파일을 디스크의 skills 폴더에 써 두었습니다. `create_deep_agent`로 만든 Agent가 이 파일을 읽게 하려면 무엇을 함께 넘기나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Agent가 Skill 파일에 접근하게 합니다",
+    "answer": "MemorySaver",
+    "correct": false,
+    "feedback": "MemorySaver는 실행 상태를 유지합니다. 디스크의 파일을 읽게 하지는 않습니다."
+   },
+   {
+    "answer": "FilesystemBackend",
     "correct": true,
-    "feedback": "`FilesystemBackend`로 Researcher와 Writer가 각자의 Skill 파일을 읽습니다."
+    "feedback": "`FilesystemBackend`를 넘기면 Agent가 디스크에 있는 Skill 파일에 접근합니다."
    },
    {
-    "answer": "사용자의 승인 입력을 받습니다",
+    "answer": "Langfuse CallbackHandler",
     "correct": false,
-    "feedback": "승인은 Human-in-the-loop 단계에서 받습니다. `FilesystemBackend`는 파일 접근을 맡습니다."
+    "feedback": "CallbackHandler는 실행을 기록합니다. 파일 접근은 맡지 않습니다."
    },
    {
-    "answer": "평가 점수를 Langfuse에 저장합니다",
+    "answer": "Human-in-the-loop 승인",
     "correct": false,
-    "feedback": "점수 저장은 Langfuse Score가 맡습니다."
-   },
-   {
-    "answer": "다음에 실행할 Agent를 고릅니다",
-    "correct": false,
-    "feedback": "다음 차례는 Supervisor가 정합니다."
+    "feedback": "승인은 Writer 실행 전에 사람이 멈추는 구조입니다. 파일을 읽는 일과는 관계가 없습니다."
    }
   ]
  }

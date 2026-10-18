@@ -1,27 +1,27 @@
 [
  {
-  "question": "LangGraph 심화에서 장기 기억을 관리하는 기능은?",
+  "question": "어제 대화에서 사용자가 \"답은 짧게\"라고 했습니다. 오늘 새 대화를 열어도 이 선호를 기억하게 하려면 무엇을 쓰나요?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "Subgraph",
     "correct": false,
-    "feedback": "Subgraph는 그래프를 모듈로 나누는 기능입니다."
+    "feedback": "Subgraph는 그래프를 모듈로 나눌 뿐, 대화 사이의 기억을 맡지 않습니다."
    },
    {
     "answer": "Persistence",
     "correct": false,
-    "feedback": "Persistence는 상태를 저장해 이어서 실행하게 합니다. 장기 기억은 따로 관리합니다."
-   },
-   {
-    "answer": "Parallel Execution",
-    "correct": false,
-    "feedback": "Parallel Execution은 병렬 처리입니다."
+    "feedback": "Persistence는 한 대화(thread)의 상태를 저장해 이어서 실행하게 합니다. 새 대화에는 그 상태가 따라오지 않습니다."
    },
    {
     "answer": "Memory Store",
     "correct": true,
-    "feedback": "Memory Store가 장기 기억을 관리합니다."
+    "feedback": "Memory Store는 대화가 바뀌어도 남는 장기 기억을 둡니다. 사용자 선호가 대표적인 예입니다."
+   },
+   {
+    "answer": "Parallel Execution",
+    "correct": false,
+    "feedback": "여러 일을 동시에 처리하는 구조입니다. 기억과는 관계없습니다."
    }
   ]
  }

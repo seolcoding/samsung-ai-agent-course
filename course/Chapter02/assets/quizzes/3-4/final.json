@@ -1,79 +1,79 @@
 [
  {
-  "question": "같은 대화 안에서 사용자가 앞에서 한 말을 이어받아 답하게 하는 것은 무엇이 맡나요?",
+  "question": "대화 중 세 번째 답부터 흐름이 잘못되었습니다. 처음부터 다시 하지 않고 두 번째 답 직후로 돌아가 다시 실행하려면 어떻게 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "같은 thread_id로 호출하고 Checkpointer를 붙인 그래프",
+    "answer": "새 `thread_id`로 첫 질문부터 다시 보낸다",
+    "correct": false,
+    "feedback": "새 thread는 빈 상태에서 시작합니다. 돌아가는 것이 아니라 처음부터 다시 하는 것입니다."
+   },
+   {
+    "answer": "Memory Store에서 세 번째 답을 지운다",
+    "correct": false,
+    "feedback": "대화 흐름은 Store가 아니라 Checkpointer가 저장합니다. Store를 지워도 대화 상태는 그대로입니다."
+   },
+   {
+    "answer": "`Send`로 두 번째 질문을 worker에 다시 보낸다",
+    "correct": false,
+    "feedback": "Send는 작업을 병렬로 나누는 API입니다. 지난 시점으로 돌아가는 기능이 아닙니다."
+   },
+   {
+    "answer": "Checkpointer의 실행 이력에서 두 번째 답 직후의 체크포인트를 골라 거기서 다시 실행한다",
     "correct": true,
-    "feedback": "Checkpointer가 thread별로 State를 저장하므로, 같은 thread_id로 부르면 앞 메시지를 이어받습니다."
-   },
-   {
-    "answer": "Memory Store의 namespace",
-    "correct": false,
-    "feedback": "namespace는 장기 기억을 사용자·조직별로 나누는 이름입니다. 한 대화의 흐름은 Checkpointer가 잇습니다."
-   },
-   {
-    "answer": "Send로 만든 Worker",
-    "correct": false,
-    "feedback": "Send는 작업을 병렬로 나누는 API입니다. 대화 기록과는 관계가 없습니다."
-   },
-   {
-    "answer": "Subgraph",
-    "correct": false,
-    "feedback": "Subgraph는 흐름을 기능 단위로 나누는 구조입니다. 앞 대화를 저장하지 않습니다."
+    "feedback": "Checkpointer는 단계마다 체크포인트를 남깁니다. 이력에서 그 시점을 골라 실행하면 그 뒤부터 다시 이어집니다."
    }
   ]
  },
  {
-  "question": "Memory Store에서 namespace의 역할은?",
+  "question": "Memory Store에 사용자 기억을 저장했더니, 사용자 A의 취미가 사용자 B와의 대화에서도 나옵니다. 무엇부터 확인하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "체크포인트가 저장되는 파일 이름을 정한다",
-    "correct": false,
-    "feedback": "파일에 저장하는 것은 SqliteSaver입니다. namespace는 Store 안의 기억을 나누는 이름입니다."
-   },
-   {
-    "answer": "사용자, 조직, 프로젝트별로 기억을 나눈다",
+    "answer": "namespace에 사용자를 구분하는 값(`(\"memories\", user_id)`)을 넣었는지",
     "correct": true,
-    "feedback": "`(\"memories\", user_id)`처럼 namespace를 정하면 사용자마다 자기 기억만 찾고 저장합니다."
+    "feedback": "Store의 기억은 namespace로 나뉩니다. 모든 사용자가 같은 namespace에 저장하면 서로의 기억을 찾게 됩니다."
    },
    {
-    "answer": "병렬로 실행할 Worker 수를 정한다",
+    "answer": "사용자마다 `thread_id`를 다르게 주었는지",
     "correct": false,
-    "feedback": "Worker 수는 Send 목록의 길이로 정해집니다."
+    "feedback": "Store는 thread를 넘어 공유됩니다. `thread_id`를 바꿔도 같은 namespace를 쓰면 같은 기억이 나옵니다."
    },
    {
-    "answer": "대화 하나의 흐름을 구분한다",
+    "answer": "체크포인터를 MemorySaver에서 SqliteSaver로 바꿨는지",
     "correct": false,
-    "feedback": "대화 하나의 흐름은 Checkpointer의 thread_id로 구분합니다."
+    "feedback": "체크포인터는 대화 흐름을 저장하는 곳입니다. Store에 저장된 기억이 섞이는 문제와는 관계가 없습니다."
+   },
+   {
+    "answer": "그래프를 Subgraph로 나눴는지",
+    "correct": false,
+    "feedback": "Subgraph는 흐름을 기능 단위로 나누는 구조입니다. 누구의 기억인지 나누는 일은 하지 않습니다."
    }
   ]
  },
  {
-  "question": "여러 분기나 Worker의 결과를 State의 한 필드에 모으려면 무엇이 필요한가요?",
+  "question": "Send로 worker 세 개를 동시에 돌렸더니 `InvalidUpdateError: At key 'results': Can receive only one value per step`가 납니다. 무엇을 고치나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "결과를 어떻게 합칠지 정한 병합 규칙(Annotated reducer 등)",
+    "answer": "worker마다 다른 `thread_id`를 준다",
+    "correct": false,
+    "feedback": "`thread_id`는 Checkpointer가 대화 흐름을 나누는 이름입니다. 같은 필드에 값이 여러 개 들어오는 문제와는 관계가 없습니다."
+   },
+   {
+    "answer": "worker 수를 하나로 줄인다",
+    "correct": false,
+    "feedback": "오류는 사라지지만 병렬 실행을 포기하는 것입니다. 질문 수만큼 worker를 만들려던 목적이 없어집니다."
+   },
+   {
+    "answer": "State의 `results`에 두 목록을 이어 붙이는 병합 규칙(`Annotated` reducer)을 붙인다",
     "correct": true,
-    "feedback": "여러 곳에서 같은 필드에 쓰므로, 이어 붙일지 덮어쓸지 규칙을 정해야 결과가 모두 남습니다."
+    "feedback": "여러 worker가 한 단계에서 같은 필드에 쓰므로, 값을 어떻게 합칠지 규칙이 있어야 결과가 모두 남습니다."
    },
    {
-    "answer": "Worker마다 다른 thread_id",
+    "answer": "체크포인터를 SqliteSaver로 바꾼다",
     "correct": false,
-    "feedback": "thread_id는 Checkpointer가 대화 흐름을 나누는 이름입니다. 결과를 합치는 규칙과는 관계가 없습니다."
-   },
-   {
-    "answer": "SqliteSaver",
-    "correct": false,
-    "feedback": "SqliteSaver는 State를 파일에 저장할 뿐, 여러 결과를 합치는 방법을 정하지 않습니다."
-   },
-   {
-    "answer": "더 큰 Context Window를 가진 모델",
-    "correct": false,
-    "feedback": "모델의 크기와 관계없이, 같은 필드에 여러 결과가 들어올 때의 규칙은 State에서 정합니다."
+    "feedback": "저장 위치를 바꿔도 같은 필드에 여러 값이 들어올 때의 규칙은 생기지 않습니다."
    }
   ]
  }

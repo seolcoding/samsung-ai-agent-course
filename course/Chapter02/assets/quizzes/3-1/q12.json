@@ -1,27 +1,27 @@
 [
  {
-  "question": "슬라이드가 설명한 RAG의 단계가 아닌 것은?",
+  "question": "약관 챗봇이 약관과 상관없는 일반론만 답합니다. RAG의 어느 부분부터 확인하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "문서를 쪼개 의미를 비교할 수 있는 형태로 바꾸기",
+    "answer": "약관 내용으로 모델을 다시 학습시킨다",
     "correct": false,
-    "feedback": "RAG의 첫 단계입니다. 쪼갠 문서를 벡터로 바꿔 두어야 검색할 수 있습니다."
+    "feedback": "RAG는 모델을 다시 학습시키지 않습니다. 찾은 문서를 질문과 함께 넣는 방식입니다."
    },
    {
-    "answer": "질문과 가장 관련이 높은 문서 검색하기",
-    "correct": false,
-    "feedback": "RAG의 두 번째 단계입니다."
-   },
-   {
-    "answer": "답변을 만들 때 검색한 문서 내용 더하기",
-    "correct": false,
-    "feedback": "RAG의 세 번째 단계입니다."
-   },
-   {
-    "answer": "문서 내용으로 모델을 다시 학습시키기",
+    "answer": "질문과 관련된 약관 조각이 실제로 검색되었는지 본다",
     "correct": true,
-    "feedback": "RAG는 모델을 다시 학습시키지 않습니다. 검색한 문서를 질문과 함께 넣어 답변하게 합니다."
+    "feedback": "검색된 조각이 엉뚱하면 모델은 근거 없이 답합니다. 답변 단계보다 검색 결과를 먼저 봅니다."
+   },
+   {
+    "answer": "답을 한 번에 받는 `invoke`를 조각으로 받는 `stream`으로 바꾼다",
+    "correct": false,
+    "feedback": "받는 방식만 바뀌고 답의 내용은 그대로입니다."
+   },
+   {
+    "answer": "모델의 temperature를 높인다",
+    "correct": false,
+    "feedback": "답이 더 다양해질 뿐, 약관을 근거로 삼게 되지는 않습니다."
    }
   ]
  }

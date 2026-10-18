@@ -1,27 +1,27 @@
 [
  {
-  "question": "Researcher가 자료를 모으는 경로가 **아닌** 것은?",
+  "question": "보고서에 사내 지식베이스에만 있는 공정 규정을 근거로 넣어야 합니다. Researcher가 어느 경로로 찾아야 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "웹 검색",
     "correct": false,
-    "feedback": "웹 검색은 Researcher의 자료 수집 경로입니다."
+    "feedback": "웹 검색은 공개된 최신 정보를 보완합니다. 사내 지식베이스의 문서는 찾지 못합니다."
    },
    {
-    "answer": "RAGaaS 사내 지식베이스 검색",
+    "answer": "Writer Skill 문서에 규정을 붙여 넣는다",
     "correct": false,
-    "feedback": "RAGaaS는 Researcher가 내부 문서를 찾는 경로입니다."
+    "feedback": "Writer Skill은 보고서 양식 규칙입니다. 자료를 모으는 일은 Researcher가 맡습니다."
    },
    {
-    "answer": "MCP 서버가 제공하는 문서 도구",
+    "answer": "MemorySaver",
     "correct": false,
-    "feedback": "MCP 서버는 `data` 경로의 파일을 Researcher에게 도구로 제공합니다."
+    "feedback": "MemorySaver는 Agent별 실행 상태를 유지합니다. 문서를 검색하지 않습니다."
    },
    {
-    "answer": "Writer가 쓴 보고서 초안",
+    "answer": "RAGaaS 검색",
     "correct": true,
-    "feedback": "초안은 Researcher가 일을 마친 뒤 Writer가 만드는 결과물입니다. Researcher의 자료 수집 경로가 아닙니다."
+    "feedback": "RAGaaS는 사내 지식베이스 검색을 API로 제공합니다. 사내망에서 호출합니다."
    }
   ]
  }

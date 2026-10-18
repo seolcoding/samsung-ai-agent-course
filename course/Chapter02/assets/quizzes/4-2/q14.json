@@ -1,27 +1,27 @@
 [
  {
-  "question": "체인을 실행할 때 CallbackHandler를 넘기는 방법으로 알맞은 것은?",
+  "question": "`langfuse_handler = CallbackHandler()`로 핸들러를 만들고 `chain.invoke({\"question\": q})`를 실행했습니다. 답은 잘 나오는데 Langfuse에 Trace가 없습니다. 어떻게 고치나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "`chain.invoke(입력, config={\"callbacks\": [langfuse_handler]})`",
+    "answer": "핸들러를 한 번 더 만든다",
+    "correct": false,
+    "feedback": "만들기만 해서는 체인과 연결되지 않습니다. 몇 번을 만들어도 같습니다."
+   },
+   {
+    "answer": "`chain.invoke({\"question\": q}, config={\"callbacks\": [langfuse_handler]})`로 실행한다",
     "correct": true,
-    "feedback": "슬라이드의 방법입니다. `config`의 `callbacks` 목록에 핸들러를 넣습니다."
+    "feedback": "핸들러를 `config`의 `callbacks` 목록에 넣어 넘겨야 그 실행이 기록됩니다."
    },
    {
-    "answer": "`chain.invoke(입력, langfuse_handler)`",
+    "answer": "`print(langfuse_handler)`로 핸들러를 확인한다",
     "correct": false,
-    "feedback": "핸들러는 두 번째 인자로 바로 넘기지 않습니다. `config`의 `callbacks`로 넘깁니다."
+    "feedback": "출력해 보는 것은 연결이 아닙니다. 실행할 때 핸들러를 넘겨야 합니다."
    },
    {
-    "answer": "`print(langfuse_handler)`",
+    "answer": "`chain.invoke(langfuse_handler)`처럼 질문 자리에 핸들러를 넣는다",
     "correct": false,
-    "feedback": "출력은 연결이 아닙니다. 실행할 때 핸들러를 넘겨야 기록됩니다."
-   },
-   {
-    "answer": "핸들러를 만들기만 하면 모든 체인이 자동으로 기록된다",
-    "correct": false,
-    "feedback": "만들기만 해서는 연결되지 않습니다. `callbacks`로 넘기거나 `with_config`로 붙여야 합니다."
+    "feedback": "첫 번째 자리는 체인의 입력입니다. 질문이 전달되지 않습니다. 기록 도구는 입력이 아니라 설정으로 넘깁니다."
    }
   ]
  }
