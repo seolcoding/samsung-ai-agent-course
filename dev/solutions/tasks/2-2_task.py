@@ -1,6 +1,7 @@
 """2-2 과제(강사용 정답) · Researcher와 Writer로 나눈 Agent 팀
 
 시작본 course/Chapter01/tasks/2-2_task.py와 ✍️ 두 자리만 다르다.
+✍️ 할 곳  코드의 `# ✍️` 표시 2곳만 채웁니다 (`# ✨` 줄은 AI에게 말할 힌트)
 ▶️ 실행   uv run --env-file .env python dev/solutions/tasks/2-2_task.py
 """
 import inspect

@@ -1,5 +1,6 @@
 """3-1 과제 · 약관 질문에만 검색 도구를 쓰는 Agent
 
+✍️ 할 곳  코드의 `# ✍️` 표시 2곳만 채웁니다 (`# ✨` 줄은 AI에게 말할 힌트)
 ▶️ 실행   uv run --env-file .env python course/Chapter02/tasks/3-1_task.py
 ✅ 확인   실행하면 맨 끝에 🟢/⛔가 나옵니다
 🆘 막히면 오류 메시지 전체를 AI에게 붙여 넣기

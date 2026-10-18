@@ -1,5 +1,6 @@
 """2-3 과제 · 대화가 남는 Streamlit 약관 챗봇
 
+✍️ 할 곳  코드의 `# ✍️` 표시 2곳만 채웁니다 (`# ✨` 줄은 AI에게 말할 힌트)
 ▶️ 실행   uv run --env-file .env python course/Chapter01/tasks/2-3_task.py
 ✅ 확인   질문을 두 번 보낸 뒤 사이드바 "✅ 과제 확인" 버튼
 🆘 막히면 오류 메시지 전체를 AI에게 붙여 넣기

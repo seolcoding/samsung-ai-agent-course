@@ -1,5 +1,6 @@
 """2-1 과제 · 약관 검색 도구를 쓰고 대화를 기억하는 LangGraph 챗봇
 
+✍️ 할 곳  코드의 `# ✍️` 표시 2곳만 채웁니다 (`# ✨` 줄은 AI에게 말할 힌트)
 ▶️ 실행   uv run --env-file .env python course/Chapter01/tasks/2-1_task.py
 ✅ 확인   사이드바 "✅ 과제 확인" 버튼
 🆘 막히면 오류 메시지 전체를 AI에게 붙여 넣기
