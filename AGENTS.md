@@ -95,7 +95,7 @@ dev/                       ← 강사·개발용. 전달하지 않는다
   release.sh               main에서 수강생용 브랜치 study와 전달 zip 만들기
   work/                    실습 작업 복사본(Git 제외, 필요할 때만 만든다). 강사 공부 자료는 저장소 밖 ~/800_Archives/830_Courses/samsung_ds_ai_developer/study_materials/
 .env.sample, pyproject.toml, uv.lock   설치 파일(study에도 들어간다)
-agents_skills.zip          수강생 AI 도우미용 스킬 묶음(.agents/skills를 윈도우에서 풀 수 있게 묶은 것, study에도 들어간다)
+.agents/skills/            프로젝트 스킬(수강생 AI 도우미용 포함, study에도 들어간다)
 README.md                  처음 받은 고객사 담당자용 안내
 ```
 

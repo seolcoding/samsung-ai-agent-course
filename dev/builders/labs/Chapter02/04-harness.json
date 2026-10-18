@@ -164,7 +164,7 @@
    {
     "what": "터미널 과제",
     "readme": "tasks/4-1/README.md",
-    "run": "uv run --env-file .env python course/Chapter02/tasks/4-1/task.py",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/4-1/4-1_task.py",
     "grade": "4-1 과제 채점해 줘"
    }
   ]

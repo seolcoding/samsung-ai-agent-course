@@ -55,7 +55,6 @@ dev (고치고 검사) → main (합치기) → study (dev/release.sh가 main에
 | `dev/docs/` | 커리큘럼, 수강생 피드백 정리, 검증 기록 |
 | `dev/materials/` | 커리큘럼 제안서, 인수인계서, 설문 원본 |
 | `pyproject.toml`, `uv.lock`, `.env.sample` | 설치 파일과 연결 설정 견본 |
-| `agents_skills.zip` | 수강생 AI 도우미용 스킬 묶음(`.agents/skills`를 윈도우에서 풀 수 있게 묶은 것) |
 | `AGENTS.md` | 강사와 AI 도우미를 위한 작업 규칙·배경 |
 
 ## 강의장 PC 준비

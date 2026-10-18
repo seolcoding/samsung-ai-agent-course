@@ -2,7 +2,9 @@
 
 노트북 종류는 파일 이름 끝으로 정한다.
     *_LEC.ipynb  강의 노트북: 슬라이드·설명·퀴즈. 실습 코드 도구(run_step 등)는 없어야 한다.
-    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → 예제(`# ✍️ CHANGE_HERE:` 값 바꿔 보기 + 성공 기준)·과제(힌트·성공 기준 → `# ✍️ WRITE_HERE:` 빈칸 셀 → 정답 보기).
+    *_LAB.ipynb  실습 노트북: 원본 코드를 셀로 넣는다. 준비 코드(접힘) → 구획 셀.
+                 값 바꾸기판(M1, 객관식 없음): 완성 코드 + `# ✍️ CHANGE_HERE:` 셀마다 뒤에 접힌 "무슨 일이 생기나".
+                 객관식판(M2): CHOOSE_HERE 보기 셀 → 정답 보기. 예제의 CHANGE_HERE는 같은 장에 🟢 성공 기준.
 수강생은 노트북만 받는다. 그래서 수강생 글에 .py·경로·다른 노트북 이야기가 없어야 한다(노트북 하나로 완결).
 
 실행(프로젝트 루트):
@@ -35,6 +37,8 @@ LAB_FILE_TOOLS = ("make_blank", "run_step", "show_diff", "show_code_map", "show_
 BLANK = "✍"
 BLANK_LINE = re.compile(r"^\s*\.\.\.\s*# ✍")  # 빈칸 줄: `...  # ✍️ 여기를 채웁니다`
 ANSWER_HEAD = "<details><summary>정답 보기</summary>"
+RESULT_HEAD = "<details><summary>무슨 일이 생기나</summary>"  # 값 바꾸기판: 바꿔 본 결과(실제 실행 결과로 쓴다)
+KERNEL = "samsung-ds-course"  # --execute용 커널. 이 가상환경의 파이썬을 가리키는 커널을 가상환경 안에 등록해 쓴다
 TOOL_CELL = re.compile(r"\b(show_\w+|slide_setup|check_env)\(|sys\.path\.insert|find_dotenv\(usecwd=True\)")  # 숨겨야 할 도구 셀
 HINT_HEAD, CRITERIA_HEAD = "**프롬프트 힌트**", "**성공 기준**"
 HINT_MAX_SENTENCES = 3
@@ -238,6 +242,8 @@ def check_student_text(nb, quizzes, R):
         for s in sentences(prose(src)):
             if re.fullmatch(r"\*\*[^*]+\*\*", s):  # "**CodeMate 지시문**" 같은 굵은 이름표는 문장이 아니다
                 continue
+            if s.startswith("**바꿔 볼 값**"):  # 빌더가 CHANGE_HERE마다 붙이는 고정 이름표(값 바꾸기판)
+                continue
             if re.search(r"다\.$", s) and not re.search(r"니다\.$", s):
                 plain.append((i, excerpt(s)))
             if len(s) >= 12 and not re.fullmatch(r"[|\-: ]+", s):  # 표 구분 줄(|---|---|)은 문장이 아니다
@@ -431,6 +437,13 @@ def check_lab(nb, R):
     R("실습", "성공 기준 자동 검사 셀 없음 — 수강생이 스스로 판단한다",
       [(i, excerpt(c.source, 40)) for i, c in enumerate(cells) if c.cell_type == "code" and "show_criteria(" in c.source])
 
+    # 값 바꾸기판(M1, 2026-10-18): 보기(CHOOSE_HERE)·빈칸이 하나도 없는 실습. "무슨 일이 생기나" 상자를 쓴다
+    change_mode = not any(c.cell_type == "code" and ("CHOOSE_HERE" in c.source or any(BLANK_LINE.match(ln) for ln in c.source.splitlines()))
+                          for c in cells) and any(c.cell_type == "markdown" and RESULT_HEAD in c.source for c in cells)
+    if change_mode:
+        R("실습", "값 바꾸기판: 객관식 흔적(보기 고르는 법·🟢/⛔ 성공 기준·정답 보기) 없음",
+          [(i, excerpt(c.source, 40)) for i, c in enumerate(cells) if c.cell_type == "markdown" and not is_box(c)
+           and (ANSWER_HEAD in c.source or CRITERIA_HEAD in c.source or "CHOOSE_HERE" in c.source or "보기를 골" in c.source)])
     syntax, guide_bad, draft, answer_bad, edit_bad = [], [], [], [], []
     for i, c in enumerate(cells):
         if c.cell_type != "code" or BLANK not in c.source or "show_criteria(" in c.source:
@@ -439,6 +452,15 @@ def check_lab(nb, R):
         n_blank = sum(bool(BLANK_LINE.match(ln)) for ln in c.source.splitlines())
         if hidden(c):
             syntax.append((i, "✍️ 셀이 숨겨져 있음 — 수강생이 채우거나 바꿀 셀은 보여야 한다"))
+            continue
+        if not n_blank and change_mode:  # 값 바꾸기판: 셀 뒤(다음 제목 전)에 실행 결과로 쓴 "무슨 일이 생기나"가 있어야 한다
+            box = next((k for k in after if cells[k].cell_type == "markdown" and cells[k].source.lstrip().startswith(RESULT_HEAD)), None)
+            if not any(cells[k].cell_type == "markdown" and "**바꿔 볼 값**" in cells[k].source for k in before):
+                edit_bad.append((i, "CHANGE_HERE 셀 앞(같은 절)에 복사해 붙여 넣을 **바꿔 볼 값**이 없음"))
+            if box is None:
+                edit_bad.append((i, "CHANGE_HERE 셀 뒤(다음 제목 전)에 접힌 \"무슨 일이 생기나\"가 없음"))
+            elif TODO_PLACEHOLDER in cells[box].source:
+                edit_bad.append((box, "\"무슨 일이 생기나\"가 아직 (작성 예정) — 바꿔 실행한 결과로 쓴다"))
             continue
         if not n_blank:  # 예제: 값만 바꿔 보는 셀. 같은 장 안에 🟢 성공 기준 글이 있어야 한다
             end = next((k for k in range(i + 1, len(cells)) if is_head(cells[k]) and cells[k].source.lstrip().startswith("## ")), len(cells))
@@ -476,7 +498,7 @@ def check_lab(nb, R):
     R("실습", "✍️ 셀이 보이고, 빈칸 상태 그대로 파이썬 문법에 맞음", syntax)
     R("실습", "과제 셀마다 앞에 **프롬프트 힌트**와 🟢 **성공 기준**", guide_bad)
     R("실습", "과제 셀마다 뒤에 정답 보기 상자, 정답을 끼우면 문법에 맞음", answer_bad)
-    R("실습", "예제의 CHANGE_HERE마다 같은 장에 🟢 성공 기준 글", edit_bad)
+    R("실습", "CHANGE_HERE마다 뒤에 \"무슨 일이 생기나\"(값 바꾸기판) / 같은 장에 🟢 성공 기준(객관식판)", edit_bad)
     R("실습", "힌트·성공 기준이 모두 작성됨 (뼈대 상태면 WARN)", draft, warn=True)
     R("실습", "(작성 예정) 자리표시 없음", [(i, excerpt(c.source, 50)) for i, c in enumerate(cells)
                                      if not is_box(c) and TODO_PLACEHOLDER in c.source], warn=True)
@@ -515,6 +537,21 @@ def secret_values():
     return vals
 
 
+def ensure_kernel():
+    """이 가상환경의 파이썬으로 도는 커널을 가상환경 안(sys.prefix)에 등록한다. 사용자 폴더의 `python3` 커널은
+    다른 환경을 가리킬 수 있어 쓰지 않는다(2026-10-18, 지워진 가상환경을 가리켜 실행이 실패했다)."""
+    import subprocess
+    from jupyter_client.kernelspec import KernelSpecManager
+
+    specs = KernelSpecManager().find_kernel_specs()
+    ok = KERNEL in specs and json.loads((Path(specs[KERNEL]) / "kernel.json").read_text(encoding="utf-8"))["argv"][0] == sys.executable
+    if not ok:
+        subprocess.run([sys.executable, "-m", "ipykernel", "install", "--sys-prefix", "--name", KERNEL,
+                        "--display-name", "Samsung DS course (.venv)"], check=True, capture_output=True)
+        print(f"✔ 커널 등록: {KERNEL} → {sys.executable}")
+    return KERNEL
+
+
 def check_execute(path, R):
     from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
 
@@ -525,10 +562,11 @@ def check_execute(path, R):
     for c in nb.cells:  # 사람이 입력해야 하는 셀(input 등)은 건너뛴다
         if "skip-auto-run" in c.metadata.get("tags", []):
             c.source = "pass  # 자동 실행 검사에서 건너뜀(skip-auto-run)"
-    print(f"✔ 새 커널로 실행 중: {path.name} (최대 셀당 300초)")
+    kernel = ensure_kernel()
+    print(f"✔ 새 커널로 실행 중: {path.name} (커널 {kernel}, 최대 셀당 300초)")
     crash = []
     try:
-        ExecutePreprocessor(timeout=300, kernel_name="python3", allow_errors=True).preprocess(
+        ExecutePreprocessor(timeout=300, kernel_name=kernel, allow_errors=True).preprocess(
             nb, {"metadata": {"path": str(path.parent)}})
     except CellExecutionError as e:  # allow_errors=True라 드물다
         crash.append((-1, excerpt(e, 80)))
@@ -538,9 +576,9 @@ def check_execute(path, R):
     print(f"✔ 실행본 저장: {out}")
 
     errors, leaks = list(crash), []
-    pattern = re.compile(r"sk-[A-Za-z0-9_-]{16,}|Bearer\s+[A-Za-z0-9._-]{16,}"
+    pattern = re.compile(r"(?<![A-Za-z])sk-[A-Za-z0-9_-]{16,}|Bearer\s+[A-Za-z0-9._-]{16,}"
                          r"|x-dep-ticket[\"']?\s*[:=]\s*[\"'][A-Za-z0-9._-]{8,}")
-    secrets = secret_values()
+    secrets = secret_values()  # sk- 앞에 글자가 붙은 낱말(예: URL의 risk-management)은 키로 보지 않는다
     for i, c in enumerate(nb.cells):
         for o in c.get("outputs", []):
             if o.output_type == "error":

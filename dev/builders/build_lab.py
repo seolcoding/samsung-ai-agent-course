@@ -4,10 +4,15 @@
   uv run python dev/builders/build_lab.py 01-llm-api        # 실습 폴더 하나
   uv run python dev/builders/build_lab.py                   # labs/*.json 전부
   uv run python dev/builders/build_lab.py --scaffold        # 아직 없는 실습 폴더의 뼈대 JSON 만들기
-  uv run python dev/builders/build_lab.py --mc               # 위와 같다(객관식판). 실습 노트북은 객관식판 하나이고 이름은 _LAB이다(2026-10-18)
+  uv run python dev/builders/build_lab.py --mc 00-review    # 객관식판으로 강제(기본은 M1 값 바꾸기판, M2 객관식판)
+
+실습 노트북은 권마다 하나이고 이름은 _LAB이다(2026-10-18). 판은 둘이다.
+  값 바꾸기판(M1, 2026-10-18 개편): 객관식 없이 완성 코드를 주고, `# ✍️ CHANGE_HERE:`에서 값을 바꿔 동작 차이를 본다.
+    바꾼 결과는 CHANGE_HERE 셀 바로 뒤의 접힌 "무슨 일이 생기나"(spec edits의 result)에 실제 실행 결과로 적는다.
+  객관식판(M2): 과제 빈칸 자리에 보기 4개를 주석으로 넣는다(labs/<폴더>.choices.json).
 
 입력: dev/builders/labs/<실습 폴더>.json
-출력: course/ChapterNN/notebooks/<번호>_<이름>_LAB.ipynb (객관식판, 출력 없음)
+출력: course/ChapterNN/notebooks/<번호>_<이름>_LAB.ipynb (출력 없음)
 
 수강생에게는 노트북만 보인다(.py 실습 파일은 주지 않는다). 그래서 원본 코드를 빌드할 때 셀로 옮겨 넣는다.
 정본은 계속 course/Chapter01/code/raw이고, 원본이 바뀌면 다시 빌드한다.
@@ -91,6 +96,43 @@ PROMPT_GUIDE_MC_NO_TASK = """코드 셀에서 손댈 곳은 주석으로 표시�
 - `# ✍️ CHANGE_HERE:` 바로 아래 줄의 값을 바꿔 다시 실행해 봅니다.
 
 실행한 뒤에는 **성공 기준**과 비교해 봅니다. 🟢는 되어야 하는 것, ⛔는 다시 해야 하는 신호입니다."""
+# 값 바꾸기판(M1, 2026-10-18): 객관식 없이 완성 코드. 바꿔 볼 곳만 CHANGE_HERE로 표시한다
+PROMPT_GUIDE_CHANGE = """코드는 모두 완성되어 있습니다. 위에서부터 차례로 실행합니다.
+
+- `# ✍️ CHANGE_HERE:` 주석이 있는 셀은 먼저 그대로 실행해 결과를 봅니다. 그다음 셀 위의 **바꿔 볼 값**을 복사해, 주석 바로 아래 줄의 표시된 자리(지금 값)를 지우고 붙여 넣습니다. 어떻게 달라질지 생각해 본 뒤 다시 실행합니다.
+- 달라진 결과를 본 뒤 셀 아래 접힌 **무슨 일이 생기나**를 펼쳐 비교합니다. 확인했으면 값을 원래대로 되돌립니다."""
+RESULT_HEAD = "<details><summary>무슨 일이 생기나</summary>"
+VALUES_HEAD = "**바꿔 볼 값**"
+
+
+def _values_md(e):
+    """바꿔 볼 값: 복사해 붙여 넣을 수 있게 값마다 코드 블록 하나. edits의 old(지금 값)·new([값] 또는 [{value, note}])."""
+    vals = [v if isinstance(v, dict) else {"value": v} for v in e["new"]]
+    if len(vals) == 1 and vals[0]["value"] == "":
+        return f"{VALUES_HEAD} — 바로 아래 줄에서 `{e['old']}` 지우기"
+    # 조사(을/를)가 값에 따라 달라지므로 쓰지 않고, 문장으로 끝맺지 않는다(권마다 같은 문장이 되풀이되지 않게)
+    many = " (하나씩 바꿔 실행)" if len(vals) > 1 else ""
+    out = [f"{VALUES_HEAD} — 바로 아래 줄의 `{e['old']}` 자리에 복사해 붙여 넣기{many}"]
+    for v in vals:
+        out.append((f"{v['note']}\n" if v.get("note") else "") + f"```text\n{v['value']}\n```")
+    return "\n\n".join(out)
+
+
+def _check_values(text, e, folder):
+    """바꿔 볼 값을 실제로 붙여 넣었을 때 줄이 맞는지 확인한다(조용히 틀리지 않게): 지금 값이 그 줄에 한 번만 있고, 바꾼 셀도 문법에 맞아야 한다."""
+    lines = text.splitlines()
+    k = next((i for i, ln in enumerate(lines) if MARK_EDIT in ln and e["todo"] in ln), None)
+    assert k is not None, f"CHANGE_HERE 줄을 셀에서 찾지 못함: {folder} {e['todo']!r}"
+    t = next(i for i in range(k + 1, len(lines)) if lines[i].strip())
+    assert lines[t].count(e["old"]) == 1, f"바꿀 값이 바로 아래 줄에 한 번만 있어야 함: {folder} {e['old']!r} | 줄: {lines[t].strip()!r}"
+    py = lambda ls: "\n".join(x for x in ls if not x.lstrip().startswith(("%", "!")))
+    try:
+        ast.parse(py(lines))
+    except SyntaxError:  # 이어 쓰기 셀처럼 셀만으로는 문법 검사가 안 되는 곳은 건너뛴다
+        return
+    for v in e["new"]:
+        val = v["value"] if isinstance(v, dict) else v
+        ast.parse(py(lines[:t] + [lines[t].replace(e["old"], val)] + lines[t + 1:]))  # 실패하면 SyntaxError로 멈춘다
 NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
 MARK_CHOOSE = "# ✅ CHOOSE_HERE:"
 HOW_CHOOSE = "같은 번호의 줄을 모두 선택하고 Ctrl + / 를 누르면 주석이 풀립니다"  # CHOOSE_HERE 바로 아래에 늘 보이게 둔다
@@ -126,6 +168,9 @@ uv run python {path}
 
 # LangChain·LangGraph 코드를 쓰는 실습은 맨 위 설정에 디버그 모드 셀을 따로 둔다(기본 켜짐, 2026-10-13 결정)
 DEBUG_MD = "LangChain 디버그 모드를 켭니다. 체인과 그래프가 실행될 때 단계마다 입력과 출력이 셀 아래에 출력됩니다."
+# 디버그 모드에서 도구를 부르면 결과와 상관없는 경고 줄이 찍힌다(langchain 콘솔 출력 쪽 문제, 2-2 실행에서 확인)
+DEBUG_TOOL_NOTE = ("도구를 부를 때 `Error in ConsoleCallbackHandler.on_tool_start callback: KeyError('input')` 같은 줄이 섞여 보일 수 있습니다. "
+                   "디버그 내용을 출력하는 쪽의 문제라 실행 결과에는 영향이 없으니 그대로 두면 됩니다.")
 DEBUG_CODE = """from langchain_core.globals import set_debug
 
 # 출력이 너무 길면 True를 False로 바꾸고 이 셀을 다시 실행합니다
@@ -281,7 +326,10 @@ def _task_section(nb, task, chapter, n):
               f"3. 다 됐으면 AI에게 **\"{part['grade']}\"**라고 말합니다. 학습 목표마다 🟢 통과 / ⛔ 수정 필요 / ❔ 확인 불가와 다음 할 일이 나옵니다.")
 
 
-def build(folder, mc=False):
+def build(folder, mode="mc"):
+    """mode: "change"(값 바꾸기판, M1) | "mc"(객관식판, M2)."""
+    change = mode == "change"
+    mc = mode in ("mc", "change")  # 두 판이 같이 쓰는 글(choices의 _text)·표시 방식
     spec = json.loads(spec_path(folder).read_text(encoding="utf-8"))
     cpath = spec_path(folder).with_suffix(".choices.json")
     choices = json.loads(cpath.read_text(encoding="utf-8")) if mc and cpath.exists() else {}
@@ -310,13 +358,17 @@ def build(folder, mc=False):
     if "LANGFUSE" in spec.get("env", []):
         nb.md(TRUSTSTORE_MD)
         nb.code(TRUSTSTORE_CODE, visible=True, kind="")
-    if any(re.search(r"^\s*(from|import) (langchain|langgraph)", (COURSE / chapter / "code" / f.get("source", "raw") / folder / f["name"]).read_text(encoding="utf-8"), re.M)
-           for f in spec["files"]):
-        nb.md(DEBUG_MD)
+    srcs = [(f, (COURSE / chapter / "code" / f.get("source", "raw") / folder / f["name"]).read_text(encoding="utf-8")) for f in spec["files"]]
+    # 디버그 셀은 노트북 커널에서 LangChain을 돌릴 때만 둔다. 파일로 써서 따로 띄우는 앱(Streamlit 등)에는 적용되지 않는다
+    if any(re.search(r"^\s*(from|import) (langchain|langgraph)", src, re.M) and not f.get("writefile") for f, src in srcs):
+        tools = any(re.search(r"@tool\b|ToolNode|bind_tools", src) for f, src in srcs if not f.get("writefile"))
+        nb.md(DEBUG_MD + ("\n\n" + DEBUG_TOOL_NOTE if tools else ""))
         nb.code(DEBUG_CODE, visible=True, kind="")
 
     nb.h(2, "1. 실습 방법")
-    if mc and not any(t.get("blank") for f in spec["files"] for t in f.get("todos", [])):
+    if change:
+        nb.md(PROMPT_GUIDE_CHANGE)
+    elif mc and not any(t.get("blank") for f in spec["files"] for t in f.get("todos", [])):
         nb.md(PROMPT_GUIDE_MC_NO_TASK)  # 고를 보기가 없는 실습: CHOOSE_HERE 안내를 빼고 CHANGE_HERE만
     else:
         nb.md(PROMPT_GUIDE_MC if mc else PROMPT_GUIDE)
@@ -333,7 +385,20 @@ def build(folder, mc=False):
         lines, answers = _blank(raw, [choices.get(t["todo"], {}).get("blank", t["blank"]) for t in todos]) if todos else (raw, [])
         todos, answers = [t for t, x in zip(todos, answers) if x is not None], [x for x in answers if x is not None]
         blank_indents = [ln[: len(ln) - len(ln.lstrip())] for ln in lines if ln.endswith(BLANK_LINE)]
-        if mc:  # 빈칸 줄을 보기 주석으로 바꾼다. 정답 보기가 지운 줄과 같은지 확인한다(조용히 틀리지 않게)
+        if change:  # 빈칸 자리에 정답(객관식판의 정답 보기와 같은 줄)을 넣어 완성 코드로 만든다
+            out, j = [], 0
+            for ln in lines:
+                if ln.endswith(BLANK_LINE):
+                    c = choices.get(todos[j]["todo"])
+                    want = c["options"][c["answer"] - 1]["lines"] if c else (todos[j].get("answer") or answers[j])
+                    if c and not c.get("rewrite"):
+                        assert [x.strip() for x in want] == [x.strip() for x in todos[j].get("answer") or answers[j]], f"정답 보기가 원본 정답과 다름: {todos[j]['todo']}"
+                    out += [blank_indents[j] + x for x in _dedent_common("\n".join(want)).splitlines()]
+                    j += 1
+                else:
+                    out.append(ln)
+            lines = out
+        elif mc:  # 빈칸 줄을 보기 주석으로 바꾼다. 정답 보기가 지운 줄과 같은지 확인한다(조용히 틀리지 않게)
             out, j = [], 0
             for ln in lines:
                 if ln.endswith(BLANK_LINE):
@@ -349,8 +414,8 @@ def build(folder, mc=False):
             lines = out
         edits = f.get("edits", [])
         lines, edit_at = _mark(lines, edits)
-        short_all = mc and bool(todos) and all("mc_checks" in choices.get(t["todo"], {}) for t in todos)
-        if mc:
+        short_all = mc and not change and bool(todos) and all("mc_checks" in choices.get(t["todo"], {}) for t in todos)
+        if mc and not change:
             out, k, moved = [], 0, {}  # moved: 옛 줄 번호 → 새 줄 번호(안내 줄을 끼워 넣어 밀린 CHANGE_HERE 위치를 다시 맞춘다)
             while k < len(lines):
                 ln = lines[k]
@@ -373,7 +438,9 @@ def build(folder, mc=False):
         # split을 주면 구획마다 나눠 쓴다(첫 구획은 새로 쓰고, 다음부터는 이어 쓰기 -a)
         wf = f.get("writefile")
         split = f.get("split", []) if wf else f.get("split") or [ln.strip() for ln in lines if ln.startswith("# ──")]
-        if mc:  # 구획 표시에 WRITE_HERE가 있으면 객관식판에서는 CHOOSE_HERE로 바뀌어 있다
+        if change:  # 값 바꾸기판은 WRITE_HERE 줄을 구획을 나눈 뒤에 지운다. 객관식판용으로 적은 표시도 받는다
+            split = [m.replace("✅ CHOOSE_HERE", "✍️ WRITE_HERE").replace("CHOOSE_HERE", "WRITE_HERE") for m in split]
+        elif mc:  # 구획 표시에 WRITE_HERE가 있으면 객관식판에서는 CHOOSE_HERE로 바뀌어 있다
             split = [m.replace("✍️ WRITE_HERE", "✅ CHOOSE_HERE").replace("WRITE_HERE", "CHOOSE_HERE") for m in split]
         nb.h(2, f"{n}. {f['title']}")
         nb.md(f["intro"])
@@ -389,7 +456,19 @@ def build(folder, mc=False):
             start, pos = pos, pos + len(body)
             while pos < len(lines) and not lines[pos].strip():
                 pos += 1
-            text = "\n".join(body).strip("\n")
+            if change:  # 원본 TODO 지시 주석(WRITE_HERE 줄과 이어지는 주석 줄)은 완성 코드에 남기지 않는다
+                kept, drop = [], False
+                for ln in body:
+                    if MARK_TASK in ln:
+                        drop = True
+                        continue
+                    if drop and ln.strip().startswith("#") and ln.strip() != "#" and MARK_EDIT not in ln:  # CHANGE_HERE 줄은 남긴다
+                        continue
+                    drop = False
+                    kept.append(ln)
+                text = "\n".join(kept).strip("\n")
+            else:
+                text = "\n".join(body).strip("\n")
             if not text.strip():
                 continue
             code_only = "\n".join(ln for ln in body if not ln.strip().startswith("#")).strip()
@@ -430,8 +509,19 @@ def build(folder, mc=False):
             visible += 1
             nb.h(3, f"{n}.{sub} {shown}")  # 예제·과제 표시는 nbkit가 제목 옆에 붙인다
             for e in my_edits:
-                nb.md(f"**✍️ CHANGE_HERE: {e['todo']}**\n\n{e['explain']}")
-            for i in mine:
+                if change and "new" in e:  # 값 바꾸기판: 복사해 붙여 넣을 값을 먼저 보여 준다
+                    _check_values(text, e, folder)
+                    nb.md(f"**✍️ CHANGE_HERE: {e['todo']}**\n\n{_values_md(e)}\n\n{e['explain']}")
+                else:
+                    if change:
+                        print(f"✖ {folder} 바꿔 볼 값 없음: {e['todo'][:30]!r} | 복사할 값(old·new)이 spec edits에 없음 | old·new를 넣는다")
+                    nb.md(f"**✍️ CHANGE_HERE: {e['todo']}**\n\n{e['explain']}")
+            if change:  # 개념 설명(객관식판의 정답 보기 맨 위 글)을 완성 코드 위에 둔다
+                notes = [choices.get(todos[i]["todo"], {}).get("explain") or todos[i].get("explain") for i in mine]
+                notes = [x for x in notes if x and x != "(작성 예정)"]
+                if notes:
+                    nb.md("\n\n".join(notes))
+            for i in ([] if change else mine):
                 t = todos[i]
                 short = mc and "mc_checks" in choices[t["todo"]]
                 if short:  # 줄인 객관식판(2026-10-18): 굵은 지시 한 줄과 🟢·⛔ 한 줄씩. 설명은 정답 보기 안으로 옮긴다
@@ -452,10 +542,16 @@ def build(folder, mc=False):
                 nb.md(f"아래는 서버를 터미널에서 띄울 때만 실행되는 부분입니다. 노트북에서는 실행하지 않고 읽어만 봅니다.\n\n```python\n{tail}\n```")
             if shown in f.get("no_auto_run", []):  # input()처럼 사람이 답해야 하는 셀: 자동 실행 검사에서 건너뛴다
                 nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")
-            done = (f.get("chunk_success") or {}).get(shown)
+            for e in my_edits if change else []:  # 바꿔 본 결과: 실제 실행 결과로 쓴 글(spec edits의 result)
+                if not e.get("result"):  # 실행해 보기 전: 자리표시만 둔다(QC가 FAIL로 잡는다)
+                    print(f"✖ {folder} CHANGE_HERE 결과 글 없음: {e['todo'][:30]!r} | 바꿔 실행한 결과를 아직 안 적음 | spec edits에 result를 넣는다")
+                nb.md(f"{RESULT_HEAD}\n\n{e.get('result') or '(작성 예정)'}\n\n</details>")
+            done = None if change else (f.get("chunk_success") or {}).get(shown)  # 값 바꾸기판은 🟢/⛔ 성공 기준을 쓰지 않는다
             if done:  # 예제: 바꿔 실행한 뒤 스스로 확인할 성공 기준. 목록(🟢만) 또는 {"success": [...], "fail": [...]}
                 nb.md(_criteria_md([], done.get("fail", []), done.get("success", [])) if isinstance(done, dict) else _criteria_md(done))
-            if mine and mc:
+            if change:
+                pass
+            elif mine and mc:
                 many = len(mine) > 1
                 ans = "\n\n".join((f"**{todos[i]['todo']}**\n\n" if many else "")
                                     + (f"{todos[i]['explain']}\n\n" if "mc_checks" in choices[todos[i]["todo"]] else "")  # 줄인 판은 설명을 여기서 보여 준다
@@ -595,12 +691,12 @@ if __name__ == "__main__":
         for folder in args[1:] or UNITS:
             scaffold(folder)
             check_blanks(folder)
-    elif args[:1] == ["--mc"]:  # 객관식판: labs/<폴더>.choices.json의 보기로 <번호>_<이름>_LAB.ipynb를 만든다
+    elif args[:1] == ["--mc"]:  # 객관식판으로 강제: labs/<폴더>.choices.json의 보기로 만든다
         for folder in args[1:] or sorted(p.stem for p in LABS.glob("**/*.json") if p.stem in UNITS):
-            build(folder, mc=True)
+            build(folder, mode="mc")
     elif args[:1] == ["--check"]:
         for folder in args[1:] or UNITS:
             check_blanks(folder)
-    else:  # 기본도 객관식판이다(2026-10-18 통일)
+    else:  # 기본: M1은 값 바꾸기판, M2는 객관식판(2026-10-18)
         for folder in args or sorted(p.stem for p in LABS.glob("**/*.json") if p.stem in UNITS):
-            build(folder, mc=True)
+            build(folder, mode="change" if chapter_of(folder) == "Chapter01" else "mc")

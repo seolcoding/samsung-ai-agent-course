@@ -325,7 +325,7 @@
    {
     "what": "터미널 과제",
     "readme": "tasks/3-2/README.md",
-    "run": "uv run --env-file .env python course/Chapter02/tasks/3-2/task.py",
+    "run": "uv run --env-file .env python course/Chapter02/tasks/3-2/3-2_task.py",
     "grade": "3-2 과제 채점해 줘"
    }
   ]
