@@ -9,7 +9,7 @@
 | 증상 | 원인 | 해결 |
 |---|---|---|
 | `ModuleNotFoundError: No module named 'config'` (또는 `dotenv`, `langchain_…`, `openai`) | 저장소 `.venv`가 아닌 커널을 골랐거나 설치를 안 함 | 커널을 저장소 `.venv`로 고른다. 그래도 나오면 저장소 맨 위에서 `uv sync --extra notebooks` |
-| `No module named 'jupyterquiz'` | `notebooks` 묶음 없이 설치함 | `uv sync --extra notebooks` |
+| `No module named 'jupyterquiz'` | 옛 판(퀴즈가 `notebooks` 묶음에 있던 때)으로 설치했거나, 저장소 `.venv`가 아닌 커널을 골랐음 | 저장소 맨 위에서 `git pull` 후 `uv sync --extra notebooks`. 커널을 저장소 `.venv`로 고르고 커널을 다시 시작 |
 | `No module named 'assets'` | 준비 셀을 건너뛰었거나, 노트북이 다른 폴더에서 실행됨 | 맨 위 준비 셀부터 실행. `os.getcwd()`가 `…/course/ChapterNN/notebooks`인지 확인([paths.md](paths.md)) |
 | `uv: command not found` | uv 미설치 또는 PATH에 없음 | uv를 설치하고 터미널을 새로 연다 |
 
