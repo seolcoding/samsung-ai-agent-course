@@ -1,27 +1,27 @@
 [
  {
-  "question": "일반 파이썬 함수를 체인 안의 실행 단위로 감싸는 것은 무엇인가요?",
+  "question": "사용자 질문의 앞뒤 공백을 지우는 파이썬 함수 `clean`을 만들었습니다. 이 함수를 프롬프트 앞 단계로 넣어 `|`로 잇고 싶을 때 무엇으로 감싸나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "RunnablePassthrough",
-    "correct": false,
-    "feedback": "RunnablePassthrough는 받은 입력을 다음 단계로 넘기는 일을 합니다."
-   },
-   {
-    "answer": "RunnableParallel",
-    "correct": false,
-    "feedback": "RunnableParallel은 여러 실행 결과를 만들어 하나의 묶음으로 합칩니다."
-   },
-   {
-    "answer": "RunnableLambda",
+    "answer": "`RunnableLambda(clean)`",
     "correct": true,
-    "feedback": "RunnableLambda로 감싼 함수는 다른 Runnable처럼 `|`로 이어 쓸 수 있습니다."
+    "feedback": "함수를 Runnable로 감싸면 다른 단계처럼 `|`로 잇고 `invoke`·`batch`·`stream`으로 실행할 수 있습니다."
    },
    {
-    "answer": "StrOutputParser",
+    "answer": "`RunnablePassthrough()`",
     "correct": false,
-    "feedback": "StrOutputParser는 모델의 출력을 문자열로 바꾸는 파서입니다."
+    "feedback": "Passthrough는 입력을 바꾸지 않고 그대로 넘깁니다. 함수를 실행해 값을 바꾸려면 Lambda가 필요합니다."
+   },
+   {
+    "answer": "`RunnableParallel`",
+    "correct": false,
+    "feedback": "Parallel은 여러 결과를 함께 만들어 하나로 묶을 때 씁니다. 함수 하나를 한 단계로 넣는 일과는 다릅니다."
+   },
+   {
+    "answer": "`StrOutputParser()`",
+    "correct": false,
+    "feedback": "이 파서는 모델의 답을 문자열로 꺼냅니다. 직접 만든 함수를 감싸는 도구가 아닙니다."
    }
   ]
  }

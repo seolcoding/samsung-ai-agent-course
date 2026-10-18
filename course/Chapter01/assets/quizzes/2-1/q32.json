@@ -4,14 +4,14 @@
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "고객에게 메일 발송",
-    "correct": true,
-    "feedback": "외부 발송은 되돌리기 어려운 행동이라 실행 전에 사람이 확인하는 지점으로 알맞습니다."
-   },
-   {
     "answer": "사내 문서 검색",
     "correct": false,
     "feedback": "읽기만 하는 작업은 되돌릴 것이 없습니다. 매번 승인을 받으면 흐름만 느려집니다."
+   },
+   {
+    "answer": "고객에게 메일 발송",
+    "correct": true,
+    "feedback": "외부 발송은 되돌리기 어려운 행동이라 실행 전에 사람이 확인하는 지점으로 알맞습니다."
    },
    {
     "answer": "환율 조회",

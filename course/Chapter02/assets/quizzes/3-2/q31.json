@@ -1,27 +1,27 @@
 [
  {
-  "question": "MCP 설정(MCP_CONFIG)에 적는 항목이 아닌 것은?",
+  "question": "이미 `tutorial` 서버를 연결해 쓰고 있는데, 다른 팀이 만든 검색 MCP 서버도 함께 쓰려고 합니다. 어떻게 하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "서버 이름",
-    "correct": false,
-    "feedback": "슬라이드 설정의 `\"tutorial\"`이 서버 이름입니다."
-   },
-   {
-    "answer": "transport",
-    "correct": false,
-    "feedback": "연결 방식입니다. 슬라이드 설정은 `\"sse\"`입니다."
-   },
-   {
-    "answer": "url",
-    "correct": false,
-    "feedback": "서버 주소입니다. 슬라이드 설정은 `http://localhost:8000/sse`입니다."
-   },
-   {
-    "answer": "모델 이름",
+    "answer": "`MCP_CONFIG`에 검색 서버의 이름·transport·url을 한 항목 더 적고, 같은 Client로 도구를 가져온다",
     "correct": true,
+    "feedback": "Client 하나로 여러 서버를 다룹니다. 설정에 서버를 더 적으면 `get_tools()`가 두 서버의 도구를 함께 가져옵니다."
+   },
+   {
+    "answer": "검색 기능을 Agent 코드 안에 `@tool`로 다시 만든다",
+    "correct": false,
+    "feedback": "이미 서버로 만들어진 도구를 다시 만들면 MCP를 쓰는 이유가 사라집니다. 연결만 하면 됩니다."
+   },
+   {
+    "answer": "`MCP_CONFIG`에 쓸 LLM 모델 이름을 더 적는다",
+    "correct": false,
     "feedback": "MCP 설정은 서버에 연결하는 방법만 적습니다. 어떤 LLM을 쓸지는 Agent 쪽에서 정합니다."
+   },
+   {
+    "answer": "서버마다 Agent를 하나씩 따로 만들어야 한다",
+    "correct": false,
+    "feedback": "Agent 하나가 Client를 통해 서버 여러 개에 연결할 수 있습니다. 서버마다 Agent를 나눌 필요는 없습니다."
    }
   ]
  }

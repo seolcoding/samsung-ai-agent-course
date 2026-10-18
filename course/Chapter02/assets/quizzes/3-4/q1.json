@@ -1,27 +1,27 @@
 [
  {
-  "question": "슬라이드의 방식에서 자식 그래프(Subgraph)를 부모 그래프에 연결하는 방법은?",
+  "question": "부모 State에는 `document`, 요약 Subgraph의 State에는 `text`와 `summary`가 있습니다. 부모의 `summarize_document` 노드 함수 안에서 Subgraph를 어떻게 부르나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "부모 그래프의 노드 함수 안에서 컴파일된 자식 그래프를 invoke로 호출한다",
+    "answer": "`summary_subgraph.invoke(state)`로 부모 State를 그대로 넘긴다",
+    "correct": false,
+    "feedback": "자식 그래프는 `text`를 찾는데 부모 State에는 `document`만 있어 `KeyError: 'text'`가 납니다. 키 이름을 자식 State에 맞춰 옮겨야 합니다."
+   },
+   {
+    "answer": "컴파일하지 않은 `summary_builder`를 그대로 `invoke`한다",
+    "correct": false,
+    "feedback": "builder에는 `invoke`가 없습니다. 자식 그래프도 `compile()`로 먼저 컴파일해 둡니다."
+   },
+   {
+    "answer": "`document`를 `text`에 옮겨 컴파일된 Subgraph를 `invoke`하고, 결과의 `summary`를 돌려준다",
     "correct": true,
-    "feedback": "`summarize_document` 노드가 `summary_subgraph.invoke(...)`를 호출하고, 그 결과를 부모 State에 담습니다."
-   },
-   {
-    "answer": "자식 그래프의 State를 부모 그래프의 State와 똑같이 맞춘다",
-    "correct": false,
-    "feedback": "Subgraph는 State를 따로 정의할 수 있습니다. 슬라이드 코드도 자식은 `text`·`summary`, 부모는 `document`·`summary`를 씁니다."
-   },
-   {
-    "answer": "자식 그래프를 컴파일하지 않고 builder 그대로 부모에 넘긴다",
-    "correct": false,
-    "feedback": "Subgraph는 독립적으로 컴파일한 그래프입니다. `summary_builder.compile()`로 만든 `summary_subgraph`를 호출합니다."
+    "feedback": "State가 다르면 노드 함수가 값을 옮겨 넣고, 자식이 돌려준 값을 부모 State의 키로 담아 돌려줍니다."
    },
    {
     "answer": "부모 그래프의 END에서 자식 그래프의 START로 엣지를 잇는다",
     "correct": false,
-    "feedback": "두 그래프 사이에 엣지를 잇지 않습니다. 부모의 노드 하나가 자식 그래프 전체를 호출합니다."
+    "feedback": "그래프와 그래프 사이에는 엣지를 잇지 않습니다. 부모의 노드 하나가 자식 그래프 전체를 호출합니다."
    }
   ]
  }

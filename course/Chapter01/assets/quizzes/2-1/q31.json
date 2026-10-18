@@ -1,27 +1,27 @@
 [
  {
-  "question": "Checkpointer가 없으면 하기 어려운 일은?",
+  "question": "메일 발송 승인을 기다리며 그래프가 멈췄습니다. 담당자가 30분 뒤 승인했을 때, 멈춘 지점부터 이어 가려면 무엇이 있어야 할까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "승인을 기다리며 멈췄다가 같은 지점부터 이어서 실행하기",
+    "answer": "승인 여부를 고르는 조건부 Edge 하나 더",
+    "correct": false,
+    "feedback": "Edge는 다음 행선지를 정할 뿐입니다. 멈춘 동안의 실행 상태를 보관하지는 않습니다."
+   },
+   {
+    "answer": "`messages` 필드의 `add_messages` Reducer",
+    "correct": false,
+    "feedback": "Reducer는 값을 합치는 규칙입니다. 멈춘 시점의 상태를 저장해 두는 기능은 아닙니다."
+   },
+   {
+    "answer": "처음부터 그래프를 다시 실행하는 코드",
+    "correct": false,
+    "feedback": "처음부터 다시 돌리면 앞 단계를 모두 반복합니다. 멈춘 지점에서 이어 가는 것과는 다릅니다."
+   },
+   {
+    "answer": "멈춘 시점의 실행 상태를 저장해 두는 Checkpointer",
     "correct": true,
-    "feedback": "Checkpointer가 실행 상태를 저장해 두기 때문에 멈춘 지점부터 다시 이어 갈 수 있습니다."
-   },
-   {
-    "answer": "노드를 더하고 엣지로 이어 그래프 만들기",
-    "correct": false,
-    "feedback": "노드와 엣지를 잇는 일은 Checkpointer 없이도 됩니다."
-   },
-   {
-    "answer": "LLM을 한 번 호출해 답 받기",
-    "correct": false,
-    "feedback": "한 번 호출하고 끝나는 일에는 저장해 둘 중간 상태가 없습니다."
-   },
-   {
-    "answer": "조건부 Edge로 분기하기",
-    "correct": false,
-    "feedback": "분기는 Edge가 정합니다. 실행 상태 저장과는 별개입니다."
+    "feedback": "저장된 상태가 있어야 같은 지점부터 다시 이어 갈 수 있습니다. 사람 승인 기능은 Checkpointer 위에서 동작합니다."
    }
   ]
  }

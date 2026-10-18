@@ -1,27 +1,27 @@
 [
  {
-  "question": "정책 문서처럼 주제가 바뀌는 흐름이 중요한 자료를, 계산 비용이 조금 더 들더라도 주제 단위로 나누고 싶습니다. 알맞은 방식은 무엇일까요?",
+  "question": "일반 사내 문서를 Fixed-size로 나눴더니 문장 중간에서 잘린 청크가 많습니다. 구현은 단순하게 두고 문단·문장 경계를 살려 나누려면 어떤 방식이 알맞을까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Fixed-size Chunking",
-    "correct": false,
-    "feedback": "Fixed-size는 글자 수나 토큰 수로 일정하게 자르므로 주제가 바뀌는 곳을 따지지 않습니다."
-   },
-   {
     "answer": "Recursive Chunking",
-    "correct": false,
-    "feedback": "Recursive는 문단·문장 같은 형식상의 경계를 찾습니다. 주제가 바뀌는 지점을 직접 보지는 않습니다."
+    "correct": true,
+    "feedback": "Recursive는 문단, 문장, 구분자 순서로 자연스러운 경계를 찾습니다. 일반 문서에서 기본으로 많이 고르는 방식입니다."
    },
    {
     "answer": "Semantic Chunking",
-    "correct": true,
-    "feedback": "Semantic은 의미 변화 지점을 기준으로 나눠 의미 흐름이 중요한 자료에 알맞습니다. 대신 계산 비용이 더 듭니다."
+    "correct": false,
+    "feedback": "Semantic도 경계를 살리지만 주제 변화를 계산해야 해서 구현과 비용이 커집니다. 단순하게 두려는 지금 상황과는 맞지 않습니다."
+   },
+   {
+    "answer": "chunk_size를 더 작게 줄인 Fixed-size Chunking",
+    "correct": false,
+    "feedback": "크기를 줄여도 글자 수로 자르는 방식은 같습니다. 문장 중간에서 잘리는 일은 그대로 생깁니다."
    },
    {
     "answer": "나누지 않고 문서 전체를 한 청크로 둔다",
     "correct": false,
-    "feedback": "문서 전체는 한 번에 검색 대상으로 쓰기에 너무 커서 필요한 부분만 찾기 어렵습니다."
+    "feedback": "문서 전체는 검색 대상으로 쓰기에 너무 커서 필요한 부분만 찾기 어렵습니다."
    }
   ]
  }

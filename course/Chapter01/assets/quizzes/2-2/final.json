@@ -1,79 +1,79 @@
 [
  {
-  "question": "상위 Agent는 목표와 정책을, 중간 Agent는 일을 다시 나눠 담당자를 정하고, 하위 Agent는 실행을 맡습니다. 어떤 패턴인가요?",
+  "question": "Supervisor 하나가 하위 Agent 12개에게 직접 일을 나누다 보니 조정이 느려지고 실수가 늘었습니다. 구조를 어떻게 바꾸는 것이 알맞을까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Supervisor",
+    "answer": "Supervisor에게 하위 Agent를 더 붙여 일을 빨리 끝낸다",
     "correct": false,
-    "feedback": "Supervisor는 중앙 조정자 하나가 하위 Agent에 직접 일을 나눕니다. 중간 층이 없습니다."
+    "feedback": "하위 Agent가 늘면 조정자가 관리할 대상도 늘어 병목이 더 심해집니다."
    },
    {
-    "answer": "Hierarchical",
+    "answer": "모든 일을 단일 Agent 하나에 합친다",
+    "correct": false,
+    "feedback": "합치면 역할이 섞이고 컨텍스트가 커지는 단일 Agent의 한계로 돌아갑니다."
+   },
+   {
+    "answer": "중간 Agent를 두어 일을 다시 나누게 하는 Hierarchical 구조로 바꾼다",
     "correct": true,
-    "feedback": "층을 나눠 중간 Agent가 조정 부담을 나눠 가지는 구조입니다."
+    "feedback": "중간 Agent들이 일을 다시 나눠 담당자를 정하므로, 조정자 한 명이 지던 부담을 나눠 가집니다."
    },
    {
-    "answer": "Network",
+    "answer": "Network로 바꾸면 병목도 없고 흐름 통제도 쉬워진다",
     "correct": false,
-    "feedback": "Network는 중앙 관리자나 층 없이 Agent끼리 직접 주고받습니다."
-   },
-   {
-    "answer": "단일 Agent",
-    "correct": false,
-    "feedback": "단일 Agent는 모델 하나가 모든 단계를 맡습니다."
+    "feedback": "Network는 병목이 적은 대신 흐름 통제가 어렵습니다. 둘 다 얻을 수는 없습니다."
    }
   ]
  },
  {
-  "question": "좋은 역할 분리의 조건으로 맞는 것은?",
+  "question": "Researcher와 Writer로 나눴더니 Writer가 Researcher의 결과에서 무엇이 출처이고 무엇이 요약인지 헷갈려 합니다. 먼저 손볼 것은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Agent 수를 가능한 한 많이 늘린다",
-    "correct": false,
-    "feedback": "핵심은 Agent 수가 아니라 책임을 잘 나누는 것입니다."
-   },
-   {
-    "answer": "모든 Agent가 모든 도구를 똑같이 가진다",
-    "correct": false,
-    "feedback": "필요한 도구를 기준으로 나눠야 각 Agent의 선택 범위가 줄어듭니다."
-   },
-   {
-    "answer": "각 Agent가 처리할 입력과 돌려줄 출력 형식을 정해 둔다",
+    "answer": "Researcher가 돌려줄 출력 형식(예: 요약과 출처 목록)을 정하고, Writer는 그 형식을 입력으로 받게 한다",
     "correct": true,
-    "feedback": "입력과 출력 형식이 정해지면 책임 경계가 분명해지고 평가 기준도 단순해집니다."
+    "feedback": "각 Agent가 받을 입력과 돌려줄 출력 형식을 정해 두면 책임 경계가 분명해지고 평가 기준도 단순해집니다."
    },
    {
-    "answer": "책임 경계를 느슨하게 두어 서로 일을 대신하게 한다",
+    "answer": "두 Agent에게 같은 도구를 모두 똑같이 준다",
+    "correct": false,
+    "feedback": "도구를 똑같이 주면 선택 범위만 넓어집니다. 넘겨주는 결과의 형식 문제는 그대로입니다."
+   },
+   {
+    "answer": "Writer가 조사도 직접 하도록 책임 경계를 느슨하게 한다",
     "correct": false,
     "feedback": "책임 경계가 모호하면 Multi-Agent도 단일 Agent보다 나아지지 않습니다."
+   },
+   {
+    "answer": "중간에 Agent를 하나 더 넣어 결과를 한 번 더 전달한다",
+    "correct": false,
+    "feedback": "Agent를 늘리는 것이 해법은 아닙니다. 주고받는 형식이 정해져 있지 않으면 같은 혼란이 생깁니다."
    }
   ]
  },
  {
-  "question": "Reviewer Agent를 추가하는 것이 알맞은 경우는?",
+  "question": "검토를 위해 Reviewer Agent를 더했더니 응답 시간과 비용이 두 배로 늘었습니다. 다음에 할 일로 가장 알맞은 것은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "단순 질의응답을 가장 싸게 처리해야 할 때",
+    "answer": "Agent가 많을수록 좋으니 그대로 쓴다",
     "correct": false,
-    "feedback": "단순 질의응답은 단일 Agent가 더 빠르고 저렴합니다."
+    "feedback": "Multi-Agent가 늘 나은 것은 아닙니다. 늘어난 비용이 값어치를 하는지 확인해야 합니다."
    },
    {
-    "answer": "위험한 결정이나 품질 검증이 필요할 때",
+    "answer": "속도를 되찾기 위해 Agent를 하나 더 추가한다",
+    "correct": false,
+    "feedback": "Agent가 늘면 비용과 지연 시간은 더 늘어납니다."
+   },
+   {
+    "answer": "품질은 잴 수 없으니 감으로 유지 여부를 정한다",
+    "correct": false,
+    "feedback": "감이 아니라 측정으로 정합니다. 오류가 얼마나 줄었는지 같은 기준으로 비교할 수 있습니다."
+   },
+   {
+    "answer": "Reviewer를 넣기 전과 후의 품질을 측정해, 늘어난 비용만큼 나아졌는지 보고 정한다",
     "correct": true,
-    "feedback": "Reviewer는 누락·오류·근거 일치를 확인합니다. 검증이 필요한 곳에 더합니다."
-   },
-   {
-    "answer": "응답을 가장 빨리 돌려줘야 할 때",
-    "correct": false,
-    "feedback": "Agent가 늘면 지연 시간도 늘어납니다. 속도가 가장 중요하면 불리합니다."
-   },
-   {
-    "answer": "쓰는 도구가 하나뿐일 때",
-    "correct": false,
-    "feedback": "도구 수는 Reviewer를 더할 기준이 아닙니다. 기준은 위험과 품질 검증의 필요입니다."
+    "feedback": "Agent가 늘면 비용과 지연도 늘어납니다. 그만큼 품질이 좋아졌는지 재 보고 유지할지 정합니다."
    }
   ]
  }

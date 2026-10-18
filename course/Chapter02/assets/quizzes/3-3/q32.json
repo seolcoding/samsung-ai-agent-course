@@ -1,27 +1,27 @@
 [
  {
-  "question": "클라이언트가 Agent의 능력과 연결 정보를 알아내려고 읽는 주소는?",
+  "question": "Researcher 서버를 8001 포트로 띄웠습니다. Agent Card가 제대로 공개되었는지 브라우저로 확인하려면 어느 주소를 여나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "/.well-known/agent-card.json",
+    "answer": "`http://127.0.0.1:8001/.well-known/agent-card.json`",
     "correct": true,
-    "feedback": "Agent Card는 이 주소에서 JSON으로 공개됩니다."
+    "feedback": "Agent Card는 정해진 주소 `/.well-known/agent-card.json`에 JSON으로 공개됩니다. 클라이언트도 이 주소를 먼저 읽습니다."
    },
    {
-    "answer": "/agent/execute",
+    "answer": "`http://127.0.0.1:8001/`",
     "correct": false,
-    "feedback": "슬라이드에 없는 주소입니다. Agent Card는 /.well-known/agent-card.json에서 공개됩니다."
+    "feedback": "`/`는 작업 요청을 받는 JSON-RPC 주소입니다. 카드는 따로 정해진 주소에 있습니다."
    },
    {
-    "answer": "/skills",
+    "answer": "`http://127.0.0.1:8001/skills`",
     "correct": false,
-    "feedback": "Skill은 카드 안의 한 항목입니다. 카드 전체는 /.well-known/agent-card.json에서 읽습니다."
+    "feedback": "Skill은 카드 안의 한 항목입니다. 카드 전체를 읽는 주소가 따로 있습니다."
    },
    {
-    "answer": "/message/send",
+    "answer": "`http://127.0.0.1:8001/agent_card`",
     "correct": false,
-    "feedback": "메시지를 보내는 주소가 아니라 카드를 읽는 주소를 묻습니다. 답은 /.well-known/agent-card.json입니다."
+    "feedback": "변수 이름을 주소로 쓰지 않습니다. 카드 주소는 A2A가 정해 둔 `/.well-known/` 아래에 있습니다."
    }
   ]
  }

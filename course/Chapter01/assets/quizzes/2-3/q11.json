@@ -1,27 +1,27 @@
 [
  {
-  "question": "LLM 실습에서 Streamlit을 쓰는 이유가 **아닌** 것은?",
+  "question": "콘솔에서 잘 돌던 RAG 체인을 Streamlit 앱에 붙였습니다. 콘솔에서 쓸 때와 비교해 달라지는 것은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "콘솔 실행 결과를 보기 쉬운 화면으로 바꾼다",
+    "answer": "체인이 더 좋은 문서를 찾아 답이 정확해진다",
     "correct": false,
-    "feedback": "이유가 맞습니다. 콘솔 출력 대신 사용자가 보기 쉬운 화면으로 결과를 보여 줍니다."
+    "feedback": "Streamlit은 화면을 만드는 도구입니다. 답의 내용은 체인과 모델이 정합니다."
    },
    {
-    "answer": "모델 응답이 생성되는 과정을 스트리밍으로 보여 준다",
-    "correct": false,
-    "feedback": "이것도 이유입니다. 답변이 만들어지는 대로 글자가 이어지며 나타나게 할 수 있습니다."
-   },
-   {
-    "answer": "RAG 체인의 답변 정확도를 높여 준다",
+    "answer": "질문 입력창과 답변 화면이 생겨 브라우저에서 바로 묻고 답을 볼 수 있다",
     "correct": true,
-    "feedback": "Streamlit은 화면을 만드는 도구입니다. 답변의 내용은 체인과 모델이 정합니다."
+    "feedback": "콘솔 출력이 사용자가 보기 쉬운 화면으로 바뀝니다. 체인을 서비스 형태로 확인할 수 있습니다."
    },
    {
-    "answer": "실습한 RAG 체인을 서비스 형태로 확인한다",
+    "answer": "화면을 만들려면 HTML과 JavaScript를 따로 작성해야 한다",
     "correct": false,
-    "feedback": "Streamlit을 쓰는 이유 중 하나입니다. 체인을 웹 화면에 연결해 실제 서비스처럼 써 봅니다."
+    "feedback": "Streamlit은 Python 코드만으로 화면을 만듭니다. HTML·JavaScript를 직접 쓰지 않습니다."
+   },
+   {
+    "answer": "임베딩 모델이 Streamlit 전용 모델로 바뀐다",
+    "correct": false,
+    "feedback": "임베딩과 모델은 체인에 정한 그대로입니다. Streamlit은 그 위에 화면만 붙입니다."
    }
   ]
  }

@@ -1,79 +1,79 @@
 [
  {
-  "question": "Agent가 실제로 어떤 모델 호출과 도구 실행을 거쳤는지 확인하고 싶습니다. 과정 2의 어느 주제에서 다루나요?",
+  "question": "약관 챗봇이 어떤 질문에 엉뚱한 답을 했습니다. 그때 어떤 약관 조각이 검색되어 모델에 들어갔는지 확인하려면 무엇을 보나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "MCP와 A2A",
-    "correct": false,
-    "feedback": "MCP와 A2A는 도구와 다른 Agent를 연결하는 방식입니다."
-   },
-   {
-    "answer": "LangGraph 심화",
-    "correct": false,
-    "feedback": "LangGraph 심화는 흐름을 모듈화·저장·병렬화하는 구조를 다룹니다."
-   },
-   {
-    "answer": "Harness Engineering",
-    "correct": false,
-    "feedback": "Harness Engineering은 Agent가 일할 환경과 맥락을 설계합니다."
-   },
-   {
-    "answer": "Observability",
+    "answer": "그 실행의 Trace",
     "correct": true,
-    "feedback": "Observability는 Trace로 모델 호출·도구 실행·체인 흐름을 확인합니다."
+    "feedback": "Trace에는 검색, 모델 호출, 체인 흐름이 차례로 남아 무엇이 모델에 들어갔는지 볼 수 있습니다."
+   },
+   {
+    "answer": "같은 질문을 여러 번 다시 물어 본 답",
+    "correct": false,
+    "feedback": "답이 매번 조금씩 달라질 뿐, 그때 무엇이 검색됐는지는 알 수 없습니다."
+   },
+   {
+    "answer": "Memory Store에 저장한 사용자 선호",
+    "correct": false,
+    "feedback": "장기 기억은 실행 과정을 기록하지 않습니다."
+   },
+   {
+    "answer": "모델을 다시 학습시킨 결과",
+    "correct": false,
+    "feedback": "원인을 확인하기도 전에 모델을 바꾸는 일입니다. RAG 문제는 실행 기록부터 봅니다."
    }
   ]
  },
  {
-  "question": "Function(Tool) Calling을 가장 잘 설명한 것은?",
+  "question": "`chain = prompt | model | parser`에서 parser가 `StrOutputParser()`이고, `chain.invoke({\"topic\": \"RAG\"})`를 실행했습니다. 무엇이 돌아오나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "LLM의 출력을 해석해 컴퓨터의 기능을 실행하는 일",
+    "answer": "`{topic}` 글자가 그대로 든 질문에 대한 답",
+    "correct": false,
+    "feedback": "`invoke`에 넣은 값이 프롬프트의 `{topic}` 자리를 먼저 채운 뒤 모델로 갑니다."
+   },
+   {
+    "answer": "topic이 \"LLM\"이 아니라서 생기는 오류",
+    "correct": false,
+    "feedback": "`{topic}` 자리에는 어떤 글이든 넣을 수 있습니다."
+   },
+   {
+    "answer": "RAG를 설명하는 답변 텍스트(문자열)",
     "correct": true,
-    "feedback": "모델은 어떤 기능을 어떤 값으로 실행할지 출력하고, 그 출력을 해석해 실제로 실행합니다."
+    "feedback": "프롬프트가 RAG로 채워져 모델로 가고, 파서가 모델 응답에서 글만 꺼내 문자열로 돌려줍니다."
    },
    {
-    "answer": "LLM이 다음에 올 말을 예측하는 일",
+    "answer": "문서를 검색해 붙인 RAG 답변",
     "correct": false,
-    "feedback": "그것은 LLM 자체의 정의입니다."
-   },
-   {
-    "answer": "질문과 관련된 문서를 검색해 답변에 더하는 일",
-    "correct": false,
-    "feedback": "그것은 RAG입니다."
-   },
-   {
-    "answer": "Agent와 Agent 사이에서 작업을 위임하는 일",
-    "correct": false,
-    "feedback": "그것은 A2A입니다."
+    "feedback": "이 체인에는 검색 단계가 없습니다. 주제 글자만 RAG일 뿐입니다."
    }
   ]
  },
  {
-  "question": "LangGraph에서 실행 맥락을 관리하는 중심은?",
+  "question": "Researcher가 조사한 결과를 다음 노드인 Writer가 읽어 글을 써야 합니다. 어떻게 넘기나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Edge",
+    "answer": "Writer 노드에서 같은 검색을 한 번 더 한다",
     "correct": false,
-    "feedback": "Edge는 노드 사이의 흐름을 잇습니다."
+    "feedback": "조사가 두 번 일어나고, 두 노드가 같은 결과를 본다는 보장도 없습니다."
    },
    {
-    "answer": "ToolNode",
-    "correct": false,
-    "feedback": "ToolNode는 도구를 실행하는 노드입니다."
-   },
-   {
-    "answer": "State",
+    "answer": "State에 `research_result` 같은 키를 두고, Researcher 노드가 그 키를 담은 dict를 돌려준다",
     "correct": true,
-    "feedback": "LangGraph는 State를 중심으로 실행 맥락을 관리합니다. 노드는 State를 읽고 바꿉니다."
+    "feedback": "노드는 State를 읽고 바뀐 키만 돌려줍니다. 다음 노드는 State에서 그 값을 꺼내 씁니다."
    },
    {
-    "answer": "Supervisor",
+    "answer": "Researcher 노드 안에서 결과를 `print`로 출력한다",
     "correct": false,
-    "feedback": "Supervisor는 멀티 에이전트 구조에서 일을 나누는 Agent입니다. 맥락을 담는 곳은 따로 있습니다."
+    "feedback": "화면에 보일 뿐, 그래프의 다음 노드에 값이 넘어가지 않습니다."
+   },
+   {
+    "answer": "`add_edge`에 조사 결과를 함께 넣는다",
+    "correct": false,
+    "feedback": "Edge는 노드 사이의 순서만 정합니다. 값은 State로 오갑니다."
    }
   ]
  }

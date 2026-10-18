@@ -1,27 +1,27 @@
 [
  {
-  "question": "Supervisor 패턴에서 최종 응답은 누가 작성하나요?",
+  "question": "Supervisor 구조에서 Researcher가 조사를 마쳤습니다. 이제 Writer에게 넘길지, Researcher에게 한 번 더 조사를 시킬지는 누가 정하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Supervisor가 하위 Agent의 결과를 종합해 작성한다",
+    "answer": "Supervisor가 진행 상태를 보고 정한다",
     "correct": true,
-    "feedback": "Supervisor는 전체 목표와 진행 상태를 관리하고, 하위 결과를 모아 최종 응답을 만듭니다."
+    "feedback": "Supervisor는 전체 목표와 진행 상태를 관리하며 다음에 일할 Agent를 고릅니다. 그 결정이 한곳에 모이므로 병목이 될 수도 있습니다."
    },
    {
-    "answer": "마지막에 일한 하위 Agent의 결과를 그대로 쓴다",
+    "answer": "Researcher가 직접 Writer에게 결과를 넘긴다",
     "correct": false,
-    "feedback": "하위 Agent는 자기 역할의 결과만 냅니다. 종합은 전체 진행을 아는 Supervisor가 맡습니다."
+    "feedback": "Agent끼리 직접 주고받는 것은 Network 패턴입니다. Supervisor 구조에서는 결과가 조정자에게 돌아갑니다."
    },
    {
-    "answer": "하위 Agent끼리 직접 토론해 합의한 쪽이 작성한다",
+    "answer": "Writer가 스스로 판단해 일을 가져간다",
     "correct": false,
-    "feedback": "중앙 관리자 없이 서로 직접 주고받는 방식은 Network 패턴입니다."
+    "feedback": "하위 Agent는 자기 역할에 집중합니다. 일을 나눠 주는 것은 Supervisor입니다."
    },
    {
-    "answer": "사용자가 하위 Agent의 결과를 모아 작성한다",
+    "answer": "미리 정한 순서대로 항상 Researcher 다음 Writer가 일한다",
     "correct": false,
-    "feedback": "결과를 모으는 일은 사용자가 아니라 중앙 조정 Agent인 Supervisor가 합니다."
+    "feedback": "순서가 늘 고정이면 판단하는 조정자가 필요 없습니다. Supervisor는 상황을 보고 다음 담당을 정합니다."
    }
   ]
  }

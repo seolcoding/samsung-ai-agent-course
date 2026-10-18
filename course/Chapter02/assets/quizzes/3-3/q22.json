@@ -1,27 +1,27 @@
 [
  {
-  "question": "보고서, 코드, 파일처럼 Agent가 만들어 낸 산출물을 가리키는 것은?",
+  "question": "Agent에게 \"월간 보고서 작성\"을 맡겼습니다. 중간에 Agent가 \"몇 월 보고서인가요?\"라고 되묻고, 마지막에 보고서 파일을 돌려줬습니다. 보고서 파일은 무엇에 해당하나요?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "Task",
     "correct": false,
-    "feedback": "Task는 Agent에게 위임되는 작업의 단위입니다."
+    "feedback": "Task는 맡긴 일 자체(\"월간 보고서 작성\")입니다. 일의 결과물은 따로 부릅니다."
    },
    {
     "answer": "Message",
     "correct": false,
-    "feedback": "Message는 요청, 질문, 중간 응답을 주고받는 말입니다."
+    "feedback": "\"몇 월 보고서인가요?\" 같은 질문과 답이 Message입니다. 결과물인 파일은 Message가 아닙니다."
    },
    {
     "answer": "Artifact",
     "correct": true,
-    "feedback": "Artifact는 최종 또는 중간 산출물입니다."
+    "feedback": "보고서, 코드, 파일처럼 Agent가 만들어 낸 산출물이 Artifact입니다."
    },
    {
     "answer": "Agent Card",
     "correct": false,
-    "feedback": "Agent Card는 Agent가 누구이고 무엇을 할 수 있는지 알리는 메타데이터입니다."
+    "feedback": "Agent Card는 일을 맡기기 전에 읽는 자기소개입니다. 작업 결과와는 관계가 없습니다."
    }
   ]
  }

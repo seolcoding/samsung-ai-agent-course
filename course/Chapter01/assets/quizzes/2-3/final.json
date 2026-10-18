@@ -1,53 +1,53 @@
 [
  {
-  "question": "Streamlit 앱이 다시 실행되어도 값이 남는 곳은?",
+  "question": "예시 앱에서 `for msg in st.session_state.messages:`로 저장된 대화를 다시 출력하는 부분을 지우면, 질문을 두 번째로 했을 때 화면은 어떻게 될까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "스크립트 맨 위에 만든 일반 리스트",
+    "answer": "이전 대화는 이미 그려져 있으므로 화면은 그대로다",
     "correct": false,
-    "feedback": "일반 리스트는 재실행 때마다 새로 만들어집니다."
+    "feedback": "화면은 재실행 때마다 새로 그려집니다. 다시 출력하지 않으면 이전 말풍선은 남지 않습니다."
    },
    {
-    "answer": "`st.session_state`",
+    "answer": "session_state의 대화 기록이 함께 지워진다",
+    "correct": false,
+    "feedback": "기록은 session_state에 그대로 남아 있습니다. 화면에 다시 그리지 않을 뿐입니다."
+   },
+   {
+    "answer": "모든 대화가 두 번씩 겹쳐 출력된다",
+    "correct": false,
+    "feedback": "출력하는 코드를 지웠으므로 겹칠 일이 없습니다. 오히려 이전 대화가 보이지 않습니다."
+   },
+   {
+    "answer": "이전 대화는 사라지고 이번 질문과 답만 보인다",
     "correct": true,
-    "feedback": "사용자 세션 동안 유지해야 하는 값을 저장하는 공간이라 재실행 뒤에도 남습니다."
-   },
-   {
-    "answer": "`if prompt := ...` 안에서 만든 변수",
-    "correct": false,
-    "feedback": "이 변수도 재실행 때마다 새로 만들어지고, 입력이 없으면 아예 실행되지 않습니다."
-   },
-   {
-    "answer": "이미 그려 둔 말풍선",
-    "correct": false,
-    "feedback": "화면은 재실행 때마다 새로 그려집니다. 그래서 저장된 메시지를 매번 다시 출력합니다."
+    "feedback": "재실행 때 화면이 처음부터 다시 그려지므로, 저장된 메시지를 매번 다시 출력해야 이전 대화가 보입니다."
    }
   ]
  },
  {
-  "question": "`@st.cache_resource`와 `st.session_state`의 쓰임을 바르게 짝지은 것은?",
+  "question": "예시 챗봇에 '수술비도 보장되나요?'라고 물은 뒤 '그건 얼마까지예요?'라고 묻자 엉뚱한 답이 나왔습니다. 화면에는 이전 대화가 다 보입니다. 이유는 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "cache_resource: 대화 기록 / session_state: RAG 체인",
-    "correct": false,
-    "feedback": "반대입니다. 무거운 체인은 cache_resource로, 계속 바뀌는 대화 기록은 session_state로 둡니다."
-   },
-   {
-    "answer": "cache_resource: RAG 체인 / session_state: 대화 기록",
+    "answer": "대화 기록은 화면에 그리는 데만 쓰이고, 체인에는 이번 질문만 들어가기 때문이다",
     "correct": true,
-    "feedback": "한 번 만들어 재사용할 무거운 객체는 cache_resource, 세션 동안 유지할 값은 session_state입니다."
+    "feedback": "예시 앱은 체인의 `stream()`에 이번 질문만 넣습니다. 앞 대화를 기억하게 하려면 이전 대화를 요청에 함께 넣어야 합니다."
    },
    {
-    "answer": "둘 다 LLM이 이전 대화를 기억하게 한다",
+    "answer": "`@st.cache_resource`가 체인을 재사용해서 이전 대화를 잊었기 때문이다",
     "correct": false,
-    "feedback": "둘 다 재실행 때 무엇을 남길지 정하는 기능입니다. LLM의 기억과는 관계가 없습니다."
+    "feedback": "cache_resource는 체인을 다시 만들지 않게 할 뿐입니다. 대화를 기억하는 기능은 처음부터 없습니다."
    },
    {
-    "answer": "둘 다 화면 요소를 꾸미는 기능이다",
+    "answer": "재실행 때 session_state가 비워졌기 때문이다",
     "correct": false,
-    "feedback": "화면 요소는 title, caption, chat_message 같은 함수가 그립니다. 두 기능은 값을 남기는 역할입니다."
+    "feedback": "session_state가 비워졌다면 화면에 이전 대화도 보이지 않았을 것입니다."
+   },
+   {
+    "answer": "`st.write_stream`이 이전 답변을 지웠기 때문이다",
+    "correct": false,
+    "feedback": "write_stream은 이번 답변을 차례로 출력하고 돌려줄 뿐입니다. 이전 답변과는 관계가 없습니다."
    }
   ]
  },

@@ -1,27 +1,27 @@
 [
  {
-  "question": "SendMessageRequest에서 사용자 입력 텍스트를 담는 곳은?",
+  "question": "Researcher에게 \"반도체 공정의 AI 활용 사례\"라는 질문을 보내고 답을 받으려 합니다. 질문 글은 어디에 담고, 답 글은 어디서 꺼내나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Agent Card의 description",
-    "correct": false,
-    "feedback": "description은 서버가 자기 Agent를 설명하는 글입니다. 요청 내용이 아닙니다."
-   },
-   {
-    "answer": "A2A-Version 헤더",
-    "correct": false,
-    "feedback": "헤더에는 SDK 1.x 요청이라는 버전 정보를 담습니다."
-   },
-   {
-    "answer": "t.Message의 parts",
+    "answer": "질문은 `t.Message`의 `parts`에 담고, 답은 응답 메시지의 `parts`에서 꺼냅니다",
     "correct": true,
-    "feedback": "입력은 t.Message의 parts에 텍스트로 담고, 답도 응답 메시지의 parts에서 꺼냅니다."
+    "feedback": "요청과 응답이 같은 `t.Message` 형식이라, 글은 양쪽 모두 `parts`에 텍스트로 들어 있습니다."
    },
    {
-    "answer": "EventQueue",
+    "answer": "질문은 `A2A-Version` 헤더에 담고, 답은 Agent Card에서 꺼냅니다",
     "correct": false,
-    "feedback": "EventQueue는 서버가 결과를 발행하는 곳입니다."
+    "feedback": "헤더에는 버전 정보만 담고, 카드는 Agent 소개입니다. 질문과 답은 메시지에 있습니다."
+   },
+   {
+    "answer": "질문은 Agent Card의 description에 담고, 답은 `parts`에서 꺼냅니다",
+    "correct": false,
+    "feedback": "description은 서버가 자기 Agent를 설명하는 글이라 클라이언트가 쓰지 않습니다."
+   },
+   {
+    "answer": "질문은 `parts`에 담고, 답은 서버 터미널의 출력에서 꺼냅니다",
+    "correct": false,
+    "feedback": "서버 터미널은 서버를 띄운 사람만 봅니다. 클라이언트는 응답 메시지에서 답을 받습니다."
    }
   ]
  }

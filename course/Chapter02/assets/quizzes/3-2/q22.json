@@ -1,27 +1,27 @@
 [
  {
-  "question": "반복해서 쓸 수 있는 프롬프트 템플릿에 해당하는 Primitive는?",
+  "question": "\"할 일 목록을 우선순위별로 정리해 줘\" 같은 요청 문장을 매번 새로 쓰지 않고, 서버에서 이름으로 불러 다시 쓰게 하려고 합니다. 서버에 무엇으로 등록하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Tools",
+    "answer": "`@mcp.tool()`",
     "correct": false,
-    "feedback": "Tools는 LLM이 실제 행동을 하려고 호출하는 함수입니다."
+    "feedback": "Tool은 LLM이 행동을 하려고 호출하는 함수입니다. 요청 문장 틀을 다시 쓰는 용도가 아닙니다."
    },
    {
-    "answer": "Resources",
-    "correct": false,
-    "feedback": "Resources는 LLM이나 Host가 읽는 데이터나 맥락 자료입니다."
-   },
-   {
-    "answer": "Prompts",
+    "answer": "`@mcp.prompt()`",
     "correct": true,
-    "feedback": "Prompts는 다시 쓰는 프롬프트 템플릿이고, 단축 명령어로 제공하기도 합니다."
+    "feedback": "Prompt는 반복해서 쓰는 프롬프트 템플릿입니다. 실습 서버의 `task_summary_prompt`가 이것이고, 단축 명령어로 제공하기도 합니다."
    },
    {
-    "answer": "Messages",
+    "answer": "`@mcp.resource(\"config://app-info\")`",
     "correct": false,
-    "feedback": "Messages는 MCP의 3대 Primitive가 아닙니다. 3대 Primitive는 Tools, Resources, Prompts입니다."
+    "feedback": "Resource는 LLM이나 Host가 읽는 데이터나 맥락 자료입니다. 서버 정보처럼 읽기만 하는 내용을 둡니다."
+   },
+   {
+    "answer": "`MCP_CONFIG`에 요청 문장을 적는다",
+    "correct": false,
+    "feedback": "`MCP_CONFIG`는 클라이언트 쪽 연결 설정입니다. 서버가 제공하는 기능은 서버 코드에 등록합니다."
    }
   ]
  }

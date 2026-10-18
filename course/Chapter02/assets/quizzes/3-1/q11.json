@@ -1,27 +1,27 @@
 [
  {
-  "question": "슬라이드의 정의로 Agent를 가장 잘 설명한 것은?",
+  "question": "다음 중 Agent라고 부를 수 있는 프로그램은 무엇인가요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "다음에 어떤 말이 나올지 예측하는 모델",
+    "answer": "질문을 모델에 한 번 보내고 받은 답을 그대로 출력한다",
     "correct": false,
-    "feedback": "그것은 LLM의 정의입니다. Agent는 LLM으로 구성한 파이프라인입니다."
+    "feedback": "모델을 한 번 호출했을 뿐입니다. 도구를 쓰고 결과를 검토하는 반복이 없습니다."
    },
    {
-    "answer": "함수 호출과 그 결과 검토를 반복해 복잡한 작업을 처리하는 LLM 파이프라인",
+    "answer": "프롬프트 템플릿에 주제를 채워 체인으로 답을 받는다",
+    "correct": false,
+    "feedback": "LangChain 체인으로 모델을 부른 것입니다. 도구 실행과 결과 검토가 없습니다."
+   },
+   {
+    "answer": "모델이 고른 도구를 실행하고, 결과를 다시 모델에 넣어 필요하면 도구를 더 부른 뒤 답한다",
     "correct": true,
-    "feedback": "Agent는 한 번 답하고 끝나지 않습니다. 도구를 호출하고 결과를 보고 다시 판단하는 일을 반복합니다."
+    "feedback": "도구 호출과 결과 검토를 반복하며 일을 끝냅니다. 이 반복이 Agent를 단순 호출과 가릅니다."
    },
    {
-    "answer": "LLM 워크플로를 만드는 데 쓰는 라이브러리",
+    "answer": "모델이 고른 도구를 한 번 실행하고 그 결과를 그대로 출력한다",
     "correct": false,
-    "feedback": "그것은 LangChain(LangGraph)의 설명입니다."
-   },
-   {
-    "answer": "LLM의 출력을 해석해 컴퓨터 기능을 한 번 실행하는 일",
-    "correct": false,
-    "feedback": "그것은 Function(Tool) Calling입니다. Agent는 이 호출과 결과 검토를 반복합니다."
+    "feedback": "Tool Calling 한 번입니다. 결과를 모델이 다시 보고 다음 행동을 정하는 단계가 빠졌습니다."
    }
   ]
  }

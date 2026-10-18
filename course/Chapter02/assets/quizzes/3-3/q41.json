@@ -1,27 +1,27 @@
 [
  {
-  "question": "A2A 클라이언트가 메시지를 보내기 전에 먼저 하는 일은?",
+  "question": "클라이언트 코드에서 Agent Card는 잘 읽었는데, 메시지를 보내자 서버가 예전 버전 요청으로 보고 거부합니다. 무엇을 확인하나요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "상대 Agent의 내부 코드 내려받기",
+    "answer": "httpx의 timeout을 늘렸는지",
     "correct": false,
-    "feedback": "내부 코드는 몰라도 됩니다. 클라이언트는 공개된 Agent Card만 읽습니다."
+    "feedback": "시간 초과가 아니라 버전 문제입니다. 기다리는 시간을 늘려도 거부는 그대로입니다."
    },
    {
-    "answer": "Agent Card 조회",
+    "answer": "Agent Card를 한 번 더 읽었는지",
+    "correct": false,
+    "feedback": "카드는 이미 잘 읽었습니다. 다시 읽어도 요청의 버전 표시는 바뀌지 않습니다."
+   },
+   {
+    "answer": "서버 포트를 다른 번호로 바꿨는지",
+    "correct": false,
+    "feedback": "포트는 연결 주소일 뿐입니다. 버전을 밝히는 것과 관계가 없습니다."
+   },
+   {
+    "answer": "요청에 `A2A-Version` 헤더를 넣었는지",
     "correct": true,
-    "feedback": "A2ACardResolver로 카드를 읽어 URL, 기능, 입출력 모드를 확인한 뒤 Client를 만듭니다."
-   },
-   {
-    "answer": "EventQueue에 결과 발행",
-    "correct": false,
-    "feedback": "EventQueue에 발행하는 것은 서버의 AgentExecutor입니다."
-   },
-   {
-    "answer": "task_store 만들기",
-    "correct": false,
-    "feedback": "task_store는 서버의 RequestHandler에 연결하는 것입니다."
+    "feedback": "클라이언트는 `A2A-Version` 헤더로 SDK 1.x 요청임을 밝힙니다. 헤더가 없으면 서버가 예전(0.3) 버전으로 여겨 거부합니다."
    }
   ]
  }

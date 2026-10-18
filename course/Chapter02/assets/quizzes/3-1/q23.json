@@ -1,27 +1,27 @@
 [
  {
-  "question": "Harness Engineering에서 다루는 것이 아닌 것은?",
+  "question": "AI 코딩 도우미가 매번 프로젝트에서 쓰지 않는 라이브러리로 코드를 짭니다. Harness Engineering 관점에서 먼저 할 일은 무엇인가요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "필요한 컨텍스트를 어떻게 제공할지 설계하기",
+    "answer": "모델을 프로젝트 코드로 다시 학습시킨다",
     "correct": false,
-    "feedback": "슬라이드의 첫 항목입니다."
+    "feedback": "Harness Engineering은 모델을 바꾸지 않고, 모델이 일하는 환경과 맥락을 설계합니다."
    },
    {
-    "answer": "도구 사용 조건과 실패 복구 전략 정하기",
-    "correct": false,
-    "feedback": "슬라이드의 두 번째 항목입니다."
-   },
-   {
-    "answer": "모델 가중치를 새로 학습시키기",
+    "answer": "쓸 라이브러리와 실행 방법을 지침 파일에 정리해 AI가 읽게 한다",
     "correct": true,
-    "feedback": "Harness Engineering은 모델 자체가 아니라 Agent가 일하는 환경과 맥락을 설계합니다."
+    "feedback": "필요한 맥락을 AI가 읽기 쉬운 지침으로 주면 매번 같은 실수를 줄일 수 있습니다."
    },
    {
-    "answer": "Skill, 지침, 파일 구조를 Agent가 읽기 쉽게 정리하기",
+    "answer": "요청 문장을 더 짧게 줄인다",
     "correct": false,
-    "feedback": "슬라이드의 세 번째 항목입니다."
+    "feedback": "맥락이 줄어 오히려 엉뚱한 라이브러리를 고를 가능성이 커집니다."
+   },
+   {
+    "answer": "temperature를 높여 다른 답이 나올 때까지 다시 시킨다",
+    "correct": false,
+    "feedback": "운에 맡기는 방법입니다. 같은 실수를 막을 맥락이 생기지 않습니다."
    }
   ]
  }

@@ -1,27 +1,27 @@
 [
  {
-  "question": "한 노드가 끝난 뒤 어디로 갈지 정하는 요소는?",
+  "question": "LLM 노드가 답을 낸 뒤, 도구 호출이 있으면 도구 노드로, 없으면 끝으로 가게 하고 싶습니다. 무엇을 쓰면 될까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "Node",
+    "answer": "항상 도구 노드로 가는 일반 Edge",
     "correct": false,
-    "feedback": "Node는 실제 작업을 하는 실행 단위입니다. 다음 행선지는 다른 요소가 정합니다."
+    "feedback": "일반 Edge는 늘 같은 곳으로 갑니다. 도구가 필요 없을 때도 도구 노드로 가게 됩니다."
    },
    {
-    "answer": "Edge",
+    "answer": "다음 노드 이름을 적어 두는 State 필드 하나",
+    "correct": false,
+    "feedback": "필드에 값만 적어 두면 그래프가 알아서 움직이지 않습니다. 그 값을 읽고 행선지를 고르는 장치가 따로 있어야 합니다."
+   },
+   {
+    "answer": "`messages` 필드에 붙인 `add_messages` Reducer",
+    "correct": false,
+    "feedback": "Reducer는 같은 필드에 들어온 값을 합치는 규칙입니다. 다음 행선지는 고르지 않습니다."
+   },
+   {
+    "answer": "State를 보고 행선지를 고르는 조건부 Edge",
     "correct": true,
-    "feedback": "Edge가 노드가 끝난 뒤 이동할 노드를 정합니다. 조건부 Edge는 State를 보고 행선지를 고릅니다."
-   },
-   {
-    "answer": "State",
-    "correct": false,
-    "feedback": "State는 실행 중 노드들이 함께 읽고 고치는 데이터입니다."
-   },
-   {
-    "answer": "Reducer",
-    "correct": false,
-    "feedback": "Reducer는 같은 필드에 들어온 값을 합치는 규칙이라 이동과는 관계가 없습니다."
+    "feedback": "갈림길 함수가 State를 읽고 돌려준 값에 따라 다음 노드가 정해집니다. 그림의 \"정보가 충분한가?\" 두 갈래가 이것입니다."
    }
   ]
  }
