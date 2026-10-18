@@ -425,6 +425,9 @@ def check_lab(nb, R):
       [(i, f"{n}문장: {excerpt(c.source, 40)}") for i, c in enumerate(cells)
        if c.cell_type == "markdown" and c.source.lstrip().startswith(HINT_HEAD)
        and (n := len(re.findall(r"[.?!](?=\s|$)", prose(c.source[len(HINT_HEAD) + 1:])))) > HINT_MAX_SENTENCES])
+    R("실습", "\"AI에게 물어보기\" 절·안내 없음 (2026-10-18 뺌)",
+      [(i, excerpt(c.source, 40)) for i, c in enumerate(cells)
+       if c.cell_type == "markdown" and not is_box(c) and "AI에게 물어보기" in c.source])
     R("실습", "성공 기준 자동 검사 셀 없음 — 수강생이 스스로 판단한다",
       [(i, excerpt(c.source, 40)) for i, c in enumerate(cells) if c.cell_type == "code" and "show_criteria(" in c.source])
 

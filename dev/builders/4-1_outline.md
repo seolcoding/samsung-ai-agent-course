@@ -1,5 +1,7 @@
 # 4-1 교안 노트북 — 목차 (v1, 2026-09-28)
 
+> 2026-10-18: 실습 노트북에서 "AI에게 물어보기" 절을 뺐다(`dev/AGENTS.md`). 아래의 물어보기 항목은 지난 설계 기록이고 빌드에 쓰이지 않는다.
+
 - **권 제목**: Harness Engineering 핵심 원칙 (PDF 제목 "4-1 Harness Engineering 핵심 원칙")
 - **원본 슬라이드**: `course/Chapter02/slides/day02/4-1-harness-engineering-core-principles.pdf` (22쪽. 표지 p1, 목차 p2, 장 표지 p3·p7·p11·p16, 정리 p21, 코드 소개 p22)
 - **원본 코드**: `course/Chapter02/code/raw/04-harness/`

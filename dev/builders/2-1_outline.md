@@ -1,5 +1,7 @@
 # 2-1 교안 노트북 — 1단계 목차 (v1, 2026-09-28)
 
+> 2026-10-18: 실습 노트북에서 "AI에게 물어보기" 절을 뺐다(`dev/AGENTS.md`). 아래의 물어보기 항목은 지난 설계 기록이고 빌드에 쓰이지 않는다.
+
 - **원본**: PDF `docs/raw/Chapter01/day02/2-1-langgraph-theory-and-advanced-features.pdf`(14쪽). 코드 `src/raw/Chapter01/04-langgraph/` 5개: `01_basic_graph.py`, `02_conditional_edge.py`, `03_tool_node.py`, `04_human_in_the_loop.py`, `05_hitl_interactive.py`
 - **권 제목**: LangGraph 정통 이론 & 고급 기능 실습
 - **커리큘럼**: 2일차 2.2 "LangGraph 정통 이론 & 고급 기능 실습" 3.0H (`docs/CURRICULUM.md`. 커리큘럼 번호 2.2 = PDF 번호 2-1)

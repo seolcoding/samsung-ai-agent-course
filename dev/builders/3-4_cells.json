@@ -61,7 +61,7 @@
  },
  "sum21": "**정리:** Checkpointer는 같은 `thread_id`의 State를 이어 줍니다. 메모리에 두면(MemorySaver) 끝나면 사라지고, 파일에 두면(SqliteSaver) 남습니다.",
  "p7": "Memory Store는 Checkpointer와 별도로 사용자별 장기 기억을 저장하는 공간입니다.\n\n- thread를 넘어 공유되는 장기 정보를 저장합니다.\n- `namespace`로 사용자, 조직, 프로젝트별 기억을 나눕니다.\n- 사용자 선호, 반복 업무 규칙, 중요한 사실을 저장하는 데 알맞습니다.\n\n슬라이드 코드는 `InMemoryStore()`로 저장소를 만들고, `compile(checkpointer=MemorySaver(), store=store)`로 체크포인터와 함께 그래프에 넘깁니다. `(\"memories\", user_id)` 같은 튜플이 namespace입니다. `store.search(namespace)`로 그 사용자의 기억을 찾고, `store.put(namespace, \"fact_0\", {...})`로 새 기억을 저장합니다.\n\n**왜 배우나:** Checkpointer는 thread 단위입니다. 새 대화(새 thread)를 열면 앞 대화에서 들은 이름이나 취미를 모릅니다. 대화가 바뀌어도 남겨 둘 정보는 따로 저장해야 합니다.",
- "p7__meta": "- 실습 원본 `03_memory_store.py`의 compile 줄은 `builder.compile()`로 checkpointer·store가 빠져 있습니다(루트 AGENTS.md 7절 알려진 결함). 실습 노트북에서는 슬라이드와 같은 줄로 바꿔 넣었습니다(원본 파일은 그대로).\n- 그런데 실습 코드의 노드는 전역 변수 `store`를 직접 씁니다. 그래서 compile에 `store=`를 넘기든 안 넘기든 화면이 똑같습니다. LangGraph는 노드 함수가 `store` 인자를 선언할 때만 compile에 넘긴 store를 넣어 줍니다(설치 버전 1.2.12에서 확인). 실습의 \"AI에게 물어보기\" 소재입니다. 수강생이 물으면 이 차이를 짚어 줍니다.",
+ "p7__meta": "- 실습 원본 `03_memory_store.py`의 compile 줄은 `builder.compile()`로 checkpointer·store가 빠져 있습니다(루트 AGENTS.md 7절 알려진 결함). 실습 노트북에서는 슬라이드와 같은 줄로 바꿔 넣었습니다(원본 파일은 그대로).\n- 그런데 실습 코드의 노드는 전역 변수 `store`를 직접 씁니다. 그래서 compile에 `store=`를 넘기든 안 넘기든 화면이 똑같습니다. LangGraph는 노드 함수가 `store` 인자를 선언할 때만 compile에 넘긴 store를 넣어 줍니다(설치 버전 1.2.12에서 확인). 수강생이 물으면 이 차이를 짚어 줍니다.",
  "q22": {
   "question": "사용자가 새 대화(새 thread)를 열어도 그 사용자의 취미를 기억하게 하려면 어디에 저장해야 하나요?",
   "type": "multiple_choice",
@@ -118,7 +118,7 @@
  },
  "sum31": "**정리:** 엣지를 여러 개 내면 fan-out, 한 노드로 모으면 fan-in입니다. 서로 독립적인 작업만 나누고, 합칠 때의 병합 규칙을 정해 둡니다.",
  "p10": "Send는 실행 시점에 필요한 Worker 수를 정하는 LangGraph의 병렬 실행 API입니다.\n\n- `Send(\"worker\", state)` 모양으로 특정 노드에 별도 입력을 보냅니다.\n- 조건부 Edge에서 `list[Send]`를 반환하면 Worker가 병렬로 생깁니다.\n- 입력 리스트 길이에 따라 작업 수가 달라지는 상황에 쓸모가 있습니다.\n- 결과를 누적하려면 `Annotated` reducer 같은 병합 전략이 필요합니다.\n\n슬라이드 코드의 `fan_out`은 `queries`에 든 질문마다 `Send(\"worker\", {\"query\": q, ...})`를 하나씩 만들어 목록으로 돌려줍니다. 이 함수를 `add_conditional_edges(START, fan_out, [\"worker\"])`에 넣으면, 질문이 세 개면 worker가 세 번, 다섯 개면 다섯 번 병렬로 실행됩니다.\n\n**왜 배우나:** 질문이 몇 개 들어올지 그래프를 만들 때는 모를 수 있습니다. 엣지로 만든 fan-out은 노드 수가 고정되어 있어 이런 경우를 다루지 못합니다.",
- "p10__meta": "- 실습 코드의 `DynamicState.results`는 `Annotated[list[str], lambda a, b: a + b]`입니다. 여러 worker가 같은 `results`에 쓰므로, 두 목록을 이어 붙이는 규칙이 없으면 값이 겹쳐 쓰입니다. 실습의 \"AI에게 물어보기\" 소재입니다.",
+ "p10__meta": "- 실습 코드의 `DynamicState.results`는 `Annotated[list[str], lambda a, b: a + b]`입니다. 여러 worker가 같은 `results`에 쓰므로, 두 목록을 이어 붙이는 규칙이 없으면 값이 겹쳐 쓰입니다. 수강생이 물으면 짚어 줍니다.",
  "q32": {
   "question": "엣지로 만든 fan-out 대신 Send를 쓰는 것이 알맞은 상황은?",
   "type": "multiple_choice",

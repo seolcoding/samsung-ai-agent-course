@@ -1,5 +1,7 @@
 # 1-3 교안 노트북 — 1단계 목차 (v1, 2026-09-28)
 
+> 2026-10-18: 실습 노트북에서 "AI에게 물어보기" 절을 뺐다(`dev/AGENTS.md`). 아래의 물어보기 항목은 지난 설계 기록이고 빌드에 쓰이지 않는다.
+
 - **원본 PDF**: `docs/raw/Chapter01/day01/1-3-langchain-framework-deep-dive.pdf` (14쪽)
 - **권 제목**: LangChain 프레임워크 깊이 있는 학습 → `# [LEC] LangChain 프레임워크 깊이 있는 학습`, `# [LAB] LangChain 실습`
 - **원본 코드**: `src/raw/Chapter01/02-langchain/` 5개 — `01_lcel_runnable.py`, `02_tool_calling.py`, `03_output_parser.py`, `04_memory_runnable.py`, `05_memory_langgraph.py` (솔루션: `src/solution/Chapter01/02-langchain/` 같은 이름)

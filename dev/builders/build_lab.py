@@ -14,7 +14,7 @@
 
 모든 실습 노트북은 같은 구조다.
   제목 → 목차 → 1. 실습 방법 → 원본 파일마다 한 장:
-    준비 코드(접힘) → 구획마다 한 절 → AI에게 물어보기(TODO가 없는 파일) → 정리
+    준비 코드(접힘) → 구획마다 한 절 → 정리
 구획은 두 종류다.
   예제: 완성된 코드를 함께 실행한다. `# ✍️ CHANGE_HERE:` 주석 바로 아래 줄의 값만 바꿔 다시 실행해 본다.
   과제: 원본 TODO 주석을 `# ✍️ WRITE_HERE:`로 바꾸고, 그 아래 정답 줄을 빈칸(`...  # ✍️ …`)으로 바꿔 넣는다. 수강생이 AI와 채운다.
@@ -487,13 +487,7 @@ def build(folder, mc=False):
                     visible=True, kind="" if mc else KIND_EXAMPLE)
             nb.cells[-1].metadata.setdefault("tags", []).append("skip-auto-run")  # 앱은 멈출 때까지 돈다
         nb.md(f["look"])
-        nb.meta(f.get("look__meta"))
-        ask = f.get("ask")
-        if ask:
-            sub += 1
-            nb.h(3, f"{n}.{sub} AI에게 물어보기")
-            nb.md(f"**프롬프트 힌트** {ask['hint']}")
-            nb.md(_criteria_md([], ask.get("fail", []), ask.get("success", [])))
+        nb.meta(f.get("look__meta"))  # 장 끝 "AI에게 물어보기" 절은 두지 않는다(2026-10-18). spec에 ask를 넣지 않는다
 
     last = len(spec["files"]) + 2
     if spec.get("task"):  # 과제 안내: 학습 목표와 과제 폴더(2026-10-18)
@@ -565,8 +559,6 @@ def scaffold(folder):
                  "look": "(작성 예정)"}
         if todos:
             entry["todos"] = todos
-        else:
-            entry["ask"] = {"hint": "(작성 예정)", "success": ["(작성 예정)"], "fail": []}
         files.append(entry)
     unit = UNITS[folder][0]
     spec = {"draft": True, "title": f"{unit} 실습", "intro": "(작성 예정)", "files": files, "closing": "(작성 예정)"}

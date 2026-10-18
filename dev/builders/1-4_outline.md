@@ -1,5 +1,7 @@
 # 1-4 교안 노트북 — 목차 (v1, 2026-09-28)
 
+> 2026-10-18: 실습 노트북에서 "AI에게 물어보기" 절을 뺐다(`dev/AGENTS.md`). 아래의 물어보기 항목은 지난 설계 기록이고 빌드에 쓰이지 않는다.
+
 - **권 제목**: RAG 이론 & 실습 (PDF 표지 "1-4 RAG 이론 & 실습")
 - **원본 PDF**: `docs/raw/Chapter01/day01/1-4-rag-theory-and-core-modules.pdf` (19쪽)
 - **원본 코드**: `src/raw/Chapter01/03-rag/` 5개 + 데이터 1개

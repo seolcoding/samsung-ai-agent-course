@@ -1,5 +1,7 @@
 # 2-3 교안 노트북 — 1단계 목차 (v1, 2026-09-28)
 
+> 2026-10-18: 실습 노트북에서 "AI에게 물어보기" 절을 뺐다(`dev/AGENTS.md`). 아래의 물어보기 항목은 지난 설계 기록이고 빌드에 쓰이지 않는다.
+
 - **권 제목**: Streamlit을 활용한 RAG 배포 (PDF 1쪽 제목)
 - **원본**: PDF `docs/raw/Chapter01/day02/2-3-streamlit-rag.pdf`(13쪽), 코드 `src/raw/Chapter01/06-rag-streamlit/` — `app.py`, `test.py`, `data/meritz_pet_insurance.pdf`(28쪽, 원본·솔루션 동일)
 - **커리큘럼 시간**: 2.3 블록 "Multi-Agent 협업 입문 / Streamlit 기반 RAG 서비스화" 2.0H를 2-2와 나눠 쓴다. 블록 안 시간 배분은 커리큘럼에 없다.
