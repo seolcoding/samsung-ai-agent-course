@@ -198,6 +198,9 @@ def written_files(nb):
     # 객관식판은 완성 서버 파일을 노트북 폴더에 미리 둔다. 터미널 실행 안내(uv run python …)에 나오는 파일도 이 노트북의 파일이다
     own |= {m.group(1) for c in nb.cells if c.cell_type == "markdown"
             for m in re.finditer(r"uv run python course/Chapter\d+/notebooks/(\S+\.py)", c.source)}
+    # 바이브 코딩 과제: 과제 파일 만들기 셀이 노트북 옆에 쓰는 <번호>_task.py
+    own |= {m.group(1) for c in nb.cells if c.cell_type == "code"
+            for m in re.finditer(r"task_file = Path\([\"'](\d-\d_task\.py)[\"']\)", c.source)}
     return own
 
 
@@ -320,7 +323,8 @@ def check_structure(nb, kind, R):
                 section_code = False
             elif c.cell_type == "code" and section_code is False:
                 section_code = True
-                if not hidden(c) and BLANK not in c.source and not c.source.startswith("%%writefile"):  # 파일로 쓰는 셀은 보여야 한다
+                if not hidden(c) and BLANK not in c.source and not c.source.startswith("%%writefile") \
+                        and "task_file = Path(" not in c.source:  # 파일로 쓰는 셀(서버·앱·과제 파일)은 보여야 한다
                     first_open.append((i, f"절의 첫 코드 셀이 보임: {excerpt(c.source, 40)}"))
         R("구조", "원본 파일 절의 첫 코드(준비 코드)는 접힘", first_open, warn=True)
 

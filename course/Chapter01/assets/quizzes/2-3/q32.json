@@ -1,27 +1,27 @@
 [
  {
-  "question": "`st.chat_input`이 입력한 문자열을 돌려주는 때는 언제일까요?",
+  "question": "앱을 처음 열어 아직 아무것도 입력하지 않았을 때, `if prompt := st.chat_input(\"질문을 입력하세요\"):` 아래 코드는 어떻게 될까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "글자를 한 자 입력할 때마다",
+    "answer": "빈 문자열을 질문으로 삼아 체인이 한 번 실행된다",
     "correct": false,
-    "feedback": "입력 도중에는 값을 돌려주지 않습니다. Enter를 눌러 보낼 때 돌려줍니다."
+    "feedback": "입력이 없으면 빈 문자열이 아니라 None을 돌려줍니다. 체인은 실행되지 않습니다."
    },
    {
-    "answer": "사용자가 입력하고 Enter를 눌렀을 때",
+    "answer": "입력창의 안내 문구가 질문으로 들어가 실행된다",
+    "correct": false,
+    "feedback": "안내 문구는 화면에만 보이는 글자입니다. 돌려주는 값이 아닙니다."
+   },
+   {
+    "answer": "입력이 없어 None을 돌려받으므로 아래 코드를 건너뛴다",
     "correct": true,
-    "feedback": "Enter를 누르면 스크립트가 다시 실행되고, 이때 입력한 문자열을 돌려줍니다."
+    "feedback": "Enter로 보내기 전에는 None이 돌아와 if 아래가 실행되지 않습니다. 보내면 입력한 문자열이 돌아오며 실행됩니다."
    },
    {
-    "answer": "앱이 처음 열렸을 때 입력창의 안내 문구를",
+    "answer": "값이 없어 오류가 나고 앱이 멈춘다",
     "correct": false,
-    "feedback": "입력창의 안내 문구는 화면에만 보이는 글자입니다. 돌려주는 값이 아닙니다."
-   },
-   {
-    "answer": "AI 답변 스트리밍이 끝났을 때",
-    "correct": false,
-    "feedback": "`st.chat_input`은 사용자 질문을 받는 입력창입니다. AI 답변과는 관계가 없습니다."
+    "feedback": "None은 정상적인 반환값입니다. 오류 없이 if 아래를 건너뛸 뿐입니다."
    }
   ]
  }

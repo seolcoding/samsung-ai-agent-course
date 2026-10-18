@@ -23,63 +23,63 @@
  "p13__meta": "- 캡스톤 연결 근거: 커리큘럼 4.3 \"스켈레톤 코드 통합 아키텍처: Supervisor → Researcher(MCP+RAG+웹검색) → HITL 승인 → Writer\". 캡스톤은 자유 주제와 스켈레톤 중 고를 수 있습니다.",
  "sum32": "**정리:** 짧고 단순한 일은 단일 Agent, 결과물이 다른 단계가 있으면 역할 분리, 검증이 필요하면 Reviewer를 더합니다. 늘어난 비용만큼 효과를 측정합니다.",
  "q11": {
-  "question": "조사·계획·작성·검토를 한 Agent의 한 흐름에 모두 맡길 때 직접 어려워지는 것은?",
+  "question": "보고서를 쓰는 단일 Agent가 틀린 결론을 냈습니다. 기록을 봐도 조사 단계에서 틀렸는지, 글을 쓰다 틀렸는지 가를 수 없습니다. 가장 근본적인 원인은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "실패 원인이 계획 문제인지 실행 문제인지 가르기", "correct": true, "feedback": "역할이 섞이면 어떤 판단이 어느 역할에서 나왔는지 추적하기 어렵습니다. 그래서 디버깅이 어려워집니다."},
-   {"answer": "모델에 API 요청을 보내기", "correct": false, "feedback": "요청을 보내는 방법은 역할이 섞여도 같습니다. 어려워지는 것은 결과를 추적하고 원인을 가르는 일입니다."},
-   {"answer": "모델이 한국어로 답하게 하기", "correct": false, "feedback": "답의 언어는 역할 혼재와 관계가 없습니다. 슬라이드는 품질과 디버깅 난이도를 짚습니다."},
-   {"answer": "Context Window의 최대 크기 늘리기", "correct": false, "feedback": "최대 크기는 모델이 정합니다. 역할 혼재로 어려워지는 것은 현재 역할을 지키고 실패 원인을 찾는 일입니다."}
+   {"answer": "모델의 temperature가 너무 높게 정해져 있다", "correct": false, "feedback": "temperature는 답의 다양성을 정할 뿐입니다. 원인을 가를 수 없는 문제는 역할이 한 흐름에 섞인 데서 옵니다."},
+   {"answer": "조사·계획·작성·검토가 한 흐름에 섞여 있다", "correct": true, "feedback": "역할이 섞이면 어떤 판단이 어느 역할에서 나왔는지 추적하기 어렵습니다. 그래서 실패 원인을 가르기도 어렵습니다."},
+   {"answer": "Agent가 쓸 수 있는 도구가 너무 적다", "correct": false, "feedback": "도구를 늘려도 단계가 한 흐름에 섞여 있으면 원인을 가르기는 여전히 어렵습니다."},
+   {"answer": "결과를 콘솔에만 출력하고 있다", "correct": false, "feedback": "출력 위치는 원인 추적과 관계가 없습니다. 문제는 한 흐름이 모든 역할을 맡는 구조입니다."}
   ]
  },
  "q12": {
-  "question": "단일 Agent의 컨텍스트가 빠르게 커지는 원인이 아닌 것은?",
+  "question": "단일 Agent가 작업 초반에는 지시를 잘 따르다가, 단계가 쌓인 후반부에는 처음 받은 조건을 자주 놓칩니다. 가장 알맞은 개선은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "여러 도구의 설명", "correct": false, "feedback": "도구 설명도 프롬프트에 들어가 컨텍스트를 키웁니다."},
-   {"answer": "한 번의 프롬프트에 함께 넣은 작업 자료", "correct": false, "feedback": "작업 자료를 한 번에 넣으면 컨텍스트가 커집니다."},
-   {"answer": "이전 단계에서 쌓인 중간 결과", "correct": false, "feedback": "단계가 지날수록 중간 결과가 쌓여 컨텍스트가 커집니다."},
-   {"answer": "temperature 값을 낮게 정한 것", "correct": true, "feedback": "temperature는 답의 다양성을 정하는 값입니다. 컨텍스트에 들어가는 내용의 양과는 관계가 없습니다."}
+   {"answer": "매 단계 프롬프트에 앞 단계 결과를 빠짐없이 다시 붙여 넣는다", "correct": false, "feedback": "중간 결과를 더 붙이면 컨텍스트가 더 커져 중요한 조건이 더 쉽게 묻힙니다."},
+   {"answer": "도구를 더 추가해 Agent가 고를 선택지를 늘린다", "correct": false, "feedback": "도구 설명도 컨텍스트에 들어갑니다. 늘리면 컨텍스트가 더 커지고 선택도 어려워집니다."},
+   {"answer": "Agent를 나눠 각 Agent가 자기 일에 필요한 정보만 들고 일하게 한다", "correct": true, "feedback": "중간 결과가 한 컨텍스트에 쌓이면 중요한 정보가 묻힙니다. 나누면 Agent마다 필요한 정보만 보게 됩니다."},
+   {"answer": "temperature를 낮춰 답을 더 일정하게 만든다", "correct": false, "feedback": "답이 일정해져도 쌓인 정보 속에 조건이 묻히는 문제는 그대로입니다."}
   ]
  },
  "q13": {
-  "question": "도구가 많아 도구 선택이 어려워질 때 슬라이드가 제시한 방법은?",
+  "question": "도구 30개를 가진 Agent가 '사내 문서 검색' 대신 비슷한 '웹 검색'을 자주 잘못 고릅니다. 가장 알맞은 개선은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "도구별 전문 Agent로 나눠 각 Agent의 선택 범위를 줄인다", "correct": true, "feedback": "전문 Agent는 자기 역할에 필요한 도구만 봅니다. 고를 도구가 적어지면 잘못 고를 가능성도 줄어듭니다."},
-   {"answer": "모든 도구의 설명을 한 프롬프트에 더 자세히 적는다", "correct": false, "feedback": "도구 설명도 컨텍스트입니다. 더 길게 적으면 컨텍스트가 커지고 선택 문제는 그대로입니다."},
-   {"answer": "temperature를 높여 여러 도구를 시도하게 한다", "correct": false, "feedback": "시도가 늘면 불필요한 호출과 비용이 늘어납니다. 선택 범위는 줄지 않습니다."},
-   {"answer": "비슷한 도구를 모두 한 Agent에 모아 둔다", "correct": false, "feedback": "비슷한 도구가 한곳에 모이면 잘못 고를 가능성이 오히려 커집니다."}
+   {"answer": "30개 도구의 설명을 한 프롬프트에 더 길고 자세히 적는다", "correct": false, "feedback": "도구 설명도 컨텍스트입니다. 길게 적으면 컨텍스트만 커지고 고를 범위는 그대로입니다."},
+   {"answer": "temperature를 높여 여러 도구를 번갈아 시도하게 한다", "correct": false, "feedback": "시도가 늘면 불필요한 호출과 비용만 늘어납니다. 고를 범위는 줄지 않습니다."},
+   {"answer": "검색 도구를 더 만들어 같은 Agent에 함께 넣는다", "correct": false, "feedback": "비슷한 도구가 한곳에 많을수록 잘못 고를 가능성이 커집니다."},
+   {"answer": "도구별 전문 Agent로 나눠 각 Agent가 고를 도구를 줄인다", "correct": true, "feedback": "전문 Agent는 자기 역할에 필요한 도구만 봅니다. 고를 도구가 적으면 잘못 고를 가능성도 줄어듭니다."}
   ]
  },
  "q21": {
-  "question": "Supervisor 패턴에서 최종 응답은 누가 작성하나요?",
+  "question": "Supervisor 구조에서 Researcher가 조사를 마쳤습니다. 이제 Writer에게 넘길지, Researcher에게 한 번 더 조사를 시킬지는 누가 정하나요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Supervisor가 하위 Agent의 결과를 종합해 작성한다", "correct": true, "feedback": "Supervisor는 전체 목표와 진행 상태를 관리하고, 하위 결과를 모아 최종 응답을 만듭니다."},
-   {"answer": "마지막에 일한 하위 Agent의 결과를 그대로 쓴다", "correct": false, "feedback": "하위 Agent는 자기 역할의 결과만 냅니다. 종합은 전체 진행을 아는 Supervisor가 맡습니다."},
-   {"answer": "하위 Agent끼리 직접 토론해 합의한 쪽이 작성한다", "correct": false, "feedback": "중앙 관리자 없이 서로 직접 주고받는 방식은 Network 패턴입니다."},
-   {"answer": "사용자가 하위 Agent의 결과를 모아 작성한다", "correct": false, "feedback": "결과를 모으는 일은 사용자가 아니라 중앙 조정 Agent인 Supervisor가 합니다."}
+   {"answer": "Supervisor가 진행 상태를 보고 정한다", "correct": true, "feedback": "Supervisor는 전체 목표와 진행 상태를 관리하며 다음에 일할 Agent를 고릅니다. 그 결정이 한곳에 모이므로 병목이 될 수도 있습니다."},
+   {"answer": "Researcher가 직접 Writer에게 결과를 넘긴다", "correct": false, "feedback": "Agent끼리 직접 주고받는 것은 Network 패턴입니다. Supervisor 구조에서는 결과가 조정자에게 돌아갑니다."},
+   {"answer": "Writer가 스스로 판단해 일을 가져간다", "correct": false, "feedback": "하위 Agent는 자기 역할에 집중합니다. 일을 나눠 주는 것은 Supervisor입니다."},
+   {"answer": "미리 정한 순서대로 항상 Researcher 다음 Writer가 일한다", "correct": false, "feedback": "순서가 늘 고정이면 판단하는 조정자가 필요 없습니다. Supervisor는 상황을 보고 다음 담당을 정합니다."}
   ]
  },
  "q23": {
-  "question": "중앙 병목은 가장 적지만 전체 흐름을 통제하기 어려운 패턴은?",
+  "question": "아이디어 Agent, 비판 Agent, 정리 Agent가 중앙 관리자 없이 필요할 때마다 서로 의견을 주고받는 토론 시스템을 만들려 합니다. 알맞은 패턴과 주의점은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Supervisor", "correct": false, "feedback": "Supervisor는 중앙 조정자가 흐름을 쥐고 있어 통제는 쉽지만, 조정자가 병목이 될 수 있습니다."},
-   {"answer": "Hierarchical", "correct": false, "feedback": "Hierarchical은 상위·중간·하위 층이 흐름을 나눠 관리합니다. 층마다 관리자가 있습니다."},
-   {"answer": "Network", "correct": true, "feedback": "중앙 관리자 없이 Agent끼리 직접 주고받아 병목은 적지만 흐름 통제가 어렵습니다. 그래서 규칙이 중요합니다."},
-   {"answer": "단일 Agent", "correct": false, "feedback": "단일 Agent는 모델 하나가 흐름 전체를 맡습니다. Agent 사이에 주고받는 일이 없습니다."}
+   {"answer": "Supervisor — 조정자가 없으니 병목 걱정이 없다", "correct": false, "feedback": "Supervisor는 중앙 조정자가 있는 구조입니다. 관리자 없이 직접 주고받는 구조와 맞지 않습니다."},
+   {"answer": "Network — 주고받는 규칙을 정해 두어야 흐름을 통제할 수 있다", "correct": true, "feedback": "Agent끼리 직접 주고받아 병목은 적지만 흐름을 통제하기 어렵습니다. 그래서 규칙이 중요합니다."},
+   {"answer": "Hierarchical — 층이 없어 구조가 가장 단순하다", "correct": false, "feedback": "Hierarchical은 상위·중간·하위로 층을 나누는 구조입니다. 층이 없는 구조가 아닙니다."},
+   {"answer": "Network — 각 Agent가 알아서 하므로 따로 규칙이 필요 없다", "correct": false, "feedback": "자율성이 큰 만큼 오히려 규칙이 중요합니다. 규칙이 없으면 대화가 끝없이 이어질 수 있습니다."}
   ]
  },
  "q31": {
-  "question": "Reviewer Agent를 평가하는 기준으로 알맞은 것은?",
+  "question": "Writer가 쓴 보고서의 수치가 Researcher가 모은 출처와 다른데, 아무도 잡지 못하고 그대로 나갔습니다. 어떤 역할을 두거나 강화해야 할까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "근거 수집 품질", "correct": false, "feedback": "근거 수집 품질은 Researcher를 평가하는 기준입니다."},
-   {"answer": "구조와 표현 품질", "correct": false, "feedback": "구조와 표현 품질은 Writer를 평가하는 기준입니다."},
-   {"answer": "누락, 오류, 근거 일치 여부", "correct": true, "feedback": "Reviewer는 빠진 것, 틀린 것, 근거와 어긋난 것을 찾는 역할입니다."},
-   {"answer": "호출한 도구의 개수", "correct": false, "feedback": "도구를 몇 번 호출했는지는 역할의 품질 기준이 아닙니다. 역할마다 맡은 일을 잘했는지로 평가합니다."}
+   {"answer": "Researcher — 근거를 더 많이 모으게 한다", "correct": false, "feedback": "근거는 이미 맞게 모였습니다. 문제는 글이 근거와 어긋난 것을 확인하지 않은 데 있습니다."},
+   {"answer": "Writer — 문장 표현을 더 다듬게 한다", "correct": false, "feedback": "Writer는 구조와 표현 품질로 평가합니다. 표현을 다듬어도 수치 불일치는 잡히지 않습니다."},
+   {"answer": "Agent 수를 늘려 같은 보고서를 여러 번 쓰게 한다", "correct": false, "feedback": "핵심은 Agent 수가 아니라 책임 나누기입니다. 확인을 맡은 역할이 없으면 여러 번 써도 같습니다."},
+   {"answer": "Reviewer — 누락·오류·근거 일치를 확인하게 한다", "correct": true, "feedback": "Reviewer는 빠진 것, 틀린 것, 근거와 어긋난 것을 찾는 역할입니다. 이번 실패가 바로 그 기준에 해당합니다."}
   ]
  },
  "q32": {
@@ -94,33 +94,33 @@
  },
  "final": [
   {
-   "question": "상위 Agent는 목표와 정책을, 중간 Agent는 일을 다시 나눠 담당자를 정하고, 하위 Agent는 실행을 맡습니다. 어떤 패턴인가요?",
+   "question": "Supervisor 하나가 하위 Agent 12개에게 직접 일을 나누다 보니 조정이 느려지고 실수가 늘었습니다. 구조를 어떻게 바꾸는 것이 알맞을까요?",
    "type": "multiple_choice",
    "answers": [
-    {"answer": "Supervisor", "correct": false, "feedback": "Supervisor는 중앙 조정자 하나가 하위 Agent에 직접 일을 나눕니다. 중간 층이 없습니다."},
-    {"answer": "Hierarchical", "correct": true, "feedback": "층을 나눠 중간 Agent가 조정 부담을 나눠 가지는 구조입니다."},
-    {"answer": "Network", "correct": false, "feedback": "Network는 중앙 관리자나 층 없이 Agent끼리 직접 주고받습니다."},
-    {"answer": "단일 Agent", "correct": false, "feedback": "단일 Agent는 모델 하나가 모든 단계를 맡습니다."}
+    {"answer": "Supervisor에게 하위 Agent를 더 붙여 일을 빨리 끝낸다", "correct": false, "feedback": "하위 Agent가 늘면 조정자가 관리할 대상도 늘어 병목이 더 심해집니다."},
+    {"answer": "모든 일을 단일 Agent 하나에 합친다", "correct": false, "feedback": "합치면 역할이 섞이고 컨텍스트가 커지는 단일 Agent의 한계로 돌아갑니다."},
+    {"answer": "중간 Agent를 두어 일을 다시 나누게 하는 Hierarchical 구조로 바꾼다", "correct": true, "feedback": "중간 Agent들이 일을 다시 나눠 담당자를 정하므로, 조정자 한 명이 지던 부담을 나눠 가집니다."},
+    {"answer": "Network로 바꾸면 병목도 없고 흐름 통제도 쉬워진다", "correct": false, "feedback": "Network는 병목이 적은 대신 흐름 통제가 어렵습니다. 둘 다 얻을 수는 없습니다."}
    ]
   },
   {
-   "question": "좋은 역할 분리의 조건으로 맞는 것은?",
+   "question": "Researcher와 Writer로 나눴더니 Writer가 Researcher의 결과에서 무엇이 출처이고 무엇이 요약인지 헷갈려 합니다. 먼저 손볼 것은 무엇일까요?",
    "type": "multiple_choice",
    "answers": [
-    {"answer": "Agent 수를 가능한 한 많이 늘린다", "correct": false, "feedback": "핵심은 Agent 수가 아니라 책임을 잘 나누는 것입니다."},
-    {"answer": "모든 Agent가 모든 도구를 똑같이 가진다", "correct": false, "feedback": "필요한 도구를 기준으로 나눠야 각 Agent의 선택 범위가 줄어듭니다."},
-    {"answer": "각 Agent가 처리할 입력과 돌려줄 출력 형식을 정해 둔다", "correct": true, "feedback": "입력과 출력 형식이 정해지면 책임 경계가 분명해지고 평가 기준도 단순해집니다."},
-    {"answer": "책임 경계를 느슨하게 두어 서로 일을 대신하게 한다", "correct": false, "feedback": "책임 경계가 모호하면 Multi-Agent도 단일 Agent보다 나아지지 않습니다."}
+    {"answer": "Researcher가 돌려줄 출력 형식(예: 요약과 출처 목록)을 정하고, Writer는 그 형식을 입력으로 받게 한다", "correct": true, "feedback": "각 Agent가 받을 입력과 돌려줄 출력 형식을 정해 두면 책임 경계가 분명해지고 평가 기준도 단순해집니다."},
+    {"answer": "두 Agent에게 같은 도구를 모두 똑같이 준다", "correct": false, "feedback": "도구를 똑같이 주면 선택 범위만 넓어집니다. 넘겨주는 결과의 형식 문제는 그대로입니다."},
+    {"answer": "Writer가 조사도 직접 하도록 책임 경계를 느슨하게 한다", "correct": false, "feedback": "책임 경계가 모호하면 Multi-Agent도 단일 Agent보다 나아지지 않습니다."},
+    {"answer": "중간에 Agent를 하나 더 넣어 결과를 한 번 더 전달한다", "correct": false, "feedback": "Agent를 늘리는 것이 해법은 아닙니다. 주고받는 형식이 정해져 있지 않으면 같은 혼란이 생깁니다."}
    ]
   },
   {
-   "question": "Reviewer Agent를 추가하는 것이 알맞은 경우는?",
+   "question": "검토를 위해 Reviewer Agent를 더했더니 응답 시간과 비용이 두 배로 늘었습니다. 다음에 할 일로 가장 알맞은 것은 무엇일까요?",
    "type": "multiple_choice",
    "answers": [
-    {"answer": "단순 질의응답을 가장 싸게 처리해야 할 때", "correct": false, "feedback": "단순 질의응답은 단일 Agent가 더 빠르고 저렴합니다."},
-    {"answer": "위험한 결정이나 품질 검증이 필요할 때", "correct": true, "feedback": "Reviewer는 누락·오류·근거 일치를 확인합니다. 검증이 필요한 곳에 더합니다."},
-    {"answer": "응답을 가장 빨리 돌려줘야 할 때", "correct": false, "feedback": "Agent가 늘면 지연 시간도 늘어납니다. 속도가 가장 중요하면 불리합니다."},
-    {"answer": "쓰는 도구가 하나뿐일 때", "correct": false, "feedback": "도구 수는 Reviewer를 더할 기준이 아닙니다. 기준은 위험과 품질 검증의 필요입니다."}
+    {"answer": "Agent가 많을수록 좋으니 그대로 쓴다", "correct": false, "feedback": "Multi-Agent가 늘 나은 것은 아닙니다. 늘어난 비용이 값어치를 하는지 확인해야 합니다."},
+    {"answer": "속도를 되찾기 위해 Agent를 하나 더 추가한다", "correct": false, "feedback": "Agent가 늘면 비용과 지연 시간은 더 늘어납니다."},
+    {"answer": "품질은 잴 수 없으니 감으로 유지 여부를 정한다", "correct": false, "feedback": "감이 아니라 측정으로 정합니다. 오류가 얼마나 줄었는지 같은 기준으로 비교할 수 있습니다."},
+    {"answer": "Reviewer를 넣기 전과 후의 품질을 측정해, 늘어난 비용만큼 나아졌는지 보고 정한다", "correct": true, "feedback": "Agent가 늘면 비용과 지연도 늘어납니다. 그만큼 품질이 좋아졌는지 재 보고 유지할지 정합니다."}
    ]
   }
  ],

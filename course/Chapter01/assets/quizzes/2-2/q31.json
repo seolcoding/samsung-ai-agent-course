@@ -1,27 +1,27 @@
 [
  {
-  "question": "Reviewer Agent를 평가하는 기준으로 알맞은 것은?",
+  "question": "Writer가 쓴 보고서의 수치가 Researcher가 모은 출처와 다른데, 아무도 잡지 못하고 그대로 나갔습니다. 어떤 역할을 두거나 강화해야 할까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "근거 수집 품질",
+    "answer": "Researcher — 근거를 더 많이 모으게 한다",
     "correct": false,
-    "feedback": "근거 수집 품질은 Researcher를 평가하는 기준입니다."
+    "feedback": "근거는 이미 맞게 모였습니다. 문제는 글이 근거와 어긋난 것을 확인하지 않은 데 있습니다."
    },
    {
-    "answer": "구조와 표현 품질",
+    "answer": "Writer — 문장 표현을 더 다듬게 한다",
     "correct": false,
-    "feedback": "구조와 표현 품질은 Writer를 평가하는 기준입니다."
+    "feedback": "Writer는 구조와 표현 품질로 평가합니다. 표현을 다듬어도 수치 불일치는 잡히지 않습니다."
    },
    {
-    "answer": "누락, 오류, 근거 일치 여부",
+    "answer": "Agent 수를 늘려 같은 보고서를 여러 번 쓰게 한다",
+    "correct": false,
+    "feedback": "핵심은 Agent 수가 아니라 책임 나누기입니다. 확인을 맡은 역할이 없으면 여러 번 써도 같습니다."
+   },
+   {
+    "answer": "Reviewer — 누락·오류·근거 일치를 확인하게 한다",
     "correct": true,
-    "feedback": "Reviewer는 빠진 것, 틀린 것, 근거와 어긋난 것을 찾는 역할입니다."
-   },
-   {
-    "answer": "호출한 도구의 개수",
-    "correct": false,
-    "feedback": "도구를 몇 번 호출했는지는 역할의 품질 기준이 아닙니다. 역할마다 맡은 일을 잘했는지로 평가합니다."
+    "feedback": "Reviewer는 빠진 것, 틀린 것, 근거와 어긋난 것을 찾는 역할입니다. 이번 실패가 바로 그 기준에 해당합니다."
    }
   ]
  }

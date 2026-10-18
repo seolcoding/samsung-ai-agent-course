@@ -40,28 +40,28 @@
  "p12": "LLM에 \"To be or not to be,\"를 넣으면 \"that is the question\"을 이어 씁니다. LLM은 \"다음 단어 예측기\"입니다.\nLLM의 여러 단점도 여기서 나옵니다.\n\n- **환각(할루시네이션, 사실이 아닌 말):** 나올 가능성이 높은 단어를 검증 없이 출력합니다.\n- **수학 문제 오류:** 숫자를 계산하지 않고, 다음에 나올 확률이 높은 숫자를 출력합니다.\n- **도메인·최신 정보 부재:** 학습한 데이터로만 예측하므로 새 데이터를 활용하지 못합니다.\n\n**왜 배우나:** 이 단점들이 뒤에서 배울 기술이 필요한 이유입니다. 최신·사내 정보가 없는 문제는 필요한 문서를 찾아 입력에 넣는 RAG가, 계산 오류는 계산을 다른 프로그램에 맡기는 도구 호출이 해결하려는 문제입니다.",
  "p12__meta": "PDF 슬라이드 제목 번호가 \"LLM (4)\" 다음에 \"(6)\"으로 건너뜁니다. 빠진 쪽이 있는지는 모릅니다(미확인). 노트북 흐름에는 영향이 없습니다.\n1-2 LEC 1.1 퀴즈가 \"To be or not to be\"를 묻기 때문에, 이 노트북의 퀴즈는 같은 문항을 쓰지 않았습니다.",
  "q_math": {
-  "question": "LLM이 계산 문제를 틀리기도 하는 이유로 맞는 것은?",
+  "question": "LLM 챗봇에 \"37 × 48은?\"이라고 물었더니 1,786이라고 답했습니다(실제 값은 1,776). 까닭과 해결 방향으로 알맞은 것은?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "계산 기능이 기본으로 꺼져 있어서",
+    "answer": "학습 데이터에 숫자가 없어서 그렇다. 숫자가 많은 글로 다시 학습시킨다",
     "correct": false,
-    "feedback": "켜고 끄는 계산 기능이 있는 것이 아닙니다. LLM은 숫자도 글처럼 예측합니다."
+    "feedback": "말뭉치에는 숫자도 많습니다. 문제는 숫자를 계산하지 않고 예측한다는 점입니다."
    },
    {
-    "answer": "숫자가 학습 데이터에 전혀 없어서",
+    "answer": "질문이 너무 짧아서 그렇다. 질문을 길게 풀어 쓴다",
     "correct": false,
-    "feedback": "말뭉치에는 숫자도 많이 있습니다. 문제는 숫자를 계산하지 않고 예측한다는 점입니다."
+    "feedback": "질문을 길게 써도 LLM에는 따로 계산하는 단계가 없습니다."
    },
    {
-    "answer": "다음에 올 가능성이 높은 숫자를 출력해서",
+    "answer": "계산 기능이 꺼져 있어서 그렇다. 설정에서 계산 기능을 켠다",
+    "correct": false,
+    "feedback": "켜고 끄는 계산 기능은 없습니다. LLM은 숫자도 글처럼 예측합니다."
+   },
+   {
+    "answer": "숫자를 계산하지 않고 그럴듯한 숫자를 예측해서 그렇다. 계산은 계산기 같은 다른 프로그램에 맡긴다",
     "correct": true,
-    "feedback": "LLM은 식을 계산하지 않고, 그 자리에 나올 확률이 높은 숫자를 출력합니다."
-   },
-   {
-    "answer": "입력이 짧으면 계산 단계를 건너뛰어서",
-    "correct": false,
-    "feedback": "입력 길이와 상관없이 LLM에는 따로 계산하는 단계가 없습니다."
+    "feedback": "LLM은 나올 확률이 높은 숫자를 출력합니다. 그래서 계산은 도구 호출로 바깥 프로그램에 맡깁니다."
    }
   ]
  },
@@ -99,161 +99,161 @@
  "p20": "LLM은 맥락이 많을수록 더 정확한 출력을 만듭니다. 그렇다면 최종 답을 내기 전에 LLM이 맥락을 스스로 만들게 하면 어떨까요?\n\n- **Reason:** 작업을 위해 무슨 행동을 해야 할지 생성합니다.\n- **Action:** 그 출력을 바탕으로 호출할 함수를 정합니다.\n- **Observation:** 함수의 결과를 다시 입력으로 넣어 다음 출력을 만듭니다.\n\n이 세 단계를 목표를 이룰 때까지 되풀이합니다. 이것이 ReAct 프레임워크입니다.\n이처럼 LLM의 출력 흐름을 알맞게 조정해 스스로 목표를 이루도록 만든 AI를 **Agent**라고 합니다.\n\n**왜 배우나:** 뒤에서 배울 LangGraph에서 이 Reason → Action → Observation 반복을 그래프로 직접 만듭니다.",
  "p20__meta": "커리큘럼 1.1에는 \"ReAct 패턴의 작동 원리와 한계\"가 있지만 받은 PDF에는 작동 원리만 있고 한계는 없습니다. 근거가 없어 수강생 글에 쓰지 않았습니다. 말로 보탤지는 강사가 정합니다.",
  "q_react": {
-  "question": "ReAct에서 함수의 결과를 다시 입력으로 넣어 다음 출력을 만드는 단계는?",
+  "question": "\"내일 우산이 필요할까?\"라는 요청에 Agent가 먼저 \"우산이 필요한지 알려면 내일 서울 날씨를 알아야 한다\"고 출력했습니다. 이 출력은 어느 단계일까요?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "Reason",
-    "correct": false,
-    "feedback": "Reason은 무슨 행동을 해야 할지 생성하는 단계입니다."
+    "correct": true,
+    "feedback": "무슨 행동을 해야 할지 글로 생성하는 단계입니다. 이 출력이 다음 행동을 고를 맥락이 됩니다."
    },
    {
     "answer": "Action",
     "correct": false,
-    "feedback": "Action은 호출할 함수를 정하는 단계입니다."
+    "feedback": "Action은 이 생각을 바탕으로 get_weather 같은 함수를 고르고 호출을 정하는 단계입니다."
    },
    {
     "answer": "Observation",
-    "correct": true,
-    "feedback": "함수 결과를 다시 넣어 다음 출력을 만드는 단계가 Observation입니다."
+    "correct": false,
+    "feedback": "Observation은 함수가 돌려준 날씨 결과를 다시 입력으로 넣는 단계입니다. 아직 함수를 부르기 전입니다."
    },
    {
-    "answer": "Fine-Tuning",
+    "answer": "최종 답",
     "correct": false,
-    "feedback": "Fine-Tuning은 모델을 추가로 학습시키는 일로, ReAct 반복의 단계가 아닙니다."
+    "feedback": "아직 날씨를 모르므로 답이 아닙니다. 필요한 행동을 정리한 중간 출력입니다."
    }
   ]
  },
  "p22": "AI Agent를 만든다는 것은 세 가지를 하는 일입니다.\n\n1. LLM에 들어갈 입력을 조정하고\n2. LLM의 출력을 바탕으로 현실의 도구를 호출하고\n3. 그 결과의 흐름을 조정해 복잡한 문제를 풀게 합니다.\n\n이 일을 돕는 프레임워크가 두 가지입니다.\n\n- **LangChain:** 사용자 프롬프트, LLM, 외부 도구 등을 이어 파이프라인을 만들 수 있게 해 줍니다.\n- **LangGraph:** LLM을 쓰는 워크플로우를 그래프 형태로 만들 수 있게 해 줍니다.\n\n**왜 배우나:** 두 프레임워크는 이 과정 실습의 중심 도구입니다. 코드는 AI가 대부분 써 주지만, 코드를 읽을 줄 알아야 하는 이유가 있습니다.\n\n- 설계는 사람이 합니다.\n- 코드를 알면 API 오류나 환각의 원인을 빨리 찾습니다.\n- 코드 구조를 알고 지시하면 결과가 좋고, 엉뚱한 재시도로 버리는 토큰이 줄어듭니다.",
  "p22__meta": "\"코딩은 AI가 해도 왜 코드를 보는가\" 세 문장은 받은 PDF에 없고, `docs/2026_11차수_수강생피드백.md` 진행 원칙 2에서 가져왔습니다(사용자 결정, 2026-09-28).\n커리큘럼 1.1의 \"오케스트레이션과 상태 관리\"라는 말은 PDF에 없습니다. PDF는 두 프레임워크의 한 줄 정의까지만 있어 설명도 그 범위로 두었습니다.",
  "q_lg": {
-  "question": "LLM을 쓰는 워크플로우를 그래프 형태로 만들 수 있게 해 주는 프레임워크는?",
+  "question": "만들려는 Agent의 흐름이 \"문서 검색 → 결과가 부족하면 다시 검색 → 충분하면 답하기\"처럼 갈림길과 되풀이를 품고 있습니다. 이 흐름을 그래프로 그려 만들기에 알맞은 것은?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "LangChain",
     "correct": false,
-    "feedback": "LangChain은 프롬프트, LLM, 외부 도구를 이어 파이프라인을 만드는 프레임워크입니다."
+    "feedback": "LangChain은 프롬프트, LLM, 도구를 이어 한 줄의 파이프라인을 만드는 데 알맞습니다."
    },
    {
     "answer": "ReAct",
     "correct": false,
-    "feedback": "ReAct는 Reason, Action, Observation을 되풀이하는 방식의 이름입니다."
-   },
-   {
-    "answer": "Function Calling",
-    "correct": false,
-    "feedback": "Function Calling은 LLM이 함수 호출 형태의 출력을 만드는 방식입니다."
+    "feedback": "ReAct는 Reason, Action, Observation을 되풀이하는 방식의 이름입니다. 만드는 도구가 아닙니다."
    },
    {
     "answer": "LangGraph",
     "correct": true,
-    "feedback": "LangGraph는 워크플로우를 그래프 형태로 만들 수 있게 해 줍니다."
+    "feedback": "LangGraph는 워크플로우를 그래프로 만들어 갈림길과 되풀이를 그릴 수 있습니다."
+   },
+   {
+    "answer": "Instruction Tuning",
+    "correct": false,
+    "feedback": "Instruction Tuning은 모델을 질문에 답하도록 추가 학습하는 일입니다. 흐름을 만드는 도구가 아닙니다."
    }
   ]
  },
  "final": [
   {
-   "question": "LLM이 하는 일을 한마디로 말하면?",
+   "question": "AI에게 \"보고서 정리해줘\"라고만 보냈더니 원하지 않은 형식의 결과가 나왔습니다. 가장 먼저 해 볼 일은?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "입력 다음에 올 말을 예측한다",
+     "answer": "같은 문장을 그대로 다시 보낸다",
+     "correct": false,
+     "feedback": "입력이 같으면 비슷하게 엉뚱한 결과가 나오기 쉽습니다. 입력을 바꿔야 합니다."
+    },
+    {
+     "answer": "문장을 더 짧게 줄여 보낸다",
+     "correct": false,
+     "feedback": "정보가 줄면 AI가 추측할 부분이 늘어납니다."
+    },
+    {
+     "answer": "결과가 나올 때까지 \"다시\"라고만 보낸다",
+     "correct": false,
+     "feedback": "새 정보 없이 되풀이하면 토큰만 쓰고 결과는 나아지기 어렵습니다."
+    },
+    {
+     "answer": "무엇을, 어떤 형식과 조건으로 원하는지 입력에 구체적으로 적는다",
      "correct": true,
-     "feedback": "LLM은 말뭉치에서 배운 대로 다음에 올 말을 예측하는 모델입니다."
-    },
-    {
-     "answer": "질문의 정답을 데이터베이스에서 찾는다",
-     "correct": false,
-     "feedback": "LLM은 정답을 찾아오지 않고, 나올 가능성이 높은 말을 만들어 냅니다."
-    },
-    {
-     "answer": "사람이 적은 규칙대로 문장을 조립한다",
-     "correct": false,
-     "feedback": "규칙을 적어 두지 않고, 글 데이터에서 패턴을 배웁니다."
-    },
-    {
-     "answer": "컴퓨터를 직접 조작해 작업을 끝낸다",
-     "correct": false,
-     "feedback": "LLM의 입출력은 문자에서 문자입니다. 스스로 컴퓨터를 조작하지 못합니다."
+     "feedback": "LLM은 입력과 관련 깊은 말을 출력합니다. 입력이 풍부하고 정확할수록 결과가 좋아집니다."
     }
    ]
   },
   {
-   "question": "LLM이 사실이 아닌 말을 그럴듯하게 출력하는(환각) 까닭은?",
+   "question": "LLM 챗봇에 이번 달 바뀐 사내 출장 규정을 물었더니 그럴듯하지만 틀린 답이 나왔습니다. 이 과정에서 배울 해결 방향으로 알맞은 것은?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "일부러 틀린 답을 섞도록 학습해서",
+     "answer": "\"확실하게 답해\"라고 지시를 덧붙인다",
      "correct": false,
-     "feedback": "일부러 틀리게 학습한 것이 아닙니다. 검증 없이 예측하기 때문입니다."
+     "feedback": "모델이 모르는 정보는 지시를 바꿔도 생기지 않습니다. 오히려 더 자신 있게 틀릴 수 있습니다."
     },
     {
-     "answer": "입력이 길면 앞부분을 잊어버려서",
-     "correct": false,
-     "feedback": "슬라이드가 든 까닭은 입력 길이가 아니라 다음 단어 예측이라는 동작 방식입니다."
-    },
-    {
-     "answer": "Instruction Tuning을 거치지 않아서",
-     "correct": false,
-     "feedback": "Instruction Tuning을 거친 챗봇도 다음 말을 예측하므로 환각이 생길 수 있습니다."
-    },
-    {
-     "answer": "나올 가능성이 높은 단어를 검증 없이 출력해서",
+     "answer": "관련 사내 문서를 찾아 질문과 함께 입력에 넣는다",
      "correct": true,
-     "feedback": "사실인지 확인하지 않고 그럴듯한 다음 단어를 고르기 때문입니다."
+     "feedback": "모델은 학습한 데이터로만 예측합니다. 필요한 문서를 찾아 입력에 넣는 방법이 RAG입니다."
+    },
+    {
+     "answer": "계산기 같은 도구를 호출하게 한다",
+     "correct": false,
+     "feedback": "계산 도구는 숫자 계산 오류를 푸는 방법입니다. 이 문제는 규정 정보가 모델에 없다는 점입니다."
+    },
+    {
+     "answer": "같은 질문을 여러 번 보내 가장 많이 나온 답을 고른다",
+     "correct": false,
+     "feedback": "모델이 모르는 정보는 여러 번 물어도 생기지 않습니다."
     }
    ]
   },
   {
-   "question": "Function Calling에서 LLM이 맡는 일로 맞는 것은?",
+   "question": "get_weather 함수를 만들어 두었는데, 날씨를 물어도 LLM이 이 함수를 한 번도 호출하지 않습니다. 가장 먼저 확인할 것은?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "함수를 직접 실행하고 결과를 저장한다",
+     "answer": "LLM에게 함수를 직접 실행할 권한을 주었는지",
      "correct": false,
-     "feedback": "실행은 LLM 바깥의 프로그램이 합니다."
+     "feedback": "LLM은 함수를 실행하지 않습니다. 호출할 함수와 인자를 글로 쓸 뿐입니다."
     },
     {
-     "answer": "어떤 함수를 어떤 인자로 호출할지 텍스트로 출력한다",
+     "answer": "질문을 영어로 바꿔 보냈는지",
+     "correct": false,
+     "feedback": "언어보다 먼저, 모델이 그 함수가 있다는 것을 알고 있는지가 문제입니다."
+    },
+    {
+     "answer": "요청을 보낼 때 쓸 수 있는 함수 목록에 get_weather를 넣었는지",
      "correct": true,
-     "feedback": "LLM은 호출할 함수와 인자를 글로 쓰고, 바깥 프로그램이 그 글을 읽어 호출합니다."
+     "feedback": "쓸 수 있는 함수는 요청할 때 맥락에 함께 넣어 줍니다. 목록에 없으면 모델은 그 함수를 고를 수 없습니다."
     },
     {
-     "answer": "쓸 수 있는 함수 목록을 스스로 만든다",
+     "answer": "함수 결과를 미리 실행해 저장해 두었는지",
      "correct": false,
-     "feedback": "쓸 수 있는 함수 목록은 요청을 보낼 때 맥락에 함께 넣어 줍니다."
-    },
-    {
-     "answer": "함수 코드를 새로 작성해 설치한다",
-     "correct": false,
-     "feedback": "함수는 미리 준비되어 있고, LLM은 그중 무엇을 호출할지 출력합니다."
+     "feedback": "함수는 모델이 호출을 출력한 뒤 바깥 프로그램이 실행합니다. 미리 실행해 둘 필요가 없습니다."
     }
    ]
   },
   {
-   "question": "이 노트북에서 말하는 Agent에 가장 가까운 것은?",
+   "question": "다음 중 Agent로 만들 만한 일은 무엇일까요?",
    "type": "multiple_choice",
    "answers": [
     {
-     "answer": "질문 하나에 답 하나를 돌려주는 챗봇",
-     "correct": false,
-     "feedback": "Instruction Tuning으로 만든 챗봇입니다. Agent는 행동을 되풀이하며 목표를 이룹니다."
-    },
-    {
-     "answer": "정해진 순서대로만 도는 자동화 스크립트",
-     "correct": false,
-     "feedback": "Agent는 LLM의 출력으로 다음 행동을 스스로 정합니다."
-    },
-    {
-     "answer": "Reason → Action → Observation을 목표를 이룰 때까지 되풀이하는 AI",
+     "answer": "날씨를 조회하고, 비가 오면 일정에 우산 알림을 추가하고, 아니면 그대로 두는 일",
      "correct": true,
-     "feedback": "출력 흐름을 조정해 스스로 목표를 이루게 만든 AI가 Agent입니다."
+     "feedback": "도구 결과를 보고 다음 행동을 스스로 정해야 합니다. Reason, Action, Observation을 되풀이하는 Agent가 맞습니다."
     },
     {
-     "answer": "더 큰 말뭉치로 다시 학습한 LLM",
+     "answer": "문장 하나를 영어로 번역하는 일",
      "correct": false,
-     "feedback": "모델을 더 크게 학습시키는 것과 Agent는 다릅니다. Agent는 출력 흐름을 조정한 구성입니다."
+     "feedback": "질문 하나에 답 하나면 됩니다. 챗봇으로 한 번 호출하면 충분합니다."
+    },
+    {
+     "answer": "메일 한 통을 세 줄로 요약하는 일",
+     "correct": false,
+     "feedback": "도구 호출이나 다음 행동 판단 없이 한 번의 답으로 끝나는 일입니다."
+    },
+    {
+     "answer": "매일 같은 시각에 같은 보고서를 같은 순서로 출력하는 일",
+     "correct": false,
+     "feedback": "순서가 정해져 있어 판단이 필요 없습니다. 자동화 스크립트로 충분합니다."
     }
    ]
   }

@@ -4,11 +4,6 @@
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "기존 메시지 목록 뒤에 새 메시지가 더해진다",
-    "correct": true,
-    "feedback": "`add_messages`가 새 메시지를 기존 목록에 쌓습니다. 그래서 앞 대화가 남습니다."
-   },
-   {
     "answer": "기존 목록이 새 메시지 하나로 바뀐다",
     "correct": false,
     "feedback": "합치는 규칙이 없는 필드라면 이렇게 바뀝니다. `add_messages`는 바꾸지 않고 쌓습니다."
@@ -17,6 +12,11 @@
     "answer": "새 메시지는 버려지고 기존 목록만 남는다",
     "correct": false,
     "feedback": "노드가 돌려준 값은 버려지지 않고 규칙에 따라 State에 반영됩니다."
+   },
+   {
+    "answer": "기존 메시지 목록 뒤에 새 메시지가 더해진다",
+    "correct": true,
+    "feedback": "`add_messages`가 새 메시지를 기존 목록에 쌓습니다. 그래서 앞 대화가 남습니다."
    },
    {
     "answer": "오류가 나서 그래프가 멈춘다",

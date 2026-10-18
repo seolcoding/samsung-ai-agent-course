@@ -70,15 +70,15 @@ def build():
     nb.h(3, "2.1 토큰의 의미")
     slides(8, 9)
     v("p9")
-    n, words = len(P9_TOKENS), len(P9_SENTENCE.split())
+    words = len(P9_SENTENCE.split())  # 숫자는 코드로 센다
     nb.quiz_file("q21", [{
-        "question": f'슬라이드 예시에서 "{P9_SENTENCE}"는 몇 개의 토큰으로 나뉘었나요?',
+        "question": f'"{P9_SENTENCE}"는 띄어쓰기로 나누면 단어 {words}개입니다. 이 문장의 토큰 수에 대한 설명으로 맞는 것은?',
         "type": "multiple_choice",
         "answers": [
-            {"answer": f"{words}개", "correct": False, "feedback": "띄어쓰기로 나눈 단어 수입니다. 토큰 수와는 다릅니다."},
-            {"answer": f"{n - 2}개", "correct": False, "feedback": "한 단어가 둘로 나뉜 곳을 다시 세어 보세요."},
-            {"answer": f"{n}개", "correct": True, "feedback": "예시 목록의 항목 수입니다. 토큰은 단어의 일부나 조사로도 나뉩니다."},
-            {"answer": f"{n + 3}개", "correct": False, "feedback": "슬라이드 예시 목록에 든 항목만 셉니다."},
+            {"answer": f"단어 수와 같은 {words}개다", "correct": False, "feedback": '토큰은 단어와 항상 같지 않습니다. 단어 하나가 여러 토큰으로 나뉠 수 있습니다.'},
+            {"answer": '글자 수와 같다', "correct": False, "feedback": '토큰은 글자 하나하나도 아닙니다. 자주 나오는 글 조각 단위로 나뉩니다.'},
+            {"answer": '조사 "으로", "를"이나 마침표는 토큰으로 세지 않는다', "correct": False, "feedback": '조사, 어미, 기호도 따로 떨어져 토큰이 될 수 있습니다.'},
+            {"answer": '단어 수보다 많을 수 있다. 단어가 쪼개지고 조사와 마침표도 따로 셀 수 있다', "correct": True, "feedback": '"Lang", "Chain"처럼 단어가 나뉘고 "를", "."도 따로 셉니다. 한국어는 더 잘게 나뉘기 쉽습니다.'},
         ],
     }])
     v("sum21")

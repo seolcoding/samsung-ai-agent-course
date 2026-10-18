@@ -20,13 +20,13 @@
  "p7": "Advanced RAG는 Naive RAG에 검색 품질과 답변 품질을 높이는 보완 단계를 더한 형태입니다.\n\n- **Query Rewrite**: 사용자의 질문을 검색하기 좋은 형태로 다시 씁니다.\n- **Hybrid Search**: 키워드 검색과 벡터 검색을 함께 씁니다.\n- **Re-ranking**: 검색 결과의 우선순위를 다시 계산합니다.\n- **Self-check**: 답변과 근거가 맞는지 점검합니다.",
  "p7__meta": "- Hybrid Search는 실습 6장 RAGaaS의 `retrieve-rrf`와 이어집니다. 원본 코드 주석에 \"bm25(키워드), knn(의미), rrf(하이브리드) 중 선택\"이라고 적혀 있습니다.",
  "q12": {
-  "question": "검색해 온 청크들의 순서를 다시 매겨, 질문과 더 관련 있는 청크를 앞에 두는 보완 단계는 무엇일까요?",
+  "question": "관련 청크가 검색되기는 하는데 늘 4~5번째에 있고, 앞쪽에는 관련이 적은 청크가 옵니다. 이미 찾아온 결과의 순서를 바로잡으려면 어떤 보완 단계를 더하면 될까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Query Rewrite", "correct": false, "feedback": "Query Rewrite는 검색하기 전에 질문을 검색하기 좋은 형태로 다시 쓰는 단계입니다."},
-   {"answer": "Hybrid Search", "correct": false, "feedback": "Hybrid Search는 키워드 검색과 벡터 검색을 함께 써서 후보를 찾는 방식입니다."},
-   {"answer": "Re-ranking", "correct": true, "feedback": "Re-ranking은 이미 찾아온 검색 결과의 우선순위를 다시 계산합니다."},
-   {"answer": "Self-check", "correct": false, "feedback": "Self-check는 답변을 만든 뒤 답변과 근거가 맞는지 점검하는 단계입니다."}
+   {"answer": "Query Rewrite", "correct": false, "feedback": "Query Rewrite는 검색하기 전에 질문을 다시 씁니다. 이미 찾아온 결과의 순서는 그대로입니다."},
+   {"answer": "Self-check", "correct": false, "feedback": "Self-check는 답변을 만든 뒤 답변이 근거와 맞는지 점검합니다. 검색 결과 순서를 바꾸지 않습니다."},
+   {"answer": "Hybrid Search", "correct": false, "feedback": "Hybrid Search는 키워드 검색과 벡터 검색을 함께 써서 후보를 넓힙니다. 순서를 다시 매기는 단계는 따로 있습니다."},
+   {"answer": "Re-ranking", "correct": true, "feedback": "Re-ranking은 찾아온 청크의 우선순위를 다시 계산해, 질문과 더 관련 있는 청크를 앞으로 올립니다."}
   ]
  },
  "p8": "Modular RAG는 RAG의 단계를 독립된 모듈처럼 떼었다 붙였다 조합하는 방식입니다.\n슬라이드처럼 Query Rewrite, Retrieval, Re-ranking, Generation, Self-check를 각각 하나의 모듈로 보고 필요한 것을 골라 잇습니다.",
@@ -66,47 +66,47 @@
  "p17": "청킹(chunking)은 문서를 청크로 나누는 방법입니다. 슬라이드는 세 가지를 비교합니다. 먼저 두 가지입니다.\n\n- **Fixed-size Chunking**: 글자 수나 토큰 수를 기준으로 일정하게 나눕니다. 구현이 단순하고 결과를 예측하기 쉽지만, 문장이나 문단 중간에서 잘릴 수 있습니다. 문서 구조가 단순할 때 빠르게 실험하기 좋습니다.\n- **Recursive Chunking**: 문단, 문장, 구분자 순서로 자연스러운 경계를 찾아 나눕니다. 의미 단위가 비교적 잘 보존되어 일반적인 문서에서 기본 선택지로 많이 씁니다. 문서 구조가 정리되어 있을수록 효과가 좋습니다.\n\n2.1 슬라이드 코드의 `RecursiveCharacterTextSplitter`가 Recursive Chunking입니다.",
  "p18": "- **Semantic Chunking**: 의미가 바뀌는 지점, 곧 주제가 바뀌는 곳을 기준으로 나눕니다. 보고서나 정책 문서처럼 의미 흐름이 중요한 자료에 알맞습니다. 대신 구현과 계산 비용이 상대적으로 커질 수 있습니다.",
  "q31": {
-  "question": "정책 문서처럼 주제가 바뀌는 흐름이 중요한 자료를, 계산 비용이 조금 더 들더라도 주제 단위로 나누고 싶습니다. 알맞은 방식은 무엇일까요?",
+  "question": "일반 사내 문서를 Fixed-size로 나눴더니 문장 중간에서 잘린 청크가 많습니다. 구현은 단순하게 두고 문단·문장 경계를 살려 나누려면 어떤 방식이 알맞을까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "Fixed-size Chunking", "correct": false, "feedback": "Fixed-size는 글자 수나 토큰 수로 일정하게 자르므로 주제가 바뀌는 곳을 따지지 않습니다."},
-   {"answer": "Recursive Chunking", "correct": false, "feedback": "Recursive는 문단·문장 같은 형식상의 경계를 찾습니다. 주제가 바뀌는 지점을 직접 보지는 않습니다."},
-   {"answer": "Semantic Chunking", "correct": true, "feedback": "Semantic은 의미 변화 지점을 기준으로 나눠 의미 흐름이 중요한 자료에 알맞습니다. 대신 계산 비용이 더 듭니다."},
-   {"answer": "나누지 않고 문서 전체를 한 청크로 둔다", "correct": false, "feedback": "문서 전체는 한 번에 검색 대상으로 쓰기에 너무 커서 필요한 부분만 찾기 어렵습니다."}
+   {"answer": "Recursive Chunking", "correct": true, "feedback": "Recursive는 문단, 문장, 구분자 순서로 자연스러운 경계를 찾습니다. 일반 문서에서 기본으로 많이 고르는 방식입니다."},
+   {"answer": "Semantic Chunking", "correct": false, "feedback": "Semantic도 경계를 살리지만 주제 변화를 계산해야 해서 구현과 비용이 커집니다. 단순하게 두려는 지금 상황과는 맞지 않습니다."},
+   {"answer": "chunk_size를 더 작게 줄인 Fixed-size Chunking", "correct": false, "feedback": "크기를 줄여도 글자 수로 자르는 방식은 같습니다. 문장 중간에서 잘리는 일은 그대로 생깁니다."},
+   {"answer": "나누지 않고 문서 전체를 한 청크로 둔다", "correct": false, "feedback": "문서 전체는 검색 대상으로 쓰기에 너무 커서 필요한 부분만 찾기 어렵습니다."}
   ]
  },
  "sum31": "**정리:** Fixed-size는 단순하고, Recursive는 기본 선택지이고, Semantic은 의미 흐름을 지키는 대신 비용이 큽니다.",
  "p19": "임베딩 모델은 문장의 의미를 벡터로 얼마나 잘 나타내는지를 결정합니다. 고를 때는 다음을 봅니다.\n\n- 한국어 문서라면 한국어 의미 유사도를 잘 반영하는 모델이 필요합니다.\n- 도메인 용어가 많으면 실제 데이터로 검색 품질을 확인해야 합니다.\n- 벡터 차원 수, 속도, 비용도 함께 고려합니다.\n\n임베딩 모델 선택은 벤치마크 점수만으로 끝나지 않습니다. 실제 사용자 질문 샘플, 기대하는 정답 문서, 청킹 전략별 검색 결과, 비용과 응답 시간을 함께 확인합니다.\n\n**왜 배우나:** 사내 문서에는 도메인 용어가 많습니다. 그래서 점수표보다 실제 질문으로 검색해 본 결과가 모델을 고르는 근거가 됩니다.",
  "q32": {
-  "question": "임베딩 모델 후보를 고를 때, 공개 벤치마크 점수 말고 꼭 함께 확인할 것은 무엇일까요?",
+  "question": "공개 벤치마크 점수가 가장 높은 임베딩 모델로 바꿨는데, 사내 용어가 든 질문에서 엉뚱한 문서가 검색됩니다. 다음에 할 일로 가장 알맞은 것은 무엇일까요?",
   "type": "multiple_choice",
   "answers": [
-   {"answer": "벡터 차원 수가 가장 큰 모델인지", "correct": false, "feedback": "차원 수는 속도·비용과 함께 따지는 요소입니다. 차원이 크다고 실제 문서 검색이 잘된다는 보장은 없습니다."},
-   {"answer": "실제 질문으로 기대한 정답 문서가 검색되는지", "correct": true, "feedback": "도메인 용어가 많은 문서일수록 실제 질문 샘플과 기대 정답 문서로 검색 결과를 직접 확인해야 합니다."},
-   {"answer": "가장 최근에 나온 모델인지", "correct": false, "feedback": "출시 시점은 슬라이드의 선택 기준에 없습니다. 우리 문서에서 검색이 잘되는지가 기준입니다."},
-   {"answer": "이름이 널리 알려진 모델인지", "correct": false, "feedback": "알려진 정도는 우리 문서의 도메인 용어를 잘 다루는지 알려 주지 않습니다."}
+   {"answer": "벡터 차원 수가 더 큰 모델로 다시 바꾼다", "correct": false, "feedback": "차원 수는 속도·비용과 함께 따지는 요소입니다. 차원이 크다고 사내 용어 검색이 잘된다는 보장은 없습니다."},
+   {"answer": "벤치마크 점수가 두 번째로 높은 모델로 바꾼다", "correct": false, "feedback": "점수표 순서만 따라가면 같은 문제가 되풀이될 수 있습니다. 우리 문서로 확인한 결과가 있어야 합니다."},
+   {"answer": "실제 질문 샘플과 기대 정답 문서를 정해 후보 모델들의 검색 결과를 비교한다", "correct": true, "feedback": "도메인 용어가 많을수록 실제 질문으로 기대한 문서가 나오는지 직접 비교해 모델을 고릅니다."},
+   {"answer": "프롬프트에 '정확한 문서를 찾아라'라고 덧붙인다", "correct": false, "feedback": "검색은 질문 벡터와 청크 벡터를 비교해 이루어집니다. 프롬프트 지시로는 어떤 청크가 검색되는지 바뀌지 않습니다."}
   ]
  },
  "sum32": "**정리:** 임베딩 모델은 한국어·도메인 용어·차원 수·속도·비용을 보고, 실제 질문으로 검색해 보고 고릅니다.",
  "final": [
   {
-   "question": "RAG와 Fine-Tuning의 역할을 바르게 설명한 것은?",
+   "question": "검색해 온 청크에 답이 없는데도 모델이 그럴듯한 답을 지어냈습니다. RAG 프롬프트에 무엇을 넣는 것이 가장 알맞을까요?",
    "type": "multiple_choice",
    "answers": [
-    {"answer": "RAG는 맥락을 추가하고, Fine-Tuning은 모델을 학습시킨다", "correct": true, "feedback": "RAG는 질문할 때 찾은 문서를 맥락으로 더하고, Fine-Tuning은 모델 자체를 추가로 학습시킵니다."},
-    {"answer": "RAG는 모델을 학습시키고, Fine-Tuning은 맥락을 추가한다", "correct": false, "feedback": "두 역할이 뒤바뀌었습니다. 모델을 다시 학습시키는 쪽은 Fine-Tuning입니다."},
-    {"answer": "둘 다 모델을 다시 학습시켜 지식을 넣는다", "correct": false, "feedback": "RAG는 모델을 다시 학습시키지 않고, 찾아볼 문서를 바꿔 지식을 바꿉니다."},
-    {"answer": "둘 다 질문할 때 문서를 찾아 프롬프트에 넣는다", "correct": false, "feedback": "문서를 찾아 넣는 것은 RAG입니다. Fine-Tuning은 말투·형식을 맞추려고 모델을 학습시킵니다."}
+    {"answer": "답변을 더 길고 자세하게 쓰라는 지시", "correct": false, "feedback": "길게 쓰라고 하면 근거 밖의 내용을 더 채워 넣기 쉬워집니다."},
+    {"answer": "맥락에 답이 없으면 '문서에서 확인할 수 없습니다'라고 말하라는 규칙", "correct": true, "feedback": "근거 안에서만 답하고, 답이 없으면 없다고 말하게 해야 지어낸 답을 줄일 수 있습니다."},
+    {"answer": "{context} 자리를 비우고 {question}만 넣기", "correct": false, "feedback": "맥락을 빼면 모델은 학습한 지식만으로 답하게 되어 지어낼 가능성이 오히려 커집니다."},
+    {"answer": "모델이 가진 일반 지식도 자유롭게 섞어 쓰라는 지시", "correct": false, "feedback": "일반 지식을 섞게 하면 사내 문서에 없는 내용이 답변에 들어갑니다."}
    ]
   },
   {
-   "question": "Naive RAG의 다섯 단계입니다. 빈칸에 들어갈 단계는? 문서 불러오기 → 청크로 나누기 → (    ) → 질문과 가까운 청크 검색 → 답변 생성",
+   "question": "Chroma 저장소를 만든 뒤 커널을 다시 시작했더니, 저장해 둔 청크가 없어 임베딩을 처음부터 다시 해야 했습니다. 무엇을 빠뜨렸을 가능성이 가장 클까요?",
    "type": "multiple_choice",
    "answers": [
-    {"answer": "질문을 검색하기 좋게 다시 쓰기", "correct": false, "feedback": "Query Rewrite는 Advanced RAG가 더하는 보완 단계입니다."},
-    {"answer": "검색 결과의 순서 다시 매기기", "correct": false, "feedback": "Re-ranking도 Advanced RAG의 보완 단계입니다. 기본 다섯 단계에는 없습니다."},
-    {"answer": "청크를 임베딩해서 저장하기", "correct": true, "feedback": "나눈 청크를 벡터로 바꿔 저장해 두어야 질문과 가까운 청크를 검색할 수 있습니다."},
-    {"answer": "답변과 근거가 맞는지 점검하기", "correct": false, "feedback": "Self-check는 답변을 만든 뒤에 하는 Advanced RAG의 보완 단계입니다."}
+    {"answer": "persist_directory: 저장소를 파일로 남길 폴더", "correct": true, "feedback": "persist_directory를 주지 않으면 저장소는 메모리에만 있다가 프로그램이 끝날 때 사라집니다."},
+    {"answer": "k: 검색해 올 청크 개수", "correct": false, "feedback": "k는 검색할 때 몇 개를 가져올지 정하는 값입니다. 저장소가 남는지와는 관계없습니다."},
+    {"answer": "chunk_overlap: 청크끼리 겹치는 길이", "correct": false, "feedback": "chunk_overlap은 Splitting 단계의 설정입니다. 저장소를 파일로 남기는 일과는 관계없습니다."},
+    {"answer": "청크마다 붙은 메타데이터", "correct": false, "feedback": "메타데이터는 출처 표시와 필터에 씁니다. 메타데이터가 있어도 폴더를 정하지 않으면 저장소는 남지 않습니다."}
    ]
   },
   {

@@ -1,53 +1,53 @@
 [
  {
-  "question": "RAG와 Fine-Tuning의 역할을 바르게 설명한 것은?",
+  "question": "검색해 온 청크에 답이 없는데도 모델이 그럴듯한 답을 지어냈습니다. RAG 프롬프트에 무엇을 넣는 것이 가장 알맞을까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "RAG는 맥락을 추가하고, Fine-Tuning은 모델을 학습시킨다",
+    "answer": "답변을 더 길고 자세하게 쓰라는 지시",
+    "correct": false,
+    "feedback": "길게 쓰라고 하면 근거 밖의 내용을 더 채워 넣기 쉬워집니다."
+   },
+   {
+    "answer": "맥락에 답이 없으면 '문서에서 확인할 수 없습니다'라고 말하라는 규칙",
     "correct": true,
-    "feedback": "RAG는 질문할 때 찾은 문서를 맥락으로 더하고, Fine-Tuning은 모델 자체를 추가로 학습시킵니다."
+    "feedback": "근거 안에서만 답하고, 답이 없으면 없다고 말하게 해야 지어낸 답을 줄일 수 있습니다."
    },
    {
-    "answer": "RAG는 모델을 학습시키고, Fine-Tuning은 맥락을 추가한다",
+    "answer": "{context} 자리를 비우고 {question}만 넣기",
     "correct": false,
-    "feedback": "두 역할이 뒤바뀌었습니다. 모델을 다시 학습시키는 쪽은 Fine-Tuning입니다."
+    "feedback": "맥락을 빼면 모델은 학습한 지식만으로 답하게 되어 지어낼 가능성이 오히려 커집니다."
    },
    {
-    "answer": "둘 다 모델을 다시 학습시켜 지식을 넣는다",
+    "answer": "모델이 가진 일반 지식도 자유롭게 섞어 쓰라는 지시",
     "correct": false,
-    "feedback": "RAG는 모델을 다시 학습시키지 않고, 찾아볼 문서를 바꿔 지식을 바꿉니다."
-   },
-   {
-    "answer": "둘 다 질문할 때 문서를 찾아 프롬프트에 넣는다",
-    "correct": false,
-    "feedback": "문서를 찾아 넣는 것은 RAG입니다. Fine-Tuning은 말투·형식을 맞추려고 모델을 학습시킵니다."
+    "feedback": "일반 지식을 섞게 하면 사내 문서에 없는 내용이 답변에 들어갑니다."
    }
   ]
  },
  {
-  "question": "Naive RAG의 다섯 단계입니다. 빈칸에 들어갈 단계는? 문서 불러오기 → 청크로 나누기 → (    ) → 질문과 가까운 청크 검색 → 답변 생성",
+  "question": "Chroma 저장소를 만든 뒤 커널을 다시 시작했더니, 저장해 둔 청크가 없어 임베딩을 처음부터 다시 해야 했습니다. 무엇을 빠뜨렸을 가능성이 가장 클까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "질문을 검색하기 좋게 다시 쓰기",
-    "correct": false,
-    "feedback": "Query Rewrite는 Advanced RAG가 더하는 보완 단계입니다."
-   },
-   {
-    "answer": "검색 결과의 순서 다시 매기기",
-    "correct": false,
-    "feedback": "Re-ranking도 Advanced RAG의 보완 단계입니다. 기본 다섯 단계에는 없습니다."
-   },
-   {
-    "answer": "청크를 임베딩해서 저장하기",
+    "answer": "persist_directory: 저장소를 파일로 남길 폴더",
     "correct": true,
-    "feedback": "나눈 청크를 벡터로 바꿔 저장해 두어야 질문과 가까운 청크를 검색할 수 있습니다."
+    "feedback": "persist_directory를 주지 않으면 저장소는 메모리에만 있다가 프로그램이 끝날 때 사라집니다."
    },
    {
-    "answer": "답변과 근거가 맞는지 점검하기",
+    "answer": "k: 검색해 올 청크 개수",
     "correct": false,
-    "feedback": "Self-check는 답변을 만든 뒤에 하는 Advanced RAG의 보완 단계입니다."
+    "feedback": "k는 검색할 때 몇 개를 가져올지 정하는 값입니다. 저장소가 남는지와는 관계없습니다."
+   },
+   {
+    "answer": "chunk_overlap: 청크끼리 겹치는 길이",
+    "correct": false,
+    "feedback": "chunk_overlap은 Splitting 단계의 설정입니다. 저장소를 파일로 남기는 일과는 관계없습니다."
+   },
+   {
+    "answer": "청크마다 붙은 메타데이터",
+    "correct": false,
+    "feedback": "메타데이터는 출처 표시와 필터에 씁니다. 메타데이터가 있어도 폴더를 정하지 않으면 저장소는 남지 않습니다."
    }
   ]
  },

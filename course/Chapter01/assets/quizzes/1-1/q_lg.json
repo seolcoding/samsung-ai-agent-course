@@ -1,27 +1,27 @@
 [
  {
-  "question": "LLM을 쓰는 워크플로우를 그래프 형태로 만들 수 있게 해 주는 프레임워크는?",
+  "question": "만들려는 Agent의 흐름이 \"문서 검색 → 결과가 부족하면 다시 검색 → 충분하면 답하기\"처럼 갈림길과 되풀이를 품고 있습니다. 이 흐름을 그래프로 그려 만들기에 알맞은 것은?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "LangChain",
     "correct": false,
-    "feedback": "LangChain은 프롬프트, LLM, 외부 도구를 이어 파이프라인을 만드는 프레임워크입니다."
+    "feedback": "LangChain은 프롬프트, LLM, 도구를 이어 한 줄의 파이프라인을 만드는 데 알맞습니다."
    },
    {
     "answer": "ReAct",
     "correct": false,
-    "feedback": "ReAct는 Reason, Action, Observation을 되풀이하는 방식의 이름입니다."
-   },
-   {
-    "answer": "Function Calling",
-    "correct": false,
-    "feedback": "Function Calling은 LLM이 함수 호출 형태의 출력을 만드는 방식입니다."
+    "feedback": "ReAct는 Reason, Action, Observation을 되풀이하는 방식의 이름입니다. 만드는 도구가 아닙니다."
    },
    {
     "answer": "LangGraph",
     "correct": true,
-    "feedback": "LangGraph는 워크플로우를 그래프 형태로 만들 수 있게 해 줍니다."
+    "feedback": "LangGraph는 워크플로우를 그래프로 만들어 갈림길과 되풀이를 그릴 수 있습니다."
+   },
+   {
+    "answer": "Instruction Tuning",
+    "correct": false,
+    "feedback": "Instruction Tuning은 모델을 질문에 답하도록 추가 학습하는 일입니다. 흐름을 만드는 도구가 아닙니다."
    }
   ]
  }

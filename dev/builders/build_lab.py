@@ -94,6 +94,7 @@ PROMPT_GUIDE_MC_NO_TASK = """코드 셀에서 손댈 곳은 주석으로 표시�
 NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
 MARK_CHOOSE = "# ✅ CHOOSE_HERE:"
 HOW_CHOOSE = "같은 번호의 줄을 모두 선택하고 Ctrl + / 를 누르면 주석이 풀립니다"  # CHOOSE_HERE 바로 아래에 늘 보이게 둔다
+HOW_CHOOSE_SHORT = "같은 번호의 줄을 모두 선택하고 Ctrl + /"  # 줄인 객관식판(choices에 mc_checks가 있을 때)
 
 
 TERMINAL_NOTE = """{write}하면 이 폴더에 서버 파일이 만들어집니다(빈칸을 먼저 채웁니다). 서버는 터미널에서 띄웁니다.
@@ -264,6 +265,70 @@ def _mark(lines, edits):
     return out, at
 
 
+SKILL_REFS = ROOT / ".agents" / "skills" / "grade-task" / "references"  # 채점 스킬이 읽는 과제별 기준(빌드 산출)
+TASK_RUN = {
+    "python": "uv run --env-file .env python {path}",
+    "streamlit": "uv run --env-file .env streamlit run {path}",
+}
+
+
+def _task_file(unit):
+    return f"{unit}_task.py"
+
+
+def _task_starter(task, unit):
+    """과제 시작 파일 내용: 설정을 불러오는 줄만 들어 있다."""
+    return "\n".join([f'"""{unit} 과제: {task["title"]}"""', "", *task["imports"], "", "", "# 아래에 AI와 함께 코드를 작성합니다", ""])
+
+
+def _task_section(nb, task, unit, chapter, n):
+    """노트북 맨 끝(정리 앞)의 바이브 코딩 과제. 과제 파일만 노트북 옆에 만들고, 실행·채점은 터미널과 AI가 한다."""
+    name, path = _task_file(unit), f"course/{chapter}/notebooks/{_task_file(unit)}"
+    run = TASK_RUN[task.get("run", "python")].format(path=path)
+    nb.h(2, f"{n}. 바이브 코딩 과제: {task['title']}")
+    nb.md(f"위에서 배운 것을 조합해 새 프로그램을 AI와 함께 만듭니다. 노트북이 아니라 따로 만든 과제 파일 `{name}`에 작성하고, 터미널에서 실행합니다.\n\n"
+          f"**목표** {task['goal']}\n\n**들어갈 것**\n\n" + "\n".join(f"- {x}" for x in task["steps"])
+          + "\n\n**성공 기준**\n\n" + "\n".join(f"- 🟢 {c['ok']}" for c in task["checks"]))
+    nb.md(f"**프롬프트 힌트** {task['hint']}")
+    nb.h(3, f"{n}.1 과제 파일 만들기")
+    nb.md(f"아래 셀을 실행하면 이 노트북 옆에 `{name}` 파일이 만들어집니다. 모델을 불러오는 줄은 미리 들어 있습니다. 파일이 이미 있으면 덮어쓰지 않으니 다시 실행해도 작업한 내용이 지워지지 않습니다.")
+    starter = _task_starter(task, unit)
+    assert "'''" not in starter and "\\" not in starter, f"{unit}: 시작 파일에 따옴표 세 개나 역슬래시가 있으면 셀 문자열이 깨진다"
+    nb.code(f"from pathlib import Path\n\ntask_file = Path({name!r})\nstarter = '''\\\n{starter}'''\n\n"
+            "# 이미 있으면 덮어쓰지 않습니다(작업한 내용이 지워지지 않게)\n"
+            "if task_file.exists():\n    print(f\"이미 있습니다. 그대로 둡니다: {task_file.resolve()}\")\n"
+            "else:\n    task_file.write_text(starter, encoding=\"utf-8\")\n    print(f\"만들었습니다: {task_file.resolve()}\")",
+            visible=True, kind="")
+    nb.h(3, f"{n}.2 AI와 함께 만들고 실행하기")
+    app = task.get("run") == "streamlit"
+    nb.md(f"1. VS Code 탐색기에서 `{path}`를 엽니다.\n"
+          "2. AI에게 목표와 들어갈 것을 주고 이 파일에 작성해 달라고 합니다. AI가 만든 코드를 읽어 보고, 성공 기준과 다르면 다시 지시합니다.\n"
+          "3. VS Code 메뉴 **터미널 → 새 터미널**을 열고(저장소 맨 위 폴더에서 열립니다) 아래 명령으로 실행합니다.\n\n"
+          f"```\n{run}\n```\n\n"
+          + ("4. 브라우저에 앱이 열립니다. 질문해 보고 성공 기준과 비교합니다. 파일을 고쳤으면 브라우저에서 새로 고침합니다. 앱을 끌 때는 터미널에서 **Ctrl + C**를 누릅니다.\n" if app else
+             "4. 출력을 성공 기준과 비교합니다. 오류가 나면 오류 메시지 전체를 AI에게 붙여 넣고 고쳐 달라고 합니다.\n"))
+    nb.h(3, f"{n}.3 채점받기")
+    nb.md(f"다 됐으면 AI에게 **\"{unit} 과제 채점해 줘\"**라고 말합니다. AI가 과제 파일을 직접 실행해 성공 기준마다 🟢 통과 / ⛔ 수정 필요 / ❔ 확인 불가를 알려 주고, 다음에 할 일 하나와 확인 질문 하나를 냅니다.")
+
+
+def _task_reference(task, unit, chapter):
+    """채점 스킬이 읽는 과제 기준 파일을 쓴다. 노트북과 같은 spec에서 만들어 서로 어긋나지 않게 한다."""
+    path = f"course/{chapter}/notebooks/{_task_file(unit)}"
+    q = task["quiz"]
+    lines = [f"# {unit} 과제: {task['title']}", "", "빌드 산출물이다(dev/builders/build_lab.py). 직접 고치지 않는다.", "",
+             f"- 과제 파일: `{path}`",
+             f"- 실행 명령(저장소 맨 위에서): `{TASK_RUN[task.get('run', 'python')].format(path=path)}`", "",
+             "## 목표", "", task["goal"], "", "## 들어갈 것", "", *[f"- {x}" for x in task["steps"]], "",
+             "## 성공 기준과 확인 방법", "", *[f"{k}. 🟢 {c['ok']}\n   - 확인: {c['how']}" for k, c in enumerate(task["checks"], 1)], ""]
+    if task.get("run") == "streamlit":
+        lines += ["## 앱 확인 방법", "", "브라우저 대신 스킬의 `scripts/check_streamlit.py`로 확인한다(질문 두 개를 보내고, 사이드바 버튼을 누른 뒤의 채팅 메시지 수를 출력한다).", "",
+                  f"`uv run --env-file .env python .agents/skills/grade-task/scripts/check_streamlit.py {path}`", ""]
+    lines += ["## 확인 질문", "", q["question"], "", *[f"{k}. {o}" for k, o in enumerate(q["options"], 1)], "",
+              f"정답: {q['answer']}", "", "해설:", *[f"- {k}: {w}" for k, w in enumerate(q["why"], 1)], ""]
+    SKILL_REFS.mkdir(parents=True, exist_ok=True)
+    (SKILL_REFS / f"{unit}.md").write_text("\n".join(lines), encoding="utf-8")
+
+
 def build(folder, mc=False):
     spec = json.loads(spec_path(folder).read_text(encoding="utf-8"))
     cpath = spec_path(folder).with_suffix(".choices.json")
@@ -332,6 +397,7 @@ def build(folder, mc=False):
             lines = out
         edits = f.get("edits", [])
         lines, edit_at = _mark(lines, edits)
+        short_all = mc and bool(todos) and all("mc_checks" in choices.get(t["todo"], {}) for t in todos)
         if mc:
             out, k, moved = [], 0, {}  # moved: 옛 줄 번호 → 새 줄 번호(안내 줄을 끼워 넣어 밀린 CHANGE_HERE 위치를 다시 맞춘다)
             while k < len(lines):
@@ -345,7 +411,7 @@ def build(folder, mc=False):
                         moved[k] = len(out)
                         out.append(lines[k])
                         k += 1
-                    out.append(ln[: len(ln) - len(ln.lstrip())] + "# (" + HOW_CHOOSE + ")")
+                    out.append(ln[: len(ln) - len(ln.lstrip())] + "# (" + (HOW_CHOOSE_SHORT if short_all else HOW_CHOOSE) + ")")
             lines, edit_at = out, [moved[a] for a in edit_at]
         # WRITE_HERE 주석 줄 위치로 어느 구획에 속하는지 정한다(찾지 못하면 순서대로 WRITE_HERE 줄을 쓴다)
         todo_lines = [k for k, ln in enumerate(lines) if MARK_TASK in ln or MARK_CHOOSE in ln]
@@ -415,6 +481,12 @@ def build(folder, mc=False):
                 nb.md(f"**✍️ CHANGE_HERE: {e['todo']}**\n\n{e['explain']}")
             for i in mine:
                 t = todos[i]
+                short = mc and "mc_checks" in choices[t["todo"]]
+                if short:  # 줄인 객관식판(2026-10-18): 굵은 지시 한 줄과 🟢·⛔ 한 줄씩. 설명은 정답 보기 안으로 옮긴다
+                    ok, bad = choices[t["todo"]]["mc_checks"]
+                    nb.md(f"**✅ {t['todo']}**\n\n- 🟢 {ok}\n- ⛔ {bad}")
+                    nb.meta(t.get("look__meta"))
+                    continue
                 if mc:
                     nb.md(f"**✅ CHOOSE_HERE: {t['todo']}**\n\n{t['explain']}\n\n보기 고르는 법: {HOW_CHOOSE.replace('Ctrl + / ', '`Ctrl + /`')}.")
                 else:
@@ -433,7 +505,9 @@ def build(folder, mc=False):
                 nb.md(_criteria_md([], done.get("fail", []), done.get("success", [])) if isinstance(done, dict) else _criteria_md(done))
             if mine and mc:
                 many = len(mine) > 1
-                ans = "\n\n".join((f"**{todos[i]['todo']}**\n\n" if many else "") + _choice_answer(choices[todos[i]["todo"]]) for i in mine)
+                ans = "\n\n".join((f"**{todos[i]['todo']}**\n\n" if many else "")
+                                    + (f"{todos[i]['explain']}\n\n" if "mc_checks" in choices[todos[i]["todo"]] else "")  # 줄인 판은 설명을 여기서 보여 준다
+                                    + _choice_answer(choices[todos[i]["todo"]]) for i in mine)
                 nb.md(f"<details><summary>정답 보기</summary>\n\n{ans}\n\n</details>")
             elif mine:
                 # 정답은 원본에서 지운 줄이 기본이고, 솔루션과 다른 곳은 spec의 answer로 바꿔 보여 준다
@@ -469,7 +543,12 @@ def build(folder, mc=False):
             nb.md(f"**프롬프트 힌트** {ask['hint']}")
             nb.md(_criteria_md([], ask.get("fail", []), ask.get("success", [])))
 
-    nb.h(2, f"{len(spec['files']) + 2}. 정리")
+    last = len(spec["files"]) + 2
+    if spec.get("task"):  # 바이브 코딩 과제: 배운 것을 조합해 별도 파일에 AI와 함께 만든다(2026-10-18)
+        _task_section(nb, spec["task"], unit, chapter, last)
+        _task_reference(spec["task"], unit, chapter)
+        last += 1
+    nb.h(2, f"{last}. 정리")
     nb.md(spec["closing"])
     if mc:  # 객관식판은 # · ## 제목을 접은 채로 연다(JupyterLab·classic 메타데이터. VS Code 반영은 미확인)
         nb.flush()

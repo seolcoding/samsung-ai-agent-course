@@ -1,27 +1,27 @@
 [
  {
-  "question": "코드 생성에 알맞은 조합은?",
+  "question": "같은 요청을 다시 보낼 때마다 생성되는 코드가 크게 달라져 검토하기 어렵습니다. 모델 파라미터를 어떻게 바꾸면 좋을까요?",
   "type": "multiple_choice",
   "answers": [
    {
-    "answer": "낮은 temperature / 낮은 top-p",
+    "answer": "temperature를 높인다",
+    "correct": false,
+    "feedback": "temperature를 높이면 답이 더 다양해져 매번 더 크게 달라집니다."
+   },
+   {
+    "answer": "top-p를 높여 후보 토큰을 넓힌다",
+    "correct": false,
+    "feedback": "후보를 넓히면 선택 폭이 커져 답이 더 흔들립니다."
+   },
+   {
+    "answer": "temperature를 낮춘다",
     "correct": true,
-    "feedback": "보수적이고 반복 가능성이 높아 사실 기반 답변, 코드 생성, 요약에 맞습니다."
+    "feedback": "낮은 temperature는 확률이 높은 토큰 쪽으로 고르게 해 일관되고 보수적인 답이 나옵니다. 코드 생성에 유리합니다."
    },
    {
-    "answer": "낮은 temperature / 높은 top-p",
+    "answer": "값은 그대로 두고 질문 끝에 \"정확하게\"만 덧붙인다",
     "correct": false,
-    "feedback": "업무 문서, 설명문에 맞는 조합입니다."
-   },
-   {
-    "answer": "높은 temperature / 낮은 top-p",
-    "correct": false,
-    "feedback": "가벼운 문장 변형에 적합한 조합입니다."
-   },
-   {
-    "answer": "높은 temperature / 높은 top-p",
-    "correct": false,
-    "feedback": "아이디어 발산, 브레인스토밍에 어울리는 조합입니다."
+    "feedback": "후보 중 하나를 고르는 방식은 파라미터가 조정합니다. 한 단어를 덧붙여서는 답의 흔들림이 줄지 않습니다."
    }
   ]
  }

@@ -1,27 +1,27 @@
 [
  {
-  "question": "검색해 온 청크들의 순서를 다시 매겨, 질문과 더 관련 있는 청크를 앞에 두는 보완 단계는 무엇일까요?",
+  "question": "관련 청크가 검색되기는 하는데 늘 4~5번째에 있고, 앞쪽에는 관련이 적은 청크가 옵니다. 이미 찾아온 결과의 순서를 바로잡으려면 어떤 보완 단계를 더하면 될까요?",
   "type": "multiple_choice",
   "answers": [
    {
     "answer": "Query Rewrite",
     "correct": false,
-    "feedback": "Query Rewrite는 검색하기 전에 질문을 검색하기 좋은 형태로 다시 쓰는 단계입니다."
-   },
-   {
-    "answer": "Hybrid Search",
-    "correct": false,
-    "feedback": "Hybrid Search는 키워드 검색과 벡터 검색을 함께 써서 후보를 찾는 방식입니다."
-   },
-   {
-    "answer": "Re-ranking",
-    "correct": true,
-    "feedback": "Re-ranking은 이미 찾아온 검색 결과의 우선순위를 다시 계산합니다."
+    "feedback": "Query Rewrite는 검색하기 전에 질문을 다시 씁니다. 이미 찾아온 결과의 순서는 그대로입니다."
    },
    {
     "answer": "Self-check",
     "correct": false,
-    "feedback": "Self-check는 답변을 만든 뒤 답변과 근거가 맞는지 점검하는 단계입니다."
+    "feedback": "Self-check는 답변을 만든 뒤 답변이 근거와 맞는지 점검합니다. 검색 결과 순서를 바꾸지 않습니다."
+   },
+   {
+    "answer": "Hybrid Search",
+    "correct": false,
+    "feedback": "Hybrid Search는 키워드 검색과 벡터 검색을 함께 써서 후보를 넓힙니다. 순서를 다시 매기는 단계는 따로 있습니다."
+   },
+   {
+    "answer": "Re-ranking",
+    "correct": true,
+    "feedback": "Re-ranking은 찾아온 청크의 우선순위를 다시 계산해, 질문과 더 관련 있는 청크를 앞으로 올립니다."
    }
   ]
  }
