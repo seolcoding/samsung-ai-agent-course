@@ -84,13 +84,13 @@ for _ in range(12 if isinstance(tid, str) else 0):  # 기록은 늦게 도착합
         break
     time.sleep(5)
 if not isinstance(tid, str):
-    print("⛔ 1. 아직 작성하지 않았습니다")
+    print("⛔ 1. trace_id가 없습니다(아직 작성하지 않았거나, invoke의 callbacks에 handler를 넣지 않았습니다)")
 elif not names:
     print(f"❔ 1. Langfuse에서 trace {tid}를 찾지 못했습니다({error or '60초 안에 도착하지 않음'})")
 else:
     print("🟢 1. 체인 실행이 trace로 남았습니다" if "RunnableSequence" in names else "⛔ 1. trace에 체인 실행이 없습니다(callbacks를 확인합니다)")
 if todo_2 or not isinstance(tid, str):
-    print("⛔ 2. 아직 작성하지 않았습니다")
+    print("⛔ 2. 아직 작성하지 않았습니다" if todo_2 else "⛔ 2. trace_id가 없어 점수를 확인할 수 없습니다(1번을 먼저 고칩니다)")
 elif {"short-answer", "llm-judge"} <= {s.name for s in scores}:
     print("🟢 2. trace에 short-answer와 llm-judge 점수(0~1)가 남았습니다")
 else:
