@@ -91,7 +91,7 @@ echo "✔ [4/5] 수강생용 브랜치에 dev/ 폴더도, dev/를 가리키는 �
 
 # 5. zip 만들기(보관 폴더가 외장 드라이브라 연결되지 않았으면 임시 폴더에 만들고 알린다)
 if ! mkdir -p "$OUT_DIR" 2>/dev/null; then
-  echo "⚠ 보관 폴더 $OUT_DIR를 쓸 수 없음(외장 드라이브 연결 확인) → zip을 ~/000_Inbox/080_Temporary에 만든다. 나중에 보관 폴더로 옮긴다"
+  echo "⚠ 보관 폴더 ${OUT_DIR}를 쓸 수 없음(외장 드라이브 연결 확인) → zip을 ~/000_Inbox/080_Temporary에 만든다. 나중에 보관 폴더로 옮긴다"
   OUT_DIR="$HOME/000_Inbox/080_Temporary"
   ZIP="$OUT_DIR/$(date +%F)_course_${VERSION}.zip"
   mkdir -p "$OUT_DIR"
