@@ -51,7 +51,6 @@
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| 보기를 풀지 않고 실행해 결과가 비거나 이상함(3·4일차) | 보기는 주석이라 실행되지 않고 `pass`만 돈다 | `# ✅ CHOOSE_HERE:` 아래 같은 번호 줄을 모두 선택하고 `Ctrl + /`로 푼 뒤 실행 |
 | `SyntaxError` | 붙여 넣은 값이나 푼 보기의 따옴표·괄호·들여쓰기 | 오류 줄 번호 근처를 본다. 값은 표시된 자리만 바꾸고, 보기는 `Ctrl + /`로 풀어 들여쓰기를 그대로 둔다 |
 | 셀이 끝나지 않음(반복이 계속됨) | 멈추는 조건이 없는 흐름 | 셀 실행 중지(■) |
 | 셀이 입력을 기다리며 멈춤 | `input()` 셀 | VS Code 위쪽 입력창에 답을 입력 |
@@ -75,14 +74,16 @@
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| 터미널: `No such file or directory` / `can't open file …_server.py` | 터미널이 저장소 맨 위가 아님(서버 파일 `mcp_server.py`·`a2a_server.py`는 노트북 폴더에 이미 있다) | 저장소 맨 위에서 `uv run python course/Chapter02/notebooks/mcp_server.py`처럼 띄운다. 위치 확인: `uv run python -c "import os; print(os.getcwd())"`(PowerShell·cmd·macOS 모두 된다, [paths.md](paths.md)) |
-| `address already in use` / `Errno 48`·`[Errno 10048]` / "소켓 주소(프로토콜/네트워크 주소/포트)는 하나만 사용할 수 있습니다"(Windows) | 같은 포트의 서버가 이미 떠 있음(A2A와 캡스톤 MCP는 둘 다 8001) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
+| 터미널: `No such file or directory` / `can't open file …_server.py` | 터미널이 저장소 맨 위가 아님(서버 파일 `basic_mcp_server.py`·`dart_mcp_server.py`·`a2a_server.py`·`friends_a2a_server.py`는 노트북 폴더에 이미 있다) | 저장소 맨 위에서 `uv run python course/Chapter02/notebooks/basic_mcp_server.py`처럼 띄운다. 위치 확인: `uv run python -c "import os; print(os.getcwd())"`(PowerShell·cmd·macOS 모두 된다, [paths.md](paths.md)) |
+| `address already in use` / `Errno 48`·`[Errno 10048]` / "소켓 주소(프로토콜/네트워크 주소/포트)는 하나만 사용할 수 있습니다"(Windows) | 같은 포트의 서버가 이미 떠 있음(기본 MCP 8000, DART MCP 8002, 기본 A2A와 캡스톤 MCP는 둘 다 8001, 친구 A2A 8003) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
 | 클라이언트 셀: `ConnectError`, `Connection refused`, 오래 기다리다 실패 | 서버가 꺼져 있거나 시작 중 오류로 끝남 | 서버 터미널에 `Uvicorn running on …`이 있는지 본다. 없으면 터미널의 마지막 오류 줄부터 고친다 |
 | 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일을 고치다 틀림 | 고친 줄을 되돌려 저장(Ctrl+S) → Ctrl+C → 다시 띄우기 |
 | 서버를 고쳤는데 결과가 그대로 | 저장하지 않았거나 예전 서버가 계속 떠 있음 | 저장(Ctrl+S) → Ctrl+C로 끄고 다시 띄운다 → 노트북의 연결 셀부터 다시 실행 |
 | 서버 시작 때 `DeprecationWarning`, `Update available` 상자 | 라이브러리 안내 문구 | 무시해도 된다 |
-| stdio로 바꿨더니 추가한 할 일이 목록에 없음 | stdio는 도구를 부를 때마다 서버를 새로 띄워 기억이 사라진다 | 정상. SSE와 비교하는 실습이다 |
-| Windows에서 stdio로 바꾼 셀이 `io.UnsupportedOperation: fileno` 또는 `NotImplementedError`로 실패 | Windows 노트북 커널에서는 stdio 방식이 서버 프로그램을 띄우지 못한다 | 정상. `"sse"`로 되돌리고 다음으로 진행한다 |
+| 3-2 DART 도구의 답이 `[모의 DART]`로 시작함 | `.env`에 `DART_API_KEY`가 없거나, 사내망에서 DART(opendart.fss.or.kr)에 연결되지 않음 | 정상(견본 답으로 실습). 실제 공시를 보려면 [setup.md](setup.md)의 키 안내대로 키를 넣고 서버를 다시 띄운다. `uv run python -m config.check --mcp --live`로 연결을 본다 |
+| 3-2에 `Tavily는 뺐습니다`가 나옴 | `TAVILY_API_KEY`가 없거나 Tavily 서버에 연결되지 않음 | 정상(DART 도구만으로 진행). 키를 넣었다면 커널을 다시 시작하고 연결 셀부터 다시 실행한다 |
+| 3-2 DART 도구가 `DART 응답: …`을 돌려줌 | DART가 오류를 돌려줌(키가 틀림, 조회 결과 없음 등). 메시지에 이유가 있다 | 키를 다시 확인한다. "조회된 데이터가 없습니다"면 연도·기간을 바꿔 묻는다 |
+| stdio로 바꾼 셀이 `io.UnsupportedOperation: fileno` 또는 `NotImplementedError`로 실패 | 노트북 화면 출력이 진짜 파일이 아니라 서버 프로그램을 띄우지 못함(Windows). 3-2 연결 셀의 `stdio_errors_to_file(...)` 줄이 빠졌거나 실행되지 않음 | 연결 셀을 처음부터 다시 실행한다(그 줄이 있어야 한다). 그래도 안 되면 노트북 폴더의 `mcp_stdio_server.log` 마지막 줄을 AI에게 보여 준다 |
 
 ## Langfuse(관측·평가, 캡스톤)
 

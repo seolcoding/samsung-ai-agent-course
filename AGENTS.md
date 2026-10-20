@@ -10,10 +10,8 @@
 
 ## 실습 노트북
 
-- 1·2일차는 값 바꾸기판이다. `# ✍️ CHANGE_HERE:` 위의 "바꿔 볼 값"을 바로 아래 줄의 그 자리에 붙여 넣고 다시 실행한 뒤 되돌린다.
+- 실습 노트북은 모두 값 바꾸기판이다(코드는 완성되어 있다). `# ✍️ CHANGE_HERE:` 위의 "바꿔 볼 값"을 바로 아래 줄의 그 자리에 붙여 넣고 다시 실행한 뒤 되돌린다.
 - 결과는 접힌 "무슨 일이 생기나"에 있다. 먼저 실행해 보게 한 뒤 무엇이 왜 달라졌는지 설명한다.
-- 3·4일차는 객관식판이다. `# ✅ CHOOSE_HERE:` 아래 같은 번호(1️⃣~4️⃣) 줄을 모두 골라 `Ctrl + /`로 푼다. `pass  # 그대로 둡니다`는 둔다.
-- 정답을 바로 말하지 말고 보기마다 무엇이 다른지 설명해 고르게 돕는다. 결과는 🟢/⛔ 기준과 비교하고, 해설은 접힌 "정답 보기"에 있다.
 - 디버그 출력(`set_debug(True)`)이 길어도 정상이다. 도구 호출 때 섞이는 `KeyError('input')` 줄은 결과와 상관없다.
 - 표시된 자리 밖은 고치지 않는다. 셀은 위에서부터 실행된 것으로 보고, 부탁받지 않은 기능·예외 처리를 더하지 않는다.
 - Streamlit 앱을 띄우는 셀은 끝나지 않으니 ■로 멈추고 다음 셀로 간다. `input()` 셀에는 답을 입력하게 한다.
@@ -28,9 +26,10 @@
 
 ## 서버 실습 (3-2 MCP, 3-3 A2A, 캡스톤)
 
-- 노트북 폴더의 `mcp_server.py`·`a2a_server.py`는 완성된 서버다. VS Code 새 터미널에서 `uv run python course/Chapter02/notebooks/mcp_server.py`처럼 띄운다.
+- 노트북 폴더의 서버 파일은 모두 완성된 서버다. 3-2는 `basic_mcp_server.py`(기본)·`dart_mcp_server.py`(실전), 3-3은 `a2a_server.py`(기본)·`friends_a2a_server.py`(실전). VS Code 새 터미널에서 `uv run python course/Chapter02/notebooks/basic_mcp_server.py`처럼 띄운다.
 - 서버를 켜 둔 채 노트북의 클라이언트 셀을 실행한다. 서버를 고쳤으면 저장 → `Ctrl + C` → 다시 띄우고 연결 셀부터 다시 실행한다.
-- 포트는 MCP 8000, A2A 8001, 캡스톤 MCP 8001. "address already in use"·`[Errno 10048]`이면 앞 서버를 `Ctrl + C`로 끈다.
+- 포트는 기본 MCP 8000, DART MCP 8002, 기본 A2A 8001, 친구 A2A 8003, 캡스톤 MCP 8001. "address already in use"·`[Errno 10048]`이면 앞 서버를 `Ctrl + C`로 끈다.
+- 3-2 실전 프로젝트는 DART 공시 MCP 서버와 Tavily 공식 MCP를 쓴다. `DART_API_KEY`는 강사가 알려 주고 `TAVILY_API_KEY`는 수강생이 각자 무료로 받는다([agent_docs/setup.md](course/agent_docs/setup.md)). 키가 없거나 사내망에서 막히면 DART는 `[모의 DART]` 견본 답, Tavily는 빼고 진행하니 정상이다. 키를 대신 지어내지 않는다.
 - 터미널을 이미 닫았으면 PowerShell: `Get-NetTCPConnection -LocalPort 8000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }`.
 
 ## 지킬 것

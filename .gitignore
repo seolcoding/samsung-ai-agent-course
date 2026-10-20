@@ -197,7 +197,9 @@ course/Chapter01/notebooks/*_task.py
 # Chapter02 노트북이 %%writefile로 만드는 서버 파일·하네스 작업 폴더
 course/Chapter02/notebooks/*.py
 # 실습 노트북(객관식판 _LAB)이 쓰는 완성 서버 파일은 함께 배포한다(build_lab.py --mc가 만든다)
-!course/Chapter02/notebooks/mcp_server.py
+!course/Chapter02/notebooks/basic_mcp_server.py
+!course/Chapter02/notebooks/dart_mcp_server.py
+!course/Chapter02/notebooks/friends_a2a_server.py
 !course/Chapter02/notebooks/a2a_server.py
 course/Chapter02/notebooks/harness/
 course/Chapter02/capstone/solution.py

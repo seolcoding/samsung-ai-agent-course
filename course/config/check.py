@@ -5,6 +5,7 @@
     uv run python -m config.check --live     실제로 모델·임베딩을 한 번씩 호출해 본다(요청 1~2회)
     uv run python -m config.check --json     AI 도우미가 읽기 좋은 JSON으로 출력
     uv run python -m config.check --langfuse Langfuse 키(2부 관측 실습·캡스톤)도 본다
+    uv run python -m config.check --mcp      3-2 MCP 실습 키(Tavily·DART)도 본다(--live면 실제로 한 번씩 부른다)
 노트북:
     from config.check import check_env
     check_env()                              # LLM만 본다
@@ -41,7 +42,12 @@ REQUIRED = {
     "LANGFUSE": {
         "on": ["LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGFUSE_BASE_URL"],
     },
+    # 3-2 MCP 실습 키. 없어도 실습은 돈다(DART는 [모의 DART] 응답, Tavily는 빼고 진행)라 ⛔ 대신 ⚠️로 알린다
+    "MCP_KEYS": {
+        "on": ["TAVILY_API_KEY", "DART_API_KEY"],
+    },
 }
+OPTIONAL_GROUPS = {"MCP_KEYS"}
 ALIAS = {"LANGFUSE_BASE_URL": "LANGFUSE_HOST"}  # 예전 이름도 받는다
 ROOT = Path(__file__).resolve().parents[2]  # course/config/check.py → 저장소 맨 위
 _SECRET = re.compile(r"(sk-[A-Za-z0-9_-]{4})[A-Za-z0-9_-]+|([A-Za-z0-9_-]{6})[A-Za-z0-9_-]{20,}")
@@ -102,7 +108,7 @@ def report(groups=("LLM_PROVIDER",), live=False):
 
     # 4. 연결 방식별 필요한 이름
     for group in groups:
-        kind = "on" if group == "LANGFUSE" else os.getenv(group, "samsung").strip().lower()
+        kind = "on" if group in ("LANGFUSE", "MCP_KEYS") else os.getenv(group, "samsung").strip().lower()
         need = REQUIRED[group].get(kind)
         if need is None:
             items.append(_item("⛔", group, f"알 수 없는 값: {kind}", f"{' 또는 '.join(REQUIRED[group])} 중 하나"))
@@ -113,7 +119,11 @@ def report(groups=("LLM_PROVIDER",), live=False):
             detail = f"{kind} — 빠진 이름: {', '.join(missing)}" if missing else f"{kind}"
             if odd:
                 detail += f" / 값이 '#'로 시작함(주석이 값으로 읽힘): {', '.join(odd)}"
-            items.append(_item("⛔", group, detail, ".env에서 이 이름들의 값을 채운다(설명은 윗줄에)"))
+            if group in OPTIONAL_GROUPS:
+                items.append(_item("⚠️", group, detail + " (없으면 DART는 [모의 DART] 응답, Tavily는 빼고 진행)",
+                                   ".env.sample (5)절의 안내대로 무료 키를 받아 채운다"))
+            else:
+                items.append(_item("⛔", group, detail, ".env에서 이 이름들의 값을 채운다(설명은 윗줄에)"))
         else:
             items.append(_item("🟢", group, f"{kind} — 필요한 이름 {len(need)}개 있음"))
 
@@ -147,6 +157,31 @@ def _live(groups):
             out.append(_item("🟢", "임베딩 호출", f"벡터 {dim}차원"))
         except Exception as e:  # noqa: BLE001
             out.append(_item("⛔", "임베딩 호출", f"{type(e).__name__}: {_mask(e)}", "course/agent_docs/troubleshooting.md"))
+    if "MCP_KEYS" in groups:  # 3-2 MCP 실습: 키가 있으면 실제로 한 번씩 불러 본다(사내망에서 막혔는지 알 수 있다)
+        out += _live_mcp()
+    return out
+
+
+def _live_mcp():
+    import requests
+
+    out, fix = [], "키가 맞는지 보고, 사내망이라 막혔다면 그대로 두고 실습한다([모의] 응답·Tavily 없이 진행)"
+    if os.getenv("DART_API_KEY", "").strip():
+        try:
+            r = requests.get("https://opendart.fss.or.kr/api/company.json", timeout=15,
+                             params={"crtfc_key": os.environ["DART_API_KEY"].strip(), "corp_code": "00126380"}).json()
+            ok = r.get("status") == "000"
+            out.append(_item("🟢" if ok else "⚠️", "DART 호출", r.get("corp_name", "") if ok else f"status {r.get('status')}: {r.get('message', '')}", "" if ok else fix))
+        except Exception as e:  # noqa: BLE001
+            out.append(_item("⚠️", "DART 호출", f"{type(e).__name__}: {_mask(e)}", fix))
+    if os.getenv("TAVILY_API_KEY", "").strip():
+        try:
+            r = requests.post("https://api.tavily.com/search", timeout=20, json={"query": "MCP", "max_results": 1},
+                              headers={"Authorization": f"Bearer {os.environ['TAVILY_API_KEY'].strip()}"})
+            ok = r.status_code == 200
+            out.append(_item("🟢" if ok else "⚠️", "Tavily 호출", "검색 결과 받음" if ok else f"HTTP {r.status_code}", "" if ok else fix))
+        except Exception as e:  # noqa: BLE001
+            out.append(_item("⚠️", "Tavily 호출", f"{type(e).__name__}: {_mask(e)}", fix))
     return out
 
 
@@ -173,6 +208,8 @@ if __name__ == "__main__":
     groups = ["LLM_PROVIDER", "EMBED_PROVIDER", "RAG_PROVIDER"]  # 명령으로 실행하면 전부 본다
     if "--langfuse" in args:  # 2부 관측 실습·캡스톤
         groups.append("LANGFUSE")
+    if "--mcp" in args:  # 3-2 MCP 실습 키(Tavily·DART)
+        groups.append("MCP_KEYS")
     if "--json" in args:
         items = report(groups, live="--live" in args)
         print(json.dumps({"ok": not any(i["status"] == "⛔" for i in items), "items": items}, ensure_ascii=False, indent=1))
