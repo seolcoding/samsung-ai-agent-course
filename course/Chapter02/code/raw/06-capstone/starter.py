@@ -6,7 +6,7 @@
 
 흐름:
   사용자 입력 → Supervisor → Researcher(MCP+RAG+웹검색) → [HITL 승인]
-               → Writer(SDS 보고서 작성) → 최종 출력
+               → Writer(DS 보고서 작성) → 최종 출력
 
 실습 파일: course/Chapter02/code/raw/06-capstone/starter.py
 정답 참고: course/Chapter02/code/solution/06-capstone/solution.py

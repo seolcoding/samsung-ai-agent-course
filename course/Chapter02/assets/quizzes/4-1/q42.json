@@ -1,6 +1,6 @@
 [
  {
-  "question": "SKILL.md에 \"보고서가 [SDS-AI-RPT v2.1] 헤더로 시작하고 요약이 세 줄인지 확인한다\"를 넣으려 합니다. 어느 항목에 적나요?",
+  "question": "SKILL.md에 \"보고서가 [DS-AI-RPT v2.1] 헤더로 시작하고 요약이 세 줄인지 확인한다\"를 넣으려 합니다. 어느 항목에 적나요?",
   "type": "multiple_choice",
   "answers": [
    {

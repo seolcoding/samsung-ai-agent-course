@@ -6,7 +6,7 @@
 
 흐름:
   사용자 입력 → Supervisor → Researcher(MCP+RAG+웹검색) → [HITL 승인]
-               → Writer(SDS 보고서 작성) → 최종 출력
+               → Writer(DS 보고서 작성) → 최종 출력
 
 실행 (저장소 맨 위에서, 터미널 두 개):
   터미널 A: uv run python course/Chapter02/capstone/mcp_server.py   ← MCP 서버 먼저
