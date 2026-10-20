@@ -18,6 +18,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from typing_extensions import TypedDict
 
 from config.llm import get_llm
+from config.mcp import stdio_errors_to_file
 
 truststore.inject_into_ssl()  # 사내망에서 Tavily(인터넷 HTTPS)에 연결할 때 회사 인증서를 믿게 한다
 load_dotenv()
@@ -35,6 +36,9 @@ async def reachable(connection: dict) -> bool:
 # ── MCP 서버 연결 설정 ────────────────────────────────────────────────────────
 # dart: 2장에서 터미널에 켜 둔 우리 서버. SSE는 켜 둔 서버에 주소로 접속하고,
 #       stdio는 노트북이 서버 파일을 직접 실행해 표준 입출력으로 주고받는다.
+#       stdio로 띄운 서버의 오류 출력은 화면 대신 mcp_stdio_server.log 파일로 받는다
+#       (Windows 노트북의 화면 출력은 진짜 파일이 아니라, 그대로 두면 서버를 띄우지 못한다)
+stdio_errors_to_file("mcp_stdio_server.log")
 CONNECTIONS = {
     "sse": {"transport": "sse", "url": "http://localhost:8000/sse"},
     "stdio": {"transport": "stdio", "command": sys.executable, "args": ["mcp_server.py", "--stdio"]},

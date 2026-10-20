@@ -17,6 +17,9 @@ SRC_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 OUT_DIR="$HOME/800_Archives/830_Courses/samsung_ds_ai_developer"
 ZIP="$OUT_DIR/$(date +%F)_course_${VERSION}.zip"
 FILES=(course pyproject.toml uv.lock .python-version .env.sample .gitignore .agents)
+# 수업 뒤에 공개할 것(2026-10-20 사용자 결정: 캡스톤 정답). study에서 뺀다. 공개할 때 비우고
+# dev/builders/build_capstone_guide.py의 SHOW_ANSWERS를 True로 바꿔 다시 빌드한다
+HIDDEN=(course/Chapter02/code/solution/06-capstone)
 
 fail() { echo "✖ $1 | $2 | $3" >&2; exit 1; }
 
@@ -65,6 +68,7 @@ fi
 git -C "$WT" read-tree --empty  # 색인을 비우고
 git -C "$WT" clean -fdq           # 작업 폴더의 파일도 비운다(새 내용으로 통째로 바꾸기 위해)
 git archive "$REV" "${FILES[@]}" | tar -x -C "$WT"
+for h in "${HIDDEN[@]}"; do rm -r "${WT:?}/$h"; done  # 임시 작업 폴더 안에서만 지운다(dev·main은 그대로)
 # 맨 위로 복사한 안내의 폴더·문서 경로는 course/ 기준으로 바꾼다
 sed -E -e 's#\| `(Chapter|config|agent_docs)#| `course/\1#g' -e 's#`agent_docs/#`course/agent_docs/#g' \
   "$WT/course/README.md" > "$WT/README.md"
@@ -83,6 +87,11 @@ fi
 if git ls-tree -r --name-only "$BRANCH" | grep -q "^dev/"; then
   fail "수강생용 브랜치에 dev/가 있음" "복사 대상이 잘못됨" "FILES 목록 확인"
 fi
+for h in "${HIDDEN[@]}"; do
+  if git ls-tree -r --name-only "$BRANCH" | grep -q "^$h/"; then
+    fail "수강생용 브랜치에 $h가 있음" "수업 뒤 공개할 정답이 섞임" "HIDDEN 목록과 3번 단계 확인"
+  fi
+done
 if git grep -q -I -E "(^|[^A-Za-z0-9./])dev/" "$BRANCH" -- . ':!uv.lock'; then
   git grep -n -I -E "(^|[^A-Za-z0-9./])dev/" "$BRANCH" -- . ':!uv.lock' >&2
   fail "수강생용 파일이 dev/를 가리킴" "위 줄" "dev에서 그 문구를 고친 뒤 다시 실행"

@@ -30,7 +30,7 @@ context = "\n\n".join(hit["_source"]["merge_title_content"] for hit in hits)
 | 주소·인증 헤더 만들기 | `course/config/samsung.py` (`ragaas_config`) |
 | 요청 보내기와 모의 응답 | `course/config/ragaas.py` (`post_ragaas`, `MockResponse`) |
 | 올리기 → 검색 → LLM 답변 → 삭제 전체 흐름 | `course/Chapter01/code/solution/03-rag/05_ragaas.py` |
-| Agent 도구로 감싸기(`@tool rag_search`) | `course/Chapter02/code/solution/06-capstone/solution.py` |
+| Agent 도구로 감싸기(`@tool rag_search`) | 4-3 캡스톤 6.1 단계(캡스톤 정답 코드는 수업 뒤 공개) |
 | 캡스톤에서 수강생이 채울 자리 | `course/Chapter02/capstone/starter.py` (`rag_search`) |
 | 필요한 `.env` 이름과 뜻 | 저장소 맨 위 `.env.sample` (2) RAGaaS 칸 |
 

@@ -344,9 +344,12 @@ def check_langfuse():
 
 
 def check_capstone():
-    nb = json.loads((NB / "4-3_capstone_LAB.ipynb").read_text(encoding="utf-8"))
-    head = "%%writefile ../capstone/solution.py"
-    cell = next("".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code" and "".join(c["source"]).startswith(head))
+    head = "%%writefile ../capstone/solution.py"  # 4-3 LAB 8.2 셀. 정답 공개 전에는 강사본에만 있다(study 클론에는 없음)
+    cells = [c for f in (NB / "4-3_capstone_LAB.ipynb", ROOT / "dev/instructor/Chapter02/4-3_capstone_LAB.ipynb") if f.exists()
+             for c in json.loads(f.read_text(encoding="utf-8"))["cells"]]
+    cell = next(("".join(c["source"]) for c in cells if c["cell_type"] == "code" and "".join(c["source"]).startswith(head)), None)
+    if cell is None:
+        return "❔", "정답 코드가 없는 클론(study) — 캡스톤 정답은 dev 클론에서 점검한다"
     sol = CAPSTONE / "_inhouse_check_solution.py"  # 4-3 LAB 8.2 셀의 정답 코드. solution.py는 건드리지 않는다
     sol.write_text(cell[len(head):].lstrip("\n"), encoding="utf-8")
     try:

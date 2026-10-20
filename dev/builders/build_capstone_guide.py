@@ -28,6 +28,9 @@ OUT = COURSE / "Chapter02" / "notebooks" / "4-3_capstone_LAB.ipynb"
 RUN_SERVER = "uv run python course/Chapter02/capstone/mcp_server.py"
 RUN_STARTER = "uv run python course/Chapter02/capstone/starter.py"
 RUN_SOLUTION = "uv run python course/Chapter02/capstone/solution.py"
+# 캡스톤 정답은 수업 뒤에 공개한다(2026-10-20 사용자 결정). 공개할 때 True로 바꿔 다시 빌드하고 dev/release.sh의 HIDDEN을 비운다.
+# False면 정답 보기·정답 코드 셀은 강사본(dev/instructor/)에만 들어간다
+SHOW_ANSWERS = False
 # 사내망에서 Langfuse(HTTPS)는 회사 인증서를 거친다. starter.py와 같은 두 줄을 맨 위 import보다 먼저 둔다
 TRUSTSTORE = ("import truststore\n\n"
               "truststore.inject_into_ssl()  # PC에 등록된 인증서(회사 인증서 포함)를 믿게 합니다. Langfuse보다 먼저 둡니다(지우지 않습니다)\n\n")
@@ -62,6 +65,17 @@ def between(lines, start, end):
     while body and not body[-1].strip():
         body.pop()
     return "\n".join(body)
+
+
+def teacher_only(nb):
+    """방금 넣은 셀을 강사본에만 둔다(정답을 공개하기 전)."""
+    if not SHOW_ANSWERS:
+        nb.cells[-1].metadata["tags"] = ["강사용"]
+
+
+def answer_md(nb, *blocks):
+    nb.md(answer(*blocks))
+    teacher_only(nb)
 
 
 def answer(*blocks):
@@ -148,9 +162,9 @@ TITLE_META = """| 항목 | 내용 |
 HOW = f"""1. 맨 위 **환경 점검** 두 셀(접힌 코드 셀)을 실행해 설정을 확인합니다.
 2. 1~4장에서 무엇을 만드는지, 폴더에 무엇이 있는지 봅니다.
 3. 5장대로 터미널 A에서 MCP 서버를 켭니다.
-4. 6장의 단계를 차례로 진행합니다. 단계마다 **할 일** → **프롬프트 힌트**를 보고 AI에게 지시를 직접 씀 → AI가 고친 코드를 읽고 받아들일지 판단 → 접힌 "정답 보기"와 비교합니다.
+4. 6장의 단계를 차례로 진행합니다. 단계마다 **할 일** → **프롬프트 힌트**를 보고 AI에게 지시를 직접 씀 → AI가 고친 코드를 읽고 받아들일지 판단합니다.
 5. 7장대로 터미널 B에서 실행하고, 🟢/⛔ 성공 기준으로 결과를 스스로 판단합니다.
-6. 8장에서 정답과 비교하고, 9장의 평가 기준을 확인합니다.
+6. 9장의 평가 기준을 확인합니다. 정답 코드는 수업이 끝난 뒤 공개합니다.
 
 AI에게 파일을 보여 줄 때는 `capstone/starter.py`를 열어 두고 지시합니다. 한 번에 한 단계만 시키면 결과를 검토하기 쉽습니다."""
 
@@ -211,10 +225,9 @@ SERVER_OK = criteria(
 
 STEPS_NOTE = """`capstone/starter.py`의 `TODO` 12개를 일곱 단계(6.1~6.7)로 묶었습니다. 6.1~6.7을 모두 채운 뒤 7장에서 한 번에 실행해 확인합니다. 각 단계의 🟢/⛔는 그때 볼 화면입니다.
 
-- 중간에 실행하면 6.5를 채우기 전에는 `Graph must have an entrypoint` 오류로 멈추고, 6.5까지 채웠으면 `MCP 도구 로드: [...]` 한 줄만 나오고 끝납니다. 6.6까지 채웠으면 보고서까지 나오고 점수는 나오지 않습니다. 아직 채우지 않은 단계 때문이니 정상입니다.
+- 중간에 실행하면 6.6을 채우기 전에는 `⚠️ 실행 코드(6.6)가 아직 비어 있어 여기서 끝납니다.`가 나오고 끝납니다(6.3까지 채웠으면 그 위에 `MCP 도구 로드: [...]`). 6.6까지 채웠으면 보고서까지 나오고 점수는 나오지 않습니다. 아직 채우지 않은 단계 때문이니 정상입니다.
 - 🟢에 적힌 `🔍 Researcher 실행 중...` 같은 출력 문구는 정답 코드가 출력하는 문구입니다. 내 코드의 문구가 달라도 같은 뜻의 줄이 나오면 통과입니다.
-- "정답 보기"의 코드는 `capstone/starter.py`에서 그 코드가 들어갈 자리와 같은 들여쓰기로 보여 줍니다. 옮겨 붙일 때는 바꿀 줄 전체(줄 앞 공백까지)를 지우고 그 자리에 붙여 넣습니다.
-- 정답 보기에 함수나 클래스가 통째로 있으면 `capstone/starter.py`에 있던 같은 이름의 빈 함수·클래스도 지웁니다. 같은 이름이 두 번 있으면 뒤에 있는 것이 앞의 것을 덮어씁니다.
+- AI가 함수나 클래스를 통째로 새로 쓰면 `capstone/starter.py`에 있던 같은 이름의 빈 함수·클래스가 남지 않았는지 봅니다. 같은 이름이 두 번 있으면 뒤에 있는 것이 앞의 것을 덮어씁니다.
 
 단계를 마칠 때마다 AI가 고친 부분을 직접 읽어 봅니다. 모르는 줄이 있으면 그 줄이 무엇을 하는지 AI에게 물어봅니다."""
 
@@ -281,7 +294,7 @@ def build():
     nb.h(3, "6.1 도구 만들기")
     nb.md("**할 일** `capstone/starter.py`의 `# TODO: 사용할 도구를 정의` 아래 `search_web`과, `rag_search` 안의 TODO를 채웁니다. "
           "`search_web`은 실제 검색 대신 정해 둔 검색 결과 몇 줄을 돌려주는 흉내 도구면 충분합니다. `rag_search`는 RAGaaS의 `retrieve-rrf`로 문서를 찾아 본문을 돌려줍니다. "
-          "정답 보기를 옮겨 붙일 때는 `@tool` 줄부터 `rag_search`의 TODO 주석 끝까지를 통째로 바꿉니다.\n\n"
+          + ("정답 보기를 옮겨 붙일 때는 `@tool` 줄부터 `rag_search`의 TODO 주석 끝까지를 통째로 바꿉니다." if SHOW_ANSWERS else "") + "\n\n"
           "RAGaaS 요청 값(AI에게 그대로 알려 줍니다): `index_name`(인덱스 이름, `.env`의 `index_name` 값), `permission_groups`(`[\"rag-public\"]`), "
           "`query_text`(검색어), `num_result_doc`(결과 개수, 예: 3), `fields_exclude`(`[\"v_merge_title_content\"]`). "
           "요청은 `config.ragaas`의 `post_ragaas(\"retrieve-rrf\", payload)`로 보내고, 본문은 응답 JSON의 `hits` → `hits` 목록 → `_source` → `merge_title_content`에 있습니다.")
@@ -294,7 +307,7 @@ def build():
         ["도구 결과가 `null`입니다 → 함수 끝에 `return`이 있는지, 뒤에 같은 이름의 빈 함수가 남아 있지 않은지 봅니다.",
          "`KeyError: 'hits'`가 납니다 → 응답에서 본문을 꺼내는 순서를 AI와 다시 확인합니다.",
          "사내망에서 인증 오류(401)가 납니다 → 저장소 맨 위에서 `uv run python -m config.check`로 RAGaaS 키 이름을 확인합니다."]))
-    nb.md(answer(between(L, "@tool", "# ── State")))
+    answer_md(nb, between(L, "@tool", "# ── State"))
     nb.meta("- 정답의 `search_web`은 실제 검색이 아니라 정해 둔 네 줄(시장 성장률 등)을 돌려줍니다. 이 숫자가 보고서에 들어갈 수 있습니다.\n"
             "- 사외 `COURSE_ENV=out`이면 `config`가 `RAG_PROVIDER=mock`을 채우고, `post_ragaas`가 네트워크 없이 모의 응답을 돌려줍니다. 정답은 mock일 때 `index_name`이 없어도 `mock-capstone`을 씁니다.\n"
             "- 사외 실행에서 Researcher trace의 도구 호출: `list_docs`, `read_doc`, `search_web` 여러 번, `rag_search` 1회, skill을 읽는 `read_file`.")
@@ -306,8 +319,8 @@ def build():
           "`initial_state`에도 같은 이름으로 처음 값을 넣어야 한다고 말합니다.")
     nb.md(criteria(["7장 실행 중에 `KeyError`가 나지 않고 `🔍 Researcher 실행 중...`까지 진행됩니다."],
                    ["`KeyError: 'topic'`처럼 이름 오류가 납니다 → `State`와 `initial_state`의 이름이 노드에서 쓰는 이름과 같은지 봅니다."]))
-    nb.md(answer(between(L, "class State(TypedDict)", "# ── Supervisor 라우팅"),
-                 between(L, "initial_state = {", "# ── 1단계")))
+    answer_md(nb, between(L, "class State(TypedDict)", "# ── Supervisor 라우팅"),
+              between(L, "initial_state = {", "# ── 1단계"))
 
     # 6.3 MCP + Agent
     nb.h(3, "6.3 MCP 연결과 두 Agent")
@@ -322,7 +335,7 @@ def build():
         ["`ConnectError: All connection attempts failed`가 납니다 → 5장의 MCP 서버를 먼저 켭니다.",
          "리서치 결과가 `## 리서치 결과:` 형식이 아닙니다 → skill 폴더를 못 찾은 것입니다. skill 경로는 `SKILL.md`가 든 폴더의 한 단계 위(`skills/researcher/`)를 가리켜야 합니다.",
          "`await` 관련 오류가 납니다 → MCP 도구를 받아 오는 줄과 Agent를 만드는 줄이 `main()` 안에 있는지 봅니다."]))
-    nb.md(answer(between(L, "mcp_client = MultiServerMCPClient", "# ── LangGraph 노드 정의")))
+    answer_md(nb, between(L, "mcp_client = MultiServerMCPClient", "# ── LangGraph 노드 정의"))
     nb.meta("- **원본 정답의 조용한 결함:** 원본 정답은 `skills=['skills/researcher/']`, `skills=['skills/sds-report-writer/']`로 SKILL.md가 바로 든 폴더를 가리킵니다. deepagents 0.7.18은 skills 경로를 \"skill 폴더들이 든 상위 폴더\"로 읽어서 skill을 하나도 찾지 못합니다. 원본 그대로 실행하면 오류 없이 돌지만 리서치 결과·보고서가 skill 양식을 따르지 않습니다(2026-09-28 사외 실행으로 확인).\n"
             "- capstone 폴더는 `skills/researcher/research/SKILL.md`, `skills/writer/sds-report-writer/SKILL.md`로 한 단계 넣고, Writer 경로를 `skills/writer/`로 바꿨습니다. 정답 보기와 8장 정답 코드도 이 경로입니다. 이렇게 바꾼 뒤 `## 리서치 결과:` 형식과 `[SDS-AI-RPT v2.1]` 양식이 나오는 것을 확인했습니다.\n"
             "- skill 폴더 이름을 `research`로 맞춰 \"name과 폴더 이름이 다르다\"는 deepagents 경고도 없앴습니다.")
@@ -330,7 +343,7 @@ def build():
     # 6.4 nodes
     nb.h(3, "6.4 노드 만들기")
     nb.md("**할 일** `# TODO: Supervisor 노드 정의`, `# TODO: Researcher 노드 정의`, `# TODO: Writer 노드 정의` 아래 세 함수의 `pass`를 채웁니다. "
-          "정답 보기를 옮겨 붙일 때는 `supervisor_llm` 줄부터 `writer_node`의 `pass`까지를 통째로 바꿉니다.")
+          + ("정답 보기를 옮겨 붙일 때는 `supervisor_llm` 줄부터 `writer_node`의 `pass`까지를 통째로 바꿉니다." if SHOW_ANSWERS else ""))
     nb.md("**프롬프트 힌트** Supervisor에게 지금 상황(주제, 리서치 완료 여부, 초안 완료 여부)을 알려 주고, 세 선택지(researcher, writer, END)를 언제 고르는지 먼저 정리해 AI에게 줍니다. "
           "Researcher·Writer 노드는 Agent 실행 결과의 마지막 메시지를 State의 어느 값에 넣는지 말합니다. "
           "두 노드는 비동기(`async`)이고 Langfuse 추적 설정을 함께 넘기며, 시작할 때 `🔍 Researcher 실행 중...`·`✍️  Writer 실행 중...`을 출력한다고 덧붙입니다.")
@@ -339,18 +352,18 @@ def build():
                     "두 노드가 결과를 State 값으로 돌려주는지(정답은 `return {'research_result': …}`·`return {'draft': …}`) 봅니다.",
                     "Writer가 리서치 결과 없이 글을 씁니다 → Writer 노드가 State의 리서치 결과를 지시에 넣는지 봅니다.",
                     "`KeyError: ''`가 납니다 → Supervisor 노드가 다음 차례를 돌려주지 않은 것입니다. `pass`만 있는 같은 이름의 빈 함수가 뒤에 남아 있지 않은지 봅니다."]))
-    nb.md(answer(between(L, "supervisor_llm = get_llm()", "def route(")))
+    answer_md(nb, between(L, "supervisor_llm = get_llm()", "def route("))
 
     # 6.5 graph + approval
     nb.h(3, "6.5 그래프 조립과 승인 지점")
     nb.md("**할 일** `# TODO: 그래프 조립` 아래에 노드 사이 연결을 넣고, 바로 아래 `app = builder.compile()`에 Writer 앞에서 멈추는 설정을 더합니다. "
-          "시작 연결 한 줄(`builder.add_edge(START, 'supervisor')`)은 빈 상태로 실행해도 멈추지 않게 미리 넣어 둔 자리표시입니다. 정답 보기의 첫 줄과 같으니 함께 바꿔도 됩니다.")
+          "시작 연결 한 줄(`builder.add_edge(START, 'supervisor')`)은 빈 상태로 실행해도 멈추지 않게 미리 넣어 둔 자리표시입니다. 그 아래에 나머지 연결을 이어서 넣습니다.")
     nb.md("**프롬프트 힌트** 노드 사이 연결(시작 → Supervisor, Supervisor의 세 갈래, 각 Agent 뒤 Supervisor로 복귀)을 그림처럼 말로 적어 AI에게 줍니다. "
           "Writer 실행 전에 멈춰야 한다는 조건과, 멈춘 상태를 기억할 장치가 필요하다는 점을 함께 말합니다.")
     nb.md(criteria(["7장 실행에서 리서치 결과가 나온 뒤 `보고서 작성을 시작할까요? (y/n):`에서 멈춥니다."],
                    ["멈추지 않고 곧장 Writer까지 갑니다 → `compile()`에 체크포인터와 Writer 앞 중단 설정이 있는지 봅니다.",
                     "`KeyError: 'END'` 같은 갈림길 오류가 납니다 → Supervisor의 세 선택지가 모두 연결되어 있는지 봅니다."]))
-    nb.md(answer(between(L, "builder.add_edge(START", "config = {'configurable'")))
+    answer_md(nb, between(L, "builder.add_edge(START", "config = {'configurable'"))
 
     # 6.6 run + resume
     nb.h(3, "6.6 실행과 재개")
@@ -364,7 +377,7 @@ def build():
                     "`No synchronous function provided` 오류가 납니다 → 노드가 비동기라 `invoke` 대신 `ainvoke`로 실행합니다.",
                     "보고서가 `[SDS-AI-RPT v2.1]` 양식이 아닙니다 → 6.3의 Writer skill 경로를 봅니다.",
                     "`y`를 넣었는데 `취소됐습니다.`가 나옵니다 → 한글 입력 상태라 `ㅛ`가 들어갔거나, `yes`나 빈 Enter를 넣은 것입니다. 정답 코드는 `y` 한 글자만 승인으로 봅니다. 영문 입력으로 바꾸고 다시 실행합니다."]))
-    nb.md(answer(between(L, "# ── 1단계", "# ── 3단계")))
+    answer_md(nb, between(L, "# ── 1단계", "# ── 3단계"))
 
     # 6.7 evaluation
     nb.h(3, "6.7 보고서 평가")
@@ -377,8 +390,8 @@ def build():
                    ["`'NoneType' object has no attribute 'relevance'` 오류가 납니다 → `evaluate_report` 끝에 평가 결과를 돌려주는 `return`이 있는지 봅니다.",
                     "점수는 나오는데 Langfuse에 없습니다 → 환경 점검 셀의 Langfuse 결과와, 프로그램 끝에서 기록을 내보내는지(`flush`) 봅니다.",
                     "네 점수가 모두 1.0입니다 → Judge 지시에 엄격하게 채점하라는 조건이 있는지 봅니다."]))
-    nb.md(answer(between(L, "evaluation: ReportEvaluation =", "# ── 메인 함수"),
-                 between(L, "# ── 3단계", "if __name__")))
+    answer_md(nb, between(L, "evaluation: ReportEvaluation =", "# ── 메인 함수"),
+              between(L, "# ── 3단계", "if __name__"))
 
     nb.h(2, "7. 전체 실행")
     nb.md(f"""VS Code 메뉴 **터미널 → 새 터미널**로 터미널을 하나 더 엽니다(**터미널 B**). 터미널이 둘이 되면 터미널 창 오른쪽에 목록이 생기고, 눌러서 A와 B를 오갑니다. 터미널 A의 MCP 서버는 켜 둔 채로, 터미널 B에서 실행합니다.
@@ -410,15 +423,31 @@ def build():
             "- 강의장 사내 게이트웨이에서 Supervisor·Judge의 구조화 출력(`with_structured_output`)과 Deep Agent의 도구 호출은 미검증입니다. 사내 Langfuse 구성도 미정입니다.\n"
             "- 사외 실행 시간: 약 40~50초(y), 약 25초(n).")
 
-    nb.h(2, "8. 정답과 비교하기")
-    nb.h(3, "8.1 AI에게 차이 리뷰받기")
-    nb.md("6장의 단계마다 접힌 \"정답 보기\"를 펼쳐 내 코드와 비교합니다. 다르다고 틀린 것은 아닙니다. 차이가 결과에 어떤 영향을 주는지가 중요합니다.")
-    nb.md("**프롬프트 힌트** 정답 보기 코드와 내 코드의 같은 부분을 함께 AI에게 보여 주고, 다른 점과 그 차이가 실행 결과에 주는 영향만 설명해 달라고 합니다. "
-          "코드는 고치지 말라고 덧붙입니다.")
-    nb.md(criteria(["AI가 차이마다 \"결과에 영향 있음/없음\"과 이유를 설명하고, 내 파일은 바뀌지 않았습니다."],
-                   ["AI가 내 코드를 정답으로 바꿔 버렸습니다 → 되돌리고, 고치지 말라는 조건을 지시 맨 앞에 둡니다."]))
-    nb.h(3, "8.2 정답 코드 실행해 점수 비교하기")
-    nb.md(f"""내 코드를 먼저 완성한 뒤에 합니다. 아래 셀을 실행하면 `capstone/solution.py`에 정답 코드 전체가 만들어집니다. 셀에 보이는 코드가 정답 전체입니다. 터미널 A의 서버는 켜 둔 채 터미널 B에서 실행합니다.
+    if SHOW_ANSWERS:
+        nb.h(2, "8. 정답과 비교하기")
+    else:  # 정답 공개 전: 수강생본에는 안내만 둔다. 아래 8.1·8.2는 강사본에만(제목 셀 대신 굵은 글: 수강생 목차에 남지 않게)
+        nb.h(2, "8. 정답 코드")
+        nb.md("정답 코드는 수업이 끝난 뒤에 공개합니다. 지금은 7장 실행 결과(`[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수)와 6장의 🟢/⛔ 기준으로 스스로 확인합니다.")
+
+    def sub(title):
+        if SHOW_ANSWERS:
+            nb.h(3, title)
+        else:
+            nb.md(f"**{title}** (강사본에만 있음, 정답 공개 전)")
+            teacher_only(nb)
+
+    def md8(text):
+        nb.md(text)
+        teacher_only(nb)
+
+    sub("8.1 AI에게 차이 리뷰받기")
+    md8("6장의 단계마다 접힌 \"정답 보기\"를 펼쳐 내 코드와 비교합니다. 다르다고 틀린 것은 아닙니다. 차이가 결과에 어떤 영향을 주는지가 중요합니다.")
+    md8("**프롬프트 힌트** 정답 보기 코드와 내 코드의 같은 부분을 함께 AI에게 보여 주고, 다른 점과 그 차이가 실행 결과에 주는 영향만 설명해 달라고 합니다. "
+        "코드는 고치지 말라고 덧붙입니다.")
+    md8(criteria(["AI가 차이마다 \"결과에 영향 있음/없음\"과 이유를 설명하고, 내 파일은 바뀌지 않았습니다."],
+                 ["AI가 내 코드를 정답으로 바꿔 버렸습니다 → 되돌리고, 고치지 말라는 조건을 지시 맨 앞에 둡니다."]))
+    sub("8.2 정답 코드 실행해 점수 비교하기")
+    md8(f"""내 코드를 먼저 완성한 뒤에 합니다. 아래 셀을 실행하면 `capstone/solution.py`에 정답 코드 전체가 만들어집니다. 셀에 보이는 코드가 정답 전체입니다. 터미널 A의 서버는 켜 둔 채 터미널 B에서 실행합니다.
 
 ```
 {RUN_SOLUTION}
@@ -427,10 +456,12 @@ def build():
 내 실행과 정답 실행의 네 항목 점수와 근거를 나란히 놓고 봅니다. 점수는 같은 코드로도 실행할 때마다 조금씩 달라집니다. 한두 번의 차이보다 **근거 글**에서 무엇이 부족하다고 했는지를 비교합니다.""")
     # 정답 코드 셀: 보이게 둔다(출력 문구에 ✍️가 있어, 숨기면 QC가 "빈칸 셀이 숨겨짐"으로 본다)
     nb.code("%%writefile ../capstone/solution.py\n" + sol.rstrip("\n"), visible=True, kind="")
-    nb.md(criteria(["정답 실행에서도 `[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수가 나옵니다. 내 점수의 근거와 정답 점수의 근거를 비교해 차이 한 가지를 말할 수 있습니다."],
-                   ["`error while attempting to bind on address` 또는 연결 오류가 납니다 → 5장의 서버 안내를 다시 봅니다."]))
+    teacher_only(nb)
+    md8(criteria(["정답 실행에서도 `[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수가 나옵니다. 내 점수의 근거와 정답 점수의 근거를 비교해 차이 한 가지를 말할 수 있습니다."],
+                 ["`error while attempting to bind on address` 또는 연결 오류가 납니다 → 5장의 서버 안내를 다시 봅니다."]))
     nb.meta("- 정답 코드 셀은 원본 정답에 세 곳만 바꿨습니다(실행 명령 설명, Writer skill 경로, 맨 위 truststore 두 줄 — 사내망 Langfuse용, starter.py와 같음). 사외 실행 종합 점수 0.90(원본 skill 경로), 0.93(바꾼 경로).\n"
-            "- `capstone/solution.py`는 `.gitignore` 대상이라 제작 저장소에 남지 않습니다.")
+            "- `capstone/solution.py`는 `.gitignore` 대상이라 제작 저장소에 남지 않습니다.\n"
+            "- 2026-10-20 사용자 결정: 캡스톤 정답(6장 정답 보기, 8장 정답 코드, 받은 원본 `code/solution/06-capstone/`)은 수업 뒤 공개합니다. 지금은 강사본에만 있고 study에서는 뺍니다(`SHOW_ANSWERS`, `dev/release.sh`의 `HIDDEN`).")
 
     nb.h(2, "9. 평가 기준")
     nb.md("""1. **체크리스트 통과:** 6장의 일곱 단계를 모두 통과합니다(7장 실행에서 각 단계의 🟢를 확인).

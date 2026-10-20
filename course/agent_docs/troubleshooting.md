@@ -84,7 +84,7 @@
 | 3-2 DART 도구의 답이 `[모의 DART]`로 시작함 | `.env`에 `DART_API_KEY`가 없거나, 사내망에서 DART(opendart.fss.or.kr)에 연결되지 않음 | 정상(견본 답으로 실습). 실제 공시를 보려면 [setup.md](setup.md)의 키 안내대로 키를 넣고 서버를 다시 띄운다. `uv run python -m config.check --mcp --live`로 연결을 본다 |
 | 3-2에 `Tavily는 뺐습니다`가 나옴 | `TAVILY_API_KEY`가 없거나 Tavily 서버에 연결되지 않음 | 정상(DART 도구만으로 진행). 키를 넣었다면 커널을 다시 시작하고 연결 셀부터 다시 실행한다 |
 | 3-2 DART 도구가 `DART 응답: …`을 돌려줌 | DART가 오류를 돌려줌(키가 틀림, 조회 결과 없음 등). 메시지에 이유가 있다 | 키를 다시 확인한다. "조회된 데이터가 없습니다"면 연도·기간을 바꿔 묻는다 |
-| Windows에서 stdio로 바꾼 셀이 `io.UnsupportedOperation: fileno` 또는 `NotImplementedError`로 실패 | Windows 노트북 커널에서는 stdio 방식이 서버 프로그램을 띄우지 못한다 | 정상. `"sse"`로 되돌리고 다음으로 진행한다 |
+| stdio로 바꾼 셀이 `io.UnsupportedOperation: fileno` 또는 `NotImplementedError`로 실패 | 노트북 화면 출력이 진짜 파일이 아니라 서버 프로그램을 띄우지 못함(Windows). 3-2 연결 셀의 `stdio_errors_to_file(...)` 줄이 빠졌거나 실행되지 않음 | 연결 셀을 처음부터 다시 실행한다(그 줄이 있어야 한다). 그래도 안 되면 노트북 폴더의 `mcp_stdio_server.log` 마지막 줄을 AI에게 보여 준다 |
 
 ## Langfuse(관측·평가, 캡스톤)
 
