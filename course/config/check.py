@@ -81,7 +81,7 @@ def report(groups=("LLM_PROVIDER",), live=False):
     # 1. 파이썬과 가상환경
     ok_py = sys.version_info >= (3, 12)
     items.append(_item("🟢" if ok_py else "⛔", "파이썬", f"{sys.version.split()[0]}",
-                       "" if ok_py else "저장소 맨 위에서 uv sync --extra notebooks 후 커널을 .venv로 고른다"))
+                       "" if ok_py else "저장소 맨 위에서 uv sync 후 커널을 .venv로 고른다"))
     in_venv = Path(sys.prefix).resolve() == (ROOT / ".venv").resolve()
     items.append(_item("🟢" if in_venv else "⚠️", "커널(가상환경)", sys.prefix,
                        "" if in_venv else "VS Code 커널을 저장소의 .venv로 고른다"))
@@ -132,7 +132,7 @@ def report(groups=("LLM_PROVIDER",), live=False):
     for mod in mods:
         found = importlib.util.find_spec(mod) is not None
         items.append(_item("🟢" if found else "⛔", f"패키지 {mod}", "설치됨" if found else "없음",
-                           "" if found else "저장소 맨 위에서 uv sync --extra notebooks"))
+                           "" if found else "저장소 맨 위에서 uv sync"))
 
     # 6. 실제 호출(선택)
     if live:
