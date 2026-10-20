@@ -25,6 +25,9 @@ def get_embeddings(**kwargs):
         _required("OPENAI_API_KEY")
         if "model" not in kwargs:
             kwargs["model"] = _required("OPENAI_EMBEDDING_MODEL")
+        if os.getenv("OPENAI_BASE_URL"):
+            # OpenAI 호환 서버(NVIDIA 등)는 글자 대신 토큰 번호 목록을 보내면 400으로 거절한다
+            kwargs.setdefault("check_embedding_ctx_length", False)
         return OpenAIEmbeddings(**kwargs)
 
     # ── 삼성 사내 임베딩 ──────────────────────────────────────────────────────
