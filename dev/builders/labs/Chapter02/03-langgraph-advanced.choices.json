@@ -1,11 +1,11 @@
 {
  "_about": "객관식 시험판(build_lab.py --mc 03-langgraph-advanced)의 보기. 형식은 labs/04-langgraph.choices.json의 _about과 같다. 열쇠는 03-langgraph-advanced.json의 todo 글이다. 같은 파일이 spec에 두 번 나오는 02_persistence.py·04_parallel_execution.py는 _text.files에서 '#0', '#1'로 따로 준다. 오답 보기의 why는 2026-10-13 사외(OpenAI) 실행 결과다.",
  "_text": {
-  "intro": "그래프를 나누고(Subgraph), 상태를 저장하고(Checkpointer, Memory Store), 여러 작업을 동시에 실행하는(Fan-out/Fan-in, Send) 코드를 완성하고 실행해 봅니다. 보기 중 하나를 골라 주석을 풀어 코드를 완성하고, 완성된 코드는 실행하며 값을 바꿔 봅니다.\n\n- **2장 Subgraph로 요약·번역 나누기**: 요약·번역 그래프를 따로 만들어 부모 그래프의 노드 안에서 호출합니다.\n- **3장 MemorySaver로 대화 이어 가기**: 체크포인터를 붙여 앞에서 한 말을 기억하게 합니다.\n- **4장 SqliteSaver로 저장하고 되돌아가기**: 대화 기록을 파일에 남기고, 지난 시점으로 되돌아가 다시 실행합니다.\n- **5장 Memory Store로 대화를 넘어 기억하기**: 새 대화에서도 사용자의 이름과 취미를 기억하게 합니다.\n- **6장 장점과 단점을 동시에 정리하기**: 두 노드를 동시에 실행하고 한 노드에서 합칩니다.\n- **7장 질문 수만큼 동시에 답하기**: 질문 목록 길이만큼 작업을 만들어 동시에 실행합니다.\n\n셀은 위에서부터 차례로 실행합니다. 각 장 첫머리의 접힌 준비 코드도 실행해야 그 아래 셀이 동작합니다. 모든 장이 LLM을 호출하므로 결과가 나오기까지 수십 초가 걸릴 수 있고, 답은 실행할 때마다 조금씩 다릅니다.",
-  "closing": "LangGraph로 조금 더 큰 그래프를 만드는 방법을 여섯 장에 걸쳐 실행해 보았습니다.\n\n| 장 | 한 일 | 확인한 것 |\n|---|---|---|\n| 2. Subgraph | 요약·번역 그래프를 부모 노드 안에서 호출했습니다 | State가 달라도 노드 함수가 값을 옮겨 주면 됩니다 |\n| 3. MemorySaver | 같은 thread_id로 두 번 호출했습니다 | 체크포인터가 앞 대화를 이어 줍니다 |\n| 4. SqliteSaver | 파일에 저장하고 지난 시점으로 되돌아갔습니다 | 기록이 파일에 남고, 과거 체크포인트에서 새 갈래로 다시 실행할 수 있습니다 |\n| 5. Memory Store | 새 thread에서도 사용자 정보를 기억하게 했습니다 | 장기 기억은 namespace로 사용자별로 나뉩니다. 노드가 어떤 store를 쓰는지는 코드를 봐야 압니다 |\n| 6. Fan-out/Fan-in | 장점·단점을 동시에 정리하고 합쳤습니다 | 병렬인지는 출력이 아니라 엣지를 봐야 알 수 있습니다 |\n| 7. Send | 질문 수만큼 worker를 만들어 동시에 답하게 했습니다 | 작업 수를 실행할 때 정하고, 결과는 reducer로 모읍니다 |\n\n보기를 골라 실행하고 값을 바꿔 다시 실행한 뒤, 결과를 성공 기준(🟢/⛔)과 비교하고 정답 보기의 해설로 확인했습니다.",
+  "intro": "그래프를 나누고(Subgraph), 상태를 저장하고(Checkpointer, Memory Store), 여러 작업을 동시에 실행하는(Fan-out/Fan-in, Send) 완성된 코드를 실행해 봅니다. `# ✍️ CHANGE_HERE:` 자리에서는 값을 바꿔 다시 실행하고, 그래프의 동작이 어떻게 달라지는지 봅니다.\n\n- **2장 Subgraph로 요약·번역 나누기**: 요약·번역 그래프를 따로 만들어 부모 그래프의 노드 안에서 호출합니다.\n- **3장 MemorySaver로 대화 이어 가기**: 체크포인터를 붙여 앞에서 한 말을 기억하게 합니다.\n- **4장 SqliteSaver로 저장하고 되돌아가기**: 대화 기록을 파일에 남기고, 지난 시점으로 되돌아가 다시 실행합니다.\n- **5장 Memory Store로 대화를 넘어 기억하기**: 새 대화에서도 사용자의 이름과 취미를 기억하게 합니다.\n- **6장 장점과 단점을 동시에 정리하기**: 두 노드를 동시에 실행하고 한 노드에서 합칩니다.\n- **7장 질문 수만큼 동시에 답하기**: 질문 목록 길이만큼 작업을 만들어 동시에 실행합니다.\n\n셀은 위에서부터 차례로 실행합니다. 각 장 첫머리의 접힌 준비 코드도 실행해야 그 아래 셀이 동작합니다. 모든 장이 LLM을 호출하므로 결과가 나오기까지 수십 초가 걸릴 수 있고, 답은 실행할 때마다 조금씩 다릅니다.",
+  "closing": "LangGraph로 조금 더 큰 그래프를 만드는 방법을 여섯 장에 걸쳐 실행해 보았습니다.\n\n| 장 | 한 일 | 확인한 것 |\n|---|---|---|\n| 2. Subgraph | 요약·번역 그래프를 부모 노드 안에서 호출했습니다 | State가 달라도 노드 함수가 값을 옮겨 주면 됩니다 |\n| 3. MemorySaver | 같은 thread_id로 두 번 호출했습니다 | 체크포인터가 앞 대화를 이어 줍니다 |\n| 4. SqliteSaver | 파일에 저장하고 지난 시점으로 되돌아갔습니다 | 기록이 파일에 남고, 과거 체크포인트에서 새 갈래로 다시 실행할 수 있습니다 |\n| 5. Memory Store | 새 thread에서도 사용자 정보를 기억하게 했습니다 | 장기 기억은 namespace로 사용자별로 나뉩니다. 노드가 어떤 store를 쓰는지는 코드를 봐야 압니다 |\n| 6. Fan-out/Fan-in | 장점·단점을 동시에 정리하고 합쳤습니다 | 병렬인지는 출력이 아니라 엣지를 봐야 알 수 있습니다 |\n| 7. Send | 질문 수만큼 worker를 만들어 동시에 답하게 했습니다 | 작업 수를 실행할 때 정하고, 결과는 reducer로 모읍니다 |\n\n값을 바꿔 다시 실행하며 Subgraph에 넘기는 문서, `thread_id`, 되돌아갈 체크포인트, 사용자(namespace)와 compile의 `store`, 병렬 작업 수가 그래프의 동작을 어떻게 바꾸는지 확인했습니다.",
   "files": {
    "01_subgraph.py": {
-    "intro": "문서를 받아 요약하고 영어로 옮긴 뒤, 그 요약을 바탕으로 질문에 답하는 그래프를 만듭니다. 요약·번역은 따로 만든 작은 그래프(Subgraph)가 맡고, 부모 그래프는 노드 하나에서 그 Subgraph를 호출합니다.\n\n두 그래프의 State는 다릅니다. Subgraph는 `text`(원문)와 `summary`(요약)만 알고, 부모는 `messages`(대화), `document`(문서), `summary`(영문 요약)를 가집니다. 부모 노드가 값을 옮겨 넣고 받아 와야 합니다.\n\n그래프는 맨 아래 \"실행하기\" 셀에서 처음 실행되므로, **보기를 모두 고른 뒤에** 결과를 볼 수 있습니다. 보기를 고른 셀은 그때마다 실행해 두고, 마지막 셀에서 한꺼번에 확인합니다.",
+    "intro": "문서를 받아 요약하고 영어로 옮긴 뒤, 그 요약을 바탕으로 질문에 답하는 그래프를 만듭니다. 요약·번역은 따로 만든 작은 그래프(Subgraph)가 맡고, 부모 그래프는 노드 하나에서 그 Subgraph를 호출합니다.\n\n두 그래프의 State는 다릅니다. Subgraph는 `text`(원문)와 `summary`(요약)만 알고, 부모는 `messages`(대화), `document`(문서), `summary`(영문 요약)를 가집니다. 부모 노드가 값을 옮겨 넣고 받아 와야 합니다.\n\n그래프는 맨 아래 \"실행하기\" 셀에서 처음 실행됩니다. 위의 셀을 차례로 실행해 두고, 마지막 셀에서 결과를 확인합니다.",
     "chunk_success": {
      "실행하기": {
       "success": [
@@ -132,7 +132,7 @@
  },
  "부모 그래프의 실행 순서를 START → fetch_document → summarize_document → respond → END로 연결해 주세요.": {
   "answer": 4,
-  "explain": "부모 그래프의 노드 세 개는 등록되어 있습니다. 문서를 가져오고(`fetch_document`), Subgraph로 요약·번역하고(`summarize_document`), 요약을 바탕으로 답하는(`respond`) 순서로 잇습니다. 보기 아래의 `app = parent_builder.compile()` 줄이 부모 그래프를 컴파일합니다.",
+  "explain": "부모 그래프의 노드 세 개는 등록되어 있습니다. 문서를 가져오고(`fetch_document`), Subgraph로 요약·번역하고(`summarize_document`), 요약을 바탕으로 답하는(`respond`) 순서로 잇습니다. 셀 마지막의 `app = parent_builder.compile()` 줄이 부모 그래프를 컴파일합니다.",
   "fail_all": [
    "이 셀에서 `Graph must have an entrypoint` 오류가 난다 → START에서 나가는 엣지가 없습니다. 다른 보기를 고릅니다",
    "2.4의 `영문 요약:`이 비어 있거나 문서와 관계없고, `Ai Message` 칸의 답이 문서가 없다고 말한다 → 요약 노드를 건너뛰었거나 순서가 다릅니다. 다른 보기를 고릅니다"
@@ -319,7 +319,7 @@
  "START에서 pros/cons를 병렬로 실행하고 summary에서 합쳐 END로 이어 주세요.": {
   "answer": 3,
   "rewrite": true,
-  "explain": "노드 세 개(`pros`, `cons`, `summary`)는 등록되어 있습니다. START에서 `pros`와 `cons`가 함께 시작하고, 두 노드가 모두 끝나면 `summary`가 결론을 내고, 그다음 그래프가 끝나게 잇습니다. 보기 아래의 `static_app = static_builder.compile()` 줄이 그래프를 컴파일합니다.",
+  "explain": "노드 세 개(`pros`, `cons`, `summary`)는 등록되어 있습니다. START에서 `pros`와 `cons`가 함께 시작하고, 두 노드가 모두 끝나면 `summary`가 결론을 내고, 그다음 그래프가 끝나게 잇습니다. 셀 마지막의 `static_app = static_builder.compile()` 줄이 그래프를 컴파일합니다.",
   "checks": [
    "마지막 셀에서 `장점:`, `단점:`, `결론:`이 차례로 나오고(장점·단점은 번호 목록이라 여러 줄일 수 있습니다), 결론이 장점과 단점을 함께 말한다",
    "고른 보기에서 START에서 나가는 엣지가 두 개이고, `summary`로 들어오는 엣지도 두 개다(출력만으로는 병렬인지 알 수 없습니다)"
@@ -421,7 +421,7 @@
  },
  "START에서 fan_out으로 worker를 동적 생성하고 worker 이후 END로 연결해 주세요.": {
   "answer": 1,
-  "explain": "`worker` 노드는 등록되어 있습니다. 시작하면 `fan_out`이 돌려준 `Send` 목록대로 worker를 만들고, worker가 끝나면 그래프가 끝나게 잇습니다. `Send` 목록을 돌려주는 함수는 조건부 엣지에 넣습니다. 보기 아래의 `dynamic_app = dynamic_builder.compile()` 줄이 그래프를 컴파일합니다.",
+  "explain": "`worker` 노드는 등록되어 있습니다. 시작하면 `fan_out`이 돌려준 `Send` 목록대로 worker를 만들고, worker가 끝나면 그래프가 끝나게 잇습니다. `Send` 목록을 돌려주는 함수는 조건부 엣지에 넣습니다. 셀 마지막의 `dynamic_app = dynamic_builder.compile()` 줄이 그래프를 컴파일합니다.",
   "fail_all": [
    "이 셀에서 `TypeError`나 `Found edge ending at unknown node` 오류가 난다 → `fan_out`을 넘기는 방법이 다릅니다. 다른 보기를 고릅니다",
    "7.4에서 `KeyError: 'query'`가 난다 → START를 `worker`에 바로 이어 worker가 질문 없이 실행되었습니다. 다른 보기를 고릅니다"

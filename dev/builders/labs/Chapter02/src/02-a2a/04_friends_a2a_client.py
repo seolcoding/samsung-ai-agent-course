@@ -71,9 +71,10 @@ async def call_friend(friend: str, query: str) -> str:
     return "응답을 받지 못했습니다."
 
 
-# ── 메시에게 먼저 물어보기 ─────────────────────────────────────────────────────
-messi_answer = await call_friend("messi", "이번 주 저녁 19시에 비는 날 알려 줘.")
-print(f"메시: {messi_answer}")
+# ── 친구 한 명에게 먼저 물어보기 ───────────────────────────────────────────────
+friend = "messi"
+friend_answer = await call_friend(friend, "이번 주 저녁 19시에 비는 날 알려 줘.")
+print(f"{friend}: {friend_answer}")
 
 
 # ── 내 Agent(호스트) 만들기 ───────────────────────────────────────────────────

@@ -63,6 +63,10 @@ UNITS = {
 }
 
 
+# M2에서 값 바꾸기판으로 바꾼 실습(2026-10-21 사용자 결정: 객관식 보기 대신 완성 코드 + CHANGE_HERE)
+CHANGE_M2 = {"01-mcp", "02-a2a", "03-langgraph-advanced", "04-harness", "05-observability"}
+
+
 def chapter_of(folder):
     """교안 번호 첫 자리로 챕터를 정한다: 1·2일차 → Chapter01, 3·4일차 → Chapter02."""
     return "Chapter01" if UNITS[folder][0][0] in "12" else "Chapter02"
@@ -158,7 +162,7 @@ uv run python {path}
 
 BLANK_LINE = "...  # ✍️ 여기를 채웁니다"
 
-TERMINAL_NOTE_MC = """이 폴더에는 정답이 모두 들어간 서버 파일(`{file}`)이 미리 들어 있습니다. {first}부터 위 셀들은 그 파일의 코드를 나눠 보여 주는 곳입니다. 셀을 실행해 오류가 없는지 확인합니다(보기가 있는 셀은 먼저 고릅니다). 셀이 파일을 고치지는 않습니다.
+TERMINAL_NOTE_MC = """이 폴더에는 완성된 서버 파일(`{file}`)이 미리 들어 있습니다. {first}부터 위 셀들은 그 파일의 코드를 나눠 보여 주는 곳입니다. 셀을 실행해 오류가 없는지 확인합니다. 셀이 파일을 고치지는 않습니다.
 
 서버는 터미널에서 이 완성 파일로 띄웁니다.
 
@@ -701,6 +705,6 @@ if __name__ == "__main__":
     elif args[:1] == ["--check"]:
         for folder in args[1:] or UNITS:
             check_blanks(folder)
-    else:  # 기본: M1은 값 바꾸기판, M2는 객관식판(2026-10-18)
+    else:  # 기본: M1은 값 바꾸기판(2026-10-18). M2도 객관식이 있던 실습은 값 바꾸기판(2026-10-21), 3-1만 객관식판 모양 그대로
         for folder in args or sorted(p.stem for p in LABS.glob("**/*.json") if p.stem in UNITS):
-            build(folder, mode="change" if chapter_of(folder) == "Chapter01" else "mc")
+            build(folder, mode="change" if chapter_of(folder) == "Chapter01" or folder in CHANGE_M2 else "mc")
