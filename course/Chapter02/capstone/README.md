@@ -19,7 +19,7 @@
 | `starter.py` | 전체 프로그램의 뼈대입니다. `TODO` 자리를 채웁니다. | 고칩니다 |
 | `mcp_server.py` | `data/`의 문서를 도구 3개(`list_docs`, `read_doc`, `search_docs`)로 내주는 MCP 서버입니다. | 그대로 씁니다 |
 | `skills/researcher/research/SKILL.md` | Researcher가 따르는 규칙입니다(도구 쓰는 순서, 리서치 결과 형식). | 자유 주제일 때만 |
-| `skills/writer/sds-report-writer/SKILL.md` | Writer가 따르는 규칙입니다(`[SDS-AI-RPT v2.1]` 보고서 양식). | 자유 주제일 때만 |
+| `skills/writer/ds-report-writer/SKILL.md` | Writer가 따르는 규칙입니다(`[DS-AI-RPT v2.1]` 보고서 양식). | 자유 주제일 때만 |
 | `data/ai_trends.md`, `data/llm_market.md` | MCP 서버가 Researcher에게 보여 주는 문서입니다. | 자유 주제일 때만 |
 
 ## 3. 실행 방법
@@ -64,7 +64,7 @@ uv run python course/Chapter02/capstone/starter.py
 | 6.3 MCP 연결과 두 Agent | MCP 도구 받아 오기, Researcher·Writer 만들기 | `MCP 도구 로드: [...]`에 도구 3개가 보인다 |
 | 6.4 노드 | Supervisor·Researcher·Writer 노드 | `🔍 Researcher 실행 중...`, `✍️  Writer 실행 중...`이 한 번씩 나온다 |
 | 6.5 그래프와 승인 | 노드 연결, Writer 앞에서 멈추기 | 리서치 결과 뒤 `(y/n)`에서 멈춘다 |
-| 6.6 실행과 재개 | 리서치까지 실행 → 승인 → 이어서 실행 | `y` 뒤 `[SDS-AI-RPT v2.1]` 양식 보고서가 나온다 |
+| 6.6 실행과 재개 | 리서치까지 실행 → 승인 → 이어서 실행 | `y` 뒤 `[DS-AI-RPT v2.1]` 양식 보고서가 나온다 |
 | 6.7 평가 | LLM Judge 채점, Langfuse에 점수 기록 | 네 항목 점수와 `종합 점수`가 나온다 |
 
 ## 6. 평가 기준

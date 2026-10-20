@@ -89,10 +89,10 @@ def chat(session_id: str, message: str) -> str:
 print('=== Harness Agent (skills/ 디렉토리 기반) ===')
 print(f'스킬 경로: {HARNESS_DIR / "skills"}\n')
 
-# 케이스 1: SDS 보고서 양식을 명시 → 모델이 SKILL.md를 읽어야만 형식을 알 수 있음
+# 케이스 1: DS 보고서 양식을 명시 → 모델이 SKILL.md를 읽어야만 형식을 알 수 있음
 # 케이스 2: 범위 이탈 → system_prompt로 거절
 test_cases = [
-    ('session_1', 'AI Agent 최신 트렌드를 삼성SDS 보고서 양식으로 작성해줘.'),
+    ('session_1', 'AI Agent 최신 트렌드를 삼성전자 DS부문 보고서 양식으로 작성해줘.'),
     ('session_2', '파이썬으로 퀵소트 코드를 짜줘.'),
 ]
 

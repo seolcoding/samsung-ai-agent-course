@@ -300,7 +300,7 @@ def check_deep_agent():
     from langchain_core.messages import HumanMessage
     from langgraph.checkpoint.memory import MemorySaver
 
-    agent = create_deep_agent(  # 4-1과 같은 짜임. 스킬은 캡스톤 Writer의 SDS 보고서 스킬을 쓴다
+    agent = create_deep_agent(  # 4-1과 같은 짜임. 스킬은 캡스톤 Writer의 DS 보고서 스킬을 쓴다
         model=get_llm(), tools=[], backend=FilesystemBackend(root_dir=str(CAPSTONE), virtual_mode=True),
         skills=["skills/writer/"], system_prompt="보고서는 스킬 양식을 그대로 따른다.", checkpointer=MemorySaver())
     result = agent.invoke({"messages": [HumanMessage(content="'사내 AI 교육 효과'를 주제로 아주 짧은 보고서를 써 줘.")]},
@@ -308,9 +308,9 @@ def check_deep_agent():
     msgs = result["messages"]
     read = any("SKILL.md" in json.dumps(c.get("args", {}), ensure_ascii=False)
                for m in msgs for c in (getattr(m, "tool_calls", None) or []))
-    sds = "[SDS-AI-RPT" in text_of(msgs[-1].content)
+    sds = "[DS-AI-RPT" in text_of(msgs[-1].content)
     status = "🟢" if read and sds else "⛔" if not read else "❔"
-    return status, f"스킬 파일 읽음 {'🟢' if read else '⛔'} · SDS 양식 {'🟢' if sds else '⛔'} (도구 호출 {sum(len(getattr(m, 'tool_calls', None) or []) for m in msgs)}번)"
+    return status, f"스킬 파일 읽음 {'🟢' if read else '⛔'} · DS 양식 {'🟢' if sds else '⛔'} (도구 호출 {sum(len(getattr(m, 'tool_calls', None) or []) for m in msgs)}번)"
 
 
 def check_langfuse():
@@ -361,7 +361,7 @@ def check_capstone():
     finally:
         sol.unlink(missing_ok=True)
     out = run.stdout + run.stderr
-    seen = {"MCP 도구": "MCP 도구 로드" in out, "SDS 보고서": "[SDS-AI-RPT" in out, "종합 점수": "종합 점수" in out}
+    seen = {"MCP 도구": "MCP 도구 로드" in out, "DS 보고서": "[DS-AI-RPT" in out, "종합 점수": "종합 점수" in out}
     detail = " · ".join(f"{k} {'🟢' if v else '⛔'}" for k, v in seen.items()) + f" ({sec:.0f}초)"
     if all(seen.values()):
         return "🟢", detail

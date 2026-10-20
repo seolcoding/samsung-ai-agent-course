@@ -6,7 +6,7 @@
 
 흐름:
   사용자 입력 → Supervisor → Researcher(MCP+RAG+웹검색) → [HITL 승인]
-               → Writer(SDS 보고서 작성) → 최종 출력
+               → Writer(DS 보고서 작성) → 최종 출력
 
 사전 준비:
   터미널 A: python course/Chapter02/code/solution/06-capstone/mcp_server.py   ← MCP 서버 먼저 실행
@@ -192,8 +192,8 @@ async def main(topic: str):
         model=get_llm(),
         tools=[],
         backend=writer_backend,
-        skills=['skills/sds-report-writer/'],
-        system_prompt='제공된 리서치 결과를 삼성SDS 보고서 양식으로 작성하는 역할만 수행한다.',
+        skills=['skills/ds-report-writer/'],
+        system_prompt='제공된 리서치 결과를 삼성전자 DS부문 보고서 양식으로 작성하는 역할만 수행한다.',
         checkpointer=MemorySaver(),
     )
 

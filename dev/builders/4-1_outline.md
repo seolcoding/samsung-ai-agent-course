@@ -6,9 +6,9 @@
 - **원본 슬라이드**: `course/Chapter02/slides/day02/4-1-harness-engineering-core-principles.pdf` (22쪽. 표지 p1, 목차 p2, 장 표지 p3·p7·p11·p16, 정리 p21, 코드 소개 p22)
 - **원본 코드**: `course/Chapter02/code/raw/04-harness/`
   - `agent.py` (TODO 1개, 55–56행. 배포 상태대로 정답 줄 57–66행이 채워져 있다)
-  - `skills/samsung-sds-report/SKILL.md` (Agent가 읽는 스킬 문서. raw·solution 동일)
+  - `skills/samsung-ds-report/SKILL.md` (Agent가 읽는 스킬 문서. raw·solution 동일)
   - `skills.md` (역할·행동 규칙 문서. raw·solution 동일. **agent.py가 읽지 않는다**)
-  - solution에만 `ai_agent_trends_report.md` (SDS 양식 보고서 산출물, 102줄. 만든 방법은 기록이 없다)
+  - solution에만 `ai_agent_trends_report.md` (DS 양식 보고서 산출물, 102줄. 만든 방법은 기록이 없다)
 - **input() 대화 루프**: **없다.** 이름은 "대화형 실행"이지만 `test_cases` 두 건(보고서 요청, 퀵소트 요청)을 차례로 돌리고 끝난다. 노트북 셀로 그대로 실행할 수 있다.
 - **커리큘럼**: 4일차 4.1 "Harness Engineering 핵심 원칙" 2.0H. 이 목차는 **LEC 40분 + LAB 75분**(쉬는 시간 여유 5분)을 가정한다. 슬라이드 본문이 17쪽이고, 코드는 한 파일이지만 "SKILL.md를 고쳐 다시 실행"을 여러 번 돌리는 것이 이 권의 핵심이라 LAB을 길게 잡았다.
 - **산출물**: `course/Chapter02/notebooks/4-1_harness_LEC.ipynb`, `course/Chapter02/notebooks/4-1_harness_LAB.ipynb` (`build_lab.py`의 UNITS에 `"04-harness": ("4-1", "harness")`가 이미 있다. `dev/builders/labs/Chapter02/`의 spec은 아직 없다)
@@ -50,11 +50,11 @@
 
 | 안 | 방법 | 장점 | 단점 |
 |---|---|---|---|
-| **A (제안)** | 노트북 폴더 아래 전용 작업 폴더 `harness/`를 Agent의 작업 공간으로 쓴다. spec `patch`로 `HARNESS_DIR = Path('harness')`. SKILL.md는 노트북 셀에서 `%%writefile harness/skills/samsung-sds-report/SKILL.md`로 쓴다. `%%writefile`은 폴더를 만들지 않으므로 준비 셀에서 `HARNESS_DIR.joinpath('skills/samsung-sds-report').mkdir(parents=True, exist_ok=True)`를 먼저 한다 | 수강생이 SKILL.md 내용을 노트북 안에서 보고, 고치고, 다시 쓸 수 있다(수강생은 노트북만 받는다). Agent의 파일 도구가 노트북 폴더 전체가 아니라 `harness/`만 건드린다 | 준비 셀에 한 줄이 더 들어간다. 빌더에 .md 파일 writefile 지원을 더해야 한다(4절) |
+| **A (제안)** | 노트북 폴더 아래 전용 작업 폴더 `harness/`를 Agent의 작업 공간으로 쓴다. spec `patch`로 `HARNESS_DIR = Path('harness')`. SKILL.md는 노트북 셀에서 `%%writefile harness/skills/samsung-ds-report/SKILL.md`로 쓴다. `%%writefile`은 폴더를 만들지 않으므로 준비 셀에서 `HARNESS_DIR.joinpath('skills/samsung-ds-report').mkdir(parents=True, exist_ok=True)`를 먼저 한다 | 수강생이 SKILL.md 내용을 노트북 안에서 보고, 고치고, 다시 쓸 수 있다(수강생은 노트북만 받는다). Agent의 파일 도구가 노트북 폴더 전체가 아니라 `harness/`만 건드린다 | 준비 셀에 한 줄이 더 들어간다. 빌더에 .md 파일 writefile 지원을 더해야 한다(4절) |
 | B | `root_dir`을 `../code/raw/04-harness`로 둔다 | 코드 변경이 가장 적다 | 수강생은 `.py`·경로를 보지 않는다는 규칙과 어긋난다. Agent의 `write_file`·`edit_file`이 원본 코드 폴더에 파일을 쓴다. SKILL.md를 고치려면 노트북 밖 파일을 열어야 한다 |
 | C | 슬라이드처럼 `root_dir="."`(노트북 폴더) | 슬라이드와 같다 | Agent가 노트북 폴더의 파일(노트북 자체 포함)을 읽고 쓸 수 있다 |
 
-- A안에서 `harness/`는 원본 `04-harness/` 폴더 구조를 그대로 옮긴 것이므로 가상 경로 `/skills/samsung-sds-report/SKILL.md`가 원본과 같다.
+- A안에서 `harness/`는 원본 `04-harness/` 폴더 구조를 그대로 옮긴 것이므로 가상 경로 `/skills/samsung-ds-report/SKILL.md`가 원본과 같다.
 - `skills.md`(루트 문서)는 코드가 읽지 않으므로 A안에서도 쓰지 않는다(5절 질문 2).
 
 ### 2.1 장 구성
@@ -62,9 +62,9 @@
 | 장 | 원본 | 구분 | CHANGE_HERE 후보 / WRITE_HERE로 바꿀 TODO | 성공 기준 초안 | 실행 제약 |
 |---|---|---|---|---|---|
 | 1 | (환경 확인) | — | — | — | 공통 셀. `deepagents` 불러오기 확인 |
-| 2 | `SKILL.md` (Agent가 읽을 스킬 쓰기) | **예제** + AI에게 물어보기 | 바꾸지 않고 그대로 쓴다(원본 상태). `%%writefile` 셀 1개<br>물어보기: SKILL.md를 붙여 넣고 "윗부분(name·description)과 아랫부분(양식·작성 규칙)이 각각 Agent에게 무엇을 알려 주는지" 설명받기 | 🟢 셀 출력에 `Writing harness/skills/samsung-sds-report/SKILL.md`가 보인다<br>🟢 (물어보기) description은 "언제 쓰는지", 본문은 "어떻게 쓰는지"라고 구분했다<br>⛔ `No such file or directory` → 준비 셀(폴더 만들기)을 먼저 실행 | LLM 호출 없음 |
-| 3 | `agent.py` | 도구 정의 = 예제, Agent 생성 = **과제**, 실행 = 예제 | **과제 1곳**: 55–56행<br>`# TODO: LLM, 사용가능한 도구, 백엔드, 스킬, 시스템 프롬프트를 이용해 Deep Agent를 정의해주세요.`<br>`# 이때, 시스템 프롬프트룰 이용해 범위를 벗어나지 않도록 해주세요.`<br>→ 빈칸 57–66행(`model=` ~ `checkpointer=MemorySaver(),`, 사이 주석 포함)<br>52행 `backend = FilesystemBackend(...)`는 빈칸 밖에 두어 보여 준다 | 🟢 사례 1 출력 단계에 `[ToolMessage]`로 SKILL.md 앞부분(`name: samsung-sds-report` 등)이 보인다 = Agent가 스킬을 읽었다<br>🟢 사례 1 마지막 `[AIMessage]`가 `[SDS-AI-RPT v2.1]`로 시작한다<br>🟢 사례 2(퀵소트)는 코드 없이 정중히 거절한다<br>⛔ 마지막 답이 SDS 양식이 아니고 SKILL.md를 읽은 단계도 없다 → `skills`·`backend` 인자 확인<br>⛔ 사례 2에서 퀵소트 코드가 나온다 → `system_prompt` 확인<br>⛔ `GraphRecursionError` → 셀 다시 실행, 반복되면 강사에게 | 사례 1: LLM 약 3~8회(파일 목록·SKILL.md 읽기·검색·작성, 추정), 사례 2: 1회. 합쳐 1~3분 추정. `recursion_limit` 40. 실행 셀 하나가 두 사례를 모두 돈다 |
-| 4 | `SKILL.md` 고쳐 동작 바꾸기 (핵심) | **예제** (루프) | 2장의 SKILL.md를 CHANGE_HERE 한 줄만 바꾼 두 번째 `%%writefile` 셀로 다시 쓰고, 3장의 **Agent 생성 셀과 실행 셀을 다시 실행**한다(4절 "스킬 캐시")<br>CHANGE_HERE 후보(한 가지를 고른다, 5절 질문 1):<br>(가) frontmatter `description:` 줄 — YAML 주석이라 `# ✍️ CHANGE_HERE:` 표시가 문서를 해치지 않는다. 예: 발동 조건 문구("보고서", "리포트", "SDS 양식")를 지워 본다<br>(나) 양식의 `보안등급: INTERNAL  \|  배포범위: AI연구소 내부` 줄 — 바뀐 값이 결과 첫 80자 안에 보여 눈으로 확인이 쉽다. 단 표시 주석 처리 방식이 필요하다 | (가) 🟢 SKILL.md를 읽는 `[ToolMessage]` 단계가 사라지거나, 결과가 SDS 양식이 아니게 된다 (LLM 판단이라 매번 같지 않음)<br>(나) 🟢 결과 셋째 줄 보안등급이 바꾼 값으로 나온다<br>공통 ⛔ 결과가 바꾸기 전과 똑같다 → Agent 생성 셀부터 다시 실행했는지 확인 | 한 번 돌 때 3장과 같음(1~3분). 수강생이 2~3번 바꿔 보면 10분 안팎 |
+| 2 | `SKILL.md` (Agent가 읽을 스킬 쓰기) | **예제** + AI에게 물어보기 | 바꾸지 않고 그대로 쓴다(원본 상태). `%%writefile` 셀 1개<br>물어보기: SKILL.md를 붙여 넣고 "윗부분(name·description)과 아랫부분(양식·작성 규칙)이 각각 Agent에게 무엇을 알려 주는지" 설명받기 | 🟢 셀 출력에 `Writing harness/skills/samsung-ds-report/SKILL.md`가 보인다<br>🟢 (물어보기) description은 "언제 쓰는지", 본문은 "어떻게 쓰는지"라고 구분했다<br>⛔ `No such file or directory` → 준비 셀(폴더 만들기)을 먼저 실행 | LLM 호출 없음 |
+| 3 | `agent.py` | 도구 정의 = 예제, Agent 생성 = **과제**, 실행 = 예제 | **과제 1곳**: 55–56행<br>`# TODO: LLM, 사용가능한 도구, 백엔드, 스킬, 시스템 프롬프트를 이용해 Deep Agent를 정의해주세요.`<br>`# 이때, 시스템 프롬프트룰 이용해 범위를 벗어나지 않도록 해주세요.`<br>→ 빈칸 57–66행(`model=` ~ `checkpointer=MemorySaver(),`, 사이 주석 포함)<br>52행 `backend = FilesystemBackend(...)`는 빈칸 밖에 두어 보여 준다 | 🟢 사례 1 출력 단계에 `[ToolMessage]`로 SKILL.md 앞부분(`name: samsung-ds-report` 등)이 보인다 = Agent가 스킬을 읽었다<br>🟢 사례 1 마지막 `[AIMessage]`가 `[DS-AI-RPT v2.1]`로 시작한다<br>🟢 사례 2(퀵소트)는 코드 없이 정중히 거절한다<br>⛔ 마지막 답이 DS 양식이 아니고 SKILL.md를 읽은 단계도 없다 → `skills`·`backend` 인자 확인<br>⛔ 사례 2에서 퀵소트 코드가 나온다 → `system_prompt` 확인<br>⛔ `GraphRecursionError` → 셀 다시 실행, 반복되면 강사에게 | 사례 1: LLM 약 3~8회(파일 목록·SKILL.md 읽기·검색·작성, 추정), 사례 2: 1회. 합쳐 1~3분 추정. `recursion_limit` 40. 실행 셀 하나가 두 사례를 모두 돈다 |
+| 4 | `SKILL.md` 고쳐 동작 바꾸기 (핵심) | **예제** (루프) | 2장의 SKILL.md를 CHANGE_HERE 한 줄만 바꾼 두 번째 `%%writefile` 셀로 다시 쓰고, 3장의 **Agent 생성 셀과 실행 셀을 다시 실행**한다(4절 "스킬 캐시")<br>CHANGE_HERE 후보(한 가지를 고른다, 5절 질문 1):<br>(가) frontmatter `description:` 줄 — YAML 주석이라 `# ✍️ CHANGE_HERE:` 표시가 문서를 해치지 않는다. 예: 발동 조건 문구("보고서", "리포트", "DS 양식")를 지워 본다<br>(나) 양식의 `보안등급: INTERNAL  \|  배포범위: AI연구소 내부` 줄 — 바뀐 값이 결과 첫 80자 안에 보여 눈으로 확인이 쉽다. 단 표시 주석 처리 방식이 필요하다 | (가) 🟢 SKILL.md를 읽는 `[ToolMessage]` 단계가 사라지거나, 결과가 DS 양식이 아니게 된다 (LLM 판단이라 매번 같지 않음)<br>(나) 🟢 결과 셋째 줄 보안등급이 바꾼 값으로 나온다<br>공통 ⛔ 결과가 바꾸기 전과 똑같다 → Agent 생성 셀부터 다시 실행했는지 확인 | 한 번 돌 때 3장과 같음(1~3분). 수강생이 2~3번 바꿔 보면 10분 안팎 |
 | 5 | 산출물 리뷰와 SKILL.md 보강 | **AI에게 물어보기** (코드 빈칸 없음) | ① 4장 결과(또는 3장 결과)를 SKILL.md의 "작성 규칙" 5개와 대조받기<br>② SKILL.md를 슬라이드의 기본 구조(Description·When to use·Constraints·Workflow·Examples·Verification)와 비교해 빠진 항목을 찾고, 한 항목을 보강해 2장 셀로 다시 쓴 뒤 3장 실행 셀을 다시 돌리기 | 🟢 ① 규칙마다 지켰다/안 지켰다를 결과 줄을 짚어 판정받았다<br>🟢 ② "언제 쓰지 않는지", "Workflow(작업 순서)", "Verification"이 SKILL.md에 없다는 점을 짚었다<br>⛔ AI가 SKILL.md를 통째로 새로 써 원래 양식이 사라졌다 → 한 항목만 더하도록 다시 지시 | ②를 다시 실행하면 3장과 같은 비용 |
 | 6 | 정리 | — | — | — | — |
 
@@ -80,9 +80,9 @@
 | `agent.py` 55–66행 (Agent 생성) | ① TODO 2줄은 raw에만 있다(오타 "프롬프트룰")<br>② 도구 줄 주석: raw `# @tool 데코레이터로 도구 처리된 함수들 리스트로 추가` + `# + mcp_tools` / solution은 정의되지 않은 `MCP_CONFIG`·`await`가 든 주석 3줄<br>③ 시스템 프롬프트 설명 주석: raw 3줄(이전 강사 말투, "평소와 같아...") / solution 1줄 `# 범위 이탈 거절은 system_prompt로 강제 (skills의 description만으로는 부족)`<br>④ `system_prompt`: raw `…보고서 작성과 무관한 요청은…` / solution `…보고서·리서치 범위를 벗어난 요청은…`<br>⑤ solution에 `# middleware` 한 줄 | **raw 뼈대 + 정답은 solution 쪽 주석·프롬프트** (spec `answer`) | 빈칸 과제에 TODO가 필요하다(오타는 WRITE_HERE로 바꿀 때 고친다). 정답 보기는 solution 주석이 짧고 이유가 분명하다. MCP 주석과 `# middleware`는 쓰이지 않는 코드라 뺀다 |
 | `agent.py` 74행 `recursion_limit` | raw 40 / solution 35 | raw | 여유가 더 크다. 설명 주석(기본값 25)은 같다 |
 | `agent.py` 85행 출력 길이 | raw `content[:80]` / solution `content[:200]` | **solution** | 80자면 SKILL.md를 읽는 단계와 보고서 머리가 잘 안 보인다. 4장 (가)안의 확인에도 200자가 낫다 |
-| `agent.py` 1–10행 docstring | raw·solution 모두 `skills/research-writing/SKILL.md`라고 적혀 있다. 실제 스킬은 `samsung-sds-report`다 | patch로 고친다 | 준비 셀에 들어가 수강생에게 거의 보이지 않지만 틀린 설명이다 |
+| `agent.py` 1–10행 docstring | raw·solution 모두 `skills/research-writing/SKILL.md`라고 적혀 있다. 실제 스킬은 `samsung-ds-report`다 | patch로 고친다 | 준비 셀에 들어가 수강생에게 거의 보이지 않지만 틀린 설명이다 |
 | `SKILL.md`, `skills.md` | 차이 없음 | raw | — |
-| `ai_agent_trends_report.md` | solution에만 있다. `[SDS-1.0]`~`[SDS-7.0]` 7개 절로 템플릿(3개 절)과 다르고, 작성 규칙 4번의 "SDS 영향도(상/중/하)" 표가 없다. 검색 도구가 준 적 없는 참고 자료(Gartner·McKinsey)와 사람 이름("검토: 김연구 \| 승인: 이소장")이 들어 있다 | LAB에 넣지 않음 (5절 질문 3) | 어떤 요청으로 만든 것인지 기록이 없다. 5장 리뷰 예시로 쓸 수는 있다 |
+| `ai_agent_trends_report.md` | solution에만 있다. `[DS-1.0]`~`[DS-7.0]` 7개 절로 템플릿(3개 절)과 다르고, 작성 규칙 4번의 "DS 영향도(상/중/하)" 표가 없다. 검색 도구가 준 적 없는 참고 자료(Gartner·McKinsey)와 사람 이름("검토: 김연구 \| 승인: 이소장")이 들어 있다 | LAB에 넣지 않음 (5절 질문 3) | 어떤 요청으로 만든 것인지 기록이 없다. 5장 리뷰 예시로 쓸 수는 있다 |
 
 ## 4. 실행 제약·위험과 처리 제안
 

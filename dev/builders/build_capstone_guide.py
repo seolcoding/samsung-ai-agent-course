@@ -8,9 +8,9 @@
 
 정답 코드는 원본 solution.py에서 두 곳만 바꿔 보여 준다(capstone/ 폴더 구성에 맞춤).
   1. 맨 위 설명의 실행 명령 → capstone/ 폴더 명령
-  2. Writer skill 경로 'skills/sds-report-writer/' → 'skills/writer/'
+  2. Writer skill 경로 'skills/ds-report-writer/' → 'skills/writer/'
      (deepagents는 skills=[...]를 "skill 폴더들이 든 상위 폴더"로 읽는다. 원본 경로는 SKILL.md가 바로 든 폴더라
-      skill을 하나도 찾지 못한다. capstone/은 skills/researcher/research/SKILL.md, skills/writer/sds-report-writer/SKILL.md 구조)
+      skill을 하나도 찾지 못한다. capstone/은 skills/researcher/research/SKILL.md, skills/writer/ds-report-writer/SKILL.md 구조)
 """
 
 import sys
@@ -43,7 +43,7 @@ def solution_source():
     head_new = (f"실행 (저장소 맨 위에서, 터미널 두 개):\n"
                 f"  터미널 A: {RUN_SERVER}   ← MCP 서버 먼저\n"
                 f"  터미널 B: {RUN_SOLUTION}\n")
-    swaps = [(head_old, head_new), ("skills=['skills/sds-report-writer/']", "skills=['skills/writer/']")]
+    swaps = [(head_old, head_new), ("skills=['skills/ds-report-writer/']", "skills=['skills/writer/']")]
     for old, new in swaps:
         assert src.count(old) == 1, f"정답 코드에서 바꿀 곳을 찾지 못함: {old[:40]!r}"
         src = src.replace(old, new)
@@ -204,7 +204,7 @@ FOLDER = """`capstone/` 폴더의 파일과 흐름에서의 위치입니다.
 | `capstone/starter.py` | 전체 프로그램 뼈대. `TODO` 자리를 채웁니다 | 흐름 1~6 전부 |
 | `capstone/mcp_server.py` | `data/`의 문서를 도구 3개로 내주는 MCP 서버. 그대로 씁니다 | 흐름 3(자료 수집) |
 | `capstone/skills/researcher/research/SKILL.md` | Researcher 규칙: 도구 쓰는 순서, 리서치 결과 형식(`## 리서치 결과:`) | 흐름 3 |
-| `capstone/skills/writer/sds-report-writer/SKILL.md` | Writer 규칙: `[SDS-AI-RPT v2.1]` 보고서 양식, TL;DR 3줄, 현황 분석 표 | 흐름 5 |
+| `capstone/skills/writer/ds-report-writer/SKILL.md` | Writer 규칙: `[DS-AI-RPT v2.1]` 보고서 양식, TL;DR 3줄, 현황 분석 표 | 흐름 5 |
 | `capstone/data/ai_trends.md`, `capstone/data/llm_market.md` | MCP 서버가 보여 주는 문서 | 흐름 3 |
 | `capstone/README.md` | 이 노트북 없이 폴더만 열어도 볼 수 있는 요약 | — |
 
@@ -336,8 +336,8 @@ def build():
          "리서치 결과가 `## 리서치 결과:` 형식이 아닙니다 → skill 폴더를 못 찾은 것입니다. skill 경로는 `SKILL.md`가 든 폴더의 한 단계 위(`skills/researcher/`)를 가리켜야 합니다.",
          "`await` 관련 오류가 납니다 → MCP 도구를 받아 오는 줄과 Agent를 만드는 줄이 `main()` 안에 있는지 봅니다."]))
     answer_md(nb, between(L, "mcp_client = MultiServerMCPClient", "# ── LangGraph 노드 정의"))
-    nb.meta("- **원본 정답의 조용한 결함:** 원본 정답은 `skills=['skills/researcher/']`, `skills=['skills/sds-report-writer/']`로 SKILL.md가 바로 든 폴더를 가리킵니다. deepagents 0.7.18은 skills 경로를 \"skill 폴더들이 든 상위 폴더\"로 읽어서 skill을 하나도 찾지 못합니다. 원본 그대로 실행하면 오류 없이 돌지만 리서치 결과·보고서가 skill 양식을 따르지 않습니다(2026-09-28 사외 실행으로 확인).\n"
-            "- capstone 폴더는 `skills/researcher/research/SKILL.md`, `skills/writer/sds-report-writer/SKILL.md`로 한 단계 넣고, Writer 경로를 `skills/writer/`로 바꿨습니다. 정답 보기와 8장 정답 코드도 이 경로입니다. 이렇게 바꾼 뒤 `## 리서치 결과:` 형식과 `[SDS-AI-RPT v2.1]` 양식이 나오는 것을 확인했습니다.\n"
+    nb.meta("- **원본 정답의 조용한 결함:** 원본 정답은 `skills=['skills/researcher/']`, `skills=['skills/ds-report-writer/']`로 SKILL.md가 바로 든 폴더를 가리킵니다. deepagents 0.7.18은 skills 경로를 \"skill 폴더들이 든 상위 폴더\"로 읽어서 skill을 하나도 찾지 못합니다. 원본 그대로 실행하면 오류 없이 돌지만 리서치 결과·보고서가 skill 양식을 따르지 않습니다(2026-09-28 사외 실행으로 확인).\n"
+            "- capstone 폴더는 `skills/researcher/research/SKILL.md`, `skills/writer/ds-report-writer/SKILL.md`로 한 단계 넣고, Writer 경로를 `skills/writer/`로 바꿨습니다. 정답 보기와 8장 정답 코드도 이 경로입니다. 이렇게 바꾼 뒤 `## 리서치 결과:` 형식과 `[DS-AI-RPT v2.1]` 양식이 나오는 것을 확인했습니다.\n"
             "- skill 폴더 이름을 `research`로 맞춰 \"name과 폴더 이름이 다르다\"는 deepagents 경고도 없앴습니다.")
 
     # 6.4 nodes
@@ -371,11 +371,11 @@ def build():
     nb.md("**프롬프트 힌트** 리서치까지 실행 → 결과 보여 주기 → `y/n` 입력 받기 → 재개의 순서를 AI에게 알려 줍니다. "
           "재개할 때는 같은 `thread_id`로, 새 입력 없이 이어서 실행한다고 말합니다. "
           "`n`이면 안내 문구를 출력하고 끝낸다고 덧붙입니다.")
-    nb.md(criteria(["`y`를 입력하면 `--- 2단계: 보고서 작성 ---` 뒤에 `[SDS-AI-RPT v2.1]`로 시작하는 보고서가 나옵니다. TL;DR이 세 줄(①②③)이고 현황 분석에 표가 있습니다.",
+    nb.md(criteria(["`y`를 입력하면 `--- 2단계: 보고서 작성 ---` 뒤에 `[DS-AI-RPT v2.1]`로 시작하는 보고서가 나옵니다. TL;DR이 세 줄(①②③)이고 현황 분석에 표가 있습니다.",
                     "`n`을 입력하면 `취소됐습니다.`가 나오고 끝납니다. 한 번 실행에서는 한쪽만 볼 수 있으니, 다른 쪽은 한 번 더 실행해 확인합니다."],
                    ["승인한 뒤 아무것도 나오지 않습니다 → 재개할 때 같은 `thread_id`와 빈 입력(`None`)으로 실행하는지 봅니다. Writer 노드가 `draft`를 돌려주는지도 봅니다.",
                     "`No synchronous function provided` 오류가 납니다 → 노드가 비동기라 `invoke` 대신 `ainvoke`로 실행합니다.",
-                    "보고서가 `[SDS-AI-RPT v2.1]` 양식이 아닙니다 → 6.3의 Writer skill 경로를 봅니다.",
+                    "보고서가 `[DS-AI-RPT v2.1]` 양식이 아닙니다 → 6.3의 Writer skill 경로를 봅니다.",
                     "`y`를 넣었는데 `취소됐습니다.`가 나옵니다 → 한글 입력 상태라 `ㅛ`가 들어갔거나, `yes`나 빈 Enter를 넣은 것입니다. 정답 코드는 `y` 한 글자만 승인으로 봅니다. 영문 입력으로 바꾸고 다시 실행합니다."]))
     answer_md(nb, between(L, "# ── 1단계", "# ── 3단계"))
 
@@ -427,7 +427,7 @@ def build():
         nb.h(2, "8. 정답과 비교하기")
     else:  # 정답 공개 전: 수강생본에는 안내만 둔다. 아래 8.1·8.2는 강사본에만(제목 셀 대신 굵은 글: 수강생 목차에 남지 않게)
         nb.h(2, "8. 정답 코드")
-        nb.md("정답 코드는 수업이 끝난 뒤에 공개합니다. 지금은 7장 실행 결과(`[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수)와 6장의 🟢/⛔ 기준으로 스스로 확인합니다.")
+        nb.md("정답 코드는 수업이 끝난 뒤에 공개합니다. 지금은 7장 실행 결과(`[DS-AI-RPT v2.1]` 보고서와 네 항목 점수)와 6장의 🟢/⛔ 기준으로 스스로 확인합니다.")
 
     def sub(title):
         if SHOW_ANSWERS:
@@ -457,7 +457,7 @@ def build():
     # 정답 코드 셀: 보이게 둔다(출력 문구에 ✍️가 있어, 숨기면 QC가 "빈칸 셀이 숨겨짐"으로 본다)
     nb.code("%%writefile ../capstone/solution.py\n" + sol.rstrip("\n"), visible=True, kind="")
     teacher_only(nb)
-    md8(criteria(["정답 실행에서도 `[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수가 나옵니다. 내 점수의 근거와 정답 점수의 근거를 비교해 차이 한 가지를 말할 수 있습니다."],
+    md8(criteria(["정답 실행에서도 `[DS-AI-RPT v2.1]` 보고서와 네 항목 점수가 나옵니다. 내 점수의 근거와 정답 점수의 근거를 비교해 차이 한 가지를 말할 수 있습니다."],
                  ["`error while attempting to bind on address` 또는 연결 오류가 납니다 → 5장의 서버 안내를 다시 봅니다."]))
     nb.meta("- 정답 코드 셀은 원본 정답에 세 곳만 바꿨습니다(실행 명령 설명, Writer skill 경로, 맨 위 truststore 두 줄 — 사내망 Langfuse용, starter.py와 같음). 사외 실행 종합 점수 0.90(원본 skill 경로), 0.93(바꾼 경로).\n"
             "- `capstone/solution.py`는 `.gitignore` 대상이라 제작 저장소에 남지 않습니다.\n"

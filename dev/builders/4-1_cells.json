@@ -248,7 +248,7 @@
  },
  "p18": "SKILL.md는 두 부분으로 구성합니다.\n\n| 부분 | 항목 | 담는 내용 |\n|---|---|---|\n| 상단 정보 | Description | 해결하는 문제와 범위 |\n| | When to use | 적용해야 하는 상황 |\n| | Constraints | 금지 행동과 안전 규칙 |\n| 수행 정보 | Workflow | 실제 작업 순서 |\n| | Examples | 입력과 기대 결과 |\n| | Verification | 품질 기준과 확인 방법 |",
  "q42": {
-  "question": "SKILL.md에 \"보고서가 [SDS-AI-RPT v2.1] 헤더로 시작하고 요약이 세 줄인지 확인한다\"를 넣으려 합니다. 어느 항목에 적나요?",
+  "question": "SKILL.md에 \"보고서가 [DS-AI-RPT v2.1] 헤더로 시작하고 요약이 세 줄인지 확인한다\"를 넣으려 합니다. 어느 항목에 적나요?",
   "type": "multiple_choice",
   "answers": [
    {

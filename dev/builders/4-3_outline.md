@@ -6,7 +6,7 @@
 - **원본 코드**: `course/Chapter02/code/raw/06-capstone/`
   - `starter.py` (TODO **11개**. 지시에는 12개로 적혀 있었으나 `grep TODO` 결과 11개다. 받은 zip 원본은 10개이고, 개편 때 `rag_search`의 TODO 1개가 더해졌다)
   - `data/ai_trends.md`(24행), `data/llm_market.md`(35행) — 솔루션과 같다
-  - 정답에만 있는 것: `solution.py`, `mcp_server.py`, `skills/researcher/SKILL.md`, `skills/sds-report-writer/SKILL.md`
+  - 정답에만 있는 것: `solution.py`, `mcp_server.py`, `skills/researcher/SKILL.md`, `skills/ds-report-writer/SKILL.md`
 - **커리큘럼**: 4일차 4.3 "캡스톤 프로젝트: 리서치 자동화 멀티 에이전트 시스템" 4.0H. "4일 학습요소 통합 구현 (자유 주제 혹은 스켈레톤 코드 기반 개발 중 선택)". 블록 안 시간 배분은 커리큘럼에 없다. 이 목차는 **LEC 20분 + 안내 노트북 둘러보기·준비 20분 + 개발·실행·정답 비교 약 200분**을 가정한다.
 - **산출물**
   - `course/Chapter02/notebooks/4-3_capstone_LEC.ipynb` (슬라이드·설명·퀴즈)
@@ -61,7 +61,7 @@ C 수준(슬라이드 요약 + 내용 있는 곳만 "왜 배우나") + 4지선�
 | 3 두 Agent + MCP 연결 | 107 `# TODO: 자료조사 skill을 가진 Researcher Agent`<br>114 `# TODO: 보고서 작성 skill을 가진 Writer Agent` | 실행 첫머리에 `MCP 도구 로드: ['list_docs', 'read_doc', 'search_docs']`(순서는 다를 수 있음)가 나온다. Researcher는 도구 5개, Writer는 도구 없이 skill만 쓴다 | 연결 오류 → MCP 서버를 먼저 켠다 / skill을 못 찾음 → `skills/` 폴더 경로 확인 / `await` 관련 오류 → 아래 4절 "구조 함정" | 각 Agent에 줄 도구와 skill 폴더, 역할 밖 일을 하지 않게 할 system prompt를 AI에게 알려 준다. MCP 도구는 서버에서 비동기로 받아 온다는 점도 함께 말한다 |
 | 4 노드 | 123 `# TODO: Supervisor 노드 정의`<br>131 `# TODO: Researcher 노드 정의`<br>136 `# TODO: Writer 노드 정의` | Supervisor가 "리서치 전 → researcher, 리서치 후 → writer, 초안 후 → END"로 고른다. `🔍 Researcher 실행 중...`, `✍️  Writer 실행 중...`이 한 번씩 나온다 | 같은 Agent가 되풀이된다 → Supervisor가 보는 상황(리서치·초안 완료 여부)이 전달되는지 확인 | Supervisor에게 지금 상황을 어떤 정보로 알려 줄지, 세 선택지를 언제 고르는지 먼저 정리해 AI에게 준다. Researcher·Writer 노드는 Agent 결과의 마지막 메시지를 State의 어느 필드에 넣는지 말한다 |
 | 5 그래프·승인 | 149 `# TODO: 그래프 조립`<br>(151 `app = builder.compile()`은 TODO 표시가 없지만 여기서 함께 고친다) | 리서치 결과가 출력된 뒤 `보고서 작성을 시작할까요? (y/n)`에서 멈춘다. `n`이면 `취소됐습니다.`로 끝난다 | 멈추지 않고 곧장 Writer까지 간다 → 컴파일에 체크포인터와 Writer 앞 중단 설정이 있는지 확인 | 노드 사이 연결(시작, Supervisor의 갈림길, 각 Agent 뒤 복귀)을 그림처럼 말로 적어 AI에게 준다. Writer 실행 전에 멈춰야 한다는 조건과 멈춘 상태를 기억할 장치가 필요하다는 점을 함께 말한다 |
-| 6 실행·재개 | 164 `# TODO: app.invoke로 실행하고 단계접 진행 상황 출력` | `y` 입력 뒤 `[SDS-AI-RPT v2.1]` 양식의 보고서가 나온다. TL;DR이 3줄이고 현황 분석에 표가 있다(writer skill 규칙) | 승인 뒤 아무것도 안 나온다 → 재개할 때 같은 thread_id와 빈 입력으로 이어 부르는지 확인 | 1단계 실행 → 결과 보여 주기 → 사용자 입력 → 재개의 순서를 AI에게 알려 준다. 재개 방법은 M1 HITL에서 본 방식과 같다고 말한다 |
+| 6 실행·재개 | 164 `# TODO: app.invoke로 실행하고 단계접 진행 상황 출력` | `y` 입력 뒤 `[DS-AI-RPT v2.1]` 양식의 보고서가 나온다. TL;DR이 3줄이고 현황 분석에 표가 있다(writer skill 규칙) | 승인 뒤 아무것도 안 나온다 → 재개할 때 같은 thread_id와 빈 입력으로 이어 부르는지 확인 | 1단계 실행 → 결과 보여 주기 → 사용자 입력 → 재개의 순서를 AI에게 알려 준다. 재개 방법은 M1 HITL에서 본 방식과 같다고 말한다 |
 | 7 평가 | 100 `# TODO: 평가를 진행하고 Langfuse에 점수를 기록` | 관련성·근거충실도·완성도·명확성 네 줄의 막대와 점수·근거, `종합 점수`가 나온다. Langfuse 대시보드에 Judge trace와 score 4개가 보인다 | 점수는 나오는데 Langfuse에 없다 → `LANGFUSE_*` 키 확인 / 점수가 모두 1.0 → Judge 지시에 엄격 채점 조건이 있는지 확인 | 네 평가 항목의 뜻과 점수 범위를 슬라이드 문장 그대로 AI에게 준다. 점수를 어느 trace에 어떤 이름으로 남길지 말한다 |
 
 - 단계 1~5는 코드만 바꾸고, 전체 확인은 6·7단계 실행에서 한 번에 한다. 단계별 중간 실행 확인 방법은 5절 질문 3.
@@ -74,7 +74,7 @@ C 수준(슬라이드 요약 + 내용 있는 곳만 "왜 배우나") + 4지선�
 | `starter.py` | raw `starter.py` | docstring 11–13행의 raw/solution 경로 안내를 이 폴더 실행 명령으로 바꾼다. 164행 오타 "단계접" → "단계별". 쓰지 않는 import(`json`, `requests`)와 92–94행 쓰지 않는 변수 정리. 구조 함정 처리 여부는 5절 질문 2 |
 | `mcp_server.py` | solution `mcp_server.py` | docstring 6–7행 실행 명령을 `uv run --env-file .env python course/Chapter02/capstone/mcp_server.py`로. 포트는 4절 제안에 따름 |
 | `skills/researcher/SKILL.md` | solution | 그대로 (frontmatter 이름은 `research`, 폴더 이름은 `researcher`. 동작에는 영향 없음) |
-| `skills/sds-report-writer/SKILL.md` | solution | 그대로 |
+| `skills/ds-report-writer/SKILL.md` | solution | 그대로 |
 | `data/ai_trends.md`, `data/llm_market.md` | raw (solution과 같음) | 그대로 |
 | `README.md` | 새로 씀 | 아래 요지 |
 
