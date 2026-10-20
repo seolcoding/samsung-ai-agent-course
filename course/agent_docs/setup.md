@@ -52,6 +52,17 @@
 
 - 사내 주소는 끝부분을 붙이지 않고 적는다. 코드가 `api_base_url` 뒤에 `/chat/completions`, `embedding_api_url` 뒤에 `/v1/embeddings`를 붙인다.
 
+### 3-2 MCP 실습 키 (Tavily·DART, 3일차)
+
+`.env.sample`의 **(5)절** 두 이름이다. DART 키는 강사가 수업 중 알려 주고, Tavily 키는 각자 무료로 받는다. 없어도 실습은 돈다(DART 도구는 `[모의 DART]`로 시작하는 견본 답, Tavily 서버는 빼고 진행).
+
+| 이름 | 받는 곳 | 모양 |
+|---|---|---|
+| `TAVILY_API_KEY` | https://app.tavily.com 가입 → 첫 화면의 API Key | `tvly-`로 시작 |
+| `DART_API_KEY` | 강사가 알려 줌(직접 받으려면 https://opendart.fss.or.kr 가입 → 인증키 신청) | 40자 |
+
+- 받은 뒤 `uv run python -m config.check --mcp --live`로 두 API가 실제로 불리는지 본다. 사내망에서 막히면 ⚠️가 나오고, 그대로 실습한다.
+
 ## 4. 설정 점검 (config.check)
 
 `config` 패키지가 `.env`를 읽고 `COURSE_ENV`에 맞춰 연결 방식을 정한다. 제대로 되었는지는 점검 명령으로 확인한다. 키·토큰 값은 출력하지 않고 이름이 있는지만 본다.
@@ -60,6 +71,7 @@
 uv run python -m config.check           # 파이썬·커널·.env 위치·COURSE_ENV·필요한 이름·패키지
 uv run python -m config.check --live    # 위에 더해 실제로 모델·임베딩을 한 번씩 호출(요청 1~2회)
 uv run python -m config.check --json    # AI 도우미용 JSON
+uv run python -m config.check --mcp     # 3-2 MCP 실습 키(Tavily·DART)도 본다. --live를 붙이면 실제로 한 번씩 부른다
 ```
 
 - 노트북에서는 실습 노트북 맨 위 "환경 점검" 셀이 같은 점검을 한다(`from config.check import check_env; check_env()`).

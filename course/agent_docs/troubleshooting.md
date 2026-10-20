@@ -81,7 +81,9 @@
 | 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일을 고치다 틀림 | 고친 줄을 되돌려 저장(Ctrl+S) → Ctrl+C → 다시 띄우기 |
 | 서버를 고쳤는데 결과가 그대로 | 저장하지 않았거나 예전 서버가 계속 떠 있음 | 저장(Ctrl+S) → Ctrl+C로 끄고 다시 띄운다 → 노트북의 연결 셀부터 다시 실행 |
 | 서버 시작 때 `DeprecationWarning`, `Update available` 상자 | 라이브러리 안내 문구 | 무시해도 된다 |
-| stdio로 바꿨더니 추가한 할 일이 목록에 없음 | stdio는 도구를 부를 때마다 서버를 새로 띄워 기억이 사라진다 | 정상. SSE와 비교하는 실습이다 |
+| 3-2 DART 도구의 답이 `[모의 DART]`로 시작함 | `.env`에 `DART_API_KEY`가 없거나, 사내망에서 DART(opendart.fss.or.kr)에 연결되지 않음 | 정상(견본 답으로 실습). 실제 공시를 보려면 [setup.md](setup.md)의 키 안내대로 키를 넣고 서버를 다시 띄운다. `uv run python -m config.check --mcp --live`로 연결을 본다 |
+| 3-2에 `Tavily는 뺐습니다`가 나옴 | `TAVILY_API_KEY`가 없거나 Tavily 서버에 연결되지 않음 | 정상(DART 도구만으로 진행). 키를 넣었다면 커널을 다시 시작하고 연결 셀부터 다시 실행한다 |
+| 3-2 DART 도구가 `DART 응답: …`을 돌려줌 | DART가 오류를 돌려줌(키가 틀림, 조회 결과 없음 등). 메시지에 이유가 있다 | 키를 다시 확인한다. "조회된 데이터가 없습니다"면 연도·기간을 바꿔 묻는다 |
 | Windows에서 stdio로 바꾼 셀이 `io.UnsupportedOperation: fileno` 또는 `NotImplementedError`로 실패 | Windows 노트북 커널에서는 stdio 방식이 서버 프로그램을 띄우지 못한다 | 정상. `"sse"`로 되돌리고 다음으로 진행한다 |
 
 ## Langfuse(관측·평가, 캡스톤)

@@ -94,7 +94,7 @@ def text_of(content) -> str:
 # ── 점검 (번호, 이름, 영향받는 실습, 함수). 함수는 (상태, 설명)을 돌려준다 ─────────────────
 
 def check_settings():
-    items = report(["LLM_PROVIDER", "EMBED_PROVIDER", "RAG_PROVIDER", "LANGFUSE"])
+    items = report(["LLM_PROVIDER", "EMBED_PROVIDER", "RAG_PROVIDER", "LANGFUSE", "MCP_KEYS"])
     bad = [f"{i['name']}" for i in items if i["status"] == "⛔"]
     env = os.getenv("COURSE_ENV", "").strip().lower()
     if bad:
@@ -176,19 +176,44 @@ def check_ragaas():
     return "🟢", f"결과 {len(hits)}개, 첫 글: {first[:40]}…"
 
 
+def check_mcp_apis():
+    from config.check import _live_mcp
+
+    if not (os.getenv("DART_API_KEY", "").strip() and os.getenv("TAVILY_API_KEY", "").strip()):
+        return "❔", "TAVILY_API_KEY·DART_API_KEY가 .env에 없음 → 강사 키를 넣고 다시(DART는 강사 키, Tavily는 수강생 각자)"
+    items = _live_mcp()
+    bad = [i for i in items if i["status"] != "🟢"]
+    detail = " · ".join(f"{i['name']} {i['status']} {i['detail']}" for i in items)
+    return ("⛔" if bad else "🟢"), detail + (" → 막힌 쪽은 수업에서 [모의 DART]·Tavily 없이 진행" if bad else "")
+
+
 def check_mcp():
     from langchain_mcp_adapters.client import MultiServerMCPClient
 
-    async def run():
-        client = MultiServerMCPClient({"tutorial": {"transport": "sse", "url": "http://localhost:8000/sse"}})
+    async def run():  # 3-2 LAB과 같은 연결: 터미널에 띄운 DART 서버(SSE) + 키가 있으면 Tavily 공식 원격 MCP
+        client = MultiServerMCPClient({"dart": {"transport": "sse", "url": "http://localhost:8000/sse"}})
         tools = await client.get_tools()
-        names = sorted(t.name for t in tools)
-        msg = await get_llm().bind_tools(tools).ainvoke("지금 몇 시야? 도구로 확인해 줘.")
+        names = {t.name for t in tools}
+        want = {"get_company_info", "get_recent_disclosures", "get_financial_summary"}
+        if not want <= names:
+            return "⛔", f"DART 서버 도구가 다름: {sorted(names)}"
+        msg = await get_llm().bind_tools(tools).ainvoke("삼성전자 대표이사가 누구야? 도구로 확인해 줘.")
         calls = getattr(msg, "tool_calls", []) or []
         if not calls:
-            return "⛔", f"도구 {len(names)}개는 받았지만 LLM이 MCP 도구를 부르지 않음"
-        out = await {t.name: t for t in tools}[calls[0]["name"]].ainvoke(calls[0]["args"])
-        return "🟢", f"도구 {len(names)}개 받음, {calls[0]['name']} 호출 → {text_of(out)[:30]!r}"
+            return "⛔", f"DART 도구 {len(names)}개는 받았지만 LLM이 도구를 부르지 않음"
+        out = text_of(await {t.name: t for t in tools}[calls[0]["name"]].ainvoke(calls[0]["args"]))
+        tavily = "Tavily 키 없음"
+        if os.getenv("TAVILY_API_KEY", "").strip():
+            try:
+                conn = {"transport": "streamable_http", "url": "https://mcp.tavily.com/mcp/",  # 3-2 LAB과 같은 연결(키는 머리말)
+                        "headers": {"Authorization": f"Bearer {os.environ['TAVILY_API_KEY'].strip()}"}}
+                t_tools = await asyncio.wait_for(MultiServerMCPClient({"tavily": conn}).get_tools(), 20)
+                tavily = f"Tavily MCP 도구 {len(t_tools)}개 🟢"
+            except Exception as e:  # noqa: BLE001
+                tavily = f"Tavily MCP ⛔ {type(e).__name__}"
+        mock = out.startswith("[모의 DART]")
+        status = "❔" if mock or "⛔" in tavily else "🟢"
+        return status, f"{calls[0]['name']} 호출 → {out[:30]!r}{' (모의 응답)' if mock else ''} · {tavily}"
 
     with server(NB / "mcp_server.py", 8000):
         return asyncio.run(run())
@@ -205,27 +230,28 @@ def check_a2a():
     from a2a.client.transports.jsonrpc import JsonRpcTransport
     from a2a.utils.constants import PROTOCOL_VERSION_1_0, VERSION_HEADER
 
-    url = "http://127.0.0.1:8001"
+    base = "http://127.0.0.1:8001"
 
-    async def run():  # 3-3 LAB의 call_researcher와 같은 순서
+    async def run():  # 3-3 LAB처럼 친구 셋의 Agent Card를 받고, 메시에게 한 번 물어본다
         async with httpx.AsyncClient(headers={VERSION_HEADER: PROTOCOL_VERSION_1_0}, timeout=60.0) as http:
-            card = await A2ACardResolver(http, url).get_agent_card()
-            client = BaseClient(card, ClientConfig(), JsonRpcTransport(http, card, f"{url}/"), [])
+            cards = {f: await A2ACardResolver(http, f"{base}/{f}").get_agent_card() for f in ("messi", "ronaldo", "mbappe")}
+            card = cards["messi"]
+            client = BaseClient(card, ClientConfig(), JsonRpcTransport(http, card, f"{base}/messi/"), [])
             req = t.SendMessageRequest(message=t.Message(
-                role=t.Role.ROLE_USER, parts=[t.Part(text="LangGraph가 무엇인지 두 문장으로 조사해 줘.")],
-                message_id=str(uuid.uuid4())))
+                role=t.Role.ROLE_USER, parts=[t.Part(text="목요일 저녁에 축구할 시간 있어?")], message_id=str(uuid.uuid4())))
             async for response in client.send_message(req):
                 if response.HasField("message"):
-                    return card.name, "".join(p.text for p in response.message.parts if p.text)
-        return card.name, ""
+                    return cards, "".join(p.text for p in response.message.parts if p.text)
+        return cards, ""
 
     with server(NB / "a2a_server.py", 8001):
         start = time.time()
-        name, answer = asyncio.run(run())
+        cards, answer = asyncio.run(run())
         sec = time.time() - start
+    names = ", ".join(c.name for c in cards.values())
     if not answer:
-        return "⛔", f"Agent Card({name})는 받았지만 답이 비어 있음"
-    return ("🟢" if sec < 60 else "❔"), f"{name} 답 {len(answer)}자, {sec:.0f}초"
+        return "⛔", f"Agent Card 3개({names})는 받았지만 메시의 답이 비어 있음"
+    return ("🟢" if sec < 60 else "❔"), f"카드 3개({names}), 메시 답 {len(answer)}자 {sec:.0f}초: {answer[:30]!r}"
 
 
 def check_memory_format():
@@ -347,13 +373,14 @@ CHECKS = [
     (4, "구조화 출력", "캡스톤 Supervisor·Judge", check_structured_output),
     (5, "사내 임베딩(다국어)", "3-1 5장 RAG", check_embeddings),
     (6, "RAGaaS 검색", "캡스톤 rag_search", check_ragaas),
-    (7, "MCP 서버(8000)+도구 호출", "3-2", check_mcp),
-    (8, "A2A 서버(8001) 요청", "3-3", check_a2a),
-    (9, "[기억 저장: …] 형식", "3-4 Store", check_memory_format),
-    (10, "SQLite 체크포인트", "3-4 SqliteSaver", check_sqlite),
-    (11, "Deep Agent 스킬", "4-1·캡스톤", check_deep_agent),
-    (12, "Langfuse trace·점수", "4-2·캡스톤", check_langfuse),
-    (13, "캡스톤 정답 전체(y)", "4-3", check_capstone),
+    (7, "Tavily·DART 사내망 연결", "3-2", check_mcp_apis),
+    (8, "DART MCP 서버(8000)+Tavily MCP", "3-2", check_mcp),
+    (9, "A2A 친구 에이전트(8001) 요청", "3-3", check_a2a),
+    (10, "[기억 저장: …] 형식", "3-4 Store", check_memory_format),
+    (11, "SQLite 체크포인트", "3-4 SqliteSaver", check_sqlite),
+    (12, "Deep Agent 스킬", "4-1·캡스톤", check_deep_agent),
+    (13, "Langfuse trace·점수", "4-2·캡스톤", check_langfuse),
+    (14, "캡스톤 정답 전체(y)", "4-3", check_capstone),
 ]
 
 

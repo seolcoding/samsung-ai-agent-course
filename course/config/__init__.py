@@ -20,12 +20,12 @@ ENV_FILE = find_dotenv(usecwd=True) or find_dotenv()  # 찾지 못하면 빈 문
 
 
 def _load_env(path):
-    """.env를 UTF-8로 읽는다. 옛 메모장이 cp949로 저장했다면 그 방식으로 다시 읽고 알려 준다."""
+    """.env를 UTF-8로 읽는다. PC 환경변수에 같은 이름이 있어도 .env 값을 쓴다(수업 설정은 .env가 정본). 옛 메모장이 cp949로 저장했다면 그 방식으로 다시 읽고 알려 준다."""
     try:
-        load_dotenv(path or None, encoding="utf-8")
+        load_dotenv(path or None, encoding="utf-8", override=True)
     except UnicodeDecodeError:
         try:
-            load_dotenv(path, encoding="cp949")
+            load_dotenv(path, encoding="cp949", override=True)
         except UnicodeDecodeError as e:
             raise RuntimeError(
                 f"{path}를 읽을 수 없습니다(UTF-8도 cp949도 아님). VS Code로 열어 오른쪽 아래 인코딩을 눌러 'UTF-8로 저장'을 고릅니다."

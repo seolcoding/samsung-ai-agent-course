@@ -68,6 +68,11 @@ def chapter_of(folder):
     return "Chapter01" if UNITS[folder][0][0] in "12" else "Chapter02"
 
 
+def src_dir(f, chapter, folder):
+    """실습 코드가 있는 폴더. 받은 원본은 course/<챕터>/code/<raw|solution>/<폴더>, 새로 만든 예제는 spec의 source_dir(dev/builders 기준)."""
+    return HERE / f["source_dir"] if "source_dir" in f else COURSE / chapter / "code" / f.get("source", "raw") / folder
+
+
 def spec_path(folder):
     ch = chapter_of(folder)
     return LABS / f"{folder}.json" if ch == "Chapter01" else LABS / ch / f"{folder}.json"
@@ -360,7 +365,7 @@ def build(folder, mode="mc"):
     if "LANGFUSE" in spec.get("env", []):
         nb.md(TRUSTSTORE_MD)
         nb.code(TRUSTSTORE_CODE, visible=True, kind="")
-    srcs = [(f, (COURSE / chapter / "code" / f.get("source", "raw") / folder / f["name"]).read_text(encoding="utf-8")) for f in spec["files"]]
+    srcs = [(f, (src_dir(f, chapter, folder) / f["name"]).read_text(encoding="utf-8")) for f in spec["files"]]
     # 디버그 셀은 노트북 커널에서 LangChain을 돌릴 때만 둔다. 파일로 써서 따로 띄우는 앱(Streamlit 등)에는 적용되지 않는다
     if any(re.search(r"^\s*(from|import) (langchain|langgraph)", src, re.M) and not f.get("writefile") for f, src in srcs):
         tools = any(re.search(r"@tool\b|ToolNode|bind_tools", src) for f, src in srcs if not f.get("writefile"))
@@ -378,8 +383,7 @@ def build(folder, mode="mc"):
 
     for n, f in enumerate(spec["files"], start=2):
         # 원본을 먼저 정돈한다(읽기 쉽게). 원본·솔루션이 다르면 spec의 source로 깔끔한 쪽을 고른다
-        src_dir = COURSE / chapter / "code" / f.get("source", "raw") / folder
-        raw = _patch(fmt((src_dir / f["name"]).read_text(encoding="utf-8")).splitlines(), f.get("patch", []))
+        raw = _patch(fmt((src_dir(f, chapter, folder) / f["name"]).read_text(encoding="utf-8")).splitlines(), f.get("patch", []))
         todos = [t for t in f.get("todos", []) if t.get("blank")]  # 빈칸 범위가 없는 TODO(뼈대 미완성)는 건너뛴다
         for t in f.get("todos", []):
             if not t.get("blank"):

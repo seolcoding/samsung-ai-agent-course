@@ -1,12 +1,12 @@
 """
-A2A 서버: LangGraph Agent를 A2A 프로토콜로 노출하기
+A2A 서버: 친구 일정 Agent 세 명(메시·호날두·음바페)을 A2A로 띄우기
 
-A2A(Agent-to-Agent)는 Google이 제안한 에이전트 간 통신 표준이다.
-에이전트를 HTTP 서비스로 노출하면 프레임워크에 관계없이 (LangGraph, CrewAI, AutoGen 등)
-서로 통신할 수 있다.
+A2A(Agent-to-Agent)는 Google이 제안한 Agent 사이 통신 표준이다.
+서버 하나에 친구 Agent 세 명을 주소만 다르게 띄운다.
+  http://127.0.0.1:8001/messi/   http://127.0.0.1:8001/ronaldo/   http://127.0.0.1:8001/mbappe/
+일정은 수업용으로 지어낸 것이다(실제 선수 일정이 아니다).
 """
 
-import asyncio
 import uuid
 from typing import Annotated
 
@@ -20,15 +20,13 @@ from a2a.server.request_handlers.default_request_handler_v2 import (
 from a2a.server.routes.agent_card_routes import create_agent_card_routes
 from a2a.server.routes.jsonrpc_routes import create_jsonrpc_routes
 from a2a.server.tasks import InMemoryTaskStore
-from a2a.server.events.in_memory_queue_manager import InMemoryQueueManager
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
-from langgraph.graph import END, START, StateGraph
+from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 from starlette.applications import Starlette
-from starlette.routing import Route
 from typing_extensions import TypedDict
 
 from config.llm import get_llm
@@ -36,62 +34,143 @@ from config.llm import get_llm
 load_dotenv()
 
 
-# ── 내부 LangGraph Agent ──────────────────────────────────────────────────────
+# ── 친구들의 이번 주 일정 (수업용으로 지어낸 일정) ──────────────────────────────
+# 요일마다 세 시간대(10시·14시·19시)가 있다. busy에 적히지 않은 시간은 비어 있다.
+DAYS = ["월", "화", "수", "목", "금", "토", "일"]
+TIMES = ["10시", "14시", "19시"]
+
+FRIENDS = {
+    "messi": {
+        "name": "메시",
+        "style": "차분하고 겸손한 말투",
+        "busy": {
+            "월": {"10시": "팀 훈련", "19시": "인터 마이애미 경기"},
+            "화": {"10시": "팀 훈련", "14시": "광고 촬영", "19시": "자선 행사"},
+            "수": {"10시": "팀 훈련", "19시": "대표팀 영상 미팅"},
+            "목": {"10시": "팀 훈련", "14시": "재활 운동"},
+            "금": {"10시": "팀 훈련", "19시": "가족 저녁"},
+            "토": {"14시": "가족 나들이", "19시": "리그 경기"},
+            "일": {"10시": "가족 브런치"},
+        },
+    },
+    "ronaldo": {
+        "name": "호날두",
+        "style": "자신감 넘치는 말투로, 마지막에 'Siuuu!'를 붙인다",
+        "busy": {
+            "월": {"10시": "헬스장", "14시": "광고 촬영", "19시": "야간 헬스장"},
+            "화": {"10시": "헬스장", "19시": "알나스르 경기"},
+            "수": {"10시": "헬스장"},
+            "목": {"10시": "헬스장", "14시": "인터뷰"},
+            "금": {"10시": "헬스장", "14시": "수영", "19시": "다큐 촬영"},
+            "토": {"14시": "사인회", "19시": "팬 미팅"},
+            "일": {"14시": "회복 훈련", "19시": "알나스르 경기"},
+        },
+    },
+    "mbappe": {
+        "name": "음바페",
+        "style": "빠르고 밝은 말투",
+        "busy": {
+            "월": {"10시": "팀 훈련", "19시": "챔피언스리그 경기"},
+            "화": {"10시": "팀 훈련"},
+            "수": {"10시": "팀 훈련", "14시": "스폰서 행사", "19시": "게임 방송"},
+            "목": {"10시": "팀 훈련"},
+            "금": {"10시": "팀 훈련", "19시": "대표팀 소집"},
+            "토": {"19시": "라리가 경기"},
+            "일": {"10시": "회복 훈련", "14시": "가족 식사", "19시": "영화 보기"},
+        },
+    },
+}
 
 
-@tool
-def search_web(query: str) -> str:
-    """웹에서 정보를 검색한다."""
-    print(f"[search_web] 검색어: {query}")
-    return f'"{query}" 검색 결과: 해당 주제에 대한 최신 정보 (데모 데이터)'
+# ── 친구 Agent 만들기 ─────────────────────────────────────────────────────────
+# 친구마다 같은 모양의 작은 LangGraph Agent를 만든다. 도구는 그 친구의 일정만 본다.
 
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
 
 
-# search_web 도구를 LLM과 ToolNode에 연결해 주세요.
-llm = get_llm().bind_tools([search_web])
-tool_node = ToolNode([search_web])
+def make_friend_agent(friend: str):
+    info = FRIENDS[friend]
+    booked = {}  # 서버가 켜져 있는 동안 잡은 약속({요일: {시간: 약속}}). 서버를 다시 띄우면 비워진다
+
+    @tool
+    def check_schedule() -> str:
+        """이번 주(월~일) 10시·14시·19시 일정을 알려 준다. 일정이 없으면 '비어 있음'."""
+        print(f"[{friend}] check_schedule()")
+        week = []
+        for day in DAYS:
+            plans = {**info["busy"].get(day, {}), **booked.get(day, {})}
+            week.append(
+                f"{day}: "
+                + ", ".join(f"{time} {plans.get(time, '비어 있음')}" for time in TIMES)
+            )
+        return "\n".join(week)
+
+    @tool
+    def book_match(day: str, time: str, host: str) -> str:
+        """비어 있는 시간에 축구 약속을 잡는다. day는 '목'처럼 요일 한 글자, time은 10시·14시·19시 중 하나, host는 약속을 잡는 사람."""
+        print(f"[{friend}] book_match({day}, {time}, {host})")
+        day, time = day.strip()[:1], time.strip()
+        if day not in DAYS or time not in TIMES:
+            return (
+                "요일은 월~일 한 글자, 시간은 10시·14시·19시 중 하나로 다시 요청합니다."
+            )
+        plan = booked.get(day, {}).get(time) or info["busy"].get(day, {}).get(time)
+        if plan:
+            return f"{day} {time}에는 이미 '{plan}' 일정이 있어 잡을 수 없습니다."
+        booked.setdefault(day, {})[time] = f"축구 약속({host})"
+        return f"{day} {time}에 {host}와(과) 축구 약속을 잡았습니다."
+
+    tools = [check_schedule, book_match]
+    # 친구의 두 도구를 LLM과 ToolNode에 연결해 주세요.
+    llm = get_llm().bind_tools(tools)
+    tool_node = ToolNode(tools)
+
+    system = SystemMessage(
+        content=(
+            f"너는 {info['name']}의 일정 비서 Agent다. 일정은 수업용으로 지어낸 것이다. "
+            "일정을 물으면 check_schedule로 확인하고, 물어본 시간대에 비어 있는 요일을 빠짐없이 말한다. "
+            "약속을 잡아 달라고 하면 바로 book_match로 잡는다(book_match가 비었는지 스스로 확인한다). "
+            f"답은 한국어 두세 문장으로, {info['style']}으로 한다."
+        )
+    )
+
+    def agent_node(state: State) -> dict:
+        return {"messages": [llm.invoke([system] + state["messages"])]}
+
+    builder = StateGraph(State)
+    builder.add_node("agent", agent_node)
+    builder.add_node("tools", tool_node)
+    builder.add_edge(START, "agent")
+    builder.add_conditional_edges("agent", tools_condition)
+    builder.add_edge("tools", "agent")
+    return builder.compile()
 
 
-def agent_node(state: State) -> dict:
-    # State의 messages를 도구가 연결된 LLM에 전달해 주세요.
-    return {"messages": [llm.invoke(state["messages"])]}
-
-
-builder = StateGraph(State)
-builder.add_node("agent", agent_node)
-builder.add_node("tools", tool_node)
-builder.add_edge(START, "agent")
-# tools_condition으로 도구 호출 여부를 분기하고 tools 이후 agent로 돌아오게 연결해 주세요.
-builder.add_conditional_edges("agent", tools_condition)
-builder.add_edge("tools", "agent")
-# LangGraph Agent를 컴파일해 주세요.
-langgraph_agent = builder.compile()
+friend_agents = {friend: make_friend_agent(friend) for friend in FRIENDS}
 
 
 # ── A2A AgentExecutor ─────────────────────────────────────────────────────────
-# AgentExecutor.execute(): RequestContext에서 사용자 메시지를 읽어
-# EventQueue에 결과(Message)를 발행한다.
-#
-# a2a-sdk 1.x는 a2a.types의 타입(t.Message, t.Part 등)으로 메시지를 만든다.
+# AgentExecutor.execute(): A2A 요청(RequestContext)에서 메시지 글을 읽어
+# 친구 Agent를 실행하고, 답을 A2A Message로 감싸 EventQueue에 보낸다.
 
 
-class ResearcherExecutor(AgentExecutor):
+class FriendExecutor(AgentExecutor):
+    def __init__(self, agent):
+        self.agent = agent  # 이 실행기가 맡은 친구 Agent
+
     async def execute(self, context: RequestContext, event_queue: EventQueue) -> None:
-        # context.get_user_input(): 사용자 메시지의 텍스트 파트를 모아 문자열로 반환
+        # context.get_user_input(): 받은 메시지의 텍스트 파트를 모아 문자열로 돌려준다
         user_text = context.get_user_input() or ""
 
-        # 내부 LangGraph Agent를 비동기로 호출하고 최종 답변을 추출해 주세요.
-        result = await langgraph_agent.ainvoke(
+        # 친구 Agent를 비동기로 실행하고 마지막 답을 꺼내 주세요.
+        result = await self.agent.ainvoke(
             {"messages": [HumanMessage(content=user_text)]}
         )
         answer = result["messages"][-1].content
 
-        # t.Message: A2A 응답 메시지
-        # t.Part(text=...): 텍스트 파트 (1.x에서는 TextPart 대신 Part.text 직접 사용)
-        # 결과를 A2A Message로 감싸 EventQueue에 발행한다
+        # t.Message: A2A 응답 메시지. t.Part(text=...): 텍스트 파트
         await event_queue.enqueue_event(
             t.Message(
                 role=t.Role.ROLE_AGENT,
@@ -107,52 +186,59 @@ class ResearcherExecutor(AgentExecutor):
 
 
 # ── Agent Card ────────────────────────────────────────────────────────────────
-# Agent Card: 이 에이전트가 무엇을 할 수 있는지 설명하는 메타데이터.
-# 클라이언트는 /.well-known/agent-card.json에서 이를 읽어 에이전트를 발견(discover)한다.
+# Agent Card: 이 Agent가 누구이고 무엇을 할 수 있는지 적은 자기소개(메타데이터).
+# 다른 Agent는 <주소>/.well-known/agent-card.json에서 이 카드를 읽어 친구를 찾는다(discover).
 
-# 이름, 설명, 입출력 모드, capability, skill 정보를 적는다
-agent_card = t.AgentCard(
-    name="Researcher Agent",
-    description="주어진 주제를 웹에서 조사하고 요약 정보를 제공합니다.",
-    version="1.0.0",
-    capabilities=t.AgentCapabilities(streaming=False),
-    default_input_modes=["text"],
-    default_output_modes=["text"],
-    supported_interfaces=[t.AgentInterface(url="http://localhost:8001")],
-    skills=[
-        t.AgentSkill(
-            id="web_research",
-            name="웹 리서치",
-            description="주제를 검색해 핵심 정보를 수집하고 정리합니다.",
-            tags=["research", "web"],
-            examples=["AI Agent 기술 트렌드 조사", "LangGraph 최신 기능 알려줘"],
-        )
-    ],
-)
+
+def make_card(friend: str) -> t.AgentCard:
+    info = FRIENDS[friend]
+    return t.AgentCard(
+        name=f"{info['name']} 일정 Agent",
+        description=f"{info['name']}의 이번 주 일정을 알려 주고, 비어 있는 시간에 축구 약속을 잡습니다(수업용 가상 일정).",
+        version="1.0.0",
+        capabilities=t.AgentCapabilities(streaming=False),
+        default_input_modes=["text"],
+        default_output_modes=["text"],
+        supported_interfaces=[t.AgentInterface(url=f"http://127.0.0.1:8001/{friend}/")],
+        skills=[
+            t.AgentSkill(
+                id="soccer_schedule",
+                name="일정 확인·축구 약속",
+                description="이번 주 빈 시간을 알려 주고, 비어 있는 시간에 축구 약속을 잡습니다.",
+                tags=["schedule", "soccer"],
+                examples=[
+                    "이번 주 저녁 19시에 비는 날 알려 줘",
+                    "목요일 19시에 축구 약속 잡아 줘",
+                ],
+            )
+        ],
+    )
+
 
 # ── Starlette 앱 조립 ─────────────────────────────────────────────────────────
+# 서버 하나에 친구 세 명을 주소만 다르게 단다: /messi/, /ronaldo/, /mbappe/
+# 친구마다 카드 주소(/<친구>/.well-known/agent-card.json)와 요청을 받는 주소(/<친구>/)가 있다.
 
-queue_manager = InMemoryQueueManager()
-task_store = InMemoryTaskStore()
-
-request_handler = DefaultRequestHandlerV2(
-    # AgentExecutor, TaskStore, AgentCard, QueueManager를 연결한다
-    agent_executor=ResearcherExecutor(),
-    task_store=task_store,
-    queue_manager=queue_manager,
-    agent_card=agent_card,
-)
-
-# Agent Card 조회 라우트와 JSON-RPC 라우트를 만든다
-routes: list[Route] = [
-    *create_agent_card_routes(agent_card),
-    *create_jsonrpc_routes(request_handler, rpc_url="/"),
-]
+routes = []
+for friend, agent in friend_agents.items():
+    card = make_card(friend)
+    handler = DefaultRequestHandlerV2(
+        agent_executor=FriendExecutor(agent),
+        task_store=InMemoryTaskStore(),
+        agent_card=card,
+    )
+    routes += create_agent_card_routes(
+        card, card_url=f"/{friend}/.well-known/agent-card.json"
+    )
+    routes += create_jsonrpc_routes(handler, rpc_url=f"/{friend}/")
 
 app = Starlette(routes=routes)
 
 if __name__ == "__main__":
-    print("Researcher A2A 서버 시작: http://localhost:8001")
-    print("Agent Card: http://localhost:8001/.well-known/agent-card.json")
+    print("친구 일정 A2A 서버 시작: http://localhost:8001")
+    for friend in FRIENDS:
+        print(
+            f"  {FRIENDS[friend]['name']}: http://localhost:8001/{friend}/.well-known/agent-card.json"
+        )
     # 127.0.0.1: 이 PC에서 오는 요청만 받는다. 0.0.0.0이면 다른 PC의 요청도 받는다.
     uvicorn.run(app, host="127.0.0.1", port=8001)
