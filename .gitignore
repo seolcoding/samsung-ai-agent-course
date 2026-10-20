@@ -217,5 +217,5 @@ dev/self_study/
 # CodeMate(Roo) 확장이 만드는 프로젝트 MCP 설정. .roo/의 다른 파일(규칙·스킬)은 커밋할 수 있게 둔다.
 .roo/mcp.json
 
-# 사내망 점검(dev/qc/inhouse_check.py)이 쓰는 결과 파일
+# 강사용 사내망 점검 스크립트가 쓰는 결과 파일
 inhouse_check_result.txt
