@@ -28,6 +28,9 @@ def get_llm(**kwargs):
             kwargs.setdefault("reasoning_effort", "none")
             # gpt-6 계열은 도구가 있으면 Responses API로 자동 전환되므로 고정한다.
             kwargs.setdefault("use_responses_api", False)
+        if os.getenv("OPENAI_BASE_URL"):
+            # OpenAI 호환 서버(NVIDIA Nemotron 등)는 사내 게이트웨이처럼 생각 단계를 끈다(켜 두면 느리고 답이 빌 수 있다)
+            kwargs.setdefault("extra_body", {"chat_template_kwargs": {"enable_thinking": False}})
         return ChatOpenAI(api_key=_required("OPENAI_API_KEY"), **kwargs)
 
     elif provider == "samsung":

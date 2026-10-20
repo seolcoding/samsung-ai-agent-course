@@ -11,7 +11,7 @@ from langchain_core.embeddings import Embeddings
 
 MODE_ALIASES = {"녹화 재생": "demo", "화면 데모": "demo", "OpenAI 실행": "openai", "사내 실행": "samsung"}
 FIELDS = (
-    "OPENAI_API_KEY", "OPENAI_MODEL", "OPENAI_EMBEDDING_MODEL",
+    "OPENAI_API_KEY", "OPENAI_MODEL", "OPENAI_EMBEDDING_MODEL", "OPENAI_BASE_URL",
     "api_base_url", "model", "credential_key", "send_system_name", "user_id",
     "embedding_api_url", "embedding_x_dep_ticket",
 )
@@ -80,7 +80,8 @@ def gateway_headers(settings: dict) -> dict:
 
 
 def model_options(settings: dict) -> dict:
-    if settings["mode"] == "samsung":
+    if settings["mode"] == "samsung" or settings.get("OPENAI_BASE_URL"):
+        # 사내 게이트웨이와 OpenAI 호환 서버(NVIDIA Nemotron 등)는 생각 단계를 끈다(켜 두면 답이 비거나 느리다)
         return {"extra_body": {"chat_template_kwargs": {"enable_thinking": False}}}
     return {"reasoning_effort": "none"} if settings["model"] == "gpt-6-luna" else {}
 
@@ -89,6 +90,8 @@ def client_options(settings: dict) -> dict:
     if settings["mode"] == "samsung":
         return {"api_key": "samsung-gateway", "base_url": settings["api_base_url"],
                 "default_headers": gateway_headers(settings)}
+    if settings.get("OPENAI_BASE_URL"):  # OpenAI 호환 서버(NVIDIA 등)
+        return {"api_key": settings["OPENAI_API_KEY"], "base_url": settings["OPENAI_BASE_URL"]}
     return {"api_key": settings["OPENAI_API_KEY"]}
 
 

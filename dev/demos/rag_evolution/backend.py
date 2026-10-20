@@ -171,8 +171,10 @@ def build_store(settings: dict, chunk_size: int):
     for index, chunk in enumerate(chunks, start=1):
         chunk.metadata["chunk_id"] = index
     embeddings = (SamsungEmbeddings(settings) if settings["mode"] == "samsung" else
-                  OpenAIEmbeddings(api_key=settings["OPENAI_API_KEY"], model=settings["OPENAI_EMBEDDING_MODEL"],
-                                   request_timeout=60, max_retries=1))
+                  OpenAIEmbeddings(**client_options(settings), model=settings["OPENAI_EMBEDDING_MODEL"],
+                                   request_timeout=60, max_retries=1,
+                                   # OpenAI 호환 서버는 토큰 번호 목록 입력을 400으로 거절한다
+                                   check_embedding_ctx_length=not settings.get("OPENAI_BASE_URL")))
     fingerprint = cache_fingerprint(settings, chunk_size)[:24]
     return Chroma.from_documents(
         chunks, embeddings, collection_name=f"animal_insurance_{fingerprint}",
