@@ -153,6 +153,7 @@ async def main(topic: str):
     builder.add_node('researcher', researcher_node)
     builder.add_node('writer', writer_node)
     # TODO: 그래프 조립
+    builder.add_edge(START, 'supervisor')  # 자리표시: 연결이 하나도 없으면 compile()이 멈춰서 시작 연결만 넣어 둠. 나머지 연결을 이어서 넣습니다
 
     app = builder.compile()
 
@@ -162,6 +163,7 @@ async def main(topic: str):
     }
 
     # TODO: app.ainvoke로 실행하고 단계별 진행 상황 출력
+    print('⚠️ 실행 코드(6.6)가 아직 비어 있어 여기서 끝납니다. 4-3 LAB 6장을 따라 TODO를 채웁니다.')  # 자리표시: 6.6을 채울 때 이 줄을 지웁니다
 
 
 if __name__ == '__main__':
