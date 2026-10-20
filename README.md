@@ -61,7 +61,7 @@ dev (고치고 검사) → main (합치기) → study (dev/release.sh가 main에
 
 강의장 PC는 계정별로 초기화되므로 1일차에 수강생과 함께 설치합니다(1.5~2시간). 순서는 [수강생 안내](course/README.md)와 [설치 안내](course/agent_docs/setup.md)에 있습니다. 요약하면 다음과 같습니다.
 
-1. `uv` 설치 → 저장소 맨 위에서 `uv sync --extra notebooks`
+1. `uv` 설치 → 저장소 맨 위에서 `uv sync`
 2. `.env.sample`을 복사해 `.env`를 만들고 `COURSE_ENV=samsung`(사내)과 사내 API 값을 채웁니다.
 3. `uv run python -m config.check`로 점검합니다. ⛔ 줄이 없으면 준비가 끝난 것입니다.
 
@@ -71,7 +71,7 @@ dev (고치고 검사) → main (합치기) → study (dev/release.sh가 main에
 2. 검사합니다.
 
    ```bash
-   uv run --extra notebooks python -m unittest discover -s dev/tests -p 'test_*.py'
+   uv run python -m unittest discover -s dev/tests -p 'test_*.py'
    uv run python dev/qc/notebook_qc.py
    ```
 

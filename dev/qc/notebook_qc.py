@@ -10,7 +10,7 @@
 실행(프로젝트 루트):
     uv run python dev/qc/notebook_qc.py course/Chapter01/notebooks/1-2_llm_api_LEC.ipynb
     uv run python dev/qc/notebook_qc.py                 # course/Chapter*/notebooks/*.ipynb 전부
-    uv run --extra notebooks python dev/qc/notebook_qc.py <노트북> --execute   # 새 커널 실행까지
+    uv run python dev/qc/notebook_qc.py <노트북> --execute   # 새 커널 실행까지
 
 결과는 검사마다 PASS/WARN/FAIL과 문제 셀 번호(0부터)·짧은 발췌를 출력한다. FAIL이 하나라도 있으면 종료 코드 1.
 판단이 필요한 검사(내용·설명 수준 등)는 /notebook-qc 명령(.claude/commands/notebook-qc.md)의 점검표로 본다.

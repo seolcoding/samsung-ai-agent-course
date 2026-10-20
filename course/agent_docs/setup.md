@@ -8,7 +8,7 @@
 2. 패키지를 설치한다.
 
    ```
-   uv sync --extra notebooks
+   uv sync
    ```
 
    - 저장소 맨 위에 `.venv/`가 생긴다. 파이썬 버전은 3.12로 고정돼 있다(`.python-version`, `pyproject.toml`의 `requires-python`). PC에 3.12가 없으면 uv가 받아서 쓴다.

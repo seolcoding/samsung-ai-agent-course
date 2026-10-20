@@ -4,7 +4,7 @@
 
 기존 실습 코드(`src/raw/`·`src/solution/`)와 환경 설정(`src/config/`)의 검증 기록이다. 환경: macOS, 프로젝트 `.venv`, Python 3.12.7. 설치 버전은 `uv.lock`으로 고정한다.
 
-환경·설정 테스트: `uv run --extra notebooks python -m unittest discover -s tests -p 'test_*.py'`
+환경·설정 테스트: `uv run python -m unittest discover -s tests -p 'test_*.py'`
 
 - `gpt-6` 계열은 langchain-openai 1.6.6에서 도구가 있으면 Responses API로 자동 전환된다. 이때 `content`가 dict 목록으로 나와 사내 경로(Chat Completions, 문자열)와 화면이 달랐다. `src/config/llm.py`에서 `use_responses_api=False`로 고정해 두 경로의 출력 형식을 맞췄다.
 

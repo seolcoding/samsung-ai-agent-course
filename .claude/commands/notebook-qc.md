@@ -20,7 +20,7 @@ argument-hint: "[노트북 경로] [실행]"
 
 ```
 uv run python dev/qc/notebook_qc.py $ARGUMENTS
-uv run --extra notebooks python dev/qc/notebook_qc.py $ARGUMENTS --execute   # 실행을 요청받았을 때
+uv run python dev/qc/notebook_qc.py $ARGUMENTS --execute   # 실행을 요청받았을 때
 ```
 
 - 하네스가 보는 것

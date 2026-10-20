@@ -55,7 +55,7 @@
 
 ## 8. 검증
 
-- `uv sync --extra notebooks` 후 `uv run --extra notebooks python -m unittest discover -s dev/tests -p 'test_*.py'`(외부 API 없음).
+- `uv sync` 후 `uv run python -m unittest discover -s dev/tests -p 'test_*.py'`(외부 API 없음).
 - 노트북은 `dev/qc/notebook_qc.py`로 검사한다. 실제 모델·Langfuse·CodeMate 확인은 따로 기록한다.
 - 노트북 출력과 키는 커밋하지 않는다.
 
