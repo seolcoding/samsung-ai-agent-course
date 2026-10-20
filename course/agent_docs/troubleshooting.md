@@ -89,6 +89,7 @@
 | 증상 | 원인 | 해결 |
 |---|---|---|
 | 준비 셀: Langfuse 연결 ⛔ | `.env`의 `LANGFUSE_PUBLIC_KEY`·`LANGFUSE_SECRET_KEY`·`LANGFUSE_BASE_URL`이 없거나 틀림 | `uv run python -m config.check --langfuse`로 빠진 이름을 확인하고, https://cloud.langfuse.com 에 직접 가입해 발급받은 키를 채운다. 주소는 `https://cloud.langfuse.com` |
+| `SSLError`, `CERTIFICATE_VERIFY_FAILED`, `certificate verify failed`(사내망에서 Langfuse에 보낼 때) | 사내망의 HTTPS 연결은 회사 보안 인증서를 거치는데, 파이썬이 그 인증서를 모른다 | Langfuse를 쓰기 전에 `import truststore` → `truststore.inject_into_ssl()`를 한 번 실행한다(4-2 실습 노트북의 "회사 인증서 쓰기" 셀). 커널을 다시 시작했으면 그 셀부터 다시 실행한다. 파일로 실행하는 프로그램은 파일 맨 위 `import` 바로 아래에 같은 두 줄을 둔다(4-2 과제 파일처럼) |
 | Langfuse 화면을 어디서 여는지 모름 | — | 브라우저에서 `.env`의 `LANGFUSE_BASE_URL` 주소를 열고 로그인한 뒤, 키를 받은 프로젝트를 연다. 왼쪽 메뉴 **Tracing**에 trace, **Scores**에 점수가 있다 |
 | 코드는 잘 도는데 대시보드에 trace가 없음 | 전송 전(몇 초 모았다 보냄), 또는 다른 프로젝트 화면을 봄 | 각 장 끝의 `flush()` 셀을 실행하고 새로고침. 키와 같은 프로젝트인지 확인 |
 | 남의 trace가 섞여 보임 | 여러 명이 한 프로젝트를 같이 씀 | 노트북 안내대로 이름·실행 시각·내가 보낸 질문으로 찾는다 |

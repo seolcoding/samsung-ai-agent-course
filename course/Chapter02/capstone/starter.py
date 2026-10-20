@@ -21,22 +21,26 @@ import os
 from pathlib import Path
 from typing import Annotated, Literal
 
-from deepagents import create_deep_agent
-from deepagents.backends import FilesystemBackend
-from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage
-from langchain_core.tools import tool
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph import END, START, StateGraph
-from langgraph.graph.message import add_messages
-from langfuse import get_client
-from langfuse.langchain import CallbackHandler
-from pydantic import BaseModel
-from typing_extensions import TypedDict
+import truststore
 
-from config.llm import get_llm
-from config.ragaas import post_ragaas
+truststore.inject_into_ssl()  # PC에 등록된 인증서(회사 인증서 포함)를 믿게 합니다. Langfuse보다 먼저 둡니다(지우지 않습니다)
+
+from deepagents import create_deep_agent  # noqa: E402
+from deepagents.backends import FilesystemBackend  # noqa: E402
+from dotenv import load_dotenv  # noqa: E402
+from langchain_core.messages import HumanMessage  # noqa: E402
+from langchain_core.tools import tool  # noqa: E402
+from langchain_mcp_adapters.client import MultiServerMCPClient  # noqa: E402
+from langgraph.checkpoint.memory import MemorySaver  # noqa: E402
+from langgraph.graph import END, START, StateGraph  # noqa: E402
+from langgraph.graph.message import add_messages  # noqa: E402
+from langfuse import get_client  # noqa: E402
+from langfuse.langchain import CallbackHandler  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
+from typing_extensions import TypedDict  # noqa: E402
+
+from config.llm import get_llm  # noqa: E402
+from config.ragaas import post_ragaas  # noqa: E402
 
 load_dotenv()
 
@@ -149,6 +153,7 @@ async def main(topic: str):
     builder.add_node('researcher', researcher_node)
     builder.add_node('writer', writer_node)
     # TODO: 그래프 조립
+    builder.add_edge(START, 'supervisor')  # 자리표시: 연결이 하나도 없으면 compile()이 멈춰서 시작 연결만 넣어 둠. 나머지 연결을 이어서 넣습니다
 
     app = builder.compile()
 
@@ -158,6 +163,7 @@ async def main(topic: str):
     }
 
     # TODO: app.ainvoke로 실행하고 단계별 진행 상황 출력
+    print('⚠️ 실행 코드(6.6)가 아직 비어 있어 여기서 끝납니다. 4-3 LAB 6장을 따라 TODO를 채웁니다.')  # 자리표시: 6.6을 채울 때 이 줄을 지웁니다
 
 
 if __name__ == '__main__':
