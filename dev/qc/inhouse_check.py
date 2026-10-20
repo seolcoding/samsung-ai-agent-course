@@ -8,7 +8,7 @@ study로 받은 PC(dev/ 없음)에서는 이 파일만 저장소 맨 위에 받�
     uv run --env-file .env python inhouse_check.py
 
 결과: 단계마다 🟢(됨) / ⛔(안 됨) / ❔(판단 못 함)와 한 줄 설명, 맨 끝에 표. 같은 표를 inhouse_check_result.txt에도 쓴다.
-키·토큰 값은 출력하지 않는다. 서버(8000·8001)는 이 파일이 띄우고 끈다. 먼저 켜 둔 서버가 있으면 끄고 실행한다.
+키·토큰 값은 출력하지 않는다. 서버(8001·8002·8003)는 이 파일이 띄우고 끈다. 먼저 켜 둔 서버가 있으면 끄고 실행한다.
 ⛔인 실습은 수업에서 그 셀을 건너뛰고 사외 결과("무슨 일이 생기나")로 설명한다(dev/docs/2026-10-19_강의장_점검표.md).
 """
 
@@ -230,9 +230,9 @@ def check_a2a():
     from a2a.client.transports.jsonrpc import JsonRpcTransport
     from a2a.utils.constants import PROTOCOL_VERSION_1_0, VERSION_HEADER
 
-    base = "http://127.0.0.1:8001"
+    base = "http://127.0.0.1:8003"
 
-    async def run():  # 3-3 LAB처럼 친구 셋의 Agent Card를 받고, 메시에게 한 번 물어본다
+    async def run():  # 3-3 LAB 실전 프로젝트처럼 친구 셋의 Agent Card를 받고, 메시에게 한 번 물어본다
         async with httpx.AsyncClient(headers={VERSION_HEADER: PROTOCOL_VERSION_1_0}, timeout=60.0) as http:
             cards = {f: await A2ACardResolver(http, f"{base}/{f}").get_agent_card() for f in ("messi", "ronaldo", "mbappe")}
             card = cards["messi"]
@@ -244,7 +244,7 @@ def check_a2a():
                     return cards, "".join(p.text for p in response.message.parts if p.text)
         return cards, ""
 
-    with server(NB / "a2a_server.py", 8001):
+    with server(NB / "friends_a2a_server.py", 8003):
         start = time.time()
         cards, answer = asyncio.run(run())
         sec = time.time() - start
@@ -378,7 +378,7 @@ CHECKS = [
     (6, "RAGaaS 검색", "캡스톤 rag_search", check_ragaas),
     (7, "Tavily·DART 사내망 연결", "3-2", check_mcp_apis),
     (8, "DART MCP 서버(8002)+Tavily MCP", "3-2 실전", check_mcp),
-    (9, "A2A 친구 에이전트(8001) 요청", "3-3", check_a2a),
+    (9, "A2A 친구 에이전트(8003) 요청", "3-3 실전", check_a2a),
     (10, "[기억 저장: …] 형식", "3-4 Store", check_memory_format),
     (11, "SQLite 체크포인트", "3-4 SqliteSaver", check_sqlite),
     (12, "Deep Agent 스킬", "4-1·캡스톤", check_deep_agent),

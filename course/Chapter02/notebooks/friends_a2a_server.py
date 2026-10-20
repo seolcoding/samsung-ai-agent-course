@@ -3,7 +3,7 @@ A2A 서버: 친구 일정 Agent 세 명(메시·호날두·음바페)을 A2A로 
 
 A2A(Agent-to-Agent)는 Google이 제안한 Agent 사이 통신 표준이다.
 서버 하나에 친구 Agent 세 명을 주소만 다르게 띄운다.
-  http://127.0.0.1:8001/messi/   http://127.0.0.1:8001/ronaldo/   http://127.0.0.1:8001/mbappe/
+  http://127.0.0.1:8003/messi/   http://127.0.0.1:8003/ronaldo/   http://127.0.0.1:8003/mbappe/
 일정은 수업용으로 지어낸 것이다(실제 선수 일정이 아니다).
 """
 
@@ -123,7 +123,7 @@ def make_friend_agent(friend: str):
         return f"{day} {time}에 {host}와(과) 축구 약속을 잡았습니다."
 
     tools = [check_schedule, book_match]
-    # TODO: 친구의 두 도구를 LLM과 ToolNode에 연결해 주세요.
+    # 친구의 두 도구를 LLM과 ToolNode에 연결한다
     llm = get_llm().bind_tools(tools)
     tool_node = ToolNode(tools)
 
@@ -164,7 +164,7 @@ class FriendExecutor(AgentExecutor):
         # context.get_user_input(): 받은 메시지의 텍스트 파트를 모아 문자열로 돌려준다
         user_text = context.get_user_input() or ""
 
-        # TODO: 친구 Agent를 비동기로 실행하고 마지막 답을 꺼내 주세요.
+        # 친구 Agent를 비동기로 실행하고 마지막 답을 꺼낸다
         result = await self.agent.ainvoke(
             {"messages": [HumanMessage(content=user_text)]}
         )
@@ -199,7 +199,7 @@ def make_card(friend: str) -> t.AgentCard:
         capabilities=t.AgentCapabilities(streaming=False),
         default_input_modes=["text"],
         default_output_modes=["text"],
-        supported_interfaces=[t.AgentInterface(url=f"http://127.0.0.1:8001/{friend}/")],
+        supported_interfaces=[t.AgentInterface(url=f"http://127.0.0.1:8003/{friend}/")],
         skills=[
             t.AgentSkill(
                 id="soccer_schedule",
@@ -235,10 +235,10 @@ for friend, agent in friend_agents.items():
 app = Starlette(routes=routes)
 
 if __name__ == "__main__":
-    print("친구 일정 A2A 서버 시작: http://localhost:8001")
+    print("친구 일정 A2A 서버 시작: http://localhost:8003")
     for friend in FRIENDS:
         print(
-            f"  {FRIENDS[friend]['name']}: http://localhost:8001/{friend}/.well-known/agent-card.json"
+            f"  {FRIENDS[friend]['name']}: http://localhost:8003/{friend}/.well-known/agent-card.json"
         )
     # 127.0.0.1: 이 PC에서 오는 요청만 받는다. 0.0.0.0이면 다른 PC의 요청도 받는다.
-    uvicorn.run(app, host="127.0.0.1", port=8001)
+    uvicorn.run(app, host="127.0.0.1", port=8003)

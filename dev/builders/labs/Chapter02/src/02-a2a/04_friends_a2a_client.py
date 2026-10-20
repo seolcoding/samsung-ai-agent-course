@@ -24,7 +24,7 @@ from config.llm import get_llm
 
 load_dotenv()
 
-SERVER_URL = "http://127.0.0.1:8001"
+SERVER_URL = "http://127.0.0.1:8003"  # 친구 일정 서버(friends_a2a_server.py)
 FRIENDS = ["messi", "ronaldo", "mbappe"]
 # A2A-Version 헤더: 서버가 1.x 형식 요청임을 알아보게 한다(없으면 예전 0.3 형식으로 보고 거절한다)
 HEADERS = {VERSION_HEADER: PROTOCOL_VERSION_1_0}
@@ -52,7 +52,7 @@ async def call_friend(friend: str, query: str) -> str:
         client = BaseClient(card, ClientConfig(), transport, [])
 
         # 3. 메시지 전송
-        # TODO: t.SendMessageRequest를 생성해주세요.
+        # 요청 메시지(SendMessageRequest): 보내는 사람(USER), 글 조각(Part), 메시지마다 다른 ID
         req = t.SendMessageRequest(
             message=t.Message(
                 role=t.Role.ROLE_USER,
@@ -118,7 +118,7 @@ builder = StateGraph(State)
 builder.add_node("host", host_node)
 builder.add_node("tools", ToolNode([ask_friend]))
 builder.add_edge(START, "host")
-# TODO: tools_condition으로 도구 호출 여부를 분기하고 tools 이후 host로 돌아오게 연결해 주세요.
+# tools_condition: 도구 호출이 있으면 tools로, 없으면 끝. tools 다음에는 host로 돌아와 결과를 본다
 builder.add_conditional_edges("host", tools_condition)
 builder.add_edge("tools", "host")
 host_agent = builder.compile()
@@ -126,7 +126,7 @@ host_agent = builder.compile()
 
 # ── 축구 약속 잡기 ─────────────────────────────────────────────────────────────
 request = "이번 주 저녁 19시에 다 같이 축구 한 판 하자. 약속을 잡아 줘."
-# TODO: 내 Agent를 비동기로 실행해 주세요.
+# 내 Agent를 비동기로 실행한다(ask_friend가 서버와 주고받는 동안 기다린다)
 host_agent_result = await host_agent.ainvoke(
     {"messages": [HumanMessage(content=request)]}
 )
