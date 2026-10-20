@@ -5,7 +5,6 @@ MCP 클라이언트 실습: 터미널에 켜 둔 DART MCP 서버(우리가 만�
 
 import asyncio
 import os
-import sys
 from typing import Annotated
 
 import truststore
@@ -18,7 +17,6 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from typing_extensions import TypedDict
 
 from config.llm import get_llm
-from config.mcp import stdio_errors_to_file
 
 truststore.inject_into_ssl()  # 사내망에서 Tavily(인터넷 HTTPS)에 연결할 때 회사 인증서를 믿게 한다
 load_dotenv()
@@ -34,17 +32,8 @@ async def reachable(connection: dict) -> bool:
 
 
 # ── MCP 서버 연결 설정 ────────────────────────────────────────────────────────
-# dart: 2장에서 터미널에 켜 둔 우리 서버. SSE는 켜 둔 서버에 주소로 접속하고,
-#       stdio는 노트북이 서버 파일을 직접 실행해 표준 입출력으로 주고받는다.
-#       stdio로 띄운 서버의 오류 출력은 화면 대신 mcp_stdio_server.log 파일로 받는다
-#       (Windows 노트북의 화면 출력은 진짜 파일이 아니라, 그대로 두면 서버를 띄우지 못한다)
-stdio_errors_to_file("mcp_stdio_server.log")
-CONNECTIONS = {
-    "sse": {"transport": "sse", "url": "http://localhost:8000/sse"},
-    "stdio": {"transport": "stdio", "command": sys.executable, "args": ["mcp_server.py", "--stdio"]},
-}
-TRANSPORT = "sse"
-MCP_CONFIG = {"dart": CONNECTIONS[TRANSPORT]}
+# dart: 4장에서 터미널에 켜 둔 우리 DART 서버(SSE, 포트 8002)
+MCP_CONFIG = {"dart": {"transport": "sse", "url": "http://localhost:8002/sse"}}
 
 # tavily: Tavily가 인터넷에 운영하는 공식 MCP 서버(남이 만든 서버). HTTP로 접속하고, 키는 주소가 아니라
 #         머리말(headers)에 넣는다(오류 메시지에 키가 찍히지 않게). 키가 있고 연결될 때만 더한다
@@ -59,11 +48,11 @@ print("사용할 MCP 서버:", ", ".join(MCP_CONFIG))
 if "tavily" not in MCP_CONFIG:
     print("Tavily는 뺐습니다(TAVILY_API_KEY가 없거나 Tavily 서버에 연결되지 않음). DART 도구만으로 진행합니다.")
 
-# TODO: MCP 설정으로 MultiServerMCPClient를 생성해 주세요.
+# MCP 설정으로 MultiServerMCPClient를 생성해 주세요.
 client = MultiServerMCPClient(MCP_CONFIG)
 
 # get_tools()는 서버에 연결해 도구 목록을 가져온다.
-# TODO: MCP 서버에서 도구 목록을 가져와 주세요.
+# MCP 서버에서 도구 목록을 가져와 주세요.
 tools = await client.get_tools()
 # Tavily 도구는 검색(tavily_search)만 쓴다. 나머지 넷(extract·crawl·map·research)은 크레딧을 많이 쓴다
 tools = [t for t in tools if not t.name.startswith("tavily_") or t.name == "tavily_search"]
@@ -72,7 +61,7 @@ for t in tools:
     print(f"  - {t.name}: {t.description.strip().splitlines()[0][:70]}")
 print()
 
-# TODO: 가져온 MCP 도구를 LLM과 ToolNode에 연결해 주세요.
+# 가져온 MCP 도구를 LLM과 ToolNode에 연결해 주세요.
 llm = get_llm().bind_tools(tools)
 tool_node = ToolNode(tools)
 
@@ -82,7 +71,7 @@ class State(TypedDict):
 
 
 def agent_node(state: State) -> dict:
-    # TODO: State의 messages를 도구가 연결된 LLM에 전달해 주세요.
+    # State의 messages를 도구가 연결된 LLM에 전달해 주세요.
     return {"messages": [llm.invoke(state["messages"])]}
 
 
@@ -90,11 +79,11 @@ builder = StateGraph(State)
 builder.add_node("agent", agent_node)
 builder.add_node("tools", tool_node)
 builder.add_edge(START, "agent")
-# TODO: tools_condition으로 도구 호출 여부를 분기하고 tools 이후 agent로 돌아오게 연결해 주세요.
+# tools_condition으로 도구 호출 여부를 분기하고 tools 이후 agent로 돌아오게 연결해 주세요.
 builder.add_conditional_edges("agent", tools_condition)
 builder.add_edge("tools", "agent")
 
-# TODO: 그래프를 컴파일해 주세요.
+# 그래프를 컴파일해 주세요.
 app = builder.compile()
 
 # 도구를 사용해 요청 처리

@@ -2,7 +2,7 @@
 DART 공시 MCP 서버 만들기 (FastMCP)
 
 금융감독원 전자공시(OpenDART) API를 MCP 도구로 감싼다. 터미널에서 실행한다.
-기본은 HTTP/SSE 모드(포트 8000), --stdio를 붙이면 stdio 모드로 실행한다.
+기본은 HTTP/SSE 모드(포트 8002. 기본 실습 서버가 8000을 쓴다), --stdio를 붙이면 stdio 모드로 실행한다.
 .env에 DART_API_KEY가 없거나 DART에 연결되지 않으면 [모의 DART]로 시작하는 연습용 답을 돌려준다.
 """
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
         # stdio 모드: 클라이언트가 이 파일을 직접 실행해 표준 입출력으로 주고받는다(print를 쓰면 통신이 깨진다)
         mcp.run(transport="stdio")
     else:
-        print("MCP 서버 시작: http://localhost:8000/sse")
+        print("DART MCP 서버 시작: http://localhost:8002/sse")
         print(
             "DART_API_KEY:",
             "있음 — 실제 DART를 호출합니다"
@@ -165,6 +165,6 @@ if __name__ == "__main__":
             else "없음 — [모의 DART] 연습용 답을 돌려줍니다",
         )
         print("종료하려면 Ctrl+C")
-        # HTTP/SSE 모드: 클라이언트가 localhost:8000으로 연결
+        # HTTP/SSE 모드: 클라이언트가 localhost:8002로 연결
         # 127.0.0.1: 이 PC에서 오는 요청만 받는다. 0.0.0.0이면 다른 PC의 요청도 받는다.
-        mcp.run(transport="sse", host="127.0.0.1", port=8000)
+        mcp.run(transport="sse", host="127.0.0.1", port=8002)

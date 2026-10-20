@@ -191,7 +191,7 @@ def check_mcp():
     from langchain_mcp_adapters.client import MultiServerMCPClient
 
     async def run():  # 3-2 LAB과 같은 연결: 터미널에 띄운 DART 서버(SSE) + 키가 있으면 Tavily 공식 원격 MCP
-        client = MultiServerMCPClient({"dart": {"transport": "sse", "url": "http://localhost:8000/sse"}})
+        client = MultiServerMCPClient({"dart": {"transport": "sse", "url": "http://localhost:8002/sse"}})
         tools = await client.get_tools()
         names = {t.name for t in tools}
         want = {"get_company_info", "get_recent_disclosures", "get_financial_summary"}
@@ -215,7 +215,7 @@ def check_mcp():
         status = "❔" if mock or "⛔" in tavily else "🟢"
         return status, f"{calls[0]['name']} 호출 → {out[:30]!r}{' (모의 응답)' if mock else ''} · {tavily}"
 
-    with server(NB / "mcp_server.py", 8000):
+    with server(NB / "dart_mcp_server.py", 8002):
         return asyncio.run(run())
 
 
@@ -377,7 +377,7 @@ CHECKS = [
     (5, "사내 임베딩(다국어)", "3-1 5장 RAG", check_embeddings),
     (6, "RAGaaS 검색", "캡스톤 rag_search", check_ragaas),
     (7, "Tavily·DART 사내망 연결", "3-2", check_mcp_apis),
-    (8, "DART MCP 서버(8000)+Tavily MCP", "3-2", check_mcp),
+    (8, "DART MCP 서버(8002)+Tavily MCP", "3-2 실전", check_mcp),
     (9, "A2A 친구 에이전트(8001) 요청", "3-3", check_a2a),
     (10, "[기억 저장: …] 형식", "3-4 Store", check_memory_format),
     (11, "SQLite 체크포인트", "3-4 SqliteSaver", check_sqlite),

@@ -75,8 +75,8 @@
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| 터미널: `No such file or directory` / `can't open file …_server.py` | 터미널이 저장소 맨 위가 아님(서버 파일 `mcp_server.py`·`a2a_server.py`는 노트북 폴더에 이미 있다) | 저장소 맨 위에서 `uv run python course/Chapter02/notebooks/mcp_server.py`처럼 띄운다. 위치 확인: `uv run python -c "import os; print(os.getcwd())"`(PowerShell·cmd·macOS 모두 된다, [paths.md](paths.md)) |
-| `address already in use` / `Errno 48`·`[Errno 10048]` / "소켓 주소(프로토콜/네트워크 주소/포트)는 하나만 사용할 수 있습니다"(Windows) | 같은 포트의 서버가 이미 떠 있음(A2A와 캡스톤 MCP는 둘 다 8001) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
+| 터미널: `No such file or directory` / `can't open file …_server.py` | 터미널이 저장소 맨 위가 아님(서버 파일 `basic_mcp_server.py`·`dart_mcp_server.py`·`a2a_server.py`·`friends_a2a_server.py`는 노트북 폴더에 이미 있다) | 저장소 맨 위에서 `uv run python course/Chapter02/notebooks/basic_mcp_server.py`처럼 띄운다. 위치 확인: `uv run python -c "import os; print(os.getcwd())"`(PowerShell·cmd·macOS 모두 된다, [paths.md](paths.md)) |
+| `address already in use` / `Errno 48`·`[Errno 10048]` / "소켓 주소(프로토콜/네트워크 주소/포트)는 하나만 사용할 수 있습니다"(Windows) | 같은 포트의 서버가 이미 떠 있음(기본 MCP 8000, DART MCP 8002, 기본 A2A와 캡스톤 MCP는 둘 다 8001, 친구 A2A 8003) | 앞 서버 터미널에서 Ctrl+C. 터미널을 닫았으면 VS Code 터미널 목록에서 그 터미널을 휴지통으로 |
 | 클라이언트 셀: `ConnectError`, `Connection refused`, 오래 기다리다 실패 | 서버가 꺼져 있거나 시작 중 오류로 끝남 | 서버 터미널에 `Uvicorn running on …`이 있는지 본다. 없으면 터미널의 마지막 오류 줄부터 고친다 |
 | 서버 터미널에 Traceback, 클라이언트에 `InternalError` | 서버 파일을 고치다 틀림 | 고친 줄을 되돌려 저장(Ctrl+S) → Ctrl+C → 다시 띄우기 |
 | 서버를 고쳤는데 결과가 그대로 | 저장하지 않았거나 예전 서버가 계속 떠 있음 | 저장(Ctrl+S) → Ctrl+C로 끄고 다시 띄운다 → 노트북의 연결 셀부터 다시 실행 |
