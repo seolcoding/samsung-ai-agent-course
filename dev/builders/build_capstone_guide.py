@@ -28,10 +28,13 @@ OUT = COURSE / "Chapter02" / "notebooks" / "4-3_capstone_LAB.ipynb"
 RUN_SERVER = "uv run python course/Chapter02/capstone/mcp_server.py"
 RUN_STARTER = "uv run python course/Chapter02/capstone/starter.py"
 RUN_SOLUTION = "uv run python course/Chapter02/capstone/solution.py"
+# 사내망에서 Langfuse(HTTPS)는 회사 인증서를 거친다. starter.py와 같은 두 줄을 맨 위 import보다 먼저 둔다
+TRUSTSTORE = ("import truststore\n\n"
+              "truststore.inject_into_ssl()  # PC에 등록된 인증서(회사 인증서 포함)를 믿게 합니다. Langfuse보다 먼저 둡니다(지우지 않습니다)\n\n")
 
 
 def solution_source():
-    """원본 정답을 capstone/ 폴더 구성에 맞게 두 곳만 바꾼다. 바꿀 곳을 못 찾으면 멈춘다(조용히 틀리지 않게)."""
+    """원본 정답을 capstone/ 폴더 구성에 맞게 세 곳만 바꾼다. 바꿀 곳을 못 찾으면 멈춘다(조용히 틀리지 않게)."""
     src = SOLUTION.read_text(encoding="utf-8")
     head_old = src[src.index("사전 준비:"): src.index('"""', 10)]
     head_new = (f"실행 (저장소 맨 위에서, 터미널 두 개):\n"
@@ -41,7 +44,13 @@ def solution_source():
     for old, new in swaps:
         assert src.count(old) == 1, f"정답 코드에서 바꿀 곳을 찾지 못함: {old[:40]!r}"
         src = src.replace(old, new)
-    return src
+    first, end = "from deepagents import create_deep_agent", "\nload_dotenv()"
+    assert src.count(first) == 1 and src.count(end) == 1, "정답 코드에서 import 구획을 찾지 못함"
+    a, e = src.index(first), src.index(end)
+    block = [ln if not ln.startswith(("import ", "from "))
+             else ln.replace("# noqa: ", "# noqa: E402,", 1) if "# noqa: " in ln else ln + "  # noqa: E402"
+             for ln in src[a:e].split("\n")]
+    return src[:a] + TRUSTSTORE + "\n".join(block) + src[e:]
 
 
 def between(lines, start, end):
@@ -222,7 +231,10 @@ def build():
     nb.meta(TITLE_META)
     nb.code("from config.check import check_env\n\n# 값은 출력하지 않고, 필요한 설정 이름이 있는지만 봅니다\n"
             'check_env(["EMBED_PROVIDER", "RAG_PROVIDER", "LANGFUSE"])', kind="")
-    nb.code("from langfuse import get_client\n\n"
+    nb.code("import truststore\n\n"
+            "# 파이썬이 PC에 등록된 인증서(회사 인증서 포함)를 믿게 합니다. Langfuse보다 먼저 둡니다\n"
+            "truststore.inject_into_ssl()\n\n"
+            "from langfuse import get_client  # noqa: E402\n\n"
             "# Langfuse 키가 맞는지 한 번 확인합니다(키 값은 출력하지 않습니다)\n"
             'print("🟢 Langfuse 연결 확인" if get_client().auth_check() else "⛔ Langfuse 연결 실패: .env의 LANGFUSE_ 값 세 개를 확인하세요")',
             kind="")
@@ -416,7 +428,7 @@ def build():
     nb.code("%%writefile ../capstone/solution.py\n" + sol.rstrip("\n"), visible=True, kind="")
     nb.md(criteria(["정답 실행에서도 `[SDS-AI-RPT v2.1]` 보고서와 네 항목 점수가 나옵니다. 내 점수의 근거와 정답 점수의 근거를 비교해 차이 한 가지를 말할 수 있습니다."],
                    ["`error while attempting to bind on address` 또는 연결 오류가 납니다 → 5장의 서버 안내를 다시 봅니다."]))
-    nb.meta("- 정답 코드 셀은 원본 정답에 두 곳만 바꿨습니다(실행 명령 설명, Writer skill 경로). 사외 실행 종합 점수 0.90(원본 skill 경로), 0.93(바꾼 경로).\n"
+    nb.meta("- 정답 코드 셀은 원본 정답에 세 곳만 바꿨습니다(실행 명령 설명, Writer skill 경로, 맨 위 truststore 두 줄 — 사내망 Langfuse용, starter.py와 같음). 사외 실행 종합 점수 0.90(원본 skill 경로), 0.93(바꾼 경로).\n"
             "- `capstone/solution.py`는 `.gitignore` 대상이라 제작 저장소에 남지 않습니다.")
 
     nb.h(2, "9. 평가 기준")

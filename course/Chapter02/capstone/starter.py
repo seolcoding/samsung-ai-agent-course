@@ -21,22 +21,26 @@ import os
 from pathlib import Path
 from typing import Annotated, Literal
 
-from deepagents import create_deep_agent
-from deepagents.backends import FilesystemBackend
-from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage
-from langchain_core.tools import tool
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph import END, START, StateGraph
-from langgraph.graph.message import add_messages
-from langfuse import get_client
-from langfuse.langchain import CallbackHandler
-from pydantic import BaseModel
-from typing_extensions import TypedDict
+import truststore
 
-from config.llm import get_llm
-from config.ragaas import post_ragaas
+truststore.inject_into_ssl()  # PC에 등록된 인증서(회사 인증서 포함)를 믿게 합니다. Langfuse보다 먼저 둡니다(지우지 않습니다)
+
+from deepagents import create_deep_agent  # noqa: E402
+from deepagents.backends import FilesystemBackend  # noqa: E402
+from dotenv import load_dotenv  # noqa: E402
+from langchain_core.messages import HumanMessage  # noqa: E402
+from langchain_core.tools import tool  # noqa: E402
+from langchain_mcp_adapters.client import MultiServerMCPClient  # noqa: E402
+from langgraph.checkpoint.memory import MemorySaver  # noqa: E402
+from langgraph.graph import END, START, StateGraph  # noqa: E402
+from langgraph.graph.message import add_messages  # noqa: E402
+from langfuse import get_client  # noqa: E402
+from langfuse.langchain import CallbackHandler  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
+from typing_extensions import TypedDict  # noqa: E402
+
+from config.llm import get_llm  # noqa: E402
+from config.ragaas import post_ragaas  # noqa: E402
 
 load_dotenv()
 
