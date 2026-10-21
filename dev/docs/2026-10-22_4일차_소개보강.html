@@ -1,0 +1,743 @@
+<title>4일차 소개 보강</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700;900&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column like an instructor's cue sheet; each gap is a card with a cue box, explanation, figure, evidence. Slide navy/blue palette. */
+:root {
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --ink: #17213d;
+  --muted: #59637e;
+  --line: #d8deeb;
+  --accent: #2b50cf;
+  --accent-soft: #e7ecfb;
+  --cue-bg: #fdf6e3;
+  --cue-ink: #4a3a10;
+  --warn: #9a5b00;
+  --warn-bg: #fff1d9;
+  --ok: #1d7047;
+  --ok-bg: #e2f3e9;
+  --code-bg: #eef1f8;
+  --font-display: "Gothic A1", "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1323; --surface: #151c30; --ink: #e5e9f5; --muted: #9aa3bf; --line: #29324d;
+    --accent: #8ea8ff; --accent-soft: #1c2647; --cue-bg: #2a2410; --cue-ink: #f1e2b4;
+    --warn: #f0b45a; --warn-bg: #352710; --ok: #74d3a0; --ok-bg: #10301f; --code-bg: #101729;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1323; --surface: #151c30; --ink: #e5e9f5; --muted: #9aa3bf; --line: #29324d;
+  --accent: #8ea8ff; --accent-soft: #1c2647; --cue-bg: #2a2410; --cue-ink: #f1e2b4;
+  --warn: #f0b45a; --warn-bg: #352710; --ok: #74d3a0; --ok-bg: #10301f; --code-bg: #101729;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 780px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+.wrap > *, article.gap > * { min-width: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.3; margin: 0; }
+h1 { font-size: 1.9rem; font-weight: 900; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; font-weight: 900; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+code, pre, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--code-bg); padding: 0.05em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 0; overflow-x: auto; line-height: 1.55; white-space: pre; }
+pre code { background: none; padding: 0; font-size: inherit; }
+.src { font-size: 0.8rem; color: var(--muted); margin-top: 4px; overflow-wrap: anywhere; }
+
+header.top { padding-top: 28px; display: grid; gap: 10px; }
+.eyebrow { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.lede { color: var(--muted); max-width: 62ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.82rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+
+nav.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; border-bottom: 1px solid var(--line); }
+nav.jump ul { list-style: none; margin: 0 auto; padding: 0; max-width: 780px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+nav.jump a { display: inline-block; white-space: nowrap; text-decoration: none; font-size: 0.85rem; padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
+nav.jump a b { color: var(--accent); margin-right: 4px; font-family: var(--font-display); }
+
+.block-title { display: grid; gap: 4px; padding-top: 8px; border-top: 2px solid var(--ink); }
+.block-title .eyebrow { color: var(--accent); }
+
+article.gap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 16px; scroll-margin-top: 64px; min-width: 0; }
+.gap-head { display: grid; gap: 8px; }
+.gap-head h3 { display: flex; gap: 10px; align-items: baseline; }
+.letter { font-family: var(--font-display); font-weight: 900; color: var(--accent); font-size: 1.3rem; min-width: 1.1em; }
+.where { display: flex; flex-wrap: wrap; gap: 6px; }
+.where span { font-size: 0.78rem; padding: 1px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.cue { background: var(--cue-bg); color: var(--cue-ink); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; }
+.cue .label { font-size: 0.75rem; letter-spacing: 0.08em; font-weight: 700; }
+.cue p { font-size: 1.02rem; line-height: 1.75; }
+
+.sec { display: grid; gap: 10px; min-width: 0; }
+.sec > .k { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
+ul.plain { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+
+blockquote { margin: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); display: grid; gap: 6px; }
+blockquote .en { font-size: 0.92rem; }
+blockquote .ko { font-size: 0.88rem; color: var(--muted); }
+blockquote .ko::before { content: "풀어 쓴 것 · "; font-weight: 700; }
+blockquote cite { font-style: normal; font-size: 0.8rem; color: var(--muted); }
+
+figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+figure img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
+figure.slide img { max-width: 520px; }
+figcaption { font-size: 0.84rem; color: var(--muted); }
+figure svg { width: 100%; max-width: 520px; height: auto; color: var(--ink); }
+.d-box { fill: var(--surface); stroke: var(--line); stroke-width: 1.2; }
+.d-box-acc { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+.d-box-dash { fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.d-off { fill: var(--bg); stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.d-line { stroke: currentColor; stroke-width: 1.3; fill: none; }
+.d-head { fill: currentColor; }
+.d-t { fill: currentColor; font-family: var(--font-body); font-size: 11.5px; }
+.d-tb { fill: currentColor; font-family: var(--font-body); font-size: 12px; font-weight: 700; }
+.d-tm { fill: currentColor; font-family: var(--font-mono); font-size: 10.5px; }
+.d-mut { fill: var(--muted); font-family: var(--font-body); font-size: 10.5px; }
+.d-chip { fill: var(--accent); }
+.d-chip-t { fill: var(--surface); font-family: var(--font-body); font-size: 10.5px; font-weight: 700; }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { background: var(--bg); font-weight: 700; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: normal; }
+
+.anno { display: grid; gap: 6px; }
+.anno-row { display: grid; grid-template-columns: 7.5em 1fr; gap: 10px; align-items: start; }
+.anno-row .slot { font-size: 0.78rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: var(--accent-soft); text-align: center; }
+.anno-row .slot.none { background: var(--warn-bg); color: var(--warn); }
+.anno-row .txt { font-family: var(--font-mono); font-size: 0.8rem; background: var(--code-bg); border-radius: 6px; padding: 6px 10px; overflow-wrap: anywhere; min-width: 0; }
+.anno-row .txt.note { font-family: var(--font-body); font-size: 0.85rem; background: none; padding: 3px 0; color: var(--muted); }
+
+.box { border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; font-size: 0.92rem; }
+.box .label { font-size: 0.75rem; letter-spacing: 0.08em; font-weight: 700; }
+.box.warn { background: var(--warn-bg); }
+.box.warn .label { color: var(--warn); }
+.box.note { background: var(--accent-soft); }
+.box.note .label { color: var(--accent); }
+
+.tree { list-style: none; margin: 0; padding: 0; font-size: 0.88rem; display: grid; gap: 2px; }
+.tree ul { list-style: none; margin: 0; padding-left: 1.3em; border-left: 1px solid var(--line); display: grid; gap: 2px; }
+.tree li { padding: 2px 0; }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 0.7rem; padding: 0 6px; border-radius: 4px; margin-right: 6px; border: 1px solid currentColor; }
+.tag.chain { color: var(--muted); }
+.tag.agent { color: var(--accent); }
+.tag.gen { color: var(--ok); }
+.tag.tool { color: var(--warn); }
+.tag.span { color: var(--ink); }
+
+.ok { color: var(--ok); font-weight: 700; }
+footer { font-size: 0.82rem; color: var(--muted); }
+@media (max-width: 520px) {
+  article.gap { padding: 16px 14px; }
+  .anno-row { grid-template-columns: 1fr; gap: 4px; }
+  .anno-row .slot { justify-self: start; }
+  h1 { font-size: 1.6rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+html { scroll-behavior: smooth; }
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">14차수 · 2026-10-22 4일차 · 강사용</div>
+  <h1>4일차 소개 보강</h1>
+  <p class="lede">4-1 하네스와 4-2 Langfuse를 소개할 때 슬라이드만으로는 비는 일곱 곳을 메웁니다. 칸마다 위치, 그대로 말할 문장, 쉬운 설명, 그림, 근거를 둡니다. 근거는 2026-10-21에 직접 열어 확인한 자료와, 이 저장소의 설치된 패키지 소스로 맞춰 본 것만 씁니다.</p>
+  <div class="legend" aria-label="표시 보기">
+    <span>노란 칸 = 그대로 말할 문장</span>
+    <span>"풀어 쓴 것" = 원문을 한국어로 옮긴 것</span>
+    <span>주황 칸 = 확인 못 함·주의</span>
+  </div>
+</header>
+</div>
+
+<nav class="jump" aria-label="바로 가기">
+  <ul>
+    <li><a href="#a"><b>A</b>스킬 여는 원리</a></li>
+    <li><a href="#b"><b>B</b>create_deep_agent</a></li>
+    <li><a href="#c"><b>C</b>6칸과 SKILL.md</a></li>
+    <li><a href="#d"><b>D</b>검증·예외 처리</a></li>
+    <li><a href="#e"><b>E</b>왜 Langfuse</a></li>
+    <li><a href="#f"><b>F</b>용어</a></li>
+    <li><a href="#g"><b>G</b>점수 보는 곳</a></li>
+    <li><a href="#log">검증 기록</a></li>
+  </ul>
+</nav>
+
+<div class="wrap" style="padding-top:20px">
+
+<section class="block-title" aria-labelledby="t41">
+  <div class="eyebrow">블록 4-1 · 2H</div>
+  <h2 id="t41">하네스 엔지니어링</h2>
+</section>
+
+<!-- A -->
+<article class="gap" id="a">
+  <div class="gap-head">
+    <h3><span class="letter">A</span>스킬을 단계적으로 여는 원리</h3>
+    <div class="where"><span>LEC 4.1 · p16–17</span><span>LAB 2.1 볼 지점</span><span>LAB 4장 전체</span></div>
+  </div>
+
+  <div class="cue">
+    <div class="label">그대로 말하기</div>
+    <p>"Agent는 스킬마다 이름과 설명 한 줄만 먼저 봅니다. 요청이 그 설명과 맞는다고 판단할 때만 파일을 열어 본문을 읽습니다. 그래서 설명 한 줄이 이 스킬을 쓸지 말지를 정합니다."</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">쉬운 설명</div>
+    <p>슬라이드 p17은 "Agent는 필요한 Skill을 선택하고 해당 절차를 따른다"까지만 말합니다. 어떻게 고르는지가 빠져 있습니다. 답은 세 단계로 나눠 읽는 방식입니다. 이를 progressive disclosure(단계적 공개)라고 부릅니다.</p>
+    <ul class="plain">
+      <li><b>1단계:</b> 시작할 때 모든 스킬의 이름과 설명만 시스템 프롬프트에 들어갑니다. 책의 목차와 같습니다.</li>
+      <li><b>2단계:</b> 요청과 맞는 스킬이 있으면 Agent가 <code>read_file</code>로 SKILL.md 본문을 읽습니다. 해당 장을 펼치는 것과 같습니다.</li>
+      <li><b>3단계:</b> 본문이 가리키는 추가 파일이 있으면 그때 엽니다. 이 실습의 스킬에는 추가 파일이 없습니다.</li>
+    </ul>
+    <p>스킬이 수십 개여도 본문을 한꺼번에 넣지 않으니 모델이 읽을 양(토큰)이 줄어듭니다. 대신 설명이 모호하면 Agent가 스킬을 열지 않습니다. LAB 4.1은 일부러 그 사고를 내 보는 실습입니다.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 360 445" role="img" aria-label="4-1 실습 Agent가 스킬을 여는 흐름. 시스템 프롬프트에는 스킬 이름과 설명 한 줄만 있다. 설명이 요청과 맞으면 read_file로 본문을 읽고 DS 양식으로 답하고, 맞지 않으면 파일을 열지 않아 일반 형식으로 답한다.">
+      <defs>
+        <marker id="ah-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-head"/></marker>
+      </defs>
+      <rect x="10" y="10" width="340" height="88" rx="8" class="d-box-acc"/>
+      <text x="22" y="31" class="d-tb">시작할 때 시스템 프롬프트에 들어가는 것</text>
+      <rect x="290" y="17" width="52" height="19" rx="9" class="d-chip"/><text x="316" y="30.5" text-anchor="middle" class="d-chip-t">1단계</text>
+      <text x="22" y="52" class="d-t">· 우리 system_prompt (범위 밖은 거절)</text>
+      <text x="22" y="70" class="d-t">· samsung-ds-report: 설명 한 줄</text>
+      <text x="30" y="88" class="d-tm">→ Read /skills/samsung-ds-report/SKILL.md</text>
+      <line x1="180" y1="98" x2="180" y2="116" class="d-line" marker-end="url(#ah-a)"/>
+      <rect x="10" y="118" width="340" height="34" rx="8" class="d-box"/>
+      <text x="180" y="140" text-anchor="middle" class="d-t">요청: "…DS부문 보고서 양식으로 작성해줘"</text>
+      <line x1="180" y1="152" x2="180" y2="170" class="d-line" marker-end="url(#ah-a)"/>
+      <rect x="40" y="172" width="280" height="34" rx="17" class="d-box-dash"/>
+      <text x="180" y="194" text-anchor="middle" class="d-tb">모델 판단: 설명이 요청과 맞나?</text>
+      <polyline points="120,206 92,234" class="d-line" marker-end="url(#ah-a)"/>
+      <polyline points="240,206 268,234" class="d-line" marker-end="url(#ah-a)"/>
+      <text x="84" y="222" text-anchor="end" class="d-mut">맞다</text>
+      <text x="276" y="222" class="d-mut">안 맞다</text>
+
+      <rect x="10" y="236" width="165" height="42" rx="8" class="d-box"/>
+      <text x="92" y="253" text-anchor="middle" class="d-tm">read_file(SKILL.md)</text>
+      <text x="92" y="270" text-anchor="middle" class="d-mut">도구 호출</text>
+      <line x1="92" y1="278" x2="92" y2="294" class="d-line" marker-end="url(#ah-a)"/>
+      <rect x="10" y="296" width="165" height="54" rx="8" class="d-box-acc"/>
+      <rect x="117" y="302" width="52" height="19" rx="9" class="d-chip"/><text x="143" y="315.5" text-anchor="middle" class="d-chip-t">2단계</text>
+      <text x="20" y="318" class="d-tm">@@ lines 1-…</text>
+      <text x="20" y="340" class="d-t">본문 전체가 들어옴</text>
+      <line x1="92" y1="350" x2="92" y2="366" class="d-line" marker-end="url(#ah-a)"/>
+      <rect x="10" y="368" width="165" height="42" rx="8" class="d-box"/>
+      <text x="92" y="386" text-anchor="middle" class="d-tm">[DS-AI-RPT v2.1]</text>
+      <text x="92" y="402" text-anchor="middle" class="d-mut">양식대로 답</text>
+
+      <rect x="185" y="236" width="165" height="42" rx="8" class="d-off"/>
+      <text x="268" y="253" text-anchor="middle" class="d-t">파일을 열지 않음</text>
+      <text x="268" y="270" text-anchor="middle" class="d-mut">LAB 4.1에서 바꾼 설명</text>
+      <line x1="268" y1="278" x2="268" y2="294" class="d-line" marker-end="url(#ah-a)"/>
+      <rect x="185" y="296" width="165" height="54" rx="8" class="d-off"/>
+      <text x="268" y="318" text-anchor="middle" class="d-t">양식을 모르는 채로</text>
+      <text x="268" y="338" text-anchor="middle" class="d-t">답을 씀</text>
+      <line x1="268" y1="350" x2="268" y2="366" class="d-line" marker-end="url(#ah-a)"/>
+      <rect x="185" y="368" width="165" height="42" rx="8" class="d-off"/>
+      <text x="268" y="386" text-anchor="middle" class="d-t">일반 보고서 형식</text>
+      <text x="268" y="402" text-anchor="middle" class="d-mut">사외 4번 중 2번</text>
+      <text x="180" y="434" text-anchor="middle" class="d-mut">3단계(추가 파일)는 이 실습 스킬에 없음</text>
+    </svg>
+    <figcaption>직접 그린 그림. 1단계 줄은 deepagents 0.7.18이 실제로 만든 시스템 프롬프트에서, 오른쪽 갈래의 횟수는 LAB 4.1 "무슨 일이 생기나"(사외 모델 4번 실행)에서 옮겼습니다.</figcaption>
+  </figure>
+
+  <div class="sec">
+    <div class="k">우리 Agent가 실제로 받는 글</div>
+    <p>4-1 LAB과 같은 설정으로 Agent를 만들고, 모델 자리에 받은 글을 기록만 하는 가짜 모델을 넣어 첫 호출의 시스템 프롬프트를 꺼냈습니다. 이 글은 모델이 아니라 deepagents가 만드므로 사내 모델에서도 같습니다. 디버그 셀을 켜면 강사 화면에서 이 부분을 보여 줄 수 있습니다.</p>
+    <pre><code>코드 작성, 수학 계산 등 보고서·리서치 범위를 벗어난 요청은 정중히 거절한다.
+
+## Skills System
+…
+**Available Skills:**
+
+- **samsung-ds-report**: 삼성전자 DS부문 AI연구소 공식 보고서 작성 스킬. 사용자가 "보고서", "리포트", "DS 양식" 등을 언급하며 작성을 요청할 때 반드시 발동한다. …
+  -> Read `/skills/samsung-ds-report/SKILL.md` for full instructions
+
+**How to Use Skills (Progressive Disclosure):**
+
+Skills follow a **progressive disclosure** pattern - you see their name and description above, but only read full instructions when needed:</code></pre>
+    <p class="src">출처: deepagents 0.7.18 <code>SkillsMiddleware</code>가 만든 첫 호출 시스템 프롬프트(2,157자, 가짜 모델로 기록, 2026-10-21). 가운데는 줄였습니다.</p>
+    <p>모델이 스킬을 열면 도구 결과(<code>[ToolMessage]</code>)가 아래처럼 시작합니다. LAB 3.3의 "<code>@@ lines</code> 줄을 보라"는 안내가 이 줄입니다.</p>
+    <pre><code>[ToolMessage] @@ lines 1-72 of 72 @@
+---
+name: samsung-ds-report</code></pre>
+    <p class="src">같은 가짜 모델로 <code>read_file</code>을 한 번 부르게 해 LAB의 출력 방식(앞 200자)대로 찍은 것. 줄 수는 파일 상태에 따라 다릅니다.</p>
+  </div>
+
+  <figure>
+    <img src="2026-10-22_4일차_소개보강_assets/anthropic_progressive_disclosure.jpg" alt="Anthropic 글의 표. Level 1 SKILL.md Metadata (YAML)는 항상 로드, 약 100토큰. Level 2 SKILL.md Body는 스킬이 발동될 때 로드, 5k 미만. Level 3+ 묶음 파일은 필요할 때 로드." loading="lazy">
+    <figcaption>세 단계와 각 단계의 대략적인 토큰 양. 출처: Anthropic, <a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills">Equipping agents for the real world with Agent Skills</a> (2025-10-16) 본문 이미지.</figcaption>
+  </figure>
+  <figure>
+    <img src="2026-10-22_4일차_소개보강_assets/anthropic_context_window.jpg" alt="Skills and the Context Window. 시스템 프롬프트 옆에 스킬별 짧은 조각이 붙고, 사용자 요청 뒤 Claude가 SKILL.md를 cat으로 읽고, 다시 forms.md를 읽는 순서." loading="lazy">
+    <figcaption>같은 일이 대화 안에서 어떤 순서로 일어나는지. 우리 실습에서는 <code>cat</code> 대신 <code>read_file</code> 도구를 씁니다. 출처: 같은 글 본문 이미지.</figcaption>
+  </figure>
+
+  <div class="sec">
+    <div class="k">근거</div>
+    <blockquote>
+      <p class="en">"At startup, the agent pre-loads the name and description of every installed skill into its system prompt. This metadata is the first level of progressive disclosure: it provides just enough information for Claude to know when each skill should be used without loading all of it into context. The actual body of this file is the second level of detail. If Claude thinks the skill is relevant to the current task, it will load the skill by reading its full SKILL.md into context."</p>
+      <p class="ko">시작할 때 모든 스킬의 이름과 설명을 시스템 프롬프트에 미리 넣는다. 이것이 1단계다. 본문은 2단계로, 지금 일에 맞는다고 판단하면 SKILL.md 전체를 읽는다.</p>
+      <cite>Anthropic, <a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills">Equipping agents for the real world with Agent Skills</a></cite>
+    </blockquote>
+    <blockquote>
+      <p class="en">"Like a well-organized manual that starts with a table of contents, then specific chapters, and finally a detailed appendix, skills let Claude load information only as needed"</p>
+      <p class="ko">목차, 각 장, 부록 순서로 된 잘 정리된 설명서처럼, 필요한 만큼만 읽는다.</p>
+      <cite>같은 글</cite>
+    </blockquote>
+    <blockquote>
+      <p class="en">"Loading all instructions into the system prompt wastes tokens on information irrelevant to the current task, and providing the same guidance manually across sessions does not scale. Skills use progressive disclosure: the agent loads skill information in layers instead of all at once."</p>
+      <p class="ko">지시를 전부 시스템 프롬프트에 넣으면 지금 일과 상관없는 정보에 토큰을 쓴다. 그래서 스킬은 여러 층으로 나눠 읽는다.</p>
+      <cite>LangChain, <a href="https://docs.langchain.com/oss/python/deepagents/skills">Deep Agents · Skills</a> (실습이 쓰는 라이브러리의 공식 문서)</cite>
+    </blockquote>
+  </div>
+
+  <div class="box warn">
+    <div class="label">강사만 알아 둘 것</div>
+    <p>LAB 4장 SKILL.md 맨 위의 <code># ✍️ CHANGE_HERE: …</code> 줄은 1단계 목록에는 나오지 않습니다(YAML 주석이라 버려짐). 하지만 2단계에서 <code>read_file</code>로 파일을 열면 이 주석 줄도 그대로 모델에게 갑니다(위 가짜 모델 실험에서 확인). LAB 4장 글의 "Agent가 읽는 내용에 영향이 없습니다"는 1단계에만 맞는 말입니다. 수업에는 지장이 없습니다.</p>
+  </div>
+</article>
+
+<!-- B -->
+<article class="gap" id="b">
+  <div class="gap-head">
+    <h3><span class="letter">B</span><span><code>create_deep_agent</code>란 무엇인가</span></h3>
+    <div class="where"><span>LEC 5.2 · p22</span><span>LAB 3장 도입</span><span>LAB 3.3 출력의 <code>read_file</code></span></div>
+  </div>
+
+  <div class="cue">
+    <div class="label">그대로 말하기</div>
+    <p>"2일차에 <code>create_agent</code>로 모델이 도구를 부르고 결과를 보고 다시 판단하는 루프를 만들었습니다. <code>create_deep_agent</code>는 그 루프를 그대로 쓰고, 파일 도구와 스킬 목록 같은 장비를 미리 얹어 줍니다. 우리가 준 적 없는 <code>read_file</code>이 출력에 나오는 이유입니다."</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">쉬운 설명</div>
+    <p>설치된 deepagents 0.7.18 소스를 보면 <code>create_deep_agent</code>는 마지막에 LangChain의 <code>create_agent</code>를 부릅니다. 그 앞에서 미들웨어(모델을 부르기 전후에 끼어드는 장치)를 차곡차곡 쌓습니다. 하네스의 둘레를 코드로 미리 만들어 둔 셈입니다.</p>
+    <pre><code># 2일차 (M1 2-1 LAB 4.5 "create_agent로 한 번에 만들기")
+agent = create_agent(get_llm(), tools)</code></pre>
+    <p class="src">course/Chapter01/notebooks/2-1_langgraph_LAB.ipynb 4.5</p>
+    <pre><code># deepagents 0.7.18 graph.py, create_deep_agent의 끝 (줄임)
+    return create_agent(
+        model,
+        system_prompt=final_system_prompt,
+        tools=_tools,
+        middleware=deepagent_middleware,
+        …
+        checkpointer=checkpointer,
+        …
+    ).with_config(
+        {
+            "recursion_limit": 9_999,
+            …</code></pre>
+    <p class="src">.venv/lib/python3.12/site-packages/deepagents/graph.py (958행부터)</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 360 352" role="img" aria-label="create_deep_agent는 안쪽에 create_agent의 모델-도구 루프를 그대로 두고, 바깥에 스킬, 파일 도구, 하위 Agent, 대화 요약 장치를 얹는다.">
+      <defs>
+        <marker id="ah-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-head"/></marker>
+      </defs>
+      <rect x="8" y="8" width="344" height="336" rx="10" class="d-box"/>
+      <text x="20" y="30" class="d-tm" style="font-size:12px;font-weight:500">create_deep_agent(…)</text>
+      <text x="20" y="48" class="d-mut">LAB이 넘긴 값: model · tools · system_prompt</text>
+      <text x="20" y="62" class="d-mut">skills · backend · checkpointer</text>
+
+      <rect x="20" y="72" width="320" height="36" rx="6" class="d-box-acc"/>
+      <text x="30" y="87" class="d-tb" style="font-size:11px">SkillsMiddleware</text>
+      <text x="30" y="101" class="d-t" style="font-size:10.5px">스킬 이름·설명을 시스템 프롬프트에 넣음 (A)</text>
+
+      <rect x="20" y="114" width="320" height="50" rx="6" class="d-box-acc"/>
+      <text x="30" y="129" class="d-tb" style="font-size:11px">FilesystemMiddleware → 파일 도구</text>
+      <text x="30" y="144" class="d-tm" style="font-size:10px">ls · read_file · write_file · edit_file</text>
+      <text x="30" y="157" class="d-tm" style="font-size:10px">delete · glob · grep</text>
+
+      <rect x="20" y="170" width="320" height="36" rx="6" class="d-box-acc"/>
+      <text x="30" y="185" class="d-tb" style="font-size:11px">SubAgentMiddleware → task 도구</text>
+      <text x="30" y="199" class="d-t" style="font-size:10.5px">일을 하위 Agent에게 맡김</text>
+
+      <rect x="20" y="212" width="320" height="36" rx="6" class="d-box-acc"/>
+      <text x="30" y="227" class="d-tb" style="font-size:11px">Summarization</text>
+      <text x="30" y="241" class="d-t" style="font-size:10.5px">대화와 큰 도구 결과가 길어지면 줄임</text>
+
+      <rect x="20" y="258" width="320" height="76" rx="8" class="d-box-dash"/>
+      <text x="32" y="276" class="d-tb" style="font-size:11px">안쪽: create_agent 루프 (2일차와 같음)</text>
+      <rect x="44" y="288" width="96" height="34" rx="6" class="d-box"/>
+      <text x="92" y="309" text-anchor="middle" class="d-t">모델</text>
+      <rect x="220" y="288" width="96" height="34" rx="6" class="d-box"/>
+      <text x="268" y="309" text-anchor="middle" class="d-t">도구 9개</text>
+      <line x1="142" y1="298" x2="217" y2="298" class="d-line" marker-end="url(#ah-b)"/>
+      <line x1="217" y1="313" x2="142" y2="313" class="d-line" marker-end="url(#ah-b)"/>
+      <text x="180" y="294" text-anchor="middle" class="d-mut">도구 호출</text>
+      <text x="180" y="327" text-anchor="middle" class="d-mut">결과</text>
+    </svg>
+    <figcaption>직접 그린 그림. 쌓는 순서는 graph.py, 도구 목록은 LAB 3.2와 같은 설정으로 실제 만든 Agent에서 확인: <code>ls, read_file, write_file, edit_file, delete, glob, grep, task, search_web</code>(9개, 마지막만 우리가 준 것). 이 밖에 도구 호출 짝을 맞추는 내부 장치(PatchToolCalls)가 있습니다.</figcaption>
+  </figure>
+
+  <figure class="slide">
+    <img src="2026-10-22_4일차_소개보강_assets/slide_4-1_p22.jpg" alt="4-1 슬라이드 22쪽 create_deep_agent 소개. FilesystemBackend와 create_deep_agent 코드." loading="lazy">
+    <figcaption>4-1 슬라이드 p22. 슬라이드의 여섯 인자는 우리가 넘기는 값이고, 위 그림의 장비들은 함수가 알아서 얹는 것입니다.</figcaption>
+  </figure>
+
+  <div class="sec">
+    <div class="k">근거</div>
+    <blockquote>
+      <p class="en">"Deep Agents is an “agent harness”. It is the same core tool calling loop as other agent frameworks, but with built-in capabilities that make agents reliable for real tasks"</p>
+      <p class="ko">Deep Agents는 "에이전트 하네스"다. 다른 프레임워크와 같은 도구 호출 루프에, 실제 일을 믿고 맡길 수 있게 하는 기능을 미리 넣었다.</p>
+      <cite>LangChain, <a href="https://docs.langchain.com/oss/python/deepagents/overview">Deep Agents · Overview</a></cite>
+    </blockquote>
+    <blockquote>
+      <p class="en">"Starting in v0.7 task planning is opt-in only. In earlier versions, task planning middleware was included by default."</p>
+      <p class="ko">0.7부터 할 일 목록(계획) 기능은 직접 켜야 한다. 그 전 버전에는 기본으로 들어 있었다.</p>
+      <cite>같은 문서</cite>
+    </blockquote>
+  </div>
+
+  <div class="box warn">
+    <div class="label">주의: 옛 글·영상과 다른 점</div>
+    <p>0.7 전 버전에는 계획 도구 <code>write_todos</code>가 기본으로 들어 있었습니다(위 공식 문서). 그 시절 글이나 영상은 이것을 기본 기능으로 소개할 수 있습니다. 우리가 쓰는 0.7.18에는 없습니다(위 도구 목록에도 없음). 수강생이 "계획 도구는 어디 있나요?"라고 물으면 "이 버전부터는 직접 켜야 하고, 오늘 실습은 켜지 않았다"고 답합니다. <code>2026-10-22_4일차_강의준비.md</code> 6장 p22 줄의 "계획(todo)…기본으로 들어 있는 이유"도 이 버전에는 맞지 않습니다.</p>
+  </div>
+</article>
+
+<!-- C -->
+<article class="gap" id="c">
+  <div class="gap-head">
+    <h3><span class="letter">C</span>슬라이드 6칸은 SKILL.md의 어디인가</h3>
+    <div class="where"><span>LEC 4.2 · p18</span><span>LEC 4.3 · p20</span><span>LAB 2.1 SKILL.md</span></div>
+  </div>
+
+  <div class="cue">
+    <div class="label">그대로 말하기</div>
+    <p>"여섯 칸은 SKILL.md를 쓸 때 쓰는 점검표입니다. 우리 파일에서는 맨 위 설명에 '무엇을'과 '언제'가 들어 있고, 본문에 금지 규칙, 양식, 작성 규칙이 있습니다. 작업 순서 칸은 비어 있습니다. 그래서 검색을 몇 번 할지는 실행마다 다릅니다."</p>
+  </div>
+
+  <figure class="slide">
+    <img src="2026-10-22_4일차_소개보강_assets/slide_4-1_p18.jpg" alt="4-1 슬라이드 18쪽 SKILL.md의 기본 구조. 상단 정보: Description, When to use, Constraints. 수행 정보: Workflow, Examples, Verification." loading="lazy">
+    <figcaption>4-1 슬라이드 p18.</figcaption>
+  </figure>
+
+  <div class="sec">
+    <div class="k">LAB 2.1 SKILL.md에 대 보기</div>
+    <div class="anno" role="list">
+      <div class="anno-row" role="listitem"><span class="slot">Description</span><span class="txt">description: 삼성전자 DS부문 AI연구소 공식 보고서 작성 스킬.</span></div>
+      <div class="anno-row" role="listitem"><span class="slot">When to use</span><span class="txt">사용자가 "보고서", "리포트", "DS 양식" 등을 언급하며 작성을 요청할 때 반드시 발동한다.</span></div>
+      <div class="anno-row" role="listitem"><span class="slot">Constraints</span><span class="txt">이 양식은 삼성전자 DS부문 내부 표준으로, 다른 형식으로 작성하면 안 됩니다. / 섹션 코드([DS-...])는 생략하지 않습니다.</span></div>
+      <div class="anno-row" role="listitem"><span class="slot none">Workflow</span><span class="txt note">없음. "이 스킬이 발동되면 아래 DS-AI-RPT 양식을 반드시 사용합니다" 한 줄뿐, 검색 → 정리 → 작성 같은 순서는 적혀 있지 않습니다.</span></div>
+      <div class="anno-row" role="listitem"><span class="slot">Examples</span><span class="txt">[DS-AI-RPT v2.1] … ■ TL;DR … [DS-1.0] 개요 … [DS-END] 개정 이력</span></div>
+      <div class="anno-row" role="listitem"><span class="slot">Verification</span><span class="txt">## 작성 규칙 1. `[DS-AI-RPT v2.1]` 헤더로 시작합니다. … 5. `[DS-END]` 개정 이력 표로 마무리합니다.</span></div>
+    </div>
+    <p class="src">course/Chapter02/notebooks/4-1_harness_LAB.ipynb 2.1(SKILL.md 쓰기 셀)에서 글자 그대로 옮김. Examples는 입력 예시 없이 기대 결과의 모양(템플릿)만 있습니다. 작성 규칙 다섯 줄은 결과를 보고 하나씩 맞는지 볼 수 있어 Verification에 해당합니다(판단).</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">가장 중요한 한 가지</div>
+    <p>슬라이드는 When to use를 별도 칸으로 그리지만, Agent가 미리 보는 것은 <code>name</code>과 <code>description</code>뿐입니다(A). 그래서 "언제 쓰는지"는 반드시 description 안에 써야 합니다. p20의 "언제 사용하지 않아야 하는지"도 마찬가지입니다. LAB 4.1의 바꿔 볼 값이 바로 description에 "쓰지 않을 때"를 넣는 실험입니다.</p>
+    <pre><code>회의록 요약 전용 스킬. 보고서·리포트·DS 양식 작성 요청에는 이 파일을 읽지 말고 일반 형식으로 답한다.</code></pre>
+    <p class="src">LAB 4.1 바꿔 볼 값</p>
+    <blockquote>
+      <p class="en">"Describes what the skill does and when to use it."</p>
+      <p class="ko">description 칸에는 스킬이 무엇을 하는지와 언제 쓰는지를 쓴다. (필수, 1024자 이하)</p>
+      <cite><a href="https://agentskills.io/specification">Agent Skills Specification</a> · description 필드. deepagents도 같은 1024자 제한을 씁니다(middleware/skills.py).</cite>
+    </blockquote>
+  </div>
+
+  <figure>
+    <img src="2026-10-22_4일차_소개보강_assets/anthropic_skill_anatomy.jpg" alt="A simple SKILL.md file. 위쪽 YAML Frontmatter에 name과 description, 아래쪽 Markdown 본문." loading="lazy">
+    <figcaption>위 칸(YAML frontmatter)이 1단계로 미리 읽히고, 아래 칸(Markdown 본문)이 2단계로 열립니다. 출처: Anthropic, <a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills">Equipping agents for the real world with Agent Skills</a> 본문 이미지.</figcaption>
+  </figure>
+</article>
+
+<!-- D -->
+<article class="gap" id="d">
+  <div class="gap-head">
+    <h3><span class="letter">D</span>하네스 5단계 중 검증·예외 처리는 실습 어디에</h3>
+    <div class="where"><span>LEC 2.3 · p10</span><span>LAB 2.1 볼 지점</span><span>LAB 3.3 <code>chat()</code></span></div>
+  </div>
+
+  <div class="cue">
+    <div class="label">그대로 말하기</div>
+    <p>"오늘 실습의 검증은 사람이 합니다. 답이 <code>[DS-AI-RPT v2.1]</code>로 시작하는지, 도구 결과에 <code>@@ lines</code> 줄이 있는지 눈으로 봅니다. 예외 처리는 두 가지입니다. 범위 밖 요청은 시스템 프롬프트로 거절하고, 끝나지 않는 반복은 <code>recursion_limit</code> 40에서 끊습니다. 검증을 코드와 LLM에게 맡기는 법은 다음 시간 4-2에서 합니다."</p>
+  </div>
+
+  <figure class="slide">
+    <img src="2026-10-22_4일차_소개보강_assets/slide_4-1_p10.jpg" alt="4-1 슬라이드 10쪽 하네스 설계의 기본 순서. 목표 정의, 작업 분해, 도구 연결, 검증 설계, 예외 처리." loading="lazy">
+    <figcaption>4-1 슬라이드 p10.</figcaption>
+  </figure>
+
+  <div class="sec">
+    <div class="k">5단계를 4-1 LAB에 대 보기</div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>단계</th><th>LAB에서 하는 곳</th><th>누가</th></tr></thead>
+        <tbody>
+          <tr><td>1 목표 정의</td><td>사례 1 요청 문장, <code>system_prompt</code>의 범위</td><td>사람(코드)</td></tr>
+          <tr><td>2 작업 분해</td><td>정해 두지 않음. Agent가 SKILL.md 읽기 → 검색 → 작성을 스스로 정함(3.3 볼 지점)</td><td>모델</td></tr>
+          <tr><td>3 도구 연결</td><td><code>tools=[search_web]</code>, <code>backend</code>(파일 도구), <code>skills</code></td><td>사람(코드)</td></tr>
+          <tr><td>4 검증 설계</td><td>기준은 SKILL.md 작성 규칙 1~5. 확인은 사람이 눈으로: 헤더(2.1 볼 지점), <code>@@ lines</code> 줄(4.1)</td><td>사람</td></tr>
+          <tr><td>5 예외 처리</td><td>범위 밖 → 거절(3.2 <code>system_prompt</code>). 반복이 안 끝나면 → <code>recursion_limit: 40</code>(3.3)</td><td>코드·모델</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre><code>def chat(session_id: str, message: str) -> str:
+    # recursion_limit: LangGraph 노드 실행 횟수 상한 — 기본값 25, 무한루프 방지
+    config = {"configurable": {"thread_id": session_id}, "recursion_limit": 40}</code></pre>
+    <p class="src">course/Chapter02/notebooks/4-1_harness_LAB.ipynb 3.3</p>
+    <p>5단계의 "사람에게 물을지"는 4-1 실습에 없습니다. <code>create_deep_agent</code>에는 그런 멈춤을 거는 <code>interrupt_on</code> 인자가 있지만 이 실습은 쓰지 않습니다(graph.py 함수 정의에서 확인).</p>
+  </div>
+
+  <div class="box note">
+    <div class="label">확인한 것: 40이 실제로 끊는다</div>
+    <p>항상 도구만 부르는 가짜 모델로 LAB과 같은 Agent를 돌렸더니, 모델을 19번 부른 뒤 <code>GraphRecursionError: Recursion limit of 40 reached without hitting a stop condition.</code>로 멈췄습니다. 조용히 도는 대신 오류로 멈추는 것이 이 실습의 예외 처리입니다.</p>
+    <p>LAB 주석의 "기본값 25"는 LangGraph 일반 기본값(langchain-core <code>DEFAULT_RECURSION_LIMIT = 25</code>)입니다. <code>create_deep_agent</code>는 기본값을 <code>9_999</code>로 올려 두므로(B의 코드), 40을 넘기지 않으면 사실상 상한이 없습니다. 실행할 때 넘긴 40이 9,999를 덮어씁니다(langchain-core <code>merge_configs</code>).</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">근거</div>
+    <blockquote>
+      <p class="en">"The task often terminates upon completion, but it’s also common to include stopping conditions (such as a maximum number of iterations) to maintain control."</p>
+      <p class="ko">일이 끝나면 멈추지만, 통제를 위해 최대 반복 횟수 같은 멈춤 조건을 함께 두는 경우가 많다.</p>
+      <cite>Anthropic, <a href="https://www.anthropic.com/engineering/building-effective-agents">Building effective agents</a> (2024-12-19, 슬라이드 p11~15의 원전)</cite>
+    </blockquote>
+    <blockquote>
+      <p class="en">"Guides (feedforward controls) - anticipate the agent's behaviour and aim to steer it before it acts. … Sensors (feedback controls) - observe after the agent acts and help it self-correct."</p>
+      <p class="ko">앞에서 이끄는 장치(가이드)는 Agent가 움직이기 전에 방향을 잡고, 뒤에서 보는 장치(센서)는 움직인 뒤 결과를 보고 고치게 한다.</p>
+      <cite>Birgitta Böckeler, <a href="https://martinfowler.com/articles/harness-engineering.html">Harness engineering for coding agent users</a> (martinfowler.com, 2026-04-02). 가운데 문장은 줄였습니다.</cite>
+    </blockquote>
+    <p>이 틀로 보면 오늘 실습의 SKILL.md와 시스템 프롬프트는 가이드이고, 헤더·<code>@@ lines</code> 확인은 센서입니다. 센서를 사람이 아니라 코드와 LLM이 맡는 것이 4-2의 점수입니다(이 대응은 판단).</p>
+  </div>
+</article>
+
+<section class="block-title" aria-labelledby="t42">
+  <div class="eyebrow">블록 4-2 · 2H</div>
+  <h2 id="t42">Langfuse 관측성·평가</h2>
+</section>
+
+<!-- E -->
+<article class="gap" id="e">
+  <div class="gap-head">
+    <h3><span class="letter">E</span>print로도 보이는데 왜 Langfuse인가</h3>
+    <div class="where"><span>LEC 1.2 · p5</span><span>LAB 첫 안내</span><span>LAB 2장 디버그 셀</span></div>
+  </div>
+
+  <div class="cue">
+    <div class="label">그대로 말하기</div>
+    <p>"디버그 출력은 지금 내 셀 아래에만 있고, 셀을 다시 돌리면 사라집니다. Langfuse는 실행마다 기록을 서버에 남깁니다. 그래서 나중에 다시 찾고, 어제와 오늘을 비교하고, 그 기록에 점수를 붙일 수 있습니다."</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">쉬운 설명</div>
+    <p>4-2 LAB 첫머리에 "셀의 출력은 기록을 붙이든 안 붙이든 똑같이 보입니다"라고 적혀 있습니다. 차이는 셀 밖에서 생깁니다. 4-1에서 <code>@@ lines</code> 줄을 출력 더미에서 눈으로 찾았던 일을 Langfuse에서는 트리를 눌러 확인합니다.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th>print·디버그 셀</th><th>Langfuse</th></tr></thead>
+        <tbody>
+          <tr><td>남는 곳</td><td>내 셀 출력. 다시 실행하면 바뀜</td><td>Langfuse 프로젝트에 trace로 남음</td></tr>
+          <tr><td>찾기</td><td>긴 출력을 스크롤</td><td>Tracing 목록에서 이름·시각·입력으로 거름(LAB 첫 안내)</td></tr>
+          <tr><td>모양</td><td>단계가 한 줄씩 이어짐</td><td>단계가 부모·자식 트리로, 단계별 시간·토큰과 함께</td></tr>
+          <tr><td>점수</td><td>없음</td><td><code>create_score</code>로 trace에 붙임(5~8장)</td></tr>
+          <tr><td>여러 사람</td><td>내 화면에만</td><td>같은 프로젝트를 함께 봄</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <figure class="slide">
+    <img src="2026-10-22_4일차_소개보강_assets/slide_4-2_p5.jpg" alt="4-2 슬라이드 5쪽 Langfuse (2). 실제로 모델에 전달된 프롬프트, 도구 입력, 지연시간과 비용, 실패 원인을 확인해야 한다. Trace는 무엇이 잘못됐는가를 감으로 추측하지 않고 실행 기록으로 확인하게 만든다." loading="lazy">
+    <figcaption>4-2 슬라이드 p5.</figcaption>
+  </figure>
+
+  <div class="sec">
+    <div class="k">근거</div>
+    <blockquote>
+      <p class="en">"Generative AI systems are inherently non-deterministic. Therefore, debugging your application without any observability tool is more like guesswork."</p>
+      <p class="ko">생성형 AI는 같은 입력에도 결과가 달라질 수 있다. 그래서 관측 도구 없이 디버깅하면 짐작에 가깝다.</p>
+      <cite>Langfuse, <a href="https://langfuse.com/docs/observability/overview">Observability &amp; Application Tracing</a></cite>
+    </blockquote>
+    <blockquote>
+      <p class="en">"The core of this is application tracing — structured logs of every request that capture the exact prompt sent, the model's response, token usage, latency, and any tools or retrieval steps in between."</p>
+      <p class="ko">핵심은 요청마다 남기는 구조화된 기록이다. 실제로 보낸 프롬프트, 모델의 답, 토큰, 걸린 시간, 중간의 도구·검색 단계가 담긴다.</p>
+      <cite>같은 문서</cite>
+    </blockquote>
+  </div>
+</article>
+
+<!-- F -->
+<article class="gap" id="f">
+  <div class="gap-head">
+    <h3><span class="letter">F</span>trace · observation · span · generation · score</h3>
+    <div class="where"><span>LEC 1.3 · p6</span><span>LEC 1.5 · p8</span><span>LAB 2~4장</span><span>LAB 5~8장</span></div>
+  </div>
+
+  <div class="cue">
+    <div class="label">그대로 말하기</div>
+    <p>"trace는 요청 하나의 영수증입니다. 영수증의 줄 하나하나를 observation이라고 하고, 그중 모델을 부른 줄이 generation입니다. 토큰과 비용은 generation 줄에 적힙니다. span은 걸린 시간만 있는 일반 줄이고, score는 영수증에 붙이는 평가 점수입니다."</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">정의 (원문은 Langfuse 문서)</div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>용어</th><th>문서 원문</th><th>쉬운 말</th><th>4-2 LAB에서</th></tr></thead>
+        <tbody>
+          <tr><td><b>trace</b></td><td>"A trace represents a single request or operation, for example one chatbot interaction from the user's question to the final response."</td><td>요청 하나의 전체 기록</td><td>2장: <code>invoke</code> 한 번에 trace 하나</td></tr>
+          <tr><td><b>observation</b></td><td>"Observations are the individual steps of your application: LLM calls, tool calls, retrieval steps, and so on. They can be nested to reflect the structure of your application"</td><td>trace 안의 한 단계. 트리의 한 줄</td><td>트리의 모든 줄</td></tr>
+          <tr><td><b>span</b></td><td>"span is the generic observation type for durations of units of work in a trace."</td><td>시작과 끝(걸린 시간)이 있는 일반 단계</td><td>4장 <code>@observe</code> 함수(<code>retrieve-documents</code> 등)</td></tr>
+          <tr><td><b>generation</b></td><td>"generation logs generations of AI models incl. prompts, token usage and costs"</td><td>모델 호출 단계. 프롬프트·토큰·비용이 붙음</td><td><code>ChatOpenAI</code> 줄</td></tr>
+          <tr><td><b>score</b></td><td>"Scores are Langfuse's universal data object for storing evaluation results."</td><td>평가 결과. 이름·값을 trace에 붙임</td><td>5~8장 <code>create_score</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src">출처: <a href="https://langfuse.com/docs/observability/data-model">Observability Data Model</a>(trace, observation), <a href="https://langfuse.com/docs/observability/features/observation-types">Observation Types</a>(span, generation), <a href="https://langfuse.com/docs/evaluation/core-concepts">Evaluation Core Concepts</a>(score). 모두 글자 그대로.</p>
+    <p>슬라이드 p8은 <code>@observe</code>가 "Trace 또는 Span"을 만든다고 합니다. 헷갈리면 이 문장으로 정리합니다: "(Langfuse calls spans observations; span is also a specific observation type.)" 즉 span은 넓게는 단계 전체를, 좁게는 그중 한 종류를 가리킵니다(<a href="https://langfuse.com/docs/observability/data-model">Data Model</a>).</p>
+    <p>score는 "Every score has a name, a value, and a data type (NUMERIC, CATEGORICAL, BOOLEAN, or TEXT)."입니다(<a href="https://langfuse.com/docs/evaluation/core-concepts">Core Concepts</a>). LAB의 점수는 모두 숫자(0.0~1.0)입니다.</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">LAB 3장 trace에서 보일 모양</div>
+    <ul class="tree" aria-label="LAB 3장 LangGraph trace의 단계 트리">
+      <li><span class="tag chain">chain</span><b>LangGraph</b> <span class="src">trace 이름</span>
+        <ul>
+          <li><span class="tag agent">agent</span>agent <span class="src">노드 이름에 agent가 있어 agent로 표시</span>
+            <ul><li><span class="tag gen">generation</span>ChatOpenAI <span class="src">토큰·시간</span></li></ul>
+          </li>
+          <li><span class="tag chain">chain</span>tools_condition <span class="src">도구를 부를지 끝낼지</span></li>
+          <li><span class="tag chain">chain</span>tools
+            <ul><li><span class="tag tool">tool</span>get_weather <span class="src">입력: 도시 이름</span></li></ul>
+          </li>
+          <li><span class="tag agent">agent</span>agent
+            <ul><li><span class="tag gen">generation</span>ChatOpenAI <span class="src">최종 답</span></li></ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <p class="src">단계 이름과 순서는 LAB 3.3 볼 지점에서, 종류 표시는 설치된 Langfuse SDK 4.15.4의 <code>CallbackHandler</code> 규칙(이 이름들로 함수를 직접 불러 확인)에서 옮겼습니다: 모델 호출 → generation, <code>@tool</code> → tool, 체인·노드 → chain(이름에 agent가 들어가면 agent), <code>@observe</code> 기본 → span. 화면의 실제 아이콘은 아침에 확인하세요.</p>
+  </div>
+
+  <figure>
+    <img src="2026-10-22_4일차_소개보강_assets/langfuse_tracing_overview.png" alt="Langfuse Tracing 화면. 왼쪽은 trace 목록과 Type 필터(SPAN, GENERATION), 가운데는 단계 트리, 오른쪽은 선택한 단계의 Input·Output과 Preview·Scores·Log View 탭." loading="lazy">
+    <figcaption>Langfuse 문서의 trace 예시 화면. 왼쪽 필터에 SPAN·GENERATION 종류가, 가운데에 부모·자식 트리가, 오른쪽에 선택한 단계의 입력·출력이 보입니다. 출처: <a href="https://langfuse.com/docs/observability/overview">Observability &amp; Application Tracing</a> 본문 이미지.</figcaption>
+  </figure>
+
+  <figure class="slide">
+    <img src="2026-10-22_4일차_소개보강_assets/slide_4-2_p8.jpg" alt="4-2 슬라이드 8쪽 @observe. 일반 Python 함수를 Langfuse Trace 또는 Span으로 기록하는 데코레이터." loading="lazy">
+    <figcaption>4-2 슬라이드 p8.</figcaption>
+  </figure>
+</article>
+
+<!-- G -->
+<article class="gap" id="g">
+  <div class="gap-head">
+    <h3><span class="letter">G</span>점수(Scores)는 화면 어디에 보이나</h3>
+    <div class="where"><span>LEC 2.1 · p10</span><span>LAB 첫 안내 "[Scores] 탭"</span><span>LAB 5~8장</span></div>
+  </div>
+
+  <div class="cue">
+    <div class="label">그대로 말하기</div>
+    <p>"점수는 두 곳에서 봅니다. trace 하나를 열면 그 기록에 붙은 점수가 보이고, 왼쪽 메뉴의 Scores에서는 모든 점수를 모아 봅니다. 코드 출력에 나오는 '[Scores] 탭'은 이 Scores 메뉴를 말합니다."</p>
+  </div>
+
+  <div class="sec">
+    <div class="k">세 군데 (공식 문서 기준)</div>
+    <ul class="plain">
+      <li><b>trace 안:</b> trace를 열면 이름 옆에 점수 표시가 붙고, 오른쪽 자세히 보기 칸에 <b>Scores</b> 탭이 있습니다(아래 두 화면).</li>
+      <li><b>목록에서 거르기:</b> Tracing 검색 칸 예시에 <code>scores.accuracy:&gt;0.8</code>가 있습니다. 점수로 trace를 거를 수 있다는 뜻입니다(위 F의 화면 맨 위).</li>
+      <li><b>Scores 메뉴:</b> 모든 점수를 모아 보는 곳입니다. Analytics 탭에서 점수의 분포와 추이를 봅니다.</li>
+    </ul>
+    <blockquote>
+      <p class="en">"Go to your project in Langfuse · Click on Scores in the navigation menu · Select the Analytics tab"</p>
+      <p class="ko">프로젝트를 열고, 메뉴에서 Scores를 누르고, Analytics 탭을 고른다.</p>
+      <cite>Langfuse, <a href="https://langfuse.com/docs/evaluation/scores/score-analytics">Score Analytics</a> · Navigate to Score Analytics (세 단계 목록을 한 줄로 이음)</cite>
+    </blockquote>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>LAB 장</th><th>점수 이름</th><th>누가 매기나</th></tr></thead>
+        <tbody>
+          <tr><td>5장</td><td><code>has-example</code></td><td>코드(규칙)</td></tr>
+          <tr><td>6장</td><td><code>llm-judge-quality</code></td><td>LLM Judge</td></tr>
+          <tr><td>7장</td><td><code>user-feedback</code></td><td>사람(좋아요를 가정)</td></tr>
+          <tr><td>8장</td><td><code>correctness</code> · <code>relevance</code> · <code>completeness</code></td><td>LLM Judge(세 기준)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src">4-2 LAB 5~8장 코드에서 옮김. 6장 Judge 호출은 기록하지 않으므로 Judge의 trace는 따로 없고, 점수만 답변 trace에 붙습니다(LAB 6장 안내).</p>
+  </div>
+
+  <figure>
+    <img src="2026-10-22_4일차_소개보강_assets/langfuse_langgraph_trace_score.png" alt="LangGraph trace 화면. 맨 위 research_agent 줄 옆에 user-explicit 점수 1.00이 빨간 상자로 표시되어 있고, 오른쪽 칸에 Preview와 Scores 탭이 있다." loading="lazy">
+    <figcaption>trace에 붙은 점수(빨간 상자)와 오른쪽 Scores 탭. 2024년 7월 화면이라 지금과 모양이 다를 수 있습니다. 출처: Langfuse, <a href="https://langfuse.com/guides/cookbook/integration_langgraph">LangGraph 연동 cookbook</a>의 "Trace view including added score" 이미지.</figcaption>
+  </figure>
+  <figure>
+    <img src="2026-10-22_4일차_소개보강_assets/langfuse_score_analytics.png" alt="Langfuse Scores 페이지의 Analytics 탭. 왼쪽에 아이콘만 있는 메뉴, 위쪽에 Scores와 Analytics 탭, Statistics, Trend Over Time, Distribution 카드." loading="lazy">
+    <figcaption>Scores 메뉴 → Analytics 탭. 왼쪽 메뉴가 아이콘만 보이게 접혀 있으면 이름이 안 보이니, 메뉴를 펼쳐 보여 주세요. 출처: <a href="https://langfuse.com/docs/evaluation/scores/score-analytics">Score Analytics</a> 본문 이미지(가로 1600px로 줄임).</figcaption>
+  </figure>
+
+  <div class="box warn">
+    <div class="label">확인 못 함 · 아침에 강사 화면으로</div>
+    <p>위는 Langfuse 공식 문서의 화면입니다. 강의장에서 쓰는 Langfuse 화면에서 다음을 직접 확인하지 못했습니다.</p>
+    <ul class="plain">
+      <li>왼쪽 메뉴에서 Scores의 정확한 위치와 이름(메뉴 묶음 아래에 있을 수 있음)</li>
+      <li>trace 자세히 보기의 Scores 탭 이름과 자리</li>
+      <li>8장처럼 점수가 세 개 붙은 trace에서 점수가 어떻게 늘어서 보이는지</li>
+    </ul>
+    <p>영상으로 미리 보려면 Langfuse 공식 채널의 <a href="https://www.youtube.com/watch?v=THfB4p2xCFY">Langfuse Walkthrough – Full Demo of Agent Tracing, Evals, Experiments and Prompt Management</a>를 훑어보세요. 몇 분쯤에 Scores가 나오는지는 확인하지 못했습니다.</p>
+  </div>
+</article>
+
+<!-- log -->
+<section class="sec" id="log" style="scroll-margin-top:64px">
+  <h2>검증 기록</h2>
+  <p class="src">외부 자료는 curl로 상태 200을 본 뒤 원문 HTML에서 인용문을 글자 그대로 찾아 대조했습니다. 이미지는 내려받아 열어 무엇이 보이는지 확인했습니다. 패키지 동작은 이 저장소 <code>.venv</code>의 설치된 소스와 가짜 모델 실행으로 확인했습니다(실제 모델·Langfuse 서버는 쓰지 않음).</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>자료</th><th>URL·경로</th><th>확인 방법</th><th>확인 날짜</th></tr></thead>
+      <tbody>
+        <tr><td>Anthropic, Equipping agents for the real world with Agent Skills (2025-10-16)</td><td><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills">anthropic.com/engineering/…agent-skills</a></td><td>200, 인용 3개 원문 대조, 본문 이미지 3장 내려받아 확인(alt 일치)</td><td>2026-10-21</td></tr>
+        <tr><td>Agent Skills Specification</td><td><a href="https://agentskills.io/specification">agentskills.io/specification</a></td><td>200, description 규칙 원문 대조</td><td>2026-10-21</td></tr>
+        <tr><td>LangChain, Deep Agents · Skills</td><td><a href="https://docs.langchain.com/oss/python/deepagents/skills">docs.langchain.com/…/deepagents/skills</a></td><td>200, 인용 원문 대조, 세 단계 표 확인</td><td>2026-10-21</td></tr>
+        <tr><td>LangChain, Deep Agents · Overview</td><td><a href="https://docs.langchain.com/oss/python/deepagents/overview">docs.langchain.com/…/deepagents/overview</a></td><td>200, "agent harness"·"Starting in v0.7" 원문 대조</td><td>2026-10-21</td></tr>
+        <tr><td>deepagents 0.7.18 설치 소스</td><td><code>.venv/…/deepagents/graph.py</code>, <code>middleware/skills.py</code></td><td>소스 읽기. LAB 3.2 설정 + 가짜 모델로 도구 9개·시스템 프롬프트·<code>read_file</code> 출력·recursion_limit 40 멈춤 실행 확인</td><td>2026-10-21</td></tr>
+        <tr><td>langchain-core 설치 소스</td><td><code>.venv/…/langchain_core/runnables/config.py</code></td><td><code>DEFAULT_RECURSION_LIMIT = 25</code>, <code>merge_configs</code>의 recursion_limit 규칙 확인</td><td>2026-10-21</td></tr>
+        <tr><td>Anthropic, Building effective agents (2024-12-19)</td><td><a href="https://www.anthropic.com/engineering/building-effective-agents">anthropic.com/engineering/building-effective-agents</a></td><td>200, stopping conditions 문장 원문 대조</td><td>2026-10-21</td></tr>
+        <tr><td>Böckeler, Harness engineering for coding agent users (2026-04-02)</td><td><a href="https://martinfowler.com/articles/harness-engineering.html">martinfowler.com/articles/harness-engineering.html</a></td><td>200, Guides·Sensors 문장 원문 대조</td><td>2026-10-21</td></tr>
+        <tr><td>Langfuse, Observability &amp; Application Tracing</td><td><a href="https://langfuse.com/docs/observability/overview">langfuse.com/docs/observability/overview</a></td><td>200, 인용 2개 원문 대조, 이미지 내려받아 확인</td><td>2026-10-21</td></tr>
+        <tr><td>Langfuse, Observability Data Model</td><td><a href="https://langfuse.com/docs/observability/data-model">langfuse.com/docs/observability/data-model</a></td><td>200, trace·observation 정의 원문 대조</td><td>2026-10-21</td></tr>
+        <tr><td>Langfuse, Observation Types</td><td><a href="https://langfuse.com/docs/observability/features/observation-types">langfuse.com/docs/…/observation-types</a></td><td>200, span·generation 정의 원문 대조</td><td>2026-10-21</td></tr>
+        <tr><td>Langfuse, Evaluation Core Concepts</td><td><a href="https://langfuse.com/docs/evaluation/core-concepts">langfuse.com/docs/evaluation/core-concepts</a></td><td>200, Scores 정의 원문 대조</td><td>2026-10-21</td></tr>
+        <tr><td>Langfuse, Score Analytics</td><td><a href="https://langfuse.com/docs/evaluation/scores/score-analytics">langfuse.com/docs/evaluation/scores/score-analytics</a></td><td>200, 이동 순서 원문 대조, 이미지 내려받아 확인</td><td>2026-10-21</td></tr>
+        <tr><td>Langfuse, LangGraph 연동 cookbook</td><td><a href="https://langfuse.com/guides/cookbook/integration_langgraph">langfuse.com/guides/cookbook/integration_langgraph</a></td><td>200, 점수 붙은 trace 이미지 내려받아 확인(alt 일치)</td><td>2026-10-21</td></tr>
+        <tr><td>Langfuse SDK 4.15.4 설치 소스</td><td><code>.venv/…/langfuse/langchain/CallbackHandler.py</code>, <code>_client/observe.py</code></td><td>observation 종류 정하는 규칙, <code>@observe</code> 기본값 span 확인</td><td>2026-10-21</td></tr>
+        <tr><td>YouTube, Langfuse Walkthrough (Langfuse 채널)</td><td><a href="https://www.youtube.com/watch?v=THfB4p2xCFY">youtube.com/watch?v=THfB4p2xCFY</a></td><td>oEmbed로 제목·채널 확인. 내용·시점은 확인 안 함</td><td>2026-10-21</td></tr>
+        <tr><td>우리 슬라이드 4-1·4-2</td><td><code>course/Chapter02/slides/day02/4-1-…pdf</code>, <code>4-2-…pdf</code></td><td>pdftotext로 글 확인, p10·p18·p22, p5·p8 렌더링</td><td>2026-10-21</td></tr>
+        <tr><td>우리 노트북·스킬</td><td><code>course/Chapter02/notebooks/4-1_harness_*</code>, <code>4-2_observability_*</code>, <code>course/Chapter01/notebooks/2-1_langgraph_LAB.ipynb</code></td><td>셀 글·코드 대조, SKILL.md 원문 대조</td><td>2026-10-21</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <p>파일: <code>dev/docs/2026-10-22_4일차_소개보강.html</code> · 그림 원본: <code>dev/docs/2026-10-22_4일차_소개보강_assets/</code></p>
+</footer>
+</div>
