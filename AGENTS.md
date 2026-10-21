@@ -47,8 +47,7 @@
 
 ## 7. 알려진 결함과 미확인
 
-- 사내 게이트웨이의 도구 호출(`bind_tools`)·구조화 출력이 확인되지 않았다. M2는 거의 전부 도구 호출이라 사전 점검 1순위다.
-- 사내 Responses API(1-2·1-3), 사내 임베딩(다국어), RAGaaS, 사내 Langfuse도 미확인이다.
+- 2026-10-21 사내에서 M2 실습(도구 호출 포함)이 다 동작하고 Langfuse에 trace가 올라가는 것을 강사가 확인했다. 3-2 DART 연결도 확인.
 - RAGaaS는 `RAG_API_KEY` 전역변수와 요청 헤더 `'api-key'`가 둘 다 있어야 인증된다.
 - 받은 원본 코드의 결함(HITL 거부 때 메일 전송, MCP SSE/stdio 어긋남, 3-4 `compile()` 누락 등)은 노트북에서 patch로 고쳤다.
 - 받은 원본 A2A 코드는 현재 SDK 1.x와 API가 다르다. 캡스톤은 받은 `06-capstone/` 대신 `course/Chapter02/capstone/`을 쓴다.
