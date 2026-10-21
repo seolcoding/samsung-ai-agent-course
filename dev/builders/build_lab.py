@@ -372,7 +372,8 @@ def build(folder, mode="mc"):
         nb.code(TRUSTSTORE_CODE, visible=True, kind="")
     srcs = [(f, (src_dir(f, chapter, folder) / f["name"]).read_text(encoding="utf-8")) for f in spec["files"]]
     # 디버그 셀은 노트북 커널에서 LangChain을 돌릴 때만 둔다. 파일로 써서 따로 띄우는 앱(Streamlit 등)에는 적용되지 않는다
-    if any(re.search(r"^\s*(from|import) (langchain|langgraph)", src, re.M) and not f.get("writefile") for f, src in srcs):
+    # spec "debug": false면 넣지 않는다(출력이 너무 길어 흐름이 안 보이는 실습, 2026-10-21 4-1 보강)
+    if spec.get("debug", True) and any(re.search(r"^\s*(from|import) (langchain|langgraph)", src, re.M) and not f.get("writefile") for f, src in srcs):
         tools = any(re.search(r"@tool\b|ToolNode|bind_tools", src) for f, src in srcs if not f.get("writefile"))
         nb.md(DEBUG_MD + ("\n\n" + DEBUG_TOOL_NOTE if tools else ""))
         nb.code(DEBUG_CODE, visible=True, kind="")
