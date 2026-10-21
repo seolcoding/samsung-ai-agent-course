@@ -206,6 +206,7 @@ course/Chapter02/notebooks/*.py
 !course/Chapter02/notebooks/friends_a2a_server.py
 !course/Chapter02/notebooks/a2a_server.py
 course/Chapter02/notebooks/harness/
+course/Chapter02/notebooks/harness_plus/
 course/Chapter02/capstone/solution.py
 
 # 강사 개인 공부용 노트북(따라치기·강사용). Git에 넣지 않는다.

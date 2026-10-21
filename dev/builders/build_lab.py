@@ -59,12 +59,13 @@ UNITS = {
     "02-a2a": ("3-3", "a2a"),
     "03-langgraph-advanced": ("3-4", "langgraph_advanced"),
     "04-harness": ("4-1", "harness"),
+    "04-harness-hitl": ("4-1", "harness_hitl"),  # 4-1 보강(2026-10-21): 사람 승인·질문·파일 권한·하위 Agent
     "05-observability": ("4-2", "observability"),
 }
 
 
 # M2에서 값 바꾸기판으로 바꾼 실습(2026-10-21 사용자 결정: 객관식 보기 대신 완성 코드 + CHANGE_HERE)
-CHANGE_M2 = {"01-mcp", "02-a2a", "03-langgraph-advanced", "04-harness", "05-observability"}
+CHANGE_M2 = {"01-mcp", "02-a2a", "03-langgraph-advanced", "04-harness", "04-harness-hitl", "05-observability"}
 
 
 def chapter_of(folder):
